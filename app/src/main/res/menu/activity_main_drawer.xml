@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2016 Sandip Vaghela (AfterROOT)
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/pointer_settings">
+        <menu>
+            <item android:title="@string/text_change_color"
+                  android:id="@+id/change_color"
+                android:icon="@drawable/ic_action_color"/>
+            <item android:title="Reset Color"
+                  android:id="@+id/reset_color"
+                  android:icon="@drawable/ic_action_reset"/>
+            <item android:title="@string/apply_pointer"
+                  android:id="@+id/apply_pointer"
+                android:icon="@drawable/ic_action_apply"/>
+            <item android:title="@string/title_activity_pointer_preview"
+                  android:id="@+id/preview"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/newPointerAct"
+        android:title="New Pointer"/>
+    <item
+        android:id="@+id/action_copy_pointers"
+        android:title="@string/copy_pointers"
+        android:icon="@drawable/ic_action_copy"/>
+    <item
+        android:id="@+id/reboot"
+        android:title="@string/reboot"
+        android:icon="@drawable/ic_action_reset"/>
+    <group android:id="@+id/misc">
+        <item
+            android:id="@+id/action_changelog"
+            android:title="@string/changelog_full_title"
+            android:icon="@drawable/ic_action_changelog"/>
+    </group>
+    <group android:id="@+id/grpSettings">
+        <item
+            android:id="@+id/settings"
+            android:title="Settings"
+            android:icon="@drawable/ic_action_settings"/>
+        <item
+            android:id="@+id/support"
+            android:title="Support"
+            android:icon="@drawable/ic_action_help"
+            android:visible="false"/>
+    </group>
+</menu>

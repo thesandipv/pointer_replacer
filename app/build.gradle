@@ -1,0 +1,64 @@
+/*
+ * AfterROOT
+ */
+
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        config {
+            keyAlias 'afterroot'
+            keyPassword 'supercell'
+            storeFile file('C:/Users/After_ROOT/arks.jks')
+            storePassword 'supercell'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+    defaultConfig {
+        applicationId "afterroot.pointerreplacer"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 22
+        versionName '1.6.3'
+        signingConfig signingConfigs.config
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
+        }
+    }
+    productFlavors {
+    }
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+    mavenCentral()
+}
+
+dependencies {
+    provided fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:support-v4:23.2.0'
+    compile 'com.android.support:cardview-v7:23.2.0'
+    compile 'com.android.support:design:23.2.0'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.6@aar') {
+        transitive = true
+    }
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.6@aar') {
+        transitive = true
+    }
+    compile 'com.github.yukuku:ambilwarna:2.0'
+    compile 'org.adw.library:discrete-seekbar:1.0.0'
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
+    compile 'com.flipboard:bottomsheet-core:1.5.0'
+    compile 'com.flipboard:bottomsheet-commons:1.5.0'
+}

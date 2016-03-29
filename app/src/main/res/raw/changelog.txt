@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#000000 }
+      div.title    {
+        color:#ff1744;
+        font-size:1.2em;
+        font-weight:bold;
+        margin-top:1em;
+        margin-bottom:0.5em;
+        text-align:center }
+      div.subtitle {
+        color:#ff1744;
+        font-size:0.8em;
+        margin-bottom:1em;
+        text-align:center }
+      div.freetext { color:#000000 }
+      div.list     { color:#000000 }
+    </style>
+  </head>
+  <body>
+    $ 1.6.2
+      % Version 1.6.2
+      _ 12-3-2016
+      * New: You can see Pointer Preview before applying pointer.
+      * New: You can check for update from Settings
+      * New: Now you can set max pointer size from Settings. Max limit is 999.
+      * New: DayNight theme from AppCompat Support Library. (You can enable it from Settings)
+    $ 1.6.1
+      % Version 1.6.1
+      _ 06-03-2016
+      * Fixed: Pointer not changing on Jellybean and Kitkat devices.
+    $ 1.6
+      % Version 1.6
+      _ 06-03-2016
+      * New Card UI
+      * New Color Picker from Material-Dialogs Library
+      * You can change Card Background Color from settings
+      * Max size for pointer is 300*300
+    $ 1.5.7
+      % Version 1.5.7
+      _ 25-12-2015
+      * Added Reset Color option.
+      * Minimum Pointer Size is based on device dpi. If your device is hdpi then minimum pointer size will 49*49 and if your device is xhdpi then minimum pointer size will 66*66.
+      * Added Padding Slider. After minimum pointer size use padding to decrease pointer scale.
+      * Fixed Current pointer text looking half when pointer is set to minimum size.
+      * Some UI Changes.
+    $ 1.5.6
+      % Version 1.5.6
+      _ 11-12-2015
+      * New Christmas Pointers.
+      * New 3 Heart Pointers.
+      * Some Bug Fixes.
+    $ 1.5.5B
+      % Version 1.5.5B
+      _ 25-11-2015
+      * New Icon
+      * Added Live Grid Preview & Semi-Live Grid Preview.
+      * Added Reset Size Function.
+      * Added Reboot/Soft-reboot Prompt after confirming pointer.
+      * Added 1 new pointer posted by blue_hmay@naver.com
+      * Layout Improvement.
+    $ 1.5.4
+      % Version 1.5.4
+      _ 29-10-2015
+      * Now with <a href="http://petoria.de/android-change-log/">Android Change Log</a>!
+      * Minor Layout improvement.
+      * Added Pointer resizing function.
+      * Added 55 new pointers posted by <a href="http://forum.xda-developers.com/member.php?u=4488087">Hermankzr@XDA</a>.
+      * Now color picker remember picked color.
+    $ 1.5.3
+      % Version 1.5.3
+      _ 26-10-2015
+      * Now pointer size is based on device dpi. [experimental]
+      * Added G+ Community Link
+    $ 1.5.2
+      % Version 1.5.2
+      _ 25-10-2015
+      Fixed
+      * Reduced pointer size.
+      Added
+      * Transparent Customize Activity Background.
+      * Now Customize activity can load all available pointers from [path-to-sdcard]/Pointers/
+      Removed
+      * Load From SD button
+    $ 1.5.1
+      % Version 1.5.1
+      _ 21-10-2015
+      * Added Load from SDCard option to load pointer image from [path-to-sdcard]/Pointers/pointer.png
+      * Added WRITE_EXTERNAL_STORAGE back for loading pointer from sdcard.
+      * Added 4 new different pointers. [Rectangle, GPS, Arrow, Default]
+      * Reduced Size of pointer.
+    $ 1.4
+      % Version 1.4
+      _ 02-10-2015
+      * Replaced RGB color picker with Color Picker Dialog for better color selection.
+      * Removed WRITE_EXTERNAL_STORAGE permission.
+    $ 1.3
+      % Version 1.3 build 10
+      _ 01-10-2015
+      *Added RGB color picker that changes color of Pointer. Cheers!!
+      % Version 1.3 build 8
+      * Removed support for ICS. Sorry.
+    $ 1.2
+      % Version 1.2 build 5
+      * Enabled Action Bar.
+      * Now Action Bar is Purple.
+      % Version 1.2 build 4
+      * Added Purple Concentric Circle Type Pointer [Removed Old Pointer]
+      * Now Action Bar is Hidden in Main Activity.
+    $ 1.1
+      % Version 1.1
+      * Added UI of App
+      * Simple Material Design
+      * Purple Status Bar & Navigation Bar [Only Lollipop and above]
+    $ 1.0
+      % Version 1.0
+      * Initial Release
+    $ END_OF_CHANGE_LOG
+  </body>
+</html>

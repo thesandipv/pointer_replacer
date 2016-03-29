@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright (C) 2016 Sandip Vaghela (AfterROOT)
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="version">v1.6.3 (22)</string>
+
+    <string name="TITLE_XDA_THREAD">XDA Thread</string>
+    <string name="TITLE_VISIT_AR">Visit AfterROOT</string>
+    <string name="TITLE_VISIT_G_PLUS">G+ Community</string>
+
+    <string name="key_cardColor">pref_card_color</string>
+    <string name="key_pointerSize">POINTER_SIZE</string>
+    <string name="key_pointerPath">POINTER_PATH</string>
+    <string name="key_pointersVersion">POINTERS_VERSION</string>
+    <string name="key_oldColor">OLD_COLOR</string>
+    <string name="key_oldCardColor">OLD_CARD_COLOR</string>
+    <string name="key_useMDCC">use_md_cc</string>
+    <string name="key_enable_daynight">key_enable_daynight</string>
+    <string name="key_cardColAlt">pref_card_color_alt</string>
+    <string name="key_maxPointerSize">maxPointerSize</string>
+    <string name="key_selectedPointerPath">SELECTED_POINTER_PATH</string>
+
+    <!-- urls -->
+    <string name="url_xda_thread">http://goo.gl/mpj4S8</string>
+    <string name="url_ar">http://goo.gl/7wV9LR</string>
+    <string name="url_prx">http://repo.xposed.info/module/afterroot.pointerreplacer</string>
+    <string name="url_g_plus">http://goo.gl/r8A681</string>
+
+    <!--changelog dialog-->
+    <string name="changelog_full_title">Changelog</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">Full Changelog</string>
+
+
+    <string name="app_name">Pointer Replacer</string>
+    <string name="title_activity_pointer_preview">Pointer Preview</string>
+    <string name="title_activity_update">Update PR</string>
+    <string name="title_activity_new_pointer">New Pointer</string>
+
+    <string name="text_change_text_color">Change Text Color</string>
+
+    <string name="text_changelog">Changelog</string>
+    <string name="text_xda_thread">XDA Thread</string>
+    <string name="xmodule_description">Simple Module To Replace Touch Pointer. Coded by sandipv22@xda.</string>
+    <string name="text_will_change_to">Pointer Will Be Changed To:</string>
+    <string name="text_change_color">Change Color</string>
+    <string name="text_cur_pointer">Current Pointer:</string>
+    <string name="reset_size">Reset Size &amp; Padding</string>
+    <string name="apply_pointer">Apply Pointer</string>
+    <string name="pointer_settings">Pointer Settings</string>
+    <string name="copy_pointers">Copy Pointer</string>
+    <string name="about">About</string>
+    <string name="reboot">Reboot</string>
+    <string name="sign_minus">-</string>
+    <string name="sign_plus">+</string>
+    <string name="pointerFolderName">/Pointer Replacer/Pointers/</string>
+    <string name="choose_pointer_color">Choose Pointer Color</string>
+    <string name="choose_color_picker">Choose Color Picker</string>
+    <string name="choose_back_color">Choose Background Color</string>
+
+    <array name="CCItems">
+        <item>HSV Color Picker</item>
+        <item>Material Color Picker</item>
+    </array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="text_module_info">Module Info</string>
+    <string name="text_max_pointer_size">Max Pointer Size</string>
+</resources>
