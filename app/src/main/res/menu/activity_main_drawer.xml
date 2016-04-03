@@ -31,9 +31,6 @@
         </menu>
     </item>
     <item
-        android:id="@+id/newPointerAct"
-        android:title="New Pointer"/>
-    <item
         android:id="@+id/action_copy_pointers"
         android:title="@string/copy_pointers"
         android:icon="@drawable/ic_action_copy"/>
