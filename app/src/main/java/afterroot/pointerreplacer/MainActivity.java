@@ -713,9 +713,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.preview:
                 showPreview(true);
                 break;
-            case R.id.newPointerAct:
-                startActivity(new Intent(this, NewPointerActivity.class));
-                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

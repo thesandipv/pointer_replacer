@@ -61,7 +61,12 @@ public class UpdateActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+
 
         initialize();
     }
@@ -125,7 +130,7 @@ public class UpdateActivity extends AppCompatActivity {
                     buttonUpdate.setVisibility(View.VISIBLE);
                 } else {
                     buttonUpdate.setEnabled(false);
-                    buttonUpdate.setText("You already have latest version.");
+                    buttonUpdate.setText(R.string.text_already_latest);
                 }
 
                 String changelogVerCode = String.format("Changelog for v%s (%s)", newVersionName, vercode);
@@ -169,10 +174,10 @@ public class UpdateActivity extends AppCompatActivity {
     private static String convertStreamToString(InputStream inputStream) throws UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         StringBuilder sb = new StringBuilder();
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null){
-                sb.append(line + "\n");
+                sb.append(line).append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -253,7 +258,7 @@ public class UpdateActivity extends AppCompatActivity {
 
         public static final String
                 URL_GITHUB = "https://raw.githubusercontent.com/",
-                URL_REPO = URL_GITHUB + "sandipv22/pointer_replacer/master/updater/",
+                URL_REPO = URL_GITHUB + "sandipv22/pointer_replacer/main/version_checker/",
                 URL_VERSION_CODE = URL_REPO + "version_code.txt",
                 URL_VERSION_NAME = URL_REPO + "version_name.txt",
                 URL_CHANGELOG = URL_REPO + "changelog.txt";

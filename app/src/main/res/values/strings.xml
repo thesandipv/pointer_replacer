@@ -80,4 +80,5 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="text_module_info">Module Info</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
+    <string name="text_already_latest">You already have latest version.</string>
 </resources>

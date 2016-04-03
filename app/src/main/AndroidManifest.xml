@@ -72,15 +72,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="afterroot.pointerreplacer.SettingsActivity"/>
         </activity>
-        <activity
-            android:name=".NewPointerActivity"
-            android:label="@string/title_activity_new_pointer"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="afterroot.pointerreplacer.MainActivity"/>
-        </activity>
     </application>
 
 </manifest>
