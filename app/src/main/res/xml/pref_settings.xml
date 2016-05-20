@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="Pointer Settings">
         <Preference
@@ -23,56 +22,10 @@
             android:key="@string/key_maxPointerSize"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="UI Settings">
-        <Preference
-            android:key="@string/key_cardColor"
-            android:title="Cards Background Color"
-            android:summary="Change Background color of Cards"/>
-        <CheckBoxPreference
-            android:title="Enable DayNight Theme (Beta)"
-            android:key="@string/key_enable_daynight"
-            android:summary="When enabled theme will changed according to day and night"/>
-    </PreferenceCategory>
-    <PreferenceCategory
         android:title="Color Picker">
         <Preference
             android:key="@string/key_useMDCC"
             android:title="Use which color picker"
             android:summary="Choose which color picker to use."/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="About">
-        <Preference
-            android:title="@string/TITLE_XDA_THREAD">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/url_xda_thread"/>
-        </Preference>
-        <Preference
-            android:title="@string/TITLE_VISIT_G_PLUS">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/url_g_plus"/>
-        </Preference>
-        <Preference
-            android:title="@string/TITLE_VISIT_AR">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/url_ar"/>
-        </Preference>
-        <Preference
-            android:title="@string/text_module_info">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/url_prx"/>
-        </Preference>
-        <Preference
-            android:title="Update"
-            android:key="pref_update"/>
-        <Preference
-            android:title="Licenses"
-            android:key="licenses"
-            android:summary="Click to view licenses of third party libraries"/>
     </PreferenceCategory>
 </PreferenceScreen>
