@@ -15,42 +15,35 @@
 
 <resources>
 
-    <style name="AppTheme.Main" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
-    </style>
-
-    <style name="AppTheme.TransparentBack" parent="AppTheme.Main">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowShowWallpaper">true</item>
-    </style>
-
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <!--Style of MainActivity-->
+    <style name="AppTheme.Dark" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.AppBar" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <!--Style of SettingsActivity-->
+    <style name="AppTheme.AppBar" parent="Theme.AppCompat">
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.Default" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <!--Style of DrawerLayout-->
+    <style name="AppTheme" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.Launch">
+    <!--Style of MainActivity-launch-->
+    <style name="AppTheme.Dark.Launch">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 

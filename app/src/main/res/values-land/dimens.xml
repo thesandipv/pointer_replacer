@@ -15,11 +15,6 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">#191919</color>
-    <color name="colorAccent">#2979ff</color>
-    <color name="col_seek_bubble">@color/colorAccent</color>
-    <color name="col_seek_ripple">#742196f3</color>
-
-    <color name="color_text_primary">#ffffff</color>
+    <dimen name="activity_horizontal_margin">50dp</dimen>
+    <dimen name="activity_vertical_margin">8dp</dimen>
 </resources>

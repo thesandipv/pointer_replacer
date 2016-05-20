@@ -20,17 +20,14 @@
     <string name="TITLE_VISIT_AR">Visit AfterROOT</string>
     <string name="TITLE_VISIT_G_PLUS">G+ Community</string>
 
-    <string name="key_cardColor">pref_card_color</string>
     <string name="key_pointerSize">POINTER_SIZE</string>
     <string name="key_pointerPath">POINTER_PATH</string>
     <string name="key_pointersVersion">POINTERS_VERSION</string>
     <string name="key_oldColor">OLD_COLOR</string>
-    <string name="key_oldCardColor">OLD_CARD_COLOR</string>
     <string name="key_useMDCC">use_md_cc</string>
-    <string name="key_enable_daynight">key_enable_daynight</string>
-    <string name="key_cardColAlt">pref_card_color_alt</string>
     <string name="key_maxPointerSize">maxPointerSize</string>
     <string name="key_selectedPointerPath">SELECTED_POINTER_PATH</string>
+    <string name="key_app_info">key_app_info</string>
 
     <!-- urls -->
     <string name="url_xda_thread">http://goo.gl/mpj4S8</string>
@@ -49,23 +46,34 @@
     <string name="title_activity_pointer_preview">Pointer Preview</string>
     <string name="title_activity_update">Update PR</string>
     <string name="title_activity_new_pointer">New Pointer</string>
+    <string name="title_activity_about">About</string>
 
-    <string name="text_change_text_color">Change Text Color</string>
+    <string name="xmodule_description">Simple Module To Replace Touch Pointer. Coded by sandipv22@xda.</string>
 
     <string name="text_changelog">Changelog</string>
     <string name="text_xda_thread">XDA Thread</string>
-    <string name="xmodule_description">Simple Module To Replace Touch Pointer. Coded by sandipv22@xda.</string>
     <string name="text_will_change_to">Pointer Will Be Changed To:</string>
-    <string name="text_change_color">Change Color</string>
+    <string name="text_change_color">Change Pointer Color</string>
     <string name="text_cur_pointer">Current Pointer:</string>
+    <string name="text_module_info">Module Info</string>
+    <string name="text_max_pointer_size">Max Pointer Size</string>
+    <string name="text_already_latest">You already have latest version.</string>
+    <string name="change_background_color">Change Background Color</string>
+    <string name="change_pointer_color">Change Pointer Color</string>
+    <string name="reset_pointer_color">Reset Pointer Color</string>
+    <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
+    <string name="text_current_version">Current Version:</string>
+    <string name="text_new_version">New Version:</string>
+    <string name="text_whats_new">What\'s New</string>
+    <string name="text_update_now">Update Now</string>
+    <string name="text_no_connection">No Connection</string>
+    <string name="text_retry">Retry</string>
+
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="apply_pointer">Apply Pointer</string>
     <string name="pointer_settings">Pointer Settings</string>
     <string name="copy_pointers">Copy Pointer</string>
-    <string name="about">About</string>
     <string name="reboot">Reboot</string>
-    <string name="sign_minus">-</string>
-    <string name="sign_plus">+</string>
     <string name="pointerFolderName">/Pointer Replacer/Pointers/</string>
     <string name="choose_pointer_color">Choose Pointer Color</string>
     <string name="choose_color_picker">Choose Color Picker</string>
@@ -78,7 +86,4 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="text_module_info">Module Info</string>
-    <string name="text_max_pointer_size">Max Pointer Size</string>
-    <string name="text_already_latest">You already have latest version.</string>
 </resources>
