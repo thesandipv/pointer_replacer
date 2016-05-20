@@ -20,14 +20,15 @@
             <item android:title="@string/text_change_color"
                   android:id="@+id/change_color"
                 android:icon="@drawable/ic_action_color"/>
-            <item android:title="Reset Color"
+            <item android:title="Reset Pointer Color"
                   android:id="@+id/reset_color"
                   android:icon="@drawable/ic_action_reset"/>
             <item android:title="@string/apply_pointer"
                   android:id="@+id/apply_pointer"
                 android:icon="@drawable/ic_action_apply"/>
             <item android:title="@string/title_activity_pointer_preview"
-                  android:id="@+id/preview"/>
+                  android:id="@+id/preview"
+                android:icon="@drawable/ic_action_preview"/>
         </menu>
     </item>
     <item
@@ -50,9 +51,9 @@
             android:title="Settings"
             android:icon="@drawable/ic_action_settings"/>
         <item
-            android:id="@+id/support"
-            android:title="Support"
-            android:icon="@drawable/ic_action_help"
-            android:visible="false"/>
+            android:id="@+id/about"
+            android:icon="@drawable/ic_action_about"
+            android:title="About"/>
+
     </group>
 </menu>

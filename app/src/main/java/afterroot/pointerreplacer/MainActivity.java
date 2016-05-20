@@ -15,13 +15,14 @@
 
 package afterroot.pointerreplacer;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,12 +30,12 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,33 +69,33 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 
 import static afterroot.pointerreplacer.Utils.getDpi;
 import static afterroot.pointerreplacer.Utils.loadToBottomSheetGrid;
-import static afterroot.pointerreplacer.Utils.setNightModeEnabled;
 import static afterroot.pointerreplacer.Utils.showSnackbar;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ColorChooserDialog.ColorCallback {
 
-    int mPointersVersion, latestPointerVersion, mCardColor, oldColor;
+    int mPointersVersion, latestPointerVersion, oldColor;
     DiscreteSeekBar mPointerSizeBar, mPaddingBar;
     ImageView mPointerSelected, mCurrentPointer;
     TextView mTextSize, mPaddingSize, mTextCurrentPointer, mTextSelectedPointer;
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mEditor;
     String mPointersFolder, mExtSdDir, mTargetPath, mTag, mPointerPreviewPath;
-    CardView mPointerCard, mSlidersCard, mMenuCard;
     Boolean isUseMDCC;
     Toolbar mToolbar;
     File mFolderPointers; GridView mGridView;
     BottomSheetLayout bottomSheet;
     ActionBarDrawerToggle toggle;
     DrawerLayout drawer;
+    String[] PERMISSIONS = new String[] {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE};
+    PermissionChecker permissionChecker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme_Main);
-        setNightModeEnabled(PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean(getString(R.string.key_enable_daynight), false));
+        setTheme(R.style.AppTheme_Dark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -104,20 +105,39 @@ public class MainActivity extends AppCompatActivity
         setToggle();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        int tintlistid;
-        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.key_enable_daynight), false)){
+        if (navigationView != null){
+            navigationView.setNavigationItemSelectedListener(this);
+            int tintlistid;
             tintlistid = R.color.nav_state_list;
-        } else {
-            tintlistid = R.color.nav_state_list_dark;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                navigationView.setItemIconTintList(getResources().getColorStateList(tintlistid, getTheme()));
+            } else {
+                navigationView.setItemIconTintList(getResources().getColorStateList(tintlistid));
+            }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            navigationView.setItemIconTintList(getResources().getColorStateList(tintlistid, getTheme()));
-        } else {
-            navigationView.setItemIconTintList(getResources().getColorStateList(tintlistid));
-        }
+        checkPermissions();
 
         initialize();
+
+    }
+
+    static final int REQUEST_CODE = 0;
+    public void checkPermissions(){
+        permissionChecker = new PermissionChecker(this);
+        if (permissionChecker.lacksPermissions(PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE);
+        }
+    }
+
+    boolean PERMISSION_GRANTED;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case REQUEST_CODE:
+                PERMISSION_GRANTED = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void setToggle(){
@@ -134,13 +154,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-        setColors();
+        checkPermissions();
         getPointer();
         setSeekbar();
-        //getPointer();
-        setNightModeEnabled(PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean(getString(R.string.key_enable_daynight), false));
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -160,7 +176,6 @@ public class MainActivity extends AppCompatActivity
      */
     public void setInts(){
         latestPointerVersion = 3;
-        mCardColor = mSharedPreferences.getInt(getString(R.string.key_cardColor), Color.WHITE);
     }
 
     /**
@@ -184,9 +199,6 @@ public class MainActivity extends AppCompatActivity
         mTextSelectedPointer = (TextView) findViewById(R.id.textSelectedPointer);
         mPointerSelected = (ImageView) findViewById(R.id.pointerSelected);
         mCurrentPointer = (ImageView) findViewById(R.id.image_current_pointer);
-        mPointerCard = (CardView) findViewById(R.id.cardView);
-        mSlidersCard = (CardView) findViewById(R.id.slidersCard);
-        mMenuCard = (CardView) findViewById(R.id.card1);
     }
 
     /**
@@ -198,11 +210,6 @@ public class MainActivity extends AppCompatActivity
         newPointerCopier();
         getPointer();
         setSeekbar();
-        setColors();
-    }
-
-    public void startPointerPreview(View view){
-        showPreview(true);
     }
 
     public void showPreview(boolean isStartPreview){
@@ -240,6 +247,10 @@ public class MainActivity extends AppCompatActivity
             if (!mFolderPointers.exists()) {
                 mFolderPointers.mkdirs();
                 copyAssets();
+            }
+            File dotnomedia = new File(mExtSdDir+"/Pointer Replacer/.nomedia");
+            if (!dotnomedia.exists()){
+                dotnomedia.createNewFile();
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -303,6 +314,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         mGridView = (GridView) findViewById(R.id.bs_gridView);
+
         loadToBottomSheetGrid(this, mGridView, mTargetPath, new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -393,36 +405,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Set Cards Colors
-     */
-    public void setColors(){
-        TextView textChoosePointer = (TextView) findViewById(R.id.textChoosePointer);
-        TextView textViewPreview = (TextView) findViewById(R.id.textViewPreview);
-        setInts();
-        int invertedColor = getInverseColor(mCardColor);
-        mPointerCard.setCardBackgroundColor(mCardColor);
-        mSlidersCard.setCardBackgroundColor(mCardColor);
-        mMenuCard.setCardBackgroundColor(mCardColor);
-        mTextSize.setTextColor(invertedColor);
-        mPaddingSize.setTextColor(invertedColor);
-        mTextCurrentPointer.setTextColor(invertedColor);
-        mTextSelectedPointer.setTextColor(invertedColor);
-        textChoosePointer.setTextColor(invertedColor);
-        textViewPreview.setTextColor(invertedColor);
-    }
-
-    /**
-     * @param color color to be inversed
-     * @return opposite colors.
-     */
-    private int getInverseColor(int color){
-        int red = Color.red(color);
-        int green = Color.green(color);
-        int blue = Color.blue(color);
-        return Color.rgb(255 - red, 255 - green, 255 - blue);
-    }
-
-    /**
      * @param progress Integer value to be set as progress.
      */
     public void setSeekBarProgress(int progress){
@@ -478,7 +460,7 @@ public class MainActivity extends AppCompatActivity
         String textReboot = getString(R.string.reboot);
         new MaterialDialog.Builder(this)
                 .title(textReboot)
-                .theme(Theme.LIGHT)
+                .theme(Theme.DARK)
                 .content("Do you want to Reboot?")
                 .positiveText(textReboot)
                 .negativeText("Cancel")
@@ -596,12 +578,20 @@ public class MainActivity extends AppCompatActivity
         if (file.exists()) {
             file.delete();
         }
+        File dotnomedia = new File(mExtSdDir+"/Pointer Replacer/.nomedia");
+        if (!dotnomedia.exists()){
+            try {
+                dotnomedia.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void showConfirmDialog(){
         new MaterialDialog.Builder(this)
                 .title("Confirm Copy")
-                .theme(Theme.LIGHT)
+                .theme(Theme.DARK)
                 .content("Do you want to copy pointers to\n" +
                         mTargetPath + "\n"+
                         "Do only if pointers are not copied automatically.")
@@ -620,7 +610,7 @@ public class MainActivity extends AppCompatActivity
         Drawable drawable = mPointerSelected.getDrawable();
         new MaterialDialog.Builder(this)
                 .title("Are You Sure?")
-                .theme(Theme.LIGHT)
+                .theme(Theme.DARK)
                 .content("Do you want to apply this pointer?")
                 .positiveText("Yes")
                 .negativeText("No")
@@ -673,6 +663,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 mPaddingBar.setProgress(0);
             } return true;
+            case R.id.viewPreview:
+                showPreview(true);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -712,6 +704,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.preview:
                 showPreview(true);
+                break;
+            case R.id.about:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
 
