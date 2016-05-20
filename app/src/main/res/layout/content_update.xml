@@ -37,14 +37,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textCurrentVersion"
-                android:text="Current Version:"
+                android:text="@string/text_current_version"
                 android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-light"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textNewVersion"
-                android:text="New Version:"
+                android:text="@string/text_new_version"
                 android:layout_below="@+id/textCurrentVersion"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="What&apos;s New"
+                android:text="@string/text_whats_new"
                 android:textSize="20sp"
                 android:id="@+id/textWhatsNew"
                 android:layout_below="@+id/textNewVersion"
@@ -66,39 +66,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textNewChangelog"
-                android:text="Changelog \nNew:\nFixed:\nUpdated:"
                 android:layout_below="@+id/textWhatsNew"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-light"/>
 
-            <android.support.v7.widget.AppCompatButton
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonUpdate"
-                android:text="Update Now"
+                android:text="@string/text_update_now"
                 android:layout_below="@+id/textNewChangelog"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-light"
-                android:enabled="true"
+
                 android:textColor="@android:color/white"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonCheckUpdate"
-        android:text="Check For Update"
-        android:fontFamily="sans-serif-light"
-        android:enabled="true"
-        android:textColor="@android:color/white"
-        android:layout_centerInParent="true"
-        android:onClick="checkForUpdate"
-        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -110,12 +97,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Connection"/>
-        <android.support.v7.widget.AppCompatButton
+            android:text="@string/text_no_connection"/>
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/buttonRetry"
-            android:text="Retry"
+            android:text="@string/text_retry"
             android:fontFamily="sans-serif-light"
             android:enabled="true"
             android:textColor="@android:color/white"

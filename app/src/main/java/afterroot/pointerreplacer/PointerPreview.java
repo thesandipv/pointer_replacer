@@ -15,6 +15,7 @@
 
 package afterroot.pointerreplacer;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -52,6 +54,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mEditor;
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,14 +62,15 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         mToolbar= (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.preview_fab_apply);
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showSureDialog();
+                }
+            });
+        }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
@@ -74,7 +78,9 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         previewLayout = (RelativeLayout) findViewById(R.id.preview_layout);
         previewPointer = (ImageView) findViewById(R.id.preview_pointer);
         previewMain = (LinearLayout) findViewById(R.id.previewMain);
-        previewMain.setVisibility(View.INVISIBLE);
+        if (previewMain != null) {
+            previewMain.setVisibility(View.INVISIBLE);
+        }
 
         previewLayout.setBackgroundColor(getOldColor());
 
@@ -101,7 +107,11 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
             }
         });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
     }
 
     public void changePreviewBack(View view) {
@@ -115,13 +125,11 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
     }
 
     public int getOldColor(){
-        int oldColor = mSharedPreferences.getInt("PREVIEW_OLD_COLOR", -1);
-        return oldColor;
+        return mSharedPreferences.getInt("PREVIEW_OLD_COLOR", 16777215);
     }
 
     public int getOldPointerColor(){
-        int oldpointer = mSharedPreferences.getInt("PREVIEW_POINTER_OLD_COLOR", -1);
-        return oldpointer;
+        return mSharedPreferences.getInt("PREVIEW_POINTER_OLD_COLOR", -1);
     }
 
     @Override
@@ -152,7 +160,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         Drawable drawable = previewPointer.getDrawable();
         new MaterialDialog.Builder(this)
                 .title("Are You Sure?")
-                .theme(Theme.LIGHT)
+                .theme(Theme.DARK)
                 .content("Do you want to apply this pointer?")
                 .positiveText("Yes")
                 .negativeText("No")
@@ -204,7 +212,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         String textReboot = getString(R.string.reboot);
         new MaterialDialog.Builder(this)
                 .title(textReboot)
-                .theme(Theme.LIGHT)
+                .theme(Theme.DARK)
                 .content("All Changed applied. Do you want to Reboot?")
                 .positiveText(textReboot)
                 .negativeText("Cancel")
@@ -232,10 +240,6 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                     }
                 })
                 .show();
-    }
-
-    public void applyPointer(View view) {
-        showSureDialog();
     }
 
     public void resetColor(View view) {

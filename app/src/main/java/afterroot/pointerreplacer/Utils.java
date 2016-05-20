@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
@@ -51,26 +50,11 @@ public class Utils {
         return super.toString();
     }
 
-    /**
-     * @param view view that snackbar will displayed
-     * @param message message that to be displayed in snackbar
-     */
     public static void showSnackbar(View view, String message){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.setAction("Dismiss", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                snackBar.dismiss();
-            }
-        });
         snackBar.show();
     }
 
-    /**
-     * @param view view that snackbar will displayed
-     * @param message message that to be displayed in snackbar
-     * @param action action name that will display in snackbar
-     */
     public static void showSnackbar(View view, String message, String action){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.setAction(action, new View.OnClickListener() {
@@ -82,33 +66,14 @@ public class Utils {
         snackBar.show();
     }
 
-    /**
-     * @param context the context
-     * @return current DPI
-     */
     public static int getDpi(Context context){
         return context.getResources().getDisplayMetrics().densityDpi;
     }
 
-    /**
-     * @param view view that snackbar will displayed
-     * @param message message that to be displayed in snackbar
-     * @param action action name that will display in snackbar
-     * @param listener onclick listener for action
-     */
-    public static void showSnackbar(View view, String message, String action, View.OnClickListener listener){
+    public static void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.setAction(action, listener);
+        snackBar.setAction(action, action_listener);
         snackBar.show();
-    }
-
-    /**
-     * @param isEnable whather to enable night mode or not
-     */
-    public static void setNightModeEnabled(boolean isEnable){
-        if (isEnable){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
-        }
     }
 
     /**
@@ -200,7 +165,6 @@ public class Utils {
                 imageView = new ImageView(mContext);
                 imageView.setLayoutParams(new GridView.LayoutParams(param, param));
                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                //imageView.setPadding(mPadding, mPadding, mPadding, mPadding);
             } else {
                 imageView = (ImageView) convertView;
             }

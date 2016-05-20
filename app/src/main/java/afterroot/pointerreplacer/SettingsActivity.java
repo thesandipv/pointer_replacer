@@ -16,7 +16,6 @@
 package afterroot.pointerreplacer;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -26,63 +25,22 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
-
-import de.psdev.licensesdialog.LicensesDialog;
-import yuku.ambilwarna.AmbilWarnaDialog;
 
 
-public class SettingsActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
+public class SettingsActivity extends AppCompatActivity {
 
-    Preference mPointerCardPref, mChooseColorPicker;
+    Preference mChooseColorPicker;
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mEditor;
-    Boolean isUseMDCC;
-    int oldColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Utils.setNightModeEnabled(true);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
-    }
-
-    public int getOldColor(){
-        oldColor = mSharedPreferences.getInt(getString(R.string.key_oldCardColor), -1);
-        return oldColor;
-    }
-
-    public void buildCC(){
-        getOldColor();
-        new ColorChooserDialog.Builder(this, R.string.choose_pointer_color)
-                .titleSub(R.string.choose_pointer_color)
-                .accentMode(false)
-                .allowUserColorInputAlpha(true)
-                .dynamicButtonColor(false)
-                .preselect(oldColor)
-                .show();
-    }
-
-    /**Show color picker dialog.**/
-    public void showColorPicker() {
-        getOldColor();
-        AmbilWarnaDialog dialog = new AmbilWarnaDialog(this, oldColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-            @Override
-            public void onCancel(AmbilWarnaDialog dialog) {
-                //do nothing.
-            }
-            @Override
-            public void onOk(AmbilWarnaDialog dialog, int color) {
-                mEditor.putInt(getString(R.string.key_cardColor), color).apply();
-                mEditor.putInt(getString(R.string.key_oldCardColor), color).apply();
-            }
-        });
-        dialog.show();
     }
 
     public void showSingleChoice(){
@@ -93,17 +51,13 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                 .itemsCallbackSingleChoice(selectedIndex, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        /**
-                         * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
-                         * returning false here won't allow the newly selected radio button to actually be selected.
-                         **/
-                        Toast.makeText(getBaseContext(), text + " selected", Toast.LENGTH_SHORT).show();
                         mEditor.putInt("selectedIndex", which).apply();
                         if (which == 0) {
                             mEditor.putBoolean(getString(R.string.key_useMDCC), false).apply();
                         } else if (which == 1) {
                             mEditor.putBoolean(getString(R.string.key_useMDCC), true).apply();
                         }
+                        updateCCSummary();
                         return true;
                     }
                 })
@@ -111,49 +65,24 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                 .show();
     }
 
-    @Override
-    public void onColorSelection(@NonNull ColorChooserDialog dialog, int selectedColor) {
-        String keyOldColor = getString(R.string.key_oldCardColor);
-        mEditor.putInt(getString(R.string.key_cardColor), selectedColor).apply();
-        mEditor.putInt(keyOldColor, selectedColor).apply();
+    public void updateCCSummary(){
+        if (mSharedPreferences.getBoolean(getString(R.string.key_useMDCC), true)){
+            mChooseColorPicker.setSummary("Material Color Picker");
+        } else {
+            mChooseColorPicker.setSummary("HSV Color Picker");
+        }
     }
 
     @SuppressLint("ValidFragment")
     public class SettingsFragment extends PreferenceFragment {
-        Preference licenses, maxPointerSize, prefUpdate;
+        Preference maxPointerSize;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            Utils.setNightModeEnabled(false);
             addPreferencesFromResource(R.xml.pref_settings);
 
-            licenses = findPreference("licenses");
-            licenses.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new LicensesDialog.Builder(SettingsActivity.this)
-                            .setNotices(R.raw.notices)
-                            .build()
-                            .showAppCompat();
-                    return false;
-                }
-            });
-
-            mPointerCardPref = findPreference(getString(R.string.key_cardColor));
-            mPointerCardPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    isUseMDCC = mSharedPreferences.getBoolean(getString(R.string.key_useMDCC), true);
-                    if (isUseMDCC){
-                        buildCC();
-                    } else {
-                        showColorPicker();
-                    }
-                    return false;
-                }
-            });
-
             mChooseColorPicker = findPreference(getString(R.string.key_useMDCC));
+            updateCCSummary();
             mChooseColorPicker.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -163,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
             });
 
             maxPointerSize = findPreference(getString(R.string.key_maxPointerSize));
+            maxPointerSize.setSummary(mSharedPreferences.getString(getString(R.string.key_maxPointerSize), null));
             maxPointerSize.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -178,17 +108,9 @@ public class SettingsActivity extends AppCompatActivity implements ColorChooserD
                                     mEditor.putString(getString(R.string.key_maxPointerSize), input.toString());
                                     //mEditor.putInt(getString(R.string.key_maxPointerSize), Integer.parseInt(input.toString()));
                                     mEditor.apply();
+                                    maxPointerSize.setSummary(input);
                                 }
                             }).show();
-                    return false;
-                }
-            });
-
-            prefUpdate = findPreference("pref_update");
-            prefUpdate.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(SettingsActivity.this, UpdateActivity.class));
                     return false;
                 }
             });

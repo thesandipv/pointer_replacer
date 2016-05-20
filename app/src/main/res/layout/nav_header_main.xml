@@ -14,53 +14,56 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:gravity="bottom"
-              android:background="@drawable/side_nav_bar"
-              android:orientation="vertical"
-              android:paddingBottom="@dimen/activity_vertical_margin"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin"
-              android:theme="@style/ThemeOverlay.AppCompat.Dark"
-              android:weightSum="1">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:gravity="bottom"
+    android:background="@drawable/side_nav_bar"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:weightSum="1"
+    tools:ignore="RtlHardcoded">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/header_app_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignBottom="@+id/textHeaderVersion"
-        android:layout_alignTop="@+id/textView2"/>
+        android:layout_above="@+id/header_text_app_name"
+        android:layout_alignLeft="@+id/header_text_app_name"
+        android:layout_alignStart="@+id/header_text_app_name"
+        android:layout_marginBottom="10dp"
+        tools:ignore="ContentDescription"/>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pointer\nReplacer"
-        android:textSize="25sp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:id="@+id/textView2"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView"
-        android:layout_marginLeft="15dp"
-        android:fontFamily="sans-serif-light"/>
-
-    <TextView
-        android:id="@+id/textHeaderVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
+        android:text="@string/app_name"
+        android:textSize="25sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:id="@+id/header_text_app_name"
+        android:fontFamily="sans-serif-light"
+        android:layout_above="@+id/header_text_version"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        android:id="@+id/header_text_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/version"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignStart="@+id/textView2"
-        android:layout_marginTop="15dp"
-        android:fontFamily="sans-serif-light"/>
+        android:fontFamily="sans-serif-light"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="5dp"
+        android:textStyle="italic"/>
 
 </RelativeLayout>

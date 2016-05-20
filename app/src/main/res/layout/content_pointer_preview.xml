@@ -23,7 +23,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="afterroot.pointerreplacer.PointerPreview"
     tools:showIn="@layout/pointer_preview"
-    android:id="@+id/preview_layout">
+    android:id="@+id/preview_layout"
+    tools:ignore="RtlHardcoded">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,43 +33,58 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/preview_pointer"/>
+            android:id="@+id/preview_pointer"
+            tools:ignore="ContentDescription"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/relativeLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp">
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Change Background Color"
-            android:onClick="changePreviewBack"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Change Pointer Color"
-            android:onClick="changePointerBack"/>
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Apply Pointer"
-                android:id="@+id/btn_apply_pointer"
-                android:onClick="applyPointer"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Reset Color"
-                android:id="@+id/btn_reset_color"
-                android:onClick="resetColor"/>
-        </LinearLayout>
-    </LinearLayout>
+            android:text="@string/change_background_color"
+            android:onClick="changePreviewBack"
+            android:id="@+id/button"
+            android:layout_below="@+id/button2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="5dp"
+            android:layout_alignRight="@+id/btn_reset_color"
+            android:layout_alignEnd="@+id/btn_reset_color"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_pointer_color"
+            android:onClick="changePointerBack"
+            android:id="@+id/button2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="5dp"
+            android:layout_alignTop="@+id/btn_reset_color"
+            android:layout_alignBottom="@+id/btn_reset_color"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset_pointer_color"
+            android:id="@+id/btn_reset_color"
+            android:onClick="resetColor"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/button2"
+            android:layout_toEndOf="@+id/button2"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"/>
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tap and move your finger to see preview"
+        android:text="@string/tap_and_move_your_finger_to_see_preview"
         android:id="@+id/textView3"
         android:textSize="15sp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

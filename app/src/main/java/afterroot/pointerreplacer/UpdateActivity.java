@@ -28,10 +28,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +49,7 @@ import static afterroot.pointerreplacer.Utils.showSnackbar;
 
 public class UpdateActivity extends AppCompatActivity {
     TextView textCurrentVersion, textNewVersion, textWhatsNew, textNewChangelog;
-    AppCompatButton buttonUpdate, buttonCheckUpdate;
+    Button buttonUpdate;
     CardView cardView_update;
     LinearLayout layoutNoConnection;
 
@@ -88,8 +88,7 @@ public class UpdateActivity extends AppCompatActivity {
         textWhatsNew = (TextView) findViewById(R.id.textWhatsNew);
         textNewChangelog = (TextView) findViewById(R.id.textNewChangelog);
 
-        buttonUpdate = (AppCompatButton) findViewById(R.id.buttonUpdate);
-        buttonCheckUpdate = (AppCompatButton) findViewById(R.id.buttonCheckUpdate);
+        buttonUpdate = (Button) findViewById(R.id.buttonUpdate);
         layoutNoConnection = (LinearLayout) findViewById(R.id.layoutNoConnection);
 
         setup();
@@ -97,19 +96,17 @@ public class UpdateActivity extends AppCompatActivity {
 
     public void setup(){
         layoutNoConnection.setVisibility(View.GONE);
-        buttonCheckUpdate.setVisibility(View.GONE);
         cardView_update.setVisibility(View.GONE);
-        if (isNetworkAvailable()){
-            buttonCheckUpdate.setVisibility(View.VISIBLE);
-        } else {
+        if (!isNetworkAvailable()){
             layoutNoConnection.setVisibility(View.VISIBLE);
+        } else {
+            checkForUpdate();
         }
     }
 
-    public void checkForUpdate(View view) {
+    public void checkForUpdate() {
         Toast.makeText(this, "Please Wait...", Toast.LENGTH_SHORT).show();
         setupUpdater();
-        buttonCheckUpdate.setVisibility(View.GONE);
         cardView_update.setVisibility(View.VISIBLE);
     }
 
@@ -141,7 +138,7 @@ public class UpdateActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         final String apkName = "PR_"+newVersionName+".apk";
-                        String apkURL = "https://raw.githubusercontent.com/sandipv22/pointer_replacer/master/updater/"+apkName;
+                        String apkURL = "https://raw.githubusercontent.com/sandipv22/pointer_replacer/main/updater/"+apkName;
                         final File downlaodedApk = new File(Environment.getExternalStorageDirectory()+"/Pointer Replacer/Downloads/"+apkName);
                         if (downlaodedApk.exists()){
                             showSnackbar(findViewById(R.id.main_layoutUpdate), apkName+" already exists.");
