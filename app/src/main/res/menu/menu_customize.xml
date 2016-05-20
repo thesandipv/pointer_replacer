@@ -16,8 +16,14 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/reset_grid"
-          android:title="@string/reset_size"
-          app:showAsAction="always"
-          android:icon="@drawable/ic_action_reset"/>
+    <item
+        android:id="@+id/viewPreview"
+        android:title="@string/title_activity_pointer_preview"
+        android:icon="@drawable/ic_action_preview"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/reset_grid"
+        android:title="@string/reset_size"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_tune"/>
 </menu>
