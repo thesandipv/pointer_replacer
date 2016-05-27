@@ -19,9 +19,16 @@
     </style>
   </head>
   <body>
+    $ 1.6.3
+      % Version 1.6.3
+      _ 24-05-2016
+      * New: Improvements for Marshmallow.
+      * New: New Pointers.
+      * New: Added long press to delete pointer.
+      * Other minor improvements and bug fixes.
     $ 1.6.2
       % Version 1.6.2
-      _ 12-3-2016
+      _ 12-03-2016
       * New: You can see Pointer Preview before applying pointer.
       * New: You can check for update from Settings
       * New: Now you can set max pointer size from Settings. Max limit is 999.

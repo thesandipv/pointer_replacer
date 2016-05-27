@@ -26,15 +26,13 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 
 public class XposedMod implements IXposedHookZygoteInit, IXposedHookInitPackageResources {
 
-    String POINTER_PATH;
-    XSharedPreferences mXSharedPreferences;
-    Drawable drawable;
+    private Drawable drawable;
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
-        mXSharedPreferences = new XSharedPreferences("afterroot.pointerreplacer");
-        mXSharedPreferences.makeWorldReadable();
-        POINTER_PATH = mXSharedPreferences.getString("POINTER_PATH", "/data/data/afterroot.pointerreplacer/files/pointer.png");
+        XSharedPreferences XSharedPreferences = new XSharedPreferences("afterroot.pointerreplacer");
+        XSharedPreferences.makeWorldReadable();
+        String POINTER_PATH = XSharedPreferences.getString("POINTER_PATH", "/data/data/afterroot.pointerreplacer/files/pointer.png");
         drawable = Drawable.createFromPath(POINTER_PATH);
         XposedBridge.log("Loaded Pointer from " + POINTER_PATH);
         XposedBridge.log(new Throwable());

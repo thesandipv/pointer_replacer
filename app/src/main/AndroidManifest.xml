@@ -41,6 +41,7 @@
             android:theme="@style/AppTheme.Dark.Launch">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -77,6 +78,14 @@
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.AppBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="afterroot.pointerreplacer.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".HelpActivity"
+            android:label="@string/title_activity_help"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="afterroot.pointerreplacer.MainActivity"/>

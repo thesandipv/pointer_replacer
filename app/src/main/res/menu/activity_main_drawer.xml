@@ -29,6 +29,8 @@
             <item android:title="@string/title_activity_pointer_preview"
                   android:id="@+id/preview"
                 android:icon="@drawable/ic_action_preview"/>
+            <item android:title="Import Pointer"
+                  android:id="@+id/import_pointer"/>
         </menu>
     </item>
     <item
@@ -38,7 +40,7 @@
     <item
         android:id="@+id/reboot"
         android:title="@string/reboot"
-        android:icon="@drawable/ic_action_reset"/>
+        android:icon="@drawable/ic_action_reboot"/>
     <group android:id="@+id/misc">
         <item
             android:id="@+id/action_changelog"

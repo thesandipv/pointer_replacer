@@ -37,6 +37,12 @@
                 android:data="@string/url_g_plus"/>
         </Preference>
         <Preference
+            android:title="@string/text_source_code">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_source_code"/>
+        </Preference>
+        <Preference
             android:title="@string/TITLE_VISIT_AR">
             <intent
                 android:action="android.intent.action.VIEW"

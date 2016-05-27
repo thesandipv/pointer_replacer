@@ -34,6 +34,7 @@
     <string name="url_ar">http://goo.gl/7wV9LR</string>
     <string name="url_prx">http://repo.xposed.info/module/afterroot.pointerreplacer</string>
     <string name="url_g_plus">http://goo.gl/r8A681</string>
+    <string name="url_source_code">http://goo.gl/7jipGN</string>
 
     <!--changelog dialog-->
     <string name="changelog_full_title">Changelog</string>
@@ -47,6 +48,7 @@
     <string name="title_activity_update">Update PR</string>
     <string name="title_activity_new_pointer">New Pointer</string>
     <string name="title_activity_about">About</string>
+    <string name="title_activity_help">Help</string>
 
     <string name="xmodule_description">Simple Module To Replace Touch Pointer. Coded by sandipv22@xda.</string>
 
@@ -62,12 +64,14 @@
     <string name="change_pointer_color">Change Pointer Color</string>
     <string name="reset_pointer_color">Reset Pointer Color</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
-    <string name="text_current_version">Current Version:</string>
-    <string name="text_new_version">New Version:</string>
+    <string name="text_current_version">Current Version</string>
+    <string name="text_new_version">Latest Version</string>
     <string name="text_whats_new">What\'s New</string>
     <string name="text_update_now">Update Now</string>
     <string name="text_no_connection">No Connection</string>
     <string name="text_retry">Retry</string>
+    <string name="text_source_code">Source Code</string>
+    <string name="change_pointer">Change Pointer</string>
 
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="apply_pointer">Apply Pointer</string>

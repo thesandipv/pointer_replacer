@@ -16,6 +16,7 @@
 package afterroot.pointerreplacer;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,7 +34,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
@@ -52,12 +52,14 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
+import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.flipboard.bottomsheet.OnSheetDismissedListener;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,26 +74,27 @@ import static afterroot.pointerreplacer.Utils.loadToBottomSheetGrid;
 import static afterroot.pointerreplacer.Utils.showSnackbar;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ColorChooserDialog.ColorCallback {
+        implements NavigationView.OnNavigationItemSelectedListener, ColorChooserDialog.ColorCallback, FileChooserDialog.FileCallback {
 
-    int mPointersVersion, latestPointerVersion, oldColor;
-    DiscreteSeekBar mPointerSizeBar, mPaddingBar;
-    ImageView mPointerSelected, mCurrentPointer;
-    TextView mTextSize, mPaddingSize, mTextCurrentPointer, mTextSelectedPointer;
-    SharedPreferences mSharedPreferences;
-    SharedPreferences.Editor mEditor;
-    String mPointersFolder, mExtSdDir, mTargetPath, mTag, mPointerPreviewPath;
-    Boolean isUseMDCC;
-    Toolbar mToolbar;
-    File mFolderPointers; GridView mGridView;
-    BottomSheetLayout bottomSheet;
-    ActionBarDrawerToggle toggle;
-    DrawerLayout drawer;
-    String[] PERMISSIONS = new String[] {
+    private int latestPointerVersion = 4;
+    private DiscreteSeekBar mPointerSizeBar, mPaddingBar;
+    private ImageView mPointerSelected, mCurrentPointer;
+    private TextView mTextSize, mPaddingSize;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private String mExtSdDir;
+    private String mTargetPath;
+    private String mTag;
+    private String mPointerPreviewPath;
+    private Toolbar mToolbar;
+    private File mFolderPointers;
+    private BottomSheetLayout bottomSheet;
+    private DrawerLayout drawer;
+    private DrawerArrowDrawable drawerArrowDrawable;
+    private String[] PERMISSIONS = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE};
-    PermissionChecker permissionChecker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +105,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        setToggle();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null){
@@ -121,15 +123,15 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    static final int REQUEST_CODE = 0;
-    public void checkPermissions(){
-        permissionChecker = new PermissionChecker(this);
+    private static final int REQUEST_CODE = 0;
+    private void checkPermissions(){
+        PermissionChecker permissionChecker = new PermissionChecker(this);
         if (permissionChecker.lacksPermissions(PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE);
         }
     }
 
-    boolean PERMISSION_GRANTED;
+    private boolean PERMISSION_GRANTED;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -140,15 +142,19 @@ public class MainActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void setToggle(){
-        toggle = new ActionBarDrawerToggle(
-                this,
-                drawer,
-                mToolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+    private void setToggle(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            drawerArrowDrawable.setColor(getResources().getColor(android.R.color.white, getTheme()));
+        } else {
+            drawerArrowDrawable.setColor(getResources().getColor(android.R.color.white));
+        }
+        mToolbar.setNavigationIcon(drawerArrowDrawable);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawer.openDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
@@ -160,43 +166,35 @@ public class MainActivity extends AppCompatActivity
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void initialize(){
+    private void initialize(){
         /**Load SharedPreferences**/
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
 
-        setInts();
+        drawerArrowDrawable = new DrawerArrowDrawable(this);
+
         setStrings();
         findViews();
         loadMethods();
     }
 
     /**
-     * Load or Set Ints
-     */
-    public void setInts(){
-        latestPointerVersion = 3;
-    }
-
-    /**
      * Load or Set Strings
      */
-    public void setStrings(){
+    private void setStrings(){
         mTag = getString(R.string.app_name);
-        mPointersFolder = getString(R.string.pointerFolderName);
+        String pointersFolder = getString(R.string.pointerFolderName);
         mExtSdDir = Environment.getExternalStorageDirectory().toString();
-        mTargetPath = mExtSdDir + mPointersFolder;
+        mTargetPath = mExtSdDir + pointersFolder;
         mPointerPreviewPath = getFilesDir().getPath()+"/pointerPreview.png";
     }
 
     /**Find Views**/
-    public void findViews(){
+    private void findViews(){
         mPointerSizeBar = (DiscreteSeekBar) findViewById(R.id.seekBar);
         mPaddingBar = (DiscreteSeekBar) findViewById(R.id.seekBarPadding);
         mTextSize = (TextView) findViewById(R.id.textView_size);
         mPaddingSize = (TextView) findViewById(R.id.textPadding);
-        mTextCurrentPointer = (TextView) findViewById(R.id.textCurrentPointer);
-        mTextSelectedPointer = (TextView) findViewById(R.id.textSelectedPointer);
         mPointerSelected = (ImageView) findViewById(R.id.pointerSelected);
         mCurrentPointer = (ImageView) findViewById(R.id.image_current_pointer);
     }
@@ -204,15 +202,16 @@ public class MainActivity extends AppCompatActivity
     /**
      * Load Methods
      */
-    public void loadMethods(){
+    private void loadMethods(){
         showChangelog();
         createPointersFolder();
         newPointerCopier();
         getPointer();
         setSeekbar();
+        setToggle();
     }
 
-    public void showPreview(boolean isStartPreview){
+    private void showPreview(boolean isStartPreview){
         try {
             Bitmap bitmap = loadBitmapFromView(mPointerSelected);
             File file = new File(mPointerPreviewPath);
@@ -233,7 +232,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Show A Changelog Dialog
      */
-    public void showChangelog() {
+    private void showChangelog() {
         ChangeLog cl = new ChangeLog(this);
         if (cl.firstRun()) cl.getLogDialog().show();
     }
@@ -241,7 +240,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Create Pointers Folder
      */
-    public void createPointersFolder(){
+    private void createPointersFolder(){
         mFolderPointers = new File(mTargetPath);
         try {
             if (!mFolderPointers.exists()) {
@@ -257,27 +256,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     /**
      * Decides Whether to Copy pointer or not when new pointers are added.
      */
-    public void newPointerCopier(){
-        String textPointerCopied = "Pointers Copied to ";
-        mPointersVersion = mSharedPreferences.getInt(
+    private void newPointerCopier(){
+        String textPointerCopied = "Pointers Copied to "+ mTargetPath;
+        int pointersVersion = mSharedPreferences.getInt(
                 getString(R.string.key_pointersVersion),
                 latestPointerVersion);
 
-        if (mPointersVersion == latestPointerVersion){
+        if (pointersVersion == latestPointerVersion){
             copyAssets();
-            mEditor.putInt(getString(R.string.key_pointersVersion), ++mPointersVersion);
+            mEditor.putInt(getString(R.string.key_pointersVersion), ++pointersVersion);
             mEditor.apply();
-            showSnackbar(findViewById(R.id.main_layout),"New "+textPointerCopied + mTargetPath);
+            showSnackbar(findViewById(R.id.main_layout),"New "+textPointerCopied);
         }
         try {
             if (!mFolderPointers.exists()) {
                 mFolderPointers.mkdir();
                 copyAssets();
-                showSnackbar(findViewById(R.id.main_layout), textPointerCopied + mTargetPath);
+                showSnackbar(findViewById(R.id.main_layout), textPointerCopied);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -287,7 +285,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * get current current pointer
      */
-    public void getPointer(){
+    private void getPointer(){
         try {
             String pointerPath = mSharedPreferences.getString(getString(R.string.key_pointerPath), null);
             Drawable d = Drawable.createFromPath(pointerPath);
@@ -301,30 +299,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showPointerChooser(View view) {
-        mToolbar.setTitle("Choose Pointer");
-        bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomSheet);
-        bottomSheet.showWithSheetView(LayoutInflater
-                .from(getApplicationContext())
-                .inflate(R.layout.gridview_bottomsheet, bottomSheet, false));
-        bottomSheet.addOnSheetDismissedListener(new OnSheetDismissedListener() {
-            @Override
-            public void onDismissed(BottomSheetLayout bottomSheetLayout) {
-                mToolbar.setTitle(getString(R.string.app_name));
-                setToggle();
-            }
-        });
-        mGridView = (GridView) findViewById(R.id.bs_gridView);
-
-        loadToBottomSheetGrid(this, mGridView, mTargetPath, new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mEditor.putString(getString(R.string.key_selectedPointerPath), Utils.PointerAdapter.getPath(i)).apply();
-                mPointerSelected.setImageDrawable(Drawable.createFromPath(Utils.PointerAdapter.getPath(i)));
-                bottomSheet.dismissSheet();
-            }
-        });
-        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(this);
-        drawerArrowDrawable.setProgress(1);
+        ObjectAnimator.ofFloat(drawerArrowDrawable, "progress", 1).start();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             drawerArrowDrawable.setColor(getResources().getColor(android.R.color.white, getTheme()));
         } else {
@@ -337,9 +312,62 @@ public class MainActivity extends AppCompatActivity
                 bottomSheet.dismissSheet();
             }
         });
+
+        mToolbar.setTitle("Choose Pointer");
+        bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomSheet);
+        bottomSheet.showWithSheetView(LayoutInflater
+                .from(getApplicationContext())
+                .inflate(R.layout.gridview_bottomsheet, bottomSheet, false));
+        bottomSheet.addOnSheetDismissedListener(new OnSheetDismissedListener() {
+            @Override
+            public void onDismissed(BottomSheetLayout bottomSheetLayout) {
+                mToolbar.setTitle(getString(R.string.app_name));
+                ObjectAnimator.ofFloat(drawerArrowDrawable, "progress", 0).start();
+                Utils.PointerAdapter.clear();
+                mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        drawer.openDrawer(GravityCompat.START);
+                    }
+                });
+            }
+        });
+        GridView gridView = (GridView) findViewById(R.id.bs_gridView);
+
+        loadToBottomSheetGrid(this, gridView, mTargetPath, new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mEditor.putString(getString(R.string.key_selectedPointerPath), Utils.PointerAdapter.getPath(i)).apply();
+                mPointerSelected.setImageDrawable(Drawable.createFromPath(Utils.PointerAdapter.getPath(i)));
+                bottomSheet.dismissSheet();
+            }
+        });
+        if (gridView != null) {
+            gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                    bottomSheet.dismissSheet();
+                    final File file = new File(Utils.PointerAdapter.getPath(i));
+                    new MaterialDialog.Builder(MainActivity.this)
+                            .title("Delete " + file.getName())
+                            .content("Are you sure you want to delete this pointer??")
+                            .positiveText("Yes")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    file.delete();
+                                }
+                            })
+                            .negativeText("No")
+                            .show();
+
+                    return false;
+                }
+            });
+        }
     }
 
-    public void setPointerImageParams(int size, int padding, boolean isApplyPadding){
+    private void setPointerImageParams(int size, int padding, boolean isApplyPadding){
         mPointerSelected.setLayoutParams(new LinearLayout.LayoutParams(size,size));
         if (isApplyPadding){
             mPointerSelected.setPadding(padding, padding, padding, padding);
@@ -349,7 +377,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Set initial values to seekbar
      */
-    public void setSeekbar(){
+    private void setSeekbar(){
         if (getDpi(this) <= 240){
             mPointerSizeBar.setMin(49);
         } else if (getDpi(this) >= 240){
@@ -407,12 +435,12 @@ public class MainActivity extends AppCompatActivity
     /**
      * @param progress Integer value to be set as progress.
      */
-    public void setSeekBarProgress(int progress){
+    private void setSeekBarProgress(int progress){
         mPointerSizeBar.setProgress(progress);
     }
 
     /**Show color picker dialog.**/
-    public void showColorPicker() {
+    private void showColorPicker() {
         final String keyOldColor = getString(R.string.key_oldColor);
         int old_color = mSharedPreferences.getInt(keyOldColor, -1);
         AmbilWarnaDialog dialog = new AmbilWarnaDialog(this, old_color, new AmbilWarnaDialog.OnAmbilWarnaListener() {
@@ -434,7 +462,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * @throws IOException
      */
-    public void confirm() throws IOException {
+    private void confirm() throws IOException {
         String pointerPath = getFilesDir().getPath()+"/pointer.png";
         mEditor.putString(getString(R.string.key_pointerPath), pointerPath);
         mEditor.apply();
@@ -456,7 +484,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**Show a reboot confirm dialog**/
-    public void showRebootDialog(){
+    private void showRebootDialog(){
         String textReboot = getString(R.string.reboot);
         new MaterialDialog.Builder(this)
                 .title(textReboot)
@@ -528,12 +556,11 @@ public class MainActivity extends AppCompatActivity
         mEditor.apply();
     }
 
-    public int getOldColor(){
-        oldColor = mSharedPreferences.getInt(getString(R.string.key_oldColor), -1);
-        return oldColor;
+    private int getOldColor(){
+        return mSharedPreferences.getInt(getString(R.string.key_oldColor), -1);
     }
 
-    public void showPointerColorChooser() {
+    private void showPointerColorChooser() {
         new ColorChooserDialog.Builder(this, R.string.choose_pointer_color)
                 .titleSub(R.string.choose_pointer_color)
                 .accentMode(false)
@@ -544,7 +571,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**Copy Assets**/
-    public void copyAssets() {
+    private void copyAssets() {
         AssetManager am = getAssets();
         String[] files = null;
 
@@ -588,7 +615,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void showConfirmDialog(){
+    private void showConfirmDialog(){
         new MaterialDialog.Builder(this)
                 .title("Confirm Copy")
                 .theme(Theme.DARK)
@@ -606,7 +633,7 @@ public class MainActivity extends AppCompatActivity
                 }).show();
     }
 
-    public void showSureDialog(){
+    private void showSureDialog(){
         Drawable drawable = mPointerSelected.getDrawable();
         new MaterialDialog.Builder(this)
                 .title("Are You Sure?")
@@ -637,12 +664,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+        showSnackbar(findViewById(R.id.main_layout), "Selected: "+file.getName());
+        mPointerSelected.setImageDrawable(Drawable.createFromPath(file.getAbsolutePath()));
+
+        try {
+            InputStream in = new FileInputStream(file);
+            OutputStream out = new FileOutputStream(mTargetPath+file.getName());
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) > 0){
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        if (drawer != null) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -682,8 +731,7 @@ public class MainActivity extends AppCompatActivity
                 showConfirmDialog();
                 break;
             case R.id.change_color:
-                isUseMDCC = mSharedPreferences.getBoolean(getString(R.string.key_useMDCC), true);
-                if (isUseMDCC){
+                if (mSharedPreferences.getBoolean(getString(R.string.key_useMDCC), true)){
                     showPointerColorChooser();
                 } else {
                     showColorPicker();
@@ -708,10 +756,16 @@ public class MainActivity extends AppCompatActivity
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));
                 break;
+            case R.id.import_pointer:
+                new FileChooserDialog.Builder(this)
+                        .mimeType("image/*")
+                        .show();
+                break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        if (drawer != null) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
 }

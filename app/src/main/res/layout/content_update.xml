@@ -17,75 +17,100 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="afterroot.pointerreplacer.UpdateActivity"
     tools:showIn="@layout/activity_update"
     android:id="@+id/main_layoutUpdate"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    <android.support.v7.widget.CardView
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:paddingRight="@dimen/content_padding_horizontal"
+    android:paddingTop="@dimen/content_padding"
+    android:paddingBottom="@dimen/content_padding"
+    android:paddingLeft="@dimen/content_padding_horizontal">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/cardView_update">
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
-            <TextView
+            android:orientation="vertical">
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textCurrentVersion"
-                android:text="@string/text_current_version"
-                android:layout_marginTop="5dp"
-                android:fontFamily="sans-serif-light"/>
-            <TextView
+                android:id="@+id/cardView_update"
+                app:contentPadding="@dimen/content_padding">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_current_version"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="@dimen/text_size_title"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/version"
+                        android:id="@+id/textCurrentVersion"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textNewVersion"
-                android:text="@string/text_new_version"
-                android:layout_below="@+id/textCurrentVersion"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
-                android:fontFamily="sans-serif-light"/>
-
-            <TextView
+                android:layout_marginTop="@dimen/content_margin"
+                app:contentPadding="@dimen/content_padding">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_new_version"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="@dimen/text_size_title"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/version"
+                        android:id="@+id/textNewVersion"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/text_whats_new"
-                android:textSize="20sp"
-                android:id="@+id/textWhatsNew"
-                android:layout_below="@+id/textNewVersion"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="10dp"
-                android:fontFamily="sans-serif-light"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textNewChangelog"
-                android:layout_below="@+id/textWhatsNew"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
-                android:fontFamily="sans-serif-light"/>
-
+                app:contentPadding="@dimen/content_padding"
+                android:layout_marginTop="@dimen/content_margin">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_whats_new"
+                        android:textSize="20sp"
+                        android:id="@+id/textWhatsNew"
+                        android:fontFamily="sans-serif-light"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textNewChangelog"
+                        android:fontFamily="sans-serif-light"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonUpdate"
                 android:text="@string/text_update_now"
-                android:layout_below="@+id/textNewChangelog"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-light"
-
                 android:textColor="@android:color/white"/>
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="wrap_content"

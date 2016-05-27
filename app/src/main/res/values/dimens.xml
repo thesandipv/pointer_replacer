@@ -22,4 +22,9 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="card_radius">2dp</dimen>
     <dimen name="seek_button_padding">6dp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+    <dimen name="content_margin">6dp</dimen>
+    <dimen name="content_padding">10dp</dimen>
+    <dimen name="content_padding_horizontal">6dp</dimen>
+
 </resources>

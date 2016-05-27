@@ -13,26 +13,18 @@
  * limitations under the License.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package afterroot.pointerreplacer;
 
-buildscript {
-    repositories {
-        jcenter()
+import android.os.Bundle;
+import android.app.Activity;
+
+public class HelpActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_help);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha1'
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }

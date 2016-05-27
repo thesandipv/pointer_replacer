@@ -48,10 +48,12 @@ import static afterroot.pointerreplacer.Utils.getMimeType;
 import static afterroot.pointerreplacer.Utils.showSnackbar;
 
 public class UpdateActivity extends AppCompatActivity {
-    TextView textCurrentVersion, textNewVersion, textWhatsNew, textNewChangelog;
-    Button buttonUpdate;
-    CardView cardView_update;
-    LinearLayout layoutNoConnection;
+    private TextView textCurrentVersion;
+    private TextView textNewVersion;
+    private TextView textNewChangelog;
+    private Button buttonUpdate;
+    private CardView cardView_update;
+    private LinearLayout layoutNoConnection;
 
 
     @Override
@@ -77,15 +79,14 @@ public class UpdateActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public void initialize(){
+    private void initialize(){
         findViews();
     }
 
-    public void findViews(){
+    private void findViews(){
         cardView_update = (CardView) findViewById(R.id.cardView_update);
         textCurrentVersion = (TextView) findViewById(R.id.textCurrentVersion);
         textNewVersion = (TextView) findViewById(R.id.textNewVersion);
-        textWhatsNew = (TextView) findViewById(R.id.textWhatsNew);
         textNewChangelog = (TextView) findViewById(R.id.textNewChangelog);
 
         buttonUpdate = (Button) findViewById(R.id.buttonUpdate);
@@ -94,7 +95,7 @@ public class UpdateActivity extends AppCompatActivity {
         setup();
     }
 
-    public void setup(){
+    private void setup(){
         layoutNoConnection.setVisibility(View.GONE);
         cardView_update.setVisibility(View.GONE);
         if (!isNetworkAvailable()){
@@ -104,16 +105,16 @@ public class UpdateActivity extends AppCompatActivity {
         }
     }
 
-    public void checkForUpdate() {
+    private void checkForUpdate() {
         Toast.makeText(this, "Please Wait...", Toast.LENGTH_SHORT).show();
         setupUpdater();
         cardView_update.setVisibility(View.VISIBLE);
     }
 
-    public void setupUpdater(){
+    private void setupUpdater(){
         if (isNetworkAvailable()){
             try {
-                textCurrentVersion.setText(String.format("Current Version: %s (%s)",
+                textCurrentVersion.setText(String.format("v%s (%s)",
                         getPackageManager().getPackageInfo(getPackageName(), 0).versionName,
                         getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
 
@@ -121,7 +122,7 @@ public class UpdateActivity extends AppCompatActivity {
                 int vercode = Integer.valueOf(latestVersionCode);
 
                 final String newVersionName = dlString(UpdateURLs.URL_VERSION_NAME, false);
-                textNewVersion.setText(String.format("Latest Version: %s (%s)", newVersionName, vercode));
+                textNewVersion.setText(String.format("v%s (%s)", newVersionName, vercode));
 
                 if (vercode > getPackageManager().getPackageInfo(getPackageName(), 0).versionCode){
                     buttonUpdate.setVisibility(View.VISIBLE);
@@ -130,9 +131,8 @@ public class UpdateActivity extends AppCompatActivity {
                     buttonUpdate.setText(R.string.text_already_latest);
                 }
 
-                String changelogVerCode = String.format("Changelog for v%s (%s)", newVersionName, vercode);
                 String changelog = dlString(UpdateURLs.URL_CHANGELOG, true);
-                textNewChangelog.setText(String.format("%s\n%s", changelogVerCode, changelog));
+                textNewChangelog.setText(changelog);
 
                 buttonUpdate.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -188,7 +188,7 @@ public class UpdateActivity extends AppCompatActivity {
         return sb.toString();
     }
 
-    public boolean isNetworkAvailable(){
+    private boolean isNetworkAvailable(){
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkWiFi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo networkMobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -197,13 +197,13 @@ public class UpdateActivity extends AppCompatActivity {
                 networkMobile != null && networkMobile.isAvailable() && networkMobile.isConnectedOrConnecting();
     }
 
-    public void openFile(String filname, Uri downloadedFile){
+    private void openFile(String filname, Uri downloadedFile){
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(downloadedFile, getMimeType(filname));
         startActivity(intent);
     }
 
-    public static String dlString(String url, boolean fetchLines) {
+    private static String dlString(String url, boolean fetchLines) {
         String dS = "";
         try {
             StringAsync.setFetchLines(fetchLines);
@@ -220,10 +220,10 @@ public class UpdateActivity extends AppCompatActivity {
         setup();
     }
 
-    public static class StringAsync extends AsyncTask< String, Integer, String > {
+    private static class StringAsync extends AsyncTask< String, Integer, String > {
         static boolean isFetchLines;
 
-        public static void setFetchLines(boolean fetchLines){
+        static void setFetchLines(boolean fetchLines){
             isFetchLines = fetchLines;
         }
 
@@ -249,11 +249,17 @@ public class UpdateActivity extends AppCompatActivity {
 
             return result;
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+        }
     }
 
-    public class UpdateURLs {
+    private class UpdateURLs {
 
-        public static final String
+        static final String
                 URL_GITHUB = "https://raw.githubusercontent.com/",
                 URL_REPO = URL_GITHUB + "sandipv22/pointer_replacer/main/version_checker/",
                 URL_VERSION_CODE = URL_REPO + "version_code.txt",

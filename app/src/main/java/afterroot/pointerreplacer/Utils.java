@@ -18,7 +18,6 @@ package afterroot.pointerreplacer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,31 +30,14 @@ import android.widget.ImageView;
 import java.io.File;
 import java.util.ArrayList;
 
-public class Utils {
-    static String POINTER_SAVE_DIR;
-    static String POINTER_FOLDER_PATH;
+class Utils {
 
-    /**
-
-     * @param context the context
-     * @return Pointer folder directory
-     */
-    public static String getPointerFolderPath(Context context){
-        return POINTER_FOLDER_PATH = Environment.getExternalStorageDirectory().toString() + context.getString(R.string.pointerFolderName);
-    }
-
-    @Override
-    public String toString() {
-        POINTER_SAVE_DIR = Environment.getDataDirectory().toString() + "/data/afterroot.pointerreplacer/files/pointer.png";
-        return super.toString();
-    }
-
-    public static void showSnackbar(View view, String message){
+    static void showSnackbar(View view, String message){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.show();
     }
 
-    public static void showSnackbar(View view, String message, String action){
+    static void showSnackbar(View view, String message, String action){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.setAction(action, new View.OnClickListener() {
             @Override
@@ -66,11 +48,11 @@ public class Utils {
         snackBar.show();
     }
 
-    public static int getDpi(Context context){
+    static int getDpi(Context context){
         return context.getResources().getDisplayMetrics().densityDpi;
     }
 
-    public static void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
+    static void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.setAction(action, action_listener);
         snackBar.show();
@@ -80,7 +62,7 @@ public class Utils {
      * @param fileName name of file
      * @return extension of fileName
      */
-    public static String getFileExt(String fileName) {
+    private static String getFileExt(String fileName) {
         return fileName.substring((fileName.lastIndexOf(".")+ 1 ), fileName.length());
     }
 
@@ -88,7 +70,7 @@ public class Utils {
      * @param fileName name of file
      * @return mime type of fileName
      */
-    public static String getMimeType(String fileName) {
+    static String getMimeType(String fileName) {
         String type = null;
         try {
             String extension = getFileExt(fileName);
@@ -99,10 +81,10 @@ public class Utils {
         return type;
     }
 
-    public static void loadToBottomSheetGrid(Context context,
-                                             GridView target,
-                                             String targetPath,
-                                             AdapterView.OnItemClickListener listener){
+    static void loadToBottomSheetGrid(Context context,
+                                      GridView target,
+                                      String targetPath,
+                                      AdapterView.OnItemClickListener listener){
         final PointerAdapter pointerAdapter = new PointerAdapter(context);
         if (getDpi(context) <= 240){
             pointerAdapter.setLayoutParams(49);
@@ -124,14 +106,18 @@ public class Utils {
     }
 
     /**GridView Image Adapter.**/
-    public static class PointerAdapter extends BaseAdapter {
+    static class PointerAdapter extends BaseAdapter {
         private Context mContext;
         static ArrayList<String> itemList = new ArrayList<>();
-        public PointerAdapter(Context context) {
+        PointerAdapter(Context context) {
             mContext = context;
         }
         void add(String path) {
             itemList.add(path);
+        }
+
+        static void clear(){
+            itemList.clear();
         }
 
         static String getPath(int index){
@@ -154,7 +140,7 @@ public class Utils {
         }
 
         int param = 49;
-        public void setLayoutParams(int i){
+        void setLayoutParams(int i){
             param = i;
         }
 
@@ -174,7 +160,7 @@ public class Utils {
             return imageView;
         }
 
-        public Bitmap decodeSampleBitmapFromUri(String path, int reqWidth, int reqHeight) {
+        Bitmap decodeSampleBitmapFromUri(String path, int reqWidth, int reqHeight) {
             Bitmap bm;
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -185,7 +171,7 @@ public class Utils {
             return bm;
         }
 
-        public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight){
+        int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight){
             final int height = options.outHeight;
             final int width = options.outWidth;
             int inSampleSize = 1;

@@ -76,7 +76,8 @@
                             android:layout_centerVertical="true"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
-                            android:textColor="@color/color_text_primary"/>
+                            android:textColor="@color/color_text_primary"
+                            tools:ignore="RelativeOverlap"/>
                     </RelativeLayout>
                     <View
                         android:layout_width="match_parent"
@@ -124,7 +125,7 @@
                             style="?attr/borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Change Pointer"
+                            android:text="@string/change_pointer"
                             android:onClick="showPointerChooser"
                             android:id="@+id/buttonChangePointer"
                             android:layout_alignParentTop="true"
@@ -159,13 +160,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Size: 50*50"
                         android:id="@+id/textView_size"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:textColor="@color/color_text_primary"
-                        android:alpha="70"/>
+                        android:alpha="70"
+                        tools:ignore="RelativeOverlap"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -176,7 +177,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:textColor="@color/color_text_primary"
-                        android:alpha="70"/>
+                        android:alpha="70"
+                        tools:ignore="HardcodedText"/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"

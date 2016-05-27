@@ -19,14 +19,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 
-public class PermissionChecker {
+class PermissionChecker {
     private final Context mContext;
 
-    public PermissionChecker (Context context){
+    PermissionChecker(Context context){
         this.mContext = context;
     }
 
-    public boolean lacksPermissions(String... permissions){
+    boolean lacksPermissions(String... permissions){
         for (String permission : permissions){
             if (lacksPermission(permission)){
                 return true;

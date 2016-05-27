@@ -25,5 +25,5 @@
         android:id="@+id/reset_grid"
         android:title="@string/reset_size"
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_tune"/>
+        android:icon="@drawable/ic_action_reset"/>
 </menu>

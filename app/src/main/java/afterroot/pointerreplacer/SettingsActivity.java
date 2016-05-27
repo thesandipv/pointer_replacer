@@ -31,10 +31,11 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    Preference mChooseColorPicker;
-    SharedPreferences mSharedPreferences;
-    SharedPreferences.Editor mEditor;
+    private Preference mChooseColorPicker;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         mEditor = mSharedPreferences.edit();
     }
 
-    public void showSingleChoice(){
+    private void showSingleChoice(){
         int selectedIndex = mSharedPreferences.getInt("selectedIndex", 1);
         new MaterialDialog.Builder(this)
                 .title(R.string.choose_color_picker)
@@ -65,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void updateCCSummary(){
+    private void updateCCSummary(){
         if (mSharedPreferences.getBoolean(getString(R.string.key_useMDCC), true)){
             mChooseColorPicker.setSummary("Material Color Picker");
         } else {
@@ -74,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @SuppressLint("ValidFragment")
-    public class SettingsFragment extends PreferenceFragment {
+    private class SettingsFragment extends PreferenceFragment {
         Preference maxPointerSize;
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -92,7 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
 
             maxPointerSize = findPreference(getString(R.string.key_maxPointerSize));
-            maxPointerSize.setSummary(mSharedPreferences.getString(getString(R.string.key_maxPointerSize), null));
+            maxPointerSize.setSummary(mSharedPreferences.getString(getString(R.string.key_maxPointerSize), "100"));
             maxPointerSize.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {

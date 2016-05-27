@@ -28,8 +28,10 @@ import de.psdev.licensesdialog.LicensesDialog;
 
 public class AboutActivity extends AppCompatActivity {
 
-    SharedPreferences mSharedPreferences;
-    SharedPreferences.Editor mEditor;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +41,7 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     @SuppressLint("ValidFragment")
-    public class AboutFragment extends PreferenceFragment{
+    private class AboutFragment extends PreferenceFragment{
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);

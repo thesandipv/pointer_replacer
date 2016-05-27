@@ -47,20 +47,19 @@ import java.io.IOException;
 import static afterroot.pointerreplacer.Utils.showSnackbar;
 
 public class PointerPreview extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
-    RelativeLayout previewLayout;
-    ImageView previewPointer;
-    LinearLayout previewMain;
-    Toolbar mToolbar;
-    SharedPreferences mSharedPreferences;
-    SharedPreferences.Editor mEditor;
+    private RelativeLayout previewLayout;
+    private ImageView previewPointer;
+    private LinearLayout previewMain;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pointer_preview);
-        mToolbar= (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.preview_fab_apply);
         if (fab != null) {
@@ -124,11 +123,11 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                 .show();
     }
 
-    public int getOldColor(){
+    private int getOldColor(){
         return mSharedPreferences.getInt("PREVIEW_OLD_COLOR", 16777215);
     }
 
-    public int getOldPointerColor(){
+    private int getOldPointerColor(){
         return mSharedPreferences.getInt("PREVIEW_POINTER_OLD_COLOR", -1);
     }
 
@@ -156,7 +155,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                 .show();
     }
 
-    public void showSureDialog(){
+    private void showSureDialog(){
         Drawable drawable = previewPointer.getDrawable();
         new MaterialDialog.Builder(this)
                 .title("Are You Sure?")
@@ -189,7 +188,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         return b;
     }
 
-    public void confirm() throws IOException {
+    private void confirm() throws IOException {
         String pointerPath = getFilesDir().getPath()+"/pointer.png";
         mEditor.putString(getString(R.string.key_pointerPath), pointerPath);
         mEditor.apply();
@@ -208,7 +207,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         }
     }
 
-    public void showRebootDialog(){
+    private void showRebootDialog(){
         String textReboot = getString(R.string.reboot);
         new MaterialDialog.Builder(this)
                 .title(textReboot)
