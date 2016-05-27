@@ -1,4 +1,1 @@
--New: You can see Pointer Preview before applying pointer.
--New: You can check for update from Settings
--New: Now you can set max pointer size from Settings. Max limit is 999.
--New: DayNight theme from AppCompat Support Library. (You can enable it from Settings)
+Coming Soon v1.6.3
