@@ -3,14 +3,14 @@
     <style type='text/css'>
       a            { color:#000000 }
       div.title    {
-        color:#ff1744;
+        color:#2979ff;
         font-size:1.2em;
         font-weight:bold;
         margin-top:1em;
         margin-bottom:0.5em;
         text-align:center }
       div.subtitle {
-        color:#ff1744;
+        color:#2979ff;
         font-size:0.8em;
         margin-bottom:1em;
         text-align:center }
@@ -23,7 +23,7 @@
       % Version 1.6.3
       _ 24-05-2016
       * New: Improvements for Marshmallow.
-      * New: New Pointers.
+      * New: 4 New Pointers.
       * New: Added long press to delete pointer.
       * Other minor improvements and bug fixes.
     $ 1.6.2

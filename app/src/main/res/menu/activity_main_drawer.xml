@@ -20,7 +20,7 @@
             <item android:title="@string/text_change_color"
                   android:id="@+id/change_color"
                 android:icon="@drawable/ic_action_color"/>
-            <item android:title="Reset Pointer Color"
+            <item android:title="@string/reset_pointer_color"
                   android:id="@+id/reset_color"
                   android:icon="@drawable/ic_action_reset"/>
             <item android:title="@string/apply_pointer"
@@ -29,7 +29,8 @@
             <item android:title="@string/title_activity_pointer_preview"
                   android:id="@+id/preview"
                 android:icon="@drawable/ic_action_preview"/>
-            <item android:title="Import Pointer"
+            <item android:title="@string/import_pointer"
+                  android:icon="@drawable/ic_action_import"
                   android:id="@+id/import_pointer"/>
         </menu>
     </item>
@@ -50,12 +51,12 @@
     <group android:id="@+id/grpSettings">
         <item
             android:id="@+id/settings"
-            android:title="Settings"
+            android:title="@string/title_activity_settigs"
             android:icon="@drawable/ic_action_settings"/>
         <item
             android:id="@+id/about"
             android:icon="@drawable/ic_action_about"
-            android:title="About"/>
+            android:title="@string/title_activity_about"/>
 
     </group>
 </menu>
