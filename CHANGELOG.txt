@@ -1,3 +1,10 @@
+v1.6.3 [31/05/2016]
+------------------------------------ 
+New: Improvements for Marshmallow.
+New: 4 New Pointers.
+New: Added long press to delete pointer.
+Other minor improvements and bug fixes.
+
 v1.6.2 [12/03/2016]
 ------------------------------------ 
 -New: You can see Pointer Preview before applying pointer.
