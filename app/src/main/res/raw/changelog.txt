@@ -21,7 +21,7 @@
   <body>
     $ 1.6.3
       % Version 1.6.3
-      _ 24-05-2016
+      _ 31-05-2016
       * New: Improvements for Marshmallow.
       * New: 4 New Pointers.
       * New: Added long press to delete pointer.
