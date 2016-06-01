@@ -18,6 +18,7 @@ package afterroot.pointerreplacer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +63,7 @@ class Utils {
      * @param fileName name of file
      * @return extension of fileName
      */
+    @NonNull
     private static String getFileExt(String fileName) {
         return fileName.substring((fileName.lastIndexOf(".")+ 1 ), fileName.length());
     }
