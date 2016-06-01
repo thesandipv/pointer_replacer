@@ -1,4 +1,3 @@
-Coming Soon v1.6.3
 New: Improvements for Marshmallow.
 New: New Pointers.
 New: Added long press to delete pointer.
