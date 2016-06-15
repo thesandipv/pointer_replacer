@@ -19,4 +19,5 @@
     <dimen name="activity_vertical_margin">8dp</dimen>
 
     <dimen name="content_padding_horizontal">50dp</dimen>
+    <dimen name="content_padding_vertical">7dp</dimen>
 </resources>

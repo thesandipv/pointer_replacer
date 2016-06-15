@@ -20,6 +20,11 @@
         <Preference
             android:title="@string/text_max_pointer_size"
             android:key="@string/key_maxPointerSize"/>
+        <SwitchPreference
+            android:title="Enable Pointer Alpha"
+            android:summary="Enables Slider to Change Pointer Alpha (transparency)"
+            android:key="@string/key_EnablePointerAlpha"
+            android:defaultValue="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Color Picker">

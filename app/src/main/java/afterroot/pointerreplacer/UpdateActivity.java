@@ -87,6 +87,7 @@ public class UpdateActivity extends AppCompatActivity {
         cardView_update = (CardView) findViewById(R.id.cardView_update);
         textCurrentVersion = (TextView) findViewById(R.id.textCurrentVersion);
         textNewVersion = (TextView) findViewById(R.id.textNewVersion);
+
         textNewChangelog = (TextView) findViewById(R.id.textNewChangelog);
 
         buttonUpdate = (Button) findViewById(R.id.buttonUpdate);
@@ -207,7 +208,7 @@ public class UpdateActivity extends AppCompatActivity {
         try {
             DownloadTxtTask.setFetchLines(fetchLines);
             DownloadTxtTask DownloadTxtTask = new DownloadTxtTask ();
-            dS = DownloadTxtTask.execute(new String[] {url}).get();
+            dS = DownloadTxtTask.execute(url).get();
         } catch(Exception ex) {
             //
         }

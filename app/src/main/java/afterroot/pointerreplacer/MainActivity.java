@@ -28,6 +28,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -46,6 +48,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -67,6 +70,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+import de.psdev.licensesdialog.LicensesDialog;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import static afterroot.pointerreplacer.Utils.getDpi;
@@ -77,9 +81,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ColorChooserDialog.ColorCallback, FileChooserDialog.FileCallback {
 
     private int latestPointerVersion = 4;
-    private DiscreteSeekBar mPointerSizeBar, mPaddingBar;
+    private DiscreteSeekBar mPointerSizeBar, mPaddingBar, mAlphaBar;
     private ImageView mPointerSelected, mCurrentPointer;
-    private TextView mTextSize, mPaddingSize;
+    private TextView mTextSize, mPaddingSize, mTextAlpha;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private String mExtSdDir;
@@ -193,7 +197,9 @@ public class MainActivity extends AppCompatActivity
     private void findViews(){
         mPointerSizeBar = (DiscreteSeekBar) findViewById(R.id.seekBar);
         mPaddingBar = (DiscreteSeekBar) findViewById(R.id.seekBarPadding);
+        mAlphaBar = (DiscreteSeekBar) findViewById(R.id.seekBarAlpha);
         mTextSize = (TextView) findViewById(R.id.textView_size);
+        mTextAlpha = (TextView) findViewById(R.id.textAlpha);
         mPaddingSize = (TextView) findViewById(R.id.textPadding);
         mPointerSelected = (ImageView) findViewById(R.id.pointerSelected);
         mCurrentPointer = (ImageView) findViewById(R.id.image_current_pointer);
@@ -384,12 +390,28 @@ public class MainActivity extends AppCompatActivity
             mPointerSizeBar.setMin(66);
         }
 
+        RelativeLayout alphaBarContainer = (RelativeLayout) findViewById(R.id.alpha_bar_container);
+        if (mSharedPreferences.getBoolean(getString(R.string.key_EnablePointerAlpha), false)) {
+            if (alphaBarContainer != null) {
+                alphaBarContainer.setVisibility(View.VISIBLE);
+                mTextAlpha.setVisibility(View.VISIBLE);
+            }
+        } else{
+            if (alphaBarContainer != null) {
+                alphaBarContainer.setVisibility(View.GONE);
+                mTextAlpha.setVisibility(View.GONE);
+            }
+        }
         mPointerSelected.setLayoutParams(new LinearLayout.LayoutParams(mPointerSizeBar.getProgress(), mPointerSizeBar.getProgress()));
         String maxSize = mSharedPreferences.getString(getString(R.string.key_maxPointerSize), "100");
+        int alpha = mSharedPreferences.getInt("pointerAlpha", 255);
+        mTextAlpha.setText(String.format(Locale.US, "| Alpha: %d", alpha));
+        mAlphaBar.setProgress(alpha);
+        mPointerSelected.setAlpha(alpha);
         mPointerSizeBar.setMax(Integer.valueOf(maxSize));
         int prefGridSize = mSharedPreferences.getInt(getString(R.string.key_pointerSize), mPointerSizeBar.getMin());
         setSeekBarProgress(prefGridSize);
-        final String textSize = "Size: %d*%d";
+        final String textSize = "Size: %d*%d ";
         mTextSize.setText(String.format(Locale.US, textSize, prefGridSize, prefGridSize));
         mPointerSizeBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int imageSize;
@@ -415,7 +437,7 @@ public class MainActivity extends AppCompatActivity
             int imagePadding;
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                mPaddingSize.setText(String.format(Locale.US, "Padding: %d", value));
+                mPaddingSize.setText(String.format(Locale.US, "| Padding: %d ", value));
                 setPointerImageParams(mPointerSizeBar.getProgress(), value, true);
                 imagePadding = value;
             }
@@ -428,6 +450,25 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 setPointerImageParams(mPointerSizeBar.getProgress(), imagePadding, true);
+            }
+        });
+
+        mAlphaBar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                mEditor.putInt("pointerAlpha", value).apply();
+                mTextAlpha.setText(String.format(Locale.US, "| Alpha: %d", value));
+                mPointerSelected.setAlpha(value);
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
             }
         });
     }
@@ -545,6 +586,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.butPaddingMinus:
                 mPaddingBar.setProgress(padding - 1);
                 break;
+            case R.id.butAlphaMinus:
+                mAlphaBar.setProgress(mAlphaBar.getProgress() - 1);
+                break;
+            case R.id.butAlphaPlus:
+                mAlphaBar.setProgress(mAlphaBar.getProgress() + 1);
+                break;
         }
     }
 
@@ -576,7 +623,7 @@ public class MainActivity extends AppCompatActivity
         String[] files = null;
 
         try {
-            files = am.list("");
+            files = am.list("pointers");
         } catch (IOException e){
             Log.e(mTag, e.getMessage());
         }
@@ -585,7 +632,7 @@ public class MainActivity extends AppCompatActivity
             InputStream in;
             OutputStream out;
             try {
-                in = am.open(filename);
+                in = am.open("pointers/"+filename);
                 out = new FileOutputStream(mTargetPath + filename);
 
                 byte[] bytes = new byte[1024];
@@ -601,10 +648,7 @@ public class MainActivity extends AppCompatActivity
                 Log.e(mTag, e.getMessage());
             }
         }
-        File file = new File(mTargetPath+"xposed_init");
-        if (file.exists()) {
-            file.delete();
-        }
+
         File dotnomedia = new File(mExtSdDir+"/Pointer Replacer/.nomedia");
         if (!dotnomedia.exists()){
             try {
@@ -623,7 +667,7 @@ public class MainActivity extends AppCompatActivity
                         mTargetPath + "\n"+
                         "Do only if pointers are not copied automatically.")
                 .positiveText("Yes")
-                .neutralText("No")
+                .negativeText("No")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -661,6 +705,37 @@ public class MainActivity extends AppCompatActivity
                         showSnackbar(findViewById(R.id.main_layout), "Pointer Applied ");
                     }
                 }).show();
+    }
+
+    @SuppressLint("ValidFragment")
+    private class AboutFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_about);
+
+            findPreference(getString(R.string.key_app_info)).setTitle(getString(R.string.app_name)+" "+ getString(R.string.version));
+
+            findPreference(getString(R.string.key_app_info)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startActivity(new Intent(MainActivity.this, UpdateActivity.class));
+                    return false;
+                }
+            });
+
+            findPreference("licenses").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new LicensesDialog.Builder(MainActivity.this)
+                            .setNotices(R.raw.notices)
+                            .build()
+                            .showAppCompat();
+                    return false;
+                }
+            });
+        }
+
     }
 
     @Override

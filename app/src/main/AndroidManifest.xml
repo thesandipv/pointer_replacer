@@ -13,7 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest package="afterroot.pointerreplacer"
+<manifest xmlns:tools="http://schemas.android.com/tools"
+          package="afterroot.pointerreplacer"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -24,7 +25,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme.Dark">
+        android:theme="@style/AppTheme.Dark"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <meta-data
             android:name="xposedmodule"
             android:value="true"/>
