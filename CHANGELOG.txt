@@ -1,3 +1,11 @@
+v1.6.4 [27/07/2016]
+------------------------------------
+New: Pointer transparency settings (Disabled by default. Enable from Settings)
+New: Now you can set max pointer padding from Settings. Max limit is 999.
+New: Pokemon Pointers (Go to Install/Manage Pointers > Click on Pokemon Pointers to download Pointer Pack).
+Improvement: Improved app experience when too many pointers are installed.
+Other many changes and improvements.
+
 v1.6.3 [31/05/2016]
 ------------------------------------ 
 New: Improvements for Marshmallow.
