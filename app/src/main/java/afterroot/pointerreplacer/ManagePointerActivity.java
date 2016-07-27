@@ -1,0 +1,719 @@
+/*
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package afterroot.pointerreplacer;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+
+public class ManagePointerActivity extends AppCompatActivity {
+
+    private String mTargetPath;
+    private String mTag;
+    private Utils mUtils;
+    private File[] targetFiles;
+    private File target;
+    private SharedPreferences mInstalledPointerPrefs;
+    private SharedPreferences.Editor mInstalledPointerEditor;
+    private PointerListAdapter pointerListAdapter;
+
+    private static String DEFAULT_POINTER_PACK = "pointer";
+    private static String CHRISTMAS_POINTER_PACK = "Christmas";
+    private static String HEART_POINTER_PACK = "emoji";
+    private static String GOOGLE_MI_PACK = "GoogleMaterialIcons";
+    private static String HERMANKZR_PACK = "Hermankzr";
+    private static String XDA_POINTER = "xda";
+    private static String POKEMON_POINTER_PACK = "Pokemon";
+
+    private static String DEFAULT_PP_NAME = "Default Pointers";
+    private static String CHRISTMAS_PP_NAME = "Christmas Pointers";
+    private static String HEART_PP_NAME = "Heart Pointers";
+    private static String GOOGLE_MI_PP_NAME = "GoogleMaterialIcons";
+    private static String HERMANKZR_PP_NAME = "User Submitted: Hermankzr";
+    private static String XDA_POINTER_NAME = "XDA Pointer";
+    private static String POKEMON_PP_NAME = "Pokemon Pointers";
+
+    private static String DIR_NAME_POINTERS = "pointers";
+
+    private String POKEMON_PACK_DL_URL = "http://bit.ly/PokemonPointers";
+    private static String POKEMON_POINTERS_PACKAGE_NAME = "tk.afterroot.pokmonpointers";
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_manage_pointer);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        String pointersFolder = getString(R.string.pointerFolderName);
+        String extSdDir = Environment.getExternalStorageDirectory().toString();
+        mTargetPath = extSdDir + pointersFolder;
+        mTag = "ManagePointers";
+        mUtils = new Utils();
+
+        mInstalledPointerPrefs = this.getSharedPreferences("afterroot.pointerreplacer.installed_pointers", Context.MODE_PRIVATE);
+        mInstalledPointerEditor = mInstalledPointerPrefs.edit();
+
+        ListView pointersList = (ListView) findViewById(R.id.pointerList);
+
+        target = new File(mTargetPath);
+        targetFiles = target.listFiles();
+
+        ArrayList<String> list = new ArrayList<>();
+        list.add(0, DEFAULT_PP_NAME);
+        list.add(1, CHRISTMAS_PP_NAME);
+        list.add(2, HEART_PP_NAME);
+        list.add(3, GOOGLE_MI_PP_NAME);
+        list.add(4, HERMANKZR_PP_NAME);
+        list.add(5, XDA_POINTER_NAME);
+        list.add(6, POKEMON_PP_NAME);
+
+        pointerListAdapter = new PointerListAdapter(list, this);
+
+        if (mInstalledPointerPrefs.getBoolean("first_launch", true)){
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    pointerListAdapter.copySpecificPointer(DEFAULT_POINTER_PACK);
+                    pointerListAdapter.copySpecificPointer(CHRISTMAS_POINTER_PACK);
+                    pointerListAdapter.copySpecificPointer(HEART_POINTER_PACK);
+                    pointerListAdapter.copySpecificPointer(GOOGLE_MI_PACK);
+                    pointerListAdapter.copySpecificPointer(HERMANKZR_PACK);
+                    pointerListAdapter.copySpecificPointer(XDA_POINTER);
+                    mInstalledPointerEditor.putBoolean(DEFAULT_POINTER_PACK, true).apply();
+                    mInstalledPointerEditor.putBoolean(CHRISTMAS_POINTER_PACK, true).apply();
+                    mInstalledPointerEditor.putBoolean(HEART_POINTER_PACK, true).apply();
+                    mInstalledPointerEditor.putBoolean(GOOGLE_MI_PACK, true).apply();
+                    mInstalledPointerEditor.putBoolean(HERMANKZR_PACK, true).apply();
+                    mInstalledPointerEditor.putBoolean(XDA_POINTER, true).apply();
+                    mInstalledPointerEditor.putBoolean(POKEMON_POINTER_PACK, false).apply();
+                }
+            });
+            thread.run();
+            showHelpDialog();
+
+            mInstalledPointerEditor.putBoolean("first_launch", false);
+        }
+
+        if (pointersList != null) {
+            pointersList.setAdapter(pointerListAdapter);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        pointerListAdapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_managepointer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.help:
+                showHelpDialog();
+                break;
+        }
+        return true;
+    }
+
+    private void showHelpDialog(){
+        new MaterialDialog.Builder(this)
+                .title("Help")
+                .items("Click on INSTALL button to install all pointers from selected pack.",
+                        "Click on DELETE button to delete all pointer from selected pack.",
+                        "Click on Pointer Pack to view pointers from selected pack.",
+                        "If you don't want to install full pointer pack, " +
+                                "Click on Pointer Pack then in view pointers dialog " +
+                                "click on pointer image to install only clicked pointer.")
+                .positiveText(R.string.changelog_ok_button)
+                .show();
+    }
+
+    private class PointerListAdapter extends BaseAdapter implements ListAdapter {
+
+        private ArrayList<String> mArrayList = new ArrayList<>();
+        private Context mContext;
+        private TextView installedState = null;
+
+        PointerListAdapter(ArrayList<String> list, Context context){
+            this.mArrayList = list;
+            this.mContext = context;
+        }
+
+        @Override
+        public int getCount() {
+            return mArrayList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return mArrayList.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        void copySpecificPointer(String nameStartsWith) {
+            AssetManager am = getAssets();
+            String[] files = null;
+
+            try {
+                files = am.list(DIR_NAME_POINTERS);
+            } catch (IOException e){
+                Log.e(mTag, e.getMessage());
+            }
+            assert files != null;
+            for (String filename : files) {
+                if (filename.startsWith(nameStartsWith)){
+                    InputStream in;
+                    OutputStream out;
+                    try {
+                        in = am.open(DIR_NAME_POINTERS + File.separator +filename);
+                        out = new FileOutputStream(mTargetPath + filename);
+
+                        byte[] bytes = new byte[1024];
+                        int read;
+                        while ((read = in.read(bytes)) != -1){
+                            out.write(bytes, 0, read);
+                        }
+
+                        in.close();
+                        out.flush();
+                        out.close();
+                        notifyDataSetChanged();
+                    } catch (Exception e) {
+                        Log.e(mTag, e.getMessage());
+                    }
+                }
+            }
+        }
+
+        void copyFile(File source, File destination) throws IOException{
+            FileChannel sourceChannel = new FileInputStream(source).getChannel();
+            FileChannel destinationChannel = new FileOutputStream(destination).getChannel();
+            try {
+                sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+            } finally {
+                try {
+                    sourceChannel.close();
+                    destinationChannel.close();
+                } catch (IOException io){
+                    io.printStackTrace();
+                }
+            }
+        }
+
+        void deletePack(String packName){
+            for (File pointer : targetFiles){
+                if (pointer.getName().startsWith(packName)){
+                    pointer.delete();
+                }
+            }
+            mInstalledPointerEditor.putBoolean(packName, false).apply();
+        }
+
+        void installPack(String packName){
+            copySpecificPointer(packName);
+            if (installedState != null) {
+                installedState.setText(R.string.text_installed);
+            }
+            mInstalledPointerEditor.putBoolean(packName, true).apply();
+            mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
+        }
+
+        void showSpecificPointerDialog(String pointerPackName, String dialogTitle){
+            AssetManager am = getAssets();
+            String[] files = null;
+            ArrayList<File> arrayList = new ArrayList<>();
+
+            try {
+                files = am.list(DIR_NAME_POINTERS);
+            } catch (IOException e){
+                Log.e(mTag, e.getMessage());
+            }
+
+            final Utils.PointerAdapter pointerAdapter = new Utils.PointerAdapter(mContext);
+            assert files != null;
+            for (String filename : files) {
+                if (filename.startsWith(pointerPackName)){
+                    InputStream in;
+                    OutputStream out;
+                    try {
+                        in = am.open(DIR_NAME_POINTERS + File.separator + filename);
+                        out = new FileOutputStream(getCacheDir() + File.separator + filename);
+                        arrayList.add(new File(getCacheDir()+ File.separator + filename));
+
+                        byte[] bytes = new byte[1024];
+                        int read;
+                        while ((read = in.read(bytes)) != -1){
+                            out.write(bytes, 0, read);
+                        }
+
+                        in.close();
+                        out.flush();
+                        out.close();
+                        notifyDataSetChanged();
+                    } catch (Exception e) {
+                        Log.e(mTag, e.getMessage());
+                    }
+                }
+            }
+            for (File pointer : arrayList){
+                if (pointer.getName().startsWith(pointerPackName)){
+                    pointerAdapter.add(pointer.getPath());
+                }
+            }
+            MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
+                    .title(dialogTitle)
+                    .customView(R.layout.gridview_free, false)
+                    .show();
+            materialDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    pointerAdapter.clear();
+                }
+            });
+            View view1 = materialDialog.getCustomView();
+            if (view1 != null) {
+                final GridView gridView = (GridView) view1.findViewById(R.id.bs_gridView);
+                gridView.setAdapter(pointerAdapter);
+                gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        File source = new File(pointerAdapter.getPath(i));
+                        File targetFile = new File(mTargetPath + source.getName());
+                        if (!targetFile.exists()){
+                            try {
+                                copyFile(source, targetFile);
+                                Toast.makeText(mContext,
+                                        String.format("%s %s", source.getName(), getString(R.string.text_installed)),
+                                        Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(mContext, source.getName() + " is already installed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+
+        void showPokemonDownloadDialog(){
+            new MaterialDialog.Builder(ManagePointerActivity.this)
+                    .title("Download Pokemon Pointers Pack")
+                    .content("Pokemon Pointers is not installed. Do you want to download it now?")
+                    .positiveText("Download")
+                    .negativeText("No")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(POKEMON_PACK_DL_URL)));
+                        }
+                    })
+                    .show();
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null){
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.manage_poiinter_list_item, null);
+            }
+
+            TextView listItemText = (TextView) view.findViewById(R.id.text_pointer_list_item);
+            installedState = (TextView) view.findViewById(R.id.text_installed_state);
+            listItemText.setText(mArrayList.get(position));
+
+            final Button installButton = (Button) view.findViewById(R.id.button_list_install);
+            Button deleteButton = (Button) view.findViewById(R.id.button_list_delete);
+
+            CardView listCard = (CardView) view.findViewById(R.id.manage_pointers_list_card);
+
+            switch (position){
+                case 0:
+                    if (!mInstalledPointerPrefs.getBoolean(DEFAULT_POINTER_PACK, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 1:
+                    if (!mInstalledPointerPrefs.getBoolean(CHRISTMAS_POINTER_PACK, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 2:
+                    if (!mInstalledPointerPrefs.getBoolean(HEART_POINTER_PACK, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 3:
+                    if (!mInstalledPointerPrefs.getBoolean(GOOGLE_MI_PACK, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 4:
+                    if (!mInstalledPointerPrefs.getBoolean(HERMANKZR_PACK, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 5:
+                    if (!mInstalledPointerPrefs.getBoolean(XDA_POINTER, true)){
+                        installedState.setText(R.string.text_not_installed);
+                        installButton.setEnabled(true);
+                        deleteButton.setEnabled(false);
+                    } else {
+                        installButton.setEnabled(false);
+                        deleteButton.setEnabled(true);
+                    }
+                    break;
+                case 6:
+                    if (!mUtils.isAppInstalled(mContext, POKEMON_POINTERS_PACKAGE_NAME)){
+                        deleteButton.setEnabled(false);
+                        installButton.setEnabled(true);
+                        installedState.setText("Pokemon Pointers app not found. Click INSTALL button to downlaod Pack.");
+                    } else {
+                        if (!mInstalledPointerPrefs.getBoolean(POKEMON_POINTER_PACK, true)){
+                            installedState.setText(R.string.text_not_installed);
+                            installButton.setEnabled(true);
+                            deleteButton.setEnabled(false);
+                        } else {
+                            installButton.setEnabled(false);
+                            deleteButton.setEnabled(true);
+                        }
+                    }
+                    break;
+            }
+
+            installButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    notifyDataSetChanged();
+                    switch (position){
+                        case 0:
+                            installPack(DEFAULT_POINTER_PACK);
+                            break;
+                        case 1:
+                            installPack(CHRISTMAS_POINTER_PACK);
+                            break;
+                        case 2:
+                            installPack(HEART_POINTER_PACK);
+                            break;
+                        case 3:
+                            installPack(GOOGLE_MI_PACK);
+                            break;
+                        case 4:
+                            installPack(HERMANKZR_PACK);
+                            break;
+                        case 5:
+                            installPack(XDA_POINTER);
+                            break;
+                        case 6:
+                            if (mUtils.isAppInstalled(mContext, POKEMON_POINTERS_PACKAGE_NAME)){
+                                String[] files;
+                                try {
+                                    AssetManager am = getPackageManager().getResourcesForApplication(POKEMON_POINTERS_PACKAGE_NAME).getAssets();
+                                    files = am.list(DIR_NAME_POINTERS);
+
+                                    assert files != null;
+                                    for (String filename : files) {
+                                        if (filename.startsWith(POKEMON_POINTER_PACK)){
+                                            InputStream in;
+                                            OutputStream out;
+                                            try {
+                                                in = am.open(DIR_NAME_POINTERS + File.separator + filename);
+                                                out = new FileOutputStream(mTargetPath + filename);
+
+                                                byte[] bytes = new byte[1024];
+                                                int read;
+                                                while ((read = in.read(bytes)) != -1){
+                                                    out.write(bytes, 0, read);
+                                                }
+
+                                                in.close();
+                                                out.flush();
+                                                out.close();
+                                                notifyDataSetChanged();
+                                            } catch (Exception e) {
+                                                Log.e(mTag, e.getMessage());
+                                            }
+                                        }
+                                    }
+                                } catch (IOException e){
+                                    Log.e(mTag, e.getMessage());
+                                } catch (PackageManager.NameNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                                if (installedState != null) {
+                                    installedState.setText(R.string.text_installed);
+                                }
+                                mInstalledPointerEditor.putBoolean(POKEMON_POINTER_PACK, true).apply();
+                                notifyDataSetChanged();
+                                mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
+                            } else {
+                                showPokemonDownloadDialog();
+                            }
+                            break;
+                    }
+                    notifyDataSetChanged();
+                }
+            });
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    notifyDataSetChanged();
+                    targetFiles = target.listFiles();
+                    switch (position){
+                        case 0:
+                            deletePack(DEFAULT_POINTER_PACK);
+                            break;
+                        case 1:
+                            deletePack(CHRISTMAS_POINTER_PACK);
+                            break;
+                        case 2:
+                            deletePack(HEART_POINTER_PACK);
+                            break;
+                        case 3:
+                            deletePack(GOOGLE_MI_PACK);
+                            break;
+                        case 4:
+                            deletePack(HERMANKZR_PACK);
+                            break;
+                        case 5:
+                            deletePack(XDA_POINTER);
+                            break;
+                        case 6:
+                            for (File pointer : targetFiles){
+                                if (pointer.getName().startsWith(POKEMON_POINTER_PACK)){
+                                    pointer.delete();
+                                    notifyDataSetChanged();
+                                }
+                            }
+                            mInstalledPointerEditor.putBoolean(POKEMON_POINTER_PACK, false).apply();
+                            break;
+                    }
+                    notifyDataSetChanged();
+                    mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root),"Pointer Pack Deleted.");
+                }
+            });
+
+            listCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    switch (position){
+                        case 0:
+                            showSpecificPointerDialog(DEFAULT_POINTER_PACK, DEFAULT_PP_NAME);
+                            break;
+                        case 1:
+                            showSpecificPointerDialog(CHRISTMAS_POINTER_PACK, CHRISTMAS_PP_NAME);
+                            break;
+                        case 2:
+                            showSpecificPointerDialog(HEART_POINTER_PACK, HERMANKZR_PP_NAME);
+                            break;
+                        case 3:
+                            showSpecificPointerDialog(GOOGLE_MI_PACK, GOOGLE_MI_PP_NAME);
+                            break;
+                        case 4:
+                            showSpecificPointerDialog(HERMANKZR_PACK, HEART_PP_NAME);
+                            break;
+                        case 5:
+                            showSpecificPointerDialog(XDA_POINTER, XDA_POINTER_NAME);
+                            break;
+                        case 6:
+                            if (mUtils.isAppInstalled(mContext, POKEMON_POINTERS_PACKAGE_NAME)){
+                                String[] files;
+                                ArrayList<File> arrayList = new ArrayList<>();
+                                try {
+                                    AssetManager am = getPackageManager().getResourcesForApplication(POKEMON_POINTERS_PACKAGE_NAME).getAssets();
+                                    files = am.list(DIR_NAME_POINTERS);
+
+                                    final Utils.PointerAdapter pointerAdapter = new Utils.PointerAdapter(mContext);
+                                    assert files != null;
+                                    for (String filename : files) {
+                                        if (filename.startsWith(POKEMON_POINTER_PACK)){
+                                            String target = getCacheDir() + File.separator + filename;
+                                            if (!new File(target).exists()){
+                                                InputStream in;
+                                                OutputStream out;
+                                                try {
+                                                    in = am.open(DIR_NAME_POINTERS + File.separator + filename);
+                                                    out = new FileOutputStream(target);
+                                                    arrayList.add(new File(target));
+
+                                                    byte[] bytes = new byte[1024];
+                                                    int read;
+                                                    while ((read = in.read(bytes)) != -1){
+                                                        out.write(bytes, 0, read);
+                                                    }
+
+                                                    in.close();
+                                                    out.flush();
+                                                    out.close();
+                                                    notifyDataSetChanged();
+                                                } catch (Exception e) {
+                                                    Log.e(mTag, e.getMessage());
+                                                }
+                                            } else {
+                                                arrayList.add(new File(target));
+                                            }
+                                        }
+                                    }
+                                    for (File pointer : arrayList){
+                                        if (pointer.getName().startsWith(POKEMON_POINTER_PACK)){
+                                            pointerAdapter.add(pointer.getPath());
+                                        }
+                                    }
+                                    MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
+                                            .title(POKEMON_PP_NAME)
+                                            .customView(R.layout.gridview_free, false)
+                                            .show();
+                                    materialDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialogInterface) {
+                                            pointerAdapter.clear();
+                                        }
+                                    });
+                                    View view1 = materialDialog.getCustomView();
+                                    if (view1 != null) {
+                                        final GridView gridView = (GridView) view1.findViewById(R.id.bs_gridView);
+                                        gridView.setAdapter(pointerAdapter);
+                                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                                File source = new File(pointerAdapter.getPath(i));
+                                                File targetFile = new File(mTargetPath + source.getName());
+                                                if (!targetFile.exists()){
+                                                    try {
+                                                        copyFile(source, targetFile);
+                                                        Toast.makeText(mContext,
+                                                                String.format("%s %s", source.getName(), getString(R.string.text_installed)),
+                                                                Toast.LENGTH_SHORT).show();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                } else {
+                                                    Toast.makeText(mContext, source.getName() + " is already installed.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                                    }
+                                } catch (PackageManager.NameNotFoundException ignored) {
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                showPokemonDownloadDialog();
+                            }
+                            break;
+                    }
+                }
+            });
+            return view;
+        }
+    }
+
+}

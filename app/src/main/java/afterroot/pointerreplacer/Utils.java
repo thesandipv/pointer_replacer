@@ -1,5 +1,20 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela (AfterROOT)
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright (C) 2016 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,29 +31,64 @@
 package afterroot.pointerreplacer;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+/**
+ * Helper Class
+ */
 class Utils {
 
-    static void showSnackbar(View view, String message){
-        final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+    Utils(){
+
+    }
+
+    void showSnackbar(View view, String message){
+        Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.show();
     }
 
-    static void showSnackbar(View view, String message, String action){
+    boolean isAppInstalled(Context context, String pName){
+        try {
+            context.getPackageManager().getApplicationInfo(pName, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    void showSnackbar(View view, String message, String action){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.setAction(action, new View.OnClickListener() {
             @Override
@@ -49,12 +99,12 @@ class Utils {
         snackBar.show();
     }
 
-    static int getDpi(Context context){
+    int getDpi(Context context){
         return context.getResources().getDisplayMetrics().densityDpi;
     }
 
-    static void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
-        final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+    void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
+        Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
         snackBar.setAction(action, action_listener);
         snackBar.show();
     }
@@ -64,7 +114,7 @@ class Utils {
      * @return extension of fileName
      */
     @NonNull
-    private static String getFileExt(String fileName) {
+    private String getFileExt(String fileName) {
         return fileName.substring((fileName.lastIndexOf(".")+ 1 ), fileName.length());
     }
 
@@ -72,7 +122,7 @@ class Utils {
      * @param fileName name of file
      * @return mime type of fileName
      */
-    static String getMimeType(String fileName) {
+    String getMimeType(String fileName) {
         String type = null;
         try {
             String extension = getFileExt(fileName);
@@ -83,7 +133,22 @@ class Utils {
         return type;
     }
 
-    static void loadToBottomSheetGrid(Context context,
+    void copyFile(File source, File destination) throws IOException {
+        FileChannel sourceChannel = new FileInputStream(source).getChannel();
+        FileChannel destinationChannel = new FileOutputStream(destination).getChannel();
+        try {
+            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+        } finally {
+            try {
+                sourceChannel.close();
+                destinationChannel.close();
+            } catch (IOException io){
+                io.printStackTrace();
+            }
+        }
+    }
+
+    void loadToBottomSheetGrid(Context context,
                                       GridView target,
                                       String targetPath,
                                       AdapterView.OnItemClickListener listener){
@@ -110,19 +175,34 @@ class Utils {
     /**GridView Image Adapter.**/
     static class PointerAdapter extends BaseAdapter {
         private Context mContext;
+        private LayoutInflater inflater;
+        private DisplayImageOptions options;
+
         static ArrayList<String> itemList = new ArrayList<>();
+
         PointerAdapter(Context context) {
             mContext = context;
+            inflater = LayoutInflater.from(mContext);
+
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnLoading(R.drawable.ic_image_loading)
+                    .showImageForEmptyUri(R.drawable.ic_image_broken)
+                    .showImageOnFail(R.drawable.ic_image_error)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .considerExifParams(true)
+                    .bitmapConfig(Bitmap.Config.ARGB_8888)
+                    .build();
         }
         void add(String path) {
             itemList.add(path);
         }
 
-        static void clear(){
+        void clear(){
             itemList.clear();
         }
 
-        static String getPath(int index){
+        String getPath(int index){
             return itemList.get(index);
         }
 
@@ -148,44 +228,110 @@ class Utils {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            if (convertView == null) {
-                imageView = new ImageView(mContext);
-                imageView.setLayoutParams(new GridView.LayoutParams(param, param));
-                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            final ViewHolder holder;
+            View view = convertView;
+
+            if (view == null){
+                view = inflater.inflate(R.layout.gridview_item, parent, false);
+                holder = new ViewHolder();
+                holder.imageView = (ImageView) view.findViewById(R.id.grid_item_image);
+                holder.imageView.setLayoutParams(new FrameLayout.LayoutParams(param, param));
+                view.setTag(holder);
             } else {
-                imageView = (ImageView) convertView;
+                holder = (ViewHolder) view.getTag();
             }
 
-            Bitmap bm = decodeSampleBitmapFromUri(itemList.get(position), param, param);
-            imageView.setImageBitmap(bm);
-            return imageView;
+            ImageLoader imageLoader = ImageLoader.getInstance();
+
+            imageLoader.displayImage("file:///"+itemList.get(position), holder.imageView, options);
+
+            return view;
+        }
+    }
+
+    private static class ViewHolder {
+        ImageView imageView;
+    }
+
+    boolean isNetworkAvailable(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    void openFile(Context context, String filname, Uri downloadedFile){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(downloadedFile, getMimeType(filname));
+        context.startActivity(intent);
+    }
+
+    String dlString(String url, boolean fetchLines) {
+        String dS = "";
+        try {
+            DownloadTxtTask downloadTxtTask = new DownloadTxtTask();
+            dS = downloadTxtTask.execute(url).get();
+            downloadTxtTask.setFetchLines(fetchLines);
+        } catch(Exception ex) {
+            //
+        }
+        return dS;
+    }
+
+    private static class DownloadTxtTask extends AsyncTask< String, Integer, String > {
+        boolean isFetchLines;
+
+        void setFetchLines(boolean fetchLines){
+            isFetchLines = fetchLines;
         }
 
-        Bitmap decodeSampleBitmapFromUri(String path, int reqWidth, int reqHeight) {
-            Bitmap bm;
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, options);
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-            options.inJustDecodeBounds = false;
-            bm = BitmapFactory.decodeFile(path, options);
-            return bm;
-        }
-
-        int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight){
-            final int height = options.outHeight;
-            final int width = options.outWidth;
-            int inSampleSize = 1;
-
-            if (height > reqHeight || width > reqWidth) {
-                if (width > height) {
-                    inSampleSize = Math.round((float)height / (float)reqHeight);
+        @Override
+        protected String doInBackground(String... downloadURL) {
+            URL url;
+            String result  = null;
+            InputStream is;
+            try {
+                url = new URL(downloadURL[0]);
+                is = url.openStream();
+                if (isFetchLines){
+                    result = convertStreamToString(is);
                 } else {
-                    inSampleSize = Math.round((float)width / (float)reqWidth);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                    result = br.readLine();
+                    br.close();
+                    is.close();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return inSampleSize;
+
+            return result;
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+        }
+    }
+
+    @NonNull
+    private static String convertStreamToString(InputStream inputStream) throws UnsupportedEncodingException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null){
+                sb.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
     }
 }

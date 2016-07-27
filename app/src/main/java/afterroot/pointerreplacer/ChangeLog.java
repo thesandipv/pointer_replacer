@@ -1,3 +1,33 @@
+/*
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * Copyright (C) 2011-2013, Karsten Priegnitz
  *
@@ -14,12 +44,13 @@
  */
 package afterroot.pointerreplacer;
 
-import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.webkit.WebView;
@@ -131,10 +162,11 @@ public class ChangeLog {
 
         //wv.setBackgroundColor(Color.parseColor(context.getResources().getString(
                 //R.string.background_color)));
+        wv.setBackgroundColor(Color.DKGRAY);
         wv.loadDataWithBaseURL(null, this.getLog(full), "text/html", "UTF-8", null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this.context,
-                R.style.Theme_AppCompat_Light_Dialog));
+                R.style.Theme_AppCompat_Dialog));
         builder.setTitle(
                 context.getResources().getString(
                         full ? R.string.changelog_full_title : R.string.changelog_title))

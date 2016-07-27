@@ -1,5 +1,20 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela (AfterROOT)
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright (C) 2016 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @SuppressLint("ValidFragment")
     private class SettingsFragment extends PreferenceFragment {
-        Preference maxPointerSize;
+        Preference maxPointerSize, maxPaddingSize;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -112,6 +127,29 @@ public class SettingsActivity extends AppCompatActivity {
                                     maxPointerSize.setSummary(input);
                                 }
                             }).show();
+                    return false;
+                }
+            });
+
+            maxPaddingSize = findPreference(getString(R.string.key_maxPaddingSize));
+            maxPaddingSize.setSummary(mSharedPreferences.getString(getString(R.string.key_maxPaddingSize), "25"));
+            maxPaddingSize.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new MaterialDialog.Builder(SettingsActivity.this)
+                            .title(getString(R.string.key_maxPaddingSize))
+                            .inputType(InputType.TYPE_CLASS_NUMBER)
+                            .inputRange(1, 3)
+                            .input("Enter Max Padding Size",
+                                    mSharedPreferences.getString(getString(R.string.key_maxPaddingSize), "25"),
+                                    new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                            mEditor.putString(getString(R.string.key_maxPaddingSize), input.toString());
+                                            mEditor.apply();
+                                            maxPointerSize.setSummary(input);
+                                        }
+                                    }).show();
                     return false;
                 }
             });

@@ -1,5 +1,20 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela (AfterROOT)
+ * Copyright (C) 2016 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright (C) 2016 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,14 +59,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static afterroot.pointerreplacer.Utils.showSnackbar;
-
 public class PointerPreview extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
     private RelativeLayout previewLayout;
     private ImageView previewPointer;
     private LinearLayout previewMain;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
+    private Utils mUtils;
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -73,6 +87,8 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
+
+        mUtils = new Utils();
 
         previewLayout = (RelativeLayout) findViewById(R.id.preview_layout);
         previewPointer = (ImageView) findViewById(R.id.preview_pointer);
@@ -173,7 +189,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        showSnackbar(previewLayout, "Pointer Applied ");
+                        mUtils.showSnackbar(previewLayout, "Pointer Applied ");
                     }
                 }).show();
     }

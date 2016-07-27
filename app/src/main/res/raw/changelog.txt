@@ -14,11 +14,19 @@
         font-size:0.8em;
         margin-bottom:1em;
         text-align:center }
-      div.freetext { color:#000000 }
-      div.list     { color:#000000 }
+      div.freetext { color:#FFFFFF }
+      div.list     { color:#FFFFFF }
     </style>
   </head>
   <body>
+    $ 1.6.4
+      % Version 1.6.4
+      _ 27-07-2016
+      * New: Pointer transparency settings (Disabled by default. Enable from Settings)
+      * New: Now you can set max pointer padding from Settings. Max limit is 999.
+      * New: Pokemon Pointers (Go to Install/Manage Pointers > Click on Pokemon Pointers to download Pointer Pack).
+      * Improvement: Improved app experience when too many pointers are installed.
+      * Other many changes and improvements.
     $ 1.6.3
       % Version 1.6.3
       _ 31-05-2016
