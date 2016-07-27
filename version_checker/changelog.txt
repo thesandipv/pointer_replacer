@@ -1,4 +1,5 @@
-New: Improvements for Marshmallow.
-New: New Pointers.
-New: Added long press to delete pointer.
-Other minor improvements and bug fixes.
+New: Pointer transparency settings (Disabled by default. Enable from Settings)
+New: Now you can set max pointer padding from Settings. Max limit is 999.
+New: Pokemon Pointers (Go to Install/Manage Pointers > Click on Pokemon Pointers to download Pointer Pack).
+Improvement: Improved app experience when too many pointers are installed.
+Other many changes and improvements.
