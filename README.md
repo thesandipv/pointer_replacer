@@ -5,8 +5,14 @@ In short it replaces a dot appears when user touch the screen [Require Show Touc
 - Choose Pointer images from sdcard.
 - Change color of pointer using color picker.
 - Change the size of pointer.
+- Install/Manage Pointers.
 
-**Note:**
-If you want to use you own pointer than you should use 49˟49 png image [If your device is xhdpi or greater then use 66˟66 png image].
+**How to load your own pointer:** 
+1. Open Pointer Replacer
+2. Open Navigation Drawer by Sliding or tapping hamburger icon.
+3. Tap on Import Pointer.
+4. Select any image to import it as pointer.
 
-Tested working on Micromax Unite 2 running Lollipop 5.0 & Bluestacks running KitKat 4.4.2. 
+**Pointer Packs:**
+Pokemon Pointers - You can install this pack from Install/Manage Pointer screen.
+(Note: Pointers Included in this pack are downloaded from http://www.iconarchive.com/show/pokemon-icons-by-hektakun.1.html)
