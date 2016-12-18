@@ -4,22 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright (C) 2016 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -90,12 +75,7 @@ class Utils {
 
     void showSnackbar(View view, String message, String action){
         final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.setAction(action, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                snackBar.dismiss();
-            }
-        });
+        snackBar.setAction(action, view1 -> snackBar.dismiss());
         snackBar.show();
     }
 
@@ -122,7 +102,7 @@ class Utils {
      * @param fileName name of file
      * @return mime type of fileName
      */
-    String getMimeType(String fileName) {
+    private String getMimeType(String fileName) {
         String type = null;
         try {
             String extension = getFileExt(fileName);

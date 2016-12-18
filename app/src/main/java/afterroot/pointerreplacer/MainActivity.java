@@ -4,22 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright (C) 2016 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,6 +57,7 @@ import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.flipboard.bottomsheet.OnSheetDismissedListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -90,6 +76,7 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ColorChooserDialog.ColorCallback, FileChooserDialog.FileCallback {
 
+    private static final int REQUEST_CODE = 0;
     private int latestPointerVersion = 5;
     private DiscreteSeekBar mPointerSizeBar, mPaddingBar, mAlphaBar;
     private ImageView mPointerSelected, mCurrentPointer;
@@ -107,11 +94,13 @@ public class MainActivity extends AppCompatActivity
     private DrawerArrowDrawable drawerArrowDrawable;
     private Utils mUtils;
     private RelativeLayout mRootLayout;
+    private FirebaseAnalytics mAnalytics;
     private String[] PERMISSIONS = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE
     };
+    private boolean PERMISSION_GRANTED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +111,11 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString("Device_Name", Build.DEVICE);
+        bundle.putString("AndroidVersion", Build.VERSION.CODENAME);
+        mAnalytics.logEvent("DeviceInfo", bundle);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null){
@@ -142,14 +136,12 @@ public class MainActivity extends AppCompatActivity
         initialize();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         ImageLoader.getInstance().destroy();
     }
 
-    private static final int REQUEST_CODE = 0;
     private void checkPermissions(){
         PermissionChecker permissionChecker = new PermissionChecker(this);
         if (permissionChecker.lacksPermissions(PERMISSIONS)){
@@ -157,7 +149,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private boolean PERMISSION_GRANTED;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -175,12 +166,7 @@ public class MainActivity extends AppCompatActivity
             drawerArrowDrawable.setColor(getResources().getColor(android.R.color.white));
         }
         mToolbar.setNavigationIcon(drawerArrowDrawable);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                drawer.openDrawer(GravityCompat.START);
-            }
-        });
+        mToolbar.setNavigationOnClickListener(view -> drawer.openDrawer(GravityCompat.START));
     }
 
     @Override
@@ -193,7 +179,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressLint("CommitPrefEdits")
     private void initialize(){
-        /**Load SharedPreferences**/
+        /*Load SharedPreferences**/
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
         
@@ -295,12 +281,7 @@ public class MainActivity extends AppCompatActivity
                 .title("Install Pointers")
                 .content("No Pointers installed. Please install some pointers")
                 .positiveText("Install Pointers")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        startActivity(new Intent(MainActivity.this, ManagePointerActivity.class));
-                    }
-                }).show();
+                .onPositive((dialog, which) -> startActivity(new Intent(MainActivity.this, ManagePointerActivity.class))).show();
     }
 
     /**
@@ -397,64 +378,45 @@ public class MainActivity extends AppCompatActivity
                 drawerArrowDrawable.setColor(getResources().getColor(android.R.color.white));
             }
             mToolbar.setNavigationIcon(drawerArrowDrawable);
-            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    bottomSheet.dismissSheet();
-                }
-            });
+            mToolbar.setNavigationOnClickListener(view1 -> bottomSheet.dismissSheet());
 
             mToolbar.setTitle(R.string.text_choose_pointer);
             bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomSheet);
             bottomSheet.showWithSheetView(LayoutInflater
                     .from(getApplicationContext())
                     .inflate(R.layout.gridview_bottomsheet, bottomSheet, false));
-            bottomSheet.addOnSheetDismissedListener(new OnSheetDismissedListener() {
-                @Override
-                public void onDismissed(BottomSheetLayout bottomSheetLayout) {
-                    mToolbar.setTitle(getString(R.string.app_name));
-                    ObjectAnimator.ofFloat(drawerArrowDrawable, "progress", 0).start();
-                    pointerAdapter.clear();
-                    mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            drawer.openDrawer(GravityCompat.START);
-                        }
-                    });
-                }
+            bottomSheet.addOnSheetDismissedListener(bottomSheetLayout -> {
+                mToolbar.setTitle(getString(R.string.app_name));
+                ObjectAnimator.ofFloat(drawerArrowDrawable, "progress", 0).start();
+                pointerAdapter.clear();
+                mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view12) {
+                        drawer.openDrawer(GravityCompat.START);
+                    }
+                });
             });
             GridView gridView = (GridView) findViewById(R.id.bs_gridView);
 
-            mUtils.loadToBottomSheetGrid(this, gridView, mTargetPath, new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    mEditor.putString(getString(R.string.key_selectedPointerPath), pointerAdapter.getPath(i)).apply();
-                    mPointerSelected.setImageDrawable(Drawable.createFromPath(pointerAdapter.getPath(i)));
-                    bottomSheet.dismissSheet();
-                    Log.d(mTag, "Selected Pointer Path: "+pointerAdapter.getPath(i));
-                }
+            mUtils.loadToBottomSheetGrid(this, gridView, mTargetPath, (adapterView, view13, i, l) -> {
+                mEditor.putString(getString(R.string.key_selectedPointerPath), pointerAdapter.getPath(i)).apply();
+                mPointerSelected.setImageDrawable(Drawable.createFromPath(pointerAdapter.getPath(i)));
+                bottomSheet.dismissSheet();
+                Log.d(mTag, "Selected Pointer Path: "+pointerAdapter.getPath(i));
             });
             if (gridView != null) {
-                gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        bottomSheet.dismissSheet();
-                        final File file = new File(pointerAdapter.getPath(i));
-                        new MaterialDialog.Builder(MainActivity.this)
-                                .title(getString(R.string.text_delete) + file.getName())
-                                .content(R.string.text_delete_confirm)
-                                .positiveText(R.string.text_yes)
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        file.delete();
-                                    }
-                                })
-                                .negativeText(R.string.text_no)
-                                .show();
+                gridView.setOnItemLongClickListener((adapterView, view14, i, l) -> {
+                    bottomSheet.dismissSheet();
+                    final File file = new File(pointerAdapter.getPath(i));
+                    new MaterialDialog.Builder(MainActivity.this)
+                            .title(getString(R.string.text_delete) + file.getName())
+                            .content(R.string.text_delete_confirm)
+                            .positiveText(R.string.text_yes)
+                            .onPositive((dialog, which) -> file.delete())
+                            .negativeText(R.string.text_no)
+                            .show();
 
-                        return false;
-                    }
+                    return false;
                 });
             }
         } else {
@@ -643,26 +605,20 @@ public class MainActivity extends AppCompatActivity
                 .positiveText(R.string.reboot)
                 .negativeText(R.string.text_no)
                 .neutralText(R.string.text_soft_reboot)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot"});
-                            process.waitFor();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                .onPositive((dialog, which) -> {
+                    try {
+                        Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot"});
+                        process.waitFor();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 })
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "busybox killall system_server"});
-                            process.waitFor();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                .onNeutral((dialog, which) -> {
+                    try {
+                        Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "busybox killall system_server"});
+                        process.waitFor();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 })
                 .show();
@@ -778,12 +734,9 @@ public class MainActivity extends AppCompatActivity
                         getString(R.string.text_copy_confirm_2))
                 .positiveText(R.string.text_yes)
                 .negativeText(R.string.text_no)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        copyAssets();
-                        mUtils.showSnackbar(mRootLayout, getString(R.string.text_pointers_copied) + mTargetPath);
-                    }
+                .onPositive((dialog, which) -> {
+                    copyAssets();
+                    mUtils.showSnackbar(mRootLayout, getString(R.string.text_pointers_copied) + mTargetPath);
                 }).show();
     }
 
@@ -796,24 +749,16 @@ public class MainActivity extends AppCompatActivity
                 .positiveText(R.string.text_yes)
                 .negativeText(R.string.text_no)
                 .neutralText(R.string.title_activity_pointer_preview)
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        showPreview(true);
-                    }
-                })
+                .onNeutral((dialog, which) -> showPreview(true))
                 .maxIconSize(50)
                 .icon(drawable)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            applyPointer();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        mUtils.showSnackbar(mRootLayout, getString(R.string.text_pointer_applied));
+                .onPositive((dialog, which) -> {
+                    try {
+                        applyPointer();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    mUtils.showSnackbar(mRootLayout, getString(R.string.text_pointer_applied));
                 }).show();
     }
 
@@ -867,7 +812,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_changelog:
                 ChangeLog cl = new ChangeLog(this);

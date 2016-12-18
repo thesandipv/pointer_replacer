@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,35 +13,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright (C) 2016 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * Copyright (C) 2011-2013, Karsten Priegnitz
- *
- * Permission to use, copy, modify, and distribute this piece of software
- * for any purpose with or without fee is hereby granted, provided that
- * the above copyright notice and this permission notice appear in the
- * source code of all copies.
- *
- * It would be appreciated if you mention the author in your change log,
- * contributors list or the like.
- *
- * @author: Karsten Priegnitz
- * @see: http://code.google.com/p/android-change-log/
- */
 package afterroot.pointerreplacer;
 
 import android.content.Context;
@@ -60,15 +31,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class ChangeLog {
-
-    private final Context context;
-    private String lastVersion, thisVersion;
+class ChangeLog {
 
     // this is the key for storing the version name in SharedPreferences
     private static final String VERSION_KEY = "PREFS_VERSION_KEY";
-
     private static final String NO_VERSION = "";
+    private static final String EOCL = "END_OF_CHANGE_LOG";
+    private static final String TAG = "Pointer Replacer";
+    private final Context context;
+    private String lastVersion, thisVersion;
+    private Listmode listMode = Listmode.NONE;
+    private StringBuffer sb = null;
 
     /**
      * Constructor
@@ -77,7 +50,7 @@ public class ChangeLog {
      *
      * @param context
      */
-    public ChangeLog(Context context) {
+    ChangeLog(Context context) {
         this(context, PreferenceManager.getDefaultSharedPreferences(context));
     }
 
@@ -90,7 +63,7 @@ public class ChangeLog {
      * @param sp
      *            the shared preferences to store the last version name into
      */
-    public ChangeLog(Context context, SharedPreferences sp) {
+    private ChangeLog(Context context, SharedPreferences sp) {
         this.context = context;
 
         // get version numbers
@@ -129,7 +102,7 @@ public class ChangeLog {
     /**
      * @return <code>true</code> if this version of your app is started the first time
      */
-    public boolean firstRun() {
+    boolean firstRun() {
         return !this.lastVersion.equals(this.thisVersion);
     }
 
@@ -137,7 +110,7 @@ public class ChangeLog {
      * @return <code>true</code> if your app including ChangeLog is started the first time ever.
      *         Also <code>true</code> if your app was deinstalled and installed again.
      */
-    public boolean firstRunEver() {
+    private boolean firstRunEver() {
         return NO_VERSION.equals(this.lastVersion);
     }
 
@@ -146,18 +119,18 @@ public class ChangeLog {
      *         app (what's new). But when this is the first run of your app including ChangeLog then
      *         the full log dialog is show.
      */
-    public AlertDialog getLogDialog() {
+    AlertDialog getLogDialog() {
         return this.getDialog(this.firstRunEver());
     }
 
     /**
      * @return an AlertDialog with a full change log displayed
      */
-    public AlertDialog getFullLogDialog() {
+    AlertDialog getFullLogDialog() {
         return this.getDialog(true);
     }
 
-    protected AlertDialog getDialog(boolean full) {
+        private AlertDialog getDialog(boolean full) {
         WebView wv = new WebView(this.context);
 
         //wv.setBackgroundColor(Color.parseColor(context.getResources().getString(
@@ -174,26 +147,18 @@ public class ChangeLog {
                 .setCancelable(false)
                 // OK button
                 .setPositiveButton(context.getResources().getString(R.string.changelog_ok_button),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                updateVersionInPreferences();
-                            }
-                        });
+                        (dialog, which) -> updateVersionInPreferences());
 
         if (!full) {
             // "more ..." button
             builder.setNegativeButton(R.string.changelog_show_full,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            getFullLogDialog().show();
-                        }
-                    });
+                    (dialog, id) -> getFullLogDialog().show());
         }
 
         return builder.create();
     }
 
-    protected void updateVersionInPreferences() {
+    private void updateVersionInPreferences() {
         // save new version number to preferences
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
@@ -221,15 +186,6 @@ public class ChangeLog {
     public String getFullLog() {
         return this.getLog(true);
     }
-
-    /** modes for HTML-Lists (bullet, numbered) */
-    private enum Listmode {
-        NONE, ORDERED, UNORDERED,
-    };
-
-    private Listmode listMode = Listmode.NONE;
-    private StringBuffer sb = null;
-    private static final String EOCL = "END_OF_CHANGE_LOG";
 
     protected String getLog(boolean full) {
         // read changelog.txt file
@@ -320,8 +276,6 @@ public class ChangeLog {
         this.listMode = Listmode.NONE;
     }
 
-    private static final String TAG = "Pointer Replacer";
-
     /**
      * manually set the last version name - for testing purposes only
      *
@@ -329,5 +283,10 @@ public class ChangeLog {
      */
     public void dontuseSetLastVersion(String lastVersion) {
         this.lastVersion = lastVersion;
+    }
+
+/** modes for HTML-Lists (bullet, numbered) */
+    private enum Listmode {
+        NONE, ORDERED, UNORDERED,
     }
 }

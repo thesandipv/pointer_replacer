@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="AfterROOT">
+  <settings default="sandip">
     <module2copyright>
-      <element module="All" copyright="AfterROOT" />
+      <element module="Project Files" copyright="sandip" />
     </module2copyright>
   </settings>
 </component>
