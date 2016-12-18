@@ -4,22 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright (C) 2016 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,23 +49,17 @@ public class AboutActivity extends AppCompatActivity {
 
             findPreference(getString(R.string.key_app_info)).setTitle(getString(R.string.app_name)+" "+ getString(R.string.version));
 
-            findPreference(getString(R.string.key_app_info)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(AboutActivity.this, UpdateActivity.class));
-                    return false;
-                }
+            findPreference(getString(R.string.key_app_info)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(AboutActivity.this, UpdateActivity.class));
+                return false;
             });
 
-            findPreference("licenses").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new LicensesDialog.Builder(AboutActivity.this)
-                            .setNotices(R.raw.notices)
-                            .build()
-                            .showAppCompat();
-                    return false;
-                }
+            findPreference("licenses").setOnPreferenceClickListener(preference -> {
+                new LicensesDialog.Builder(AboutActivity.this)
+                        .setNotices(R.raw.notices)
+                        .build()
+                        .showAppCompat();
+                return false;
             });
         }
 

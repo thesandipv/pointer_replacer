@@ -4,22 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright (C) 2016 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,12 +62,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.preview_fab_apply);
         if (fab != null) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showSureDialog();
-                }
-            });
+            fab.setOnClickListener(view -> showSureDialog());
         }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -106,20 +86,17 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
 
         previewPointer.setLayoutParams(new LinearLayout.LayoutParams(pointersize, pointersize));
 
-        previewLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                int action = MotionEventCompat.getActionMasked(event);
-                switch (action){
-                    case MotionEvent.ACTION_MOVE:
-                        previewMain.setVisibility(View.VISIBLE);
-                        int x = (int) event.getX();
-                        int y = (int) event.getY();
-                        previewMain.setPadding(x, y, 0, 0);
-                        break;
-                }
-                return true;
+        previewLayout.setOnTouchListener((view, event) -> {
+            int action = MotionEventCompat.getActionMasked(event);
+            switch (action){
+                case MotionEvent.ACTION_MOVE:
+                    previewMain.setVisibility(View.VISIBLE);
+                    int x = (int) event.getX();
+                    int y = (int) event.getY();
+                    previewMain.setPadding(x, y, 0, 0);
+                    break;
             }
+            return true;
         });
 
         try {
@@ -181,16 +158,13 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                 .negativeText("No")
                 .maxIconSize(50)
                 .icon(drawable)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            confirm();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        mUtils.showSnackbar(previewLayout, "Pointer Applied ");
+                .onPositive((dialog, which) -> {
+                    try {
+                        confirm();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    mUtils.showSnackbar(previewLayout, "Pointer Applied ");
                 }).show();
     }
 
@@ -232,26 +206,20 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                 .positiveText(textReboot)
                 .negativeText("Cancel")
                 .neutralText("Soft "+ textReboot)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot"});
-                            process.waitFor();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                .onPositive((dialog, which) -> {
+                    try {
+                        Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot"});
+                        process.waitFor();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 })
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        try {
-                            Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "busybox killall system_server"});
-                            process.waitFor();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                .onNeutral((dialog, which) -> {
+                    try {
+                        Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", "busybox killall system_server"});
+                        process.waitFor();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 })
                 .show();
