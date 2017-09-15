@@ -43,20 +43,17 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.flipboard.bottomsheet.BottomSheetLayout;
-import com.flipboard.bottomsheet.OnSheetDismissedListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -94,30 +91,28 @@ public class MainActivity extends AppCompatActivity
     private DrawerArrowDrawable drawerArrowDrawable;
     private Utils mUtils;
     private RelativeLayout mRootLayout;
-    private FirebaseAnalytics mAnalytics;
     private String[] PERMISSIONS = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE
     };
-    private boolean PERMISSION_GRANTED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme_Dark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mAnalytics = FirebaseAnalytics.getInstance(this);
+        drawer = findViewById(R.id.drawer_layout);
+        FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(this);
         Bundle bundle = new Bundle();
         bundle.putString("Device_Name", Build.DEVICE);
         bundle.putString("AndroidVersion", Build.VERSION.CODENAME);
-        mAnalytics.logEvent("DeviceInfo", bundle);
+        analytics.logEvent("DeviceInfo", bundle);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null){
             navigationView.setNavigationItemSelectedListener(this);
             int tintlistid;
@@ -153,7 +148,7 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case REQUEST_CODE:
-                PERMISSION_GRANTED = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean PERMISSION_GRANTED = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -205,15 +200,15 @@ public class MainActivity extends AppCompatActivity
 
     /**Find Views**/
     private void findViews(){
-        mPointerSizeBar = (DiscreteSeekBar) findViewById(R.id.seekBar);
-        mPaddingBar = (DiscreteSeekBar) findViewById(R.id.seekBarPadding);
-        mAlphaBar = (DiscreteSeekBar) findViewById(R.id.seekBarAlpha);
-        mTextSize = (TextView) findViewById(R.id.textView_size);
-        mTextAlpha = (TextView) findViewById(R.id.textAlpha);
-        mPaddingSize = (TextView) findViewById(R.id.textPadding);
-        mPointerSelected = (ImageView) findViewById(R.id.pointerSelected);
-        mCurrentPointer = (ImageView) findViewById(R.id.image_current_pointer);
-        mRootLayout = (RelativeLayout) findViewById(R.id.main_layout);
+        mPointerSizeBar = findViewById(R.id.seekBar);
+        mPaddingBar = findViewById(R.id.seekBarPadding);
+        mAlphaBar = findViewById(R.id.seekBarAlpha);
+        mTextSize = findViewById(R.id.textView_size);
+        mTextAlpha = findViewById(R.id.textAlpha);
+        mPaddingSize = findViewById(R.id.textPadding);
+        mPointerSelected = findViewById(R.id.pointerSelected);
+        mCurrentPointer = findViewById(R.id.image_current_pointer);
+        mRootLayout = findViewById(R.id.main_layout);
     }
 
     /**
@@ -227,7 +222,7 @@ public class MainActivity extends AppCompatActivity
         setToggle();
     }
 
-    private void showPreview(boolean isStartPreview){
+    private void showPreview(){
         try {
             Bitmap bitmap = loadBitmapFromView(mPointerSelected);
             File file = new File(mPointerPreviewPath);
@@ -240,9 +235,7 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (isStartPreview){
-            startActivity(new Intent(MainActivity.this, PointerPreview.class));
-        }
+        startActivity(new Intent(MainActivity.this, PointerPreview.class));
     }
 
     /**
@@ -381,7 +374,7 @@ public class MainActivity extends AppCompatActivity
             mToolbar.setNavigationOnClickListener(view1 -> bottomSheet.dismissSheet());
 
             mToolbar.setTitle(R.string.text_choose_pointer);
-            bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomSheet);
+            bottomSheet = findViewById(R.id.bottomSheet);
             bottomSheet.showWithSheetView(LayoutInflater
                     .from(getApplicationContext())
                     .inflate(R.layout.gridview_bottomsheet, bottomSheet, false));
@@ -396,7 +389,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
             });
-            GridView gridView = (GridView) findViewById(R.id.bs_gridView);
+            GridView gridView = findViewById(R.id.bs_gridView);
 
             mUtils.loadToBottomSheetGrid(this, gridView, mTargetPath, (adapterView, view13, i, l) -> {
                 mEditor.putString(getString(R.string.key_selectedPointerPath), pointerAdapter.getPath(i)).apply();
@@ -419,6 +412,11 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 });
             }
+
+            /*AdView adView;
+            adView = (AdView) findViewById(R.id.adView);
+            AdRequest request = new AdRequest.Builder().build();
+            adView.loadAd(request);*/
         } else {
             showInstallPointersDialog();
         }
@@ -453,7 +451,7 @@ public class MainActivity extends AppCompatActivity
 
         mPointerSizeBar.setMin(getMinSize());
 
-        RelativeLayout alphaBarContainer = (RelativeLayout) findViewById(R.id.alpha_bar_container);
+        RelativeLayout alphaBarContainer = findViewById(R.id.alpha_bar_container);
         if (mSharedPreferences.getBoolean(getString(R.string.key_EnablePointerAlpha), false)) {
             if (alphaBarContainer != null) {
                 showView(alphaBarContainer);
@@ -488,7 +486,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onProgressChanged(DiscreteSeekBar discreteSeekBar, int size, boolean b) {
                 mEditor.putInt(getString(R.string.key_pointerSize), size).apply();
-                mTextSize.setText(String.format(formatTextSize, getString(R.string.text_size), size, size));
+                mTextSize.setText(String.format(Locale.US, formatTextSize, getString(R.string.text_size), size, size));
                 imageSize = size;
                 setPointerImageParams(size, mPaddingBar.getProgress() ,false);
             }
@@ -669,6 +667,11 @@ public class MainActivity extends AppCompatActivity
         mEditor.apply();
     }
 
+    @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog dialog) {
+
+    }
+
     private int getOldColor(){
         return mSharedPreferences.getInt(getString(R.string.key_oldColor), -1);
     }
@@ -749,7 +752,7 @@ public class MainActivity extends AppCompatActivity
                 .positiveText(R.string.text_yes)
                 .negativeText(R.string.text_no)
                 .neutralText(R.string.title_activity_pointer_preview)
-                .onNeutral((dialog, which) -> showPreview(true))
+                .onNeutral((dialog, which) -> showPreview())
                 .maxIconSize(50)
                 .icon(drawable)
                 .onPositive((dialog, which) -> {
@@ -779,8 +782,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+
+    }
+
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer != null) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
@@ -805,7 +813,7 @@ public class MainActivity extends AppCompatActivity
             }
             return true;
             case R.id.viewPreview:
-                showPreview(true);
+                showPreview();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -839,7 +847,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.preview:
-                showPreview(true);
+                showPreview();
                 break;
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));
