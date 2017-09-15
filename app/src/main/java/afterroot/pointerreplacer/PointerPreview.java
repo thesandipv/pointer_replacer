@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
@@ -57,10 +56,10 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pointer_preview);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.preview_fab_apply);
+        FloatingActionButton fab = findViewById(R.id.preview_fab_apply);
         if (fab != null) {
             fab.setOnClickListener(view -> showSureDialog());
         }
@@ -70,9 +69,9 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
 
         mUtils = new Utils();
 
-        previewLayout = (RelativeLayout) findViewById(R.id.preview_layout);
-        previewPointer = (ImageView) findViewById(R.id.preview_pointer);
-        previewMain = (LinearLayout) findViewById(R.id.previewMain);
+        previewLayout = findViewById(R.id.preview_layout);
+        previewPointer = findViewById(R.id.preview_pointer);
+        previewMain = findViewById(R.id.previewMain);
         if (previewMain != null) {
             previewMain.setVisibility(View.INVISIBLE);
         }
@@ -135,6 +134,11 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
             mEditor.putInt("PREVIEW_POINTER_OLD_COLOR", selectedColor);
             mEditor.apply();
         }
+
+    }
+
+    @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog dialog) {
 
     }
 

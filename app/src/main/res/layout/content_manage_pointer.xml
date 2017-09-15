@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     android:id="@+id/content_pointer_manage_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -33,4 +33,4 @@
         android:divider="@android:color/transparent"
         android:choiceMode="singleChoice"/>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>

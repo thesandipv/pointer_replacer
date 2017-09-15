@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.CoordinatorLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -39,4 +39,4 @@
 
     <include layout="@layout/content_update"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
