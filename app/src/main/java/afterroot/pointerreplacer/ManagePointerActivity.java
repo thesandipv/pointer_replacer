@@ -17,7 +17,6 @@ package afterroot.pointerreplacer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,7 +24,6 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -35,7 +33,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -44,8 +41,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,7 +83,7 @@ public class ManagePointerActivity extends AppCompatActivity {
     private static String DIR_NAME_POINTERS = "pointers";
 
     private String POKEMON_PACK_DL_URL = "http://bit.ly/PokemonPointers";
-    private static String POKEMON_POINTERS_PACKAGE_NAME = "tk.afterroot.pokmonpointers";
+    private static String POKEMON_POINTERS_PACKAGE_NAME;
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -94,7 +91,7 @@ public class ManagePointerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_pointer);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -104,10 +101,13 @@ public class ManagePointerActivity extends AppCompatActivity {
         mTag = "ManagePointers";
         mUtils = new Utils();
 
-        mInstalledPointerPrefs = this.getSharedPreferences("afterroot.pointerreplacer.installed_pointers", Context.MODE_PRIVATE);
+        FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        POKEMON_POINTERS_PACKAGE_NAME = firebaseRemoteConfig.getString("pokemon_pack_play_store");
+
+        mInstalledPointerPrefs = this.getSharedPreferences(getPackageName()+".installed_pointers", Context.MODE_PRIVATE);
         mInstalledPointerEditor = mInstalledPointerPrefs.edit();
 
-        ListView pointersList = (ListView) findViewById(R.id.pointerList);
+        ListView pointersList = findViewById(R.id.pointerList);
 
         target = new File(mTargetPath);
         targetFiles = target.listFiles();
@@ -329,7 +329,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
             View view1 = materialDialog.getCustomView();
             if (view1 != null) {
-                final GridView gridView = (GridView) view1.findViewById(R.id.bs_gridView);
+                final GridView gridView = view1.findViewById(R.id.bs_gridView);
                 gridView.setAdapter(pointerAdapter);
                 gridView.setOnItemClickListener((adapterView, view, i, l) -> {
                     File source = new File(pointerAdapter.getPath(i));
@@ -351,12 +351,19 @@ public class ManagePointerActivity extends AppCompatActivity {
         }
 
         void showPokemonDownloadDialog(){
+
             new MaterialDialog.Builder(ManagePointerActivity.this)
                     .title("Download Pokemon Pointers Pack")
                     .content("Pokemon Pointers is not installed. Do you want to download it now?")
                     .positiveText("Download")
                     .negativeText("No")
-                    .onPositive((dialog, which) -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(POKEMON_PACK_DL_URL))))
+                    .onPositive((dialog, which) -> {
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + POKEMON_POINTERS_PACKAGE_NAME)));
+                        } catch (android.content.ActivityNotFoundException anfe) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + POKEMON_POINTERS_PACKAGE_NAME)));
+                        }
+                    })
                     .show();
         }
 
@@ -365,17 +372,20 @@ public class ManagePointerActivity extends AppCompatActivity {
             View view = convertView;
             if (view == null){
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.manage_poiinter_list_item, null);
+                if (inflater != null) {
+                    view = inflater.inflate(R.layout.manage_poiinter_list_item, null);
+                }
             }
 
-            TextView listItemText = (TextView) view.findViewById(R.id.text_pointer_list_item);
-            installedState = (TextView) view.findViewById(R.id.text_installed_state);
+            assert view != null;
+            TextView listItemText = view.findViewById(R.id.text_pointer_list_item);
+            installedState = view.findViewById(R.id.text_installed_state);
             listItemText.setText(mArrayList.get(position));
 
-            final Button installButton = (Button) view.findViewById(R.id.button_list_install);
-            Button deleteButton = (Button) view.findViewById(R.id.button_list_delete);
+            final Button installButton = view.findViewById(R.id.button_list_install);
+            Button deleteButton = view.findViewById(R.id.button_list_delete);
 
-            CardView listCard = (CardView) view.findViewById(R.id.manage_pointers_list_card);
+            CardView listCard = view.findViewById(R.id.manage_pointers_list_card);
 
             switch (position){
                 case 0:
@@ -442,7 +452,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                     if (!mUtils.isAppInstalled(mContext, POKEMON_POINTERS_PACKAGE_NAME)){
                         deleteButton.setEnabled(false);
                         installButton.setEnabled(true);
-                        installedState.setText("Pokemon Pointers app not found. Click INSTALL button to downlaod Pack.");
+                        installedState.setText("Pokemon Pointers app not found. Click INSTALL button to install Pack.");
                     } else {
                         if (!mInstalledPointerPrefs.getBoolean(POKEMON_POINTER_PACK, true)){
                             installedState.setText(R.string.text_not_installed);
@@ -631,33 +641,25 @@ public class ManagePointerActivity extends AppCompatActivity {
                                         .title(POKEMON_PP_NAME)
                                         .customView(R.layout.gridview_free, false)
                                         .show();
-                                materialDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialogInterface) {
-                                        pointerAdapter.clear();
-                                    }
-                                });
+                                materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
                                 View view1 = materialDialog.getCustomView();
                                 if (view1 != null) {
-                                    final GridView gridView = (GridView) view1.findViewById(R.id.bs_gridView);
+                                    final GridView gridView = view1.findViewById(R.id.bs_gridView);
                                     gridView.setAdapter(pointerAdapter);
-                                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(AdapterView<?> adapterView, View view2, int i, long l) {
-                                            File source = new File(pointerAdapter.getPath(i));
-                                            File targetFile = new File(mTargetPath + source.getName());
-                                            if (!targetFile.exists()){
-                                                try {
-                                                    copyFile(source, targetFile);
-                                                    Toast.makeText(mContext,
-                                                            String.format("%s %s", source.getName(), getString(R.string.text_installed)),
-                                                            Toast.LENGTH_SHORT).show();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            } else {
-                                                Toast.makeText(mContext, source.getName() + " is already installed.", Toast.LENGTH_SHORT).show();
+                                    gridView.setOnItemClickListener((adapterView, view2, i, l) -> {
+                                        File source = new File(pointerAdapter.getPath(i));
+                                        File targetFile = new File(mTargetPath + source.getName());
+                                        if (!targetFile.exists()){
+                                            try {
+                                                copyFile(source, targetFile);
+                                                Toast.makeText(mContext,
+                                                        String.format("%s %s", source.getName(), getString(R.string.text_installed)),
+                                                        Toast.LENGTH_SHORT).show();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
                                             }
+                                        } else {
+                                            Toast.makeText(mContext, source.getName() + " is already installed.", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
