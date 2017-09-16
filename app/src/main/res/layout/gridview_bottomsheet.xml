@@ -20,9 +20,8 @@
     android:layout_width="wrap_content"
     android:background="@color/colorPrimary"
     android:id="@+id/bs_linear_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto">
-    <include layout="@layout/gridview_free"/>
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/gridViewInd"/>
 
 </FrameLayout>
 
