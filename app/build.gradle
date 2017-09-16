@@ -18,12 +18,6 @@ apply plugin: 'kotlin-android'
 
 android {
     signingConfigs {
-        afterroot {
-            keyAlias 'afterroot'
-            keyPassword 'supercell'
-            storeFile file('G:/Android/Android Development/Keystore/arks.jks')
-            storePassword 'supercell'
-        }
     }
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
@@ -33,7 +27,6 @@ android {
         targetSdkVersion 26
         versionCode 23
         versionName '1.6.4'
-        signingConfig signingConfigs.afterroot
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -43,7 +36,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.afterroot
         }
         debug {
         }
