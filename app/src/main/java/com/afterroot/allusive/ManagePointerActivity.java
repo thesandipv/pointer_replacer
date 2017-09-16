@@ -390,7 +390,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             if (view == null){
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 if (inflater != null) {
-                    view = inflater.inflate(R.layout.manage_poiinter_list_item, null);
+                    view = inflater.inflate(R.layout.manage_pointer_list_item, null);
                 }
             }
 
