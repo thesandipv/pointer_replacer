@@ -54,6 +54,11 @@ import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -111,6 +116,8 @@ public class MainActivity extends AppCompatActivity
         bundle.putString("Device_Name", Build.DEVICE);
         bundle.putString("AndroidVersion", Build.VERSION.CODENAME);
         analytics.logEvent("DeviceInfo", bundle);
+
+        MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null){
@@ -172,6 +179,7 @@ public class MainActivity extends AppCompatActivity
         setSeekbars();
     }
 
+    private InterstitialAd mInterstitialAd;
     @SuppressLint("CommitPrefEdits")
     private void initialize(){
         /*Load SharedPreferences**/
@@ -185,6 +193,20 @@ public class MainActivity extends AppCompatActivity
         setStrings();
         findViews();
         loadMethods();
+
+        AdView mAdView = findViewById(R.id.adView2);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1_id));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });
     }
 
     /**
@@ -412,11 +434,6 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 });
             }
-
-            /*AdView adView;
-            adView = (AdView) findViewById(R.id.adView);
-            AdRequest request = new AdRequest.Builder().build();
-            adView.loadAd(request);*/
         } else {
             showInstallPointersDialog();
         }
@@ -758,6 +775,11 @@ public class MainActivity extends AppCompatActivity
                 .onPositive((dialog, which) -> {
                     try {
                         applyPointer();
+                        if (mInterstitialAd.isLoaded()){
+                            mInterstitialAd.show();
+                        } else {
+                            Log.d(MainActivity.class.getSimpleName(), "The interstitial wasn't loaded yet.");
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

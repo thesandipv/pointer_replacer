@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.transitionseverywhere.TransitionManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -101,9 +102,6 @@ public class ManagePointerActivity extends AppCompatActivity {
         mTag = "ManagePointers";
         mUtils = new Utils();
 
-        FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        POKEMON_POINTERS_PACKAGE_NAME = firebaseRemoteConfig.getString("pokemon_pack_play_store");
-
         mInstalledPointerPrefs = this.getSharedPreferences(getPackageName()+".installed_pointers", Context.MODE_PRIVATE);
         mInstalledPointerEditor = mInstalledPointerPrefs.edit();
 
@@ -142,12 +140,25 @@ public class ManagePointerActivity extends AppCompatActivity {
             thread.run();
             showHelpDialog();
 
-            mInstalledPointerEditor.putBoolean("first_launch", false);
+            mInstalledPointerEditor.putBoolean("first_launch", false).apply();
         }
 
-        if (pointersList != null) {
-            pointersList.setAdapter(pointerListAdapter);
-        }
+        FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        firebaseRemoteConfig.setDefaults(R.xml.firebase_remote_defaults);
+        firebaseRemoteConfig.fetch().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()){
+                firebaseRemoteConfig.activateFetched();
+
+                if (pointersList != null) {
+                    TransitionManager.beginDelayedTransition(findViewById(R.id.content_pointer_manage_root));
+                    pointersList.setVisibility(View.VISIBLE);
+                    pointersList.setAdapter(pointerListAdapter);
+                    findViewById(R.id.progress_manage_pointer).setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        POKEMON_POINTERS_PACKAGE_NAME = firebaseRemoteConfig.getString("pokemon_pack_play_store");
+        Log.d(ManagePointerActivity.class.getSimpleName(), "Pointer Package name: " + POKEMON_POINTERS_PACKAGE_NAME);
 
     }
 
@@ -355,7 +366,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             new MaterialDialog.Builder(ManagePointerActivity.this)
                     .title("Download Pokemon Pointers Pack")
                     .content("Pokemon Pointers is not installed. Do you want to download it now?")
-                    .positiveText("Download")
+                    .positiveText("Install")
                     .negativeText("No")
                     .onPositive((dialog, which) -> {
                         try {
