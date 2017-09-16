@@ -18,6 +18,7 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="0dp"
     android:id="@+id/manage_pointers_list_card"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -48,14 +49,13 @@
             android:layout_toLeftOf="@+id/button_list_install"
             android:layout_toStartOf="@+id/button_list_install"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/text_pointer_list_item"
-                android:text="Sample Text"
-                android:layout_alignBaseline="@+id/button_list_install"
-                android:layout_alignBottom="@+id/button_list_install"
+                tools:text="Sample Text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <TextView
@@ -63,10 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                android:id="@+id/text_installed_state"
-                android:layout_alignBottom="@+id/button_list_install"
-                android:layout_alignLeft="@+id/text_pointer_list_item"
-                android:layout_alignStart="@+id/text_pointer_list_item"/>
+                android:id="@+id/text_installed_state"/>
         </LinearLayout>
 
         <Button
