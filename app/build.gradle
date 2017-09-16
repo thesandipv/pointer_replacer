@@ -15,18 +15,17 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
-    signingConfigs {
-    }
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
     defaultConfig {
-        applicationId "afterroot.pointerreplacer"
+        applicationId "com.afterroot.allusive"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 23
-        versionName '1.6.4'
+        versionCode 24
+        versionName '1.7'
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -37,10 +36,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-        }
-    }
-    productFlavors {
     }
 }
 
@@ -66,11 +61,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-config:11.2.2'
     implementation 'com.google.firebase:firebase-ads:11.2.2'
     implementation 'com.andkulikov:transitionseverywhere:1.7.0'
+    implementation 'com.google.firebase:firebase-messaging:11.2.2'
     provided 'de.robv.android.xposed:api:82'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
-
 apply plugin: 'com.google.gms.google-services'
-repositories {
-    mavenCentral()
-}
