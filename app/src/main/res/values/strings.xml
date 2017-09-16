@@ -14,7 +14,7 @@
   -->
 
 <resources>
-    <string name="version" translatable="false">v1.6.4 (23)</string>
+    <string name="version" translatable="false">v1.7 (24)</string>
 
     <string name="TITLE_XDA_THREAD">XDA Thread</string>
     <string name="TITLE_VISIT_AR">Visit AfterROOT</string>
