@@ -57,6 +57,50 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302054959566:android:57b289ce2c9d5196",
+        "android_client_info": {
+          "package_name": "com.afterroot.allusive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302054959566-cdg90huhtjn965og3khj3jiq0rc7a2sd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive",
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+          }
+        },
+        {
+          "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-O1qrPjqq9N_S5bHO1viRIac7bYc0wCE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"
