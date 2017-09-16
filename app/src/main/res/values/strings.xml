@@ -124,4 +124,6 @@
     <string name="install_manage_pointers">Install/Manage Pointers</string>
     <string name="no_pointer_applied">No Pointer Applied. Please Apply Pointer</string>
     <string name="banner_ad_unit_id">ca-app-pub-6628325093439880/4128118050</string>
+    <string name="interstitial_ad_1_id">ca-app-pub-6628325093439880/6191545783</string>
+
 </resources>

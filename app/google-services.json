@@ -1,153 +1,29 @@
 {
   "project_info": {
-    "project_number": "764888262147",
-    "firebase_url": "https://after-root.firebaseio.com",
-    "project_id": "after-root",
-    "storage_bucket": "after-root.appspot.com"
+    "project_number": "302054959566",
+    "firebase_url": "https://pointer-replacer.firebaseio.com",
+    "project_id": "pointer-replacer",
+    "storage_bucket": "pointer-replacer.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:764888262147:android:fb70bbe08f83da83",
-        "android_client_info": {
-          "package_name": "com.afterroot.photos"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "764888262147-dbtj2hjn1cd7mi08ncml146sg7dci90c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afterroot.photos",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
-          }
-        },
-        {
-          "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAruxn8L5UT8fsl-ffW_rxiSw-KMbh_ZKs"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:764888262147:android:622a62133af55470",
-        "android_client_info": {
-          "package_name": "com.afterroot.jbmportal"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "764888262147-4b3mhplbkkqegoan4i4toi7pq9nt005c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afterroot.jbmportal",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
-          }
-        },
-        {
-          "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAruxn8L5UT8fsl-ffW_rxiSw-KMbh_ZKs"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:764888262147:android:57b289ce2c9d5196",
-        "android_client_info": {
-          "package_name": "com.afterroot.allusive"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "764888262147-ikgu44daomfhqurgnfos1skfuj8ha99n.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afterroot.allusive",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
-          }
-        },
-        {
-          "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAruxn8L5UT8fsl-ffW_rxiSw-KMbh_ZKs"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:764888262147:android:44dc81093d5f8738",
+        "mobilesdk_app_id": "1:302054959566:android:44dc81093d5f8738",
         "android_client_info": {
           "package_name": "afterroot.pointerreplacer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "764888262147-65cuo4br0pit88hn26cmor5h1ajm53i8.apps.googleusercontent.com",
+          "client_id": "302054959566-h0krcs36gr19rrftl4unjifc824vmk97.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "afterroot.pointerreplacer",
+            "certificate_hash": "2d896881a521211b3853e39dd18194b00392da3d"
+          }
+        },
+        {
+          "client_id": "302054959566-rtse1nol5egmpgjkss9c2i0oekjdmj2i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "afterroot.pointerreplacer",
@@ -155,13 +31,13 @@
           }
         },
         {
-          "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
+          "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAruxn8L5UT8fsl-ffW_rxiSw-KMbh_ZKs"
+          "current_key": "AIzaSyC-O1qrPjqq9N_S5bHO1viRIac7bYc0wCE"
         }
       ],
       "services": {
@@ -172,7 +48,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "764888262147-25b62n172vlktqn7djudhud1uf8ubkr9.apps.googleusercontent.com",
+              "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -22,6 +22,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="afterroot.pointerreplacer.MainActivity"
     tools:showIn="@layout/app_bar_main"
@@ -32,7 +33,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/content_padding_vertical"
         android:paddingTop="@dimen/content_padding_vertical">
 
         <ScrollView
@@ -70,7 +70,7 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
                             android:foregroundGravity="center"
-                            android:src="@drawable/pointer" />
+                            android:src="@drawable/pointer"/>
 
                         <TextView
                             android:id="@+id/textNoPointerApplied"
@@ -80,7 +80,7 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
                             android:padding="@dimen/content_padding"
-                            android:text="@string/no_pointer_applied" />
+                            android:text="@string/no_pointer_applied"/>
 
                         <TextView
                             android:id="@+id/textCurrentPointer"
@@ -94,7 +94,7 @@
                             android:layout_alignTop="@id/image_current_pointer"
                             android:gravity="center_vertical"
                             android:text="@string/text_cur_pointer"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap"/>
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
 
@@ -124,7 +124,7 @@
                                 android:id="@+id/pointerSelected"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/pointer" />
+                                android:src="@drawable/pointer"/>
                         </LinearLayout>
 
                         <TextView
@@ -140,7 +140,7 @@
                             android:layout_toLeftOf="@+id/buttonChangePointer"
                             android:layout_toStartOf="@+id/buttonChangePointer"
                             android:gravity="center_vertical"
-                            android:text="@string/text_will_change_to" />
+                            android:text="@string/text_will_change_to"/>
 
                         <Button
                             android:id="@+id/buttonChangePointer"
@@ -151,7 +151,8 @@
                             android:layout_alignParentRight="true"
                             android:layout_alignParentTop="true"
                             android:onClick="showPointerChooser"
-                            android:text="@string/change_pointer" />
+                            android:text="@string/change_pointer"/>
+
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
             </LinearLayout>
@@ -161,10 +162,11 @@
             android:id="@+id/slidersCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/adView2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="@dimen/content_padding_vertical"
             card_view:cardCornerRadius="@dimen/card_radius">
 
             <LinearLayout
@@ -187,7 +189,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="70"
                         android:textColor="@color/color_text_primary"
-                        tools:ignore="RelativeOverlap" />
+                        tools:ignore="RelativeOverlap"/>
 
                     <TextView
                         android:id="@+id/textPadding"
@@ -195,7 +197,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="70"
                         android:textColor="@color/color_text_primary"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"/>
 
                     <TextView
                         android:id="@+id/textAlpha"
@@ -203,7 +205,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="70"
                         android:textColor="@color/color_text_primary"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText"/>
                 </LinearLayout>
 
                 <View
@@ -212,7 +214,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:layout_marginTop="5dp"
-                    android:background="@android:color/darker_gray" />
+                    android:background="@android:color/darker_gray"/>
 
                 <RelativeLayout
                     android:id="@+id/slidersLayout"
@@ -232,18 +234,18 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_minus" />
+                            android:src="@drawable/ic_action_minus"/>
 
                         <ImageView
                             android:id="@+id/butPlus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_plus"
-                            android:layout_alignParentRight="true" />
+                            android:src="@drawable/ic_action_plus"/>
 
                         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                             android:id="@+id/seekBar"
@@ -260,7 +262,7 @@
                             app:dsb_max="300"
                             app:dsb_min="25"
                             app:dsb_progressColor="@color/col_seek_bubble"
-                            app:dsb_rippleColor="@color/col_seek_ripple" />
+                            app:dsb_rippleColor="@color/col_seek_ripple"/>
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -278,18 +280,18 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_minus" />
+                            android:src="@drawable/ic_action_minus"/>
 
                         <ImageView
                             android:id="@+id/butPaddingPlus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_plus"
-                            android:layout_alignParentRight="true" />
+                            android:src="@drawable/ic_action_plus"/>
 
                         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                             android:id="@+id/seekBarPadding"
@@ -306,7 +308,7 @@
                             app:dsb_max="25"
                             app:dsb_min="0"
                             app:dsb_progressColor="@color/col_seek_bubble"
-                            app:dsb_rippleColor="@color/col_seek_ripple" />
+                            app:dsb_rippleColor="@color/col_seek_ripple"/>
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -324,18 +326,18 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_minus" />
+                            android:src="@drawable/ic_action_minus"/>
 
                         <ImageView
                             android:id="@+id/butAlphaPlus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:onClick="changeSeekVal"
                             android:padding="@dimen/seek_button_padding"
-                            android:src="@drawable/ic_action_plus"
-                            android:layout_alignParentRight="true" />
+                            android:src="@drawable/ic_action_plus"/>
 
                         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                             android:id="@+id/seekBarAlpha"
@@ -352,11 +354,22 @@
                             app:dsb_max="255"
                             app:dsb_min="0"
                             app:dsb_progressColor="@color/col_seek_bubble"
-                            app:dsb_rippleColor="@color/col_seek_ripple" />
+                            app:dsb_rippleColor="@color/col_seek_ripple"/>
                     </RelativeLayout>
 
                 </RelativeLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="false"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id"/>
     </RelativeLayout>
+
 </com.flipboard.bottomsheet.BottomSheetLayout>
