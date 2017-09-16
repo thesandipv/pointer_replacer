@@ -20,6 +20,10 @@
   </head>
   <body>
     $ 1.6.4
+      % Version 1.7
+      _ 16-09-2017
+      * Preparation for Releasing on Play Store
+    $ 1.6.4
       % Version 1.6.4
       _ 27-07-2016
       * New: Pointer transparency settings (Disabled by default. Enable from Settings)
