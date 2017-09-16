@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -24,7 +24,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 

@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;

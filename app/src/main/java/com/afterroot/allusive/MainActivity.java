@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;

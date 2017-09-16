@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -28,6 +28,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,6 +38,9 @@ import android.widget.RelativeLayout;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +54,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private Utils mUtils;
+    private InterstitialAd mInterstitialAd;
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -103,6 +108,16 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
         } catch (NullPointerException npe){
             npe.printStackTrace();
         }
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1_id));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });
     }
 
     public void changePreviewBack(View view) {
@@ -165,6 +180,11 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                 .onPositive((dialog, which) -> {
                     try {
                         confirm();
+                        if (mInterstitialAd.isLoaded()){
+                            mInterstitialAd.show();
+                        } else {
+                            Log.d(MainActivity.class.getSimpleName(), "The interstitial wasn't loaded yet.");
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

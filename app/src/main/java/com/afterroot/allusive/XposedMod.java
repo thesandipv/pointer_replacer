@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.content.res.XResources;
 import android.graphics.drawable.Drawable;
@@ -30,9 +30,9 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookInitPackageR
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
-        XSharedPreferences XSharedPreferences = new XSharedPreferences("afterroot.pointerreplacer");
+        XSharedPreferences XSharedPreferences = new XSharedPreferences(BuildConfig.APPLICATION_ID);
         XSharedPreferences.makeWorldReadable();
-        String POINTER_PATH = XSharedPreferences.getString("POINTER_PATH", "/data/data/afterroot.pointerreplacer/files/pointer.png");
+        String POINTER_PATH = XSharedPreferences.getString("POINTER_PATH", "/data/data/"+BuildConfig.APPLICATION_ID+"/files/pointer.png");
         drawable = Drawable.createFromPath(POINTER_PATH);
         XposedBridge.log("Loaded Pointer from " + POINTER_PATH);
         XposedBridge.log(new Throwable());
