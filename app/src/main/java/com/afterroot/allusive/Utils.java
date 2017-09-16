@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.content.Context;
 import android.content.Intent;
@@ -214,7 +214,7 @@ class Utils {
             if (view == null){
                 view = inflater.inflate(R.layout.gridview_item, parent, false);
                 holder = new ViewHolder();
-                holder.imageView = (ImageView) view.findViewById(R.id.grid_item_image);
+                holder.imageView = view.findViewById(R.id.grid_item_image);
                 holder.imageView.setLayoutParams(new FrameLayout.LayoutParams(param, param));
                 view.setTag(holder);
             } else {

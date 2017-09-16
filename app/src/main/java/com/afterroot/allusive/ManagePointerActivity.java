@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package afterroot.pointerreplacer;
+package com.afterroot.allusive;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -82,8 +82,6 @@ public class ManagePointerActivity extends AppCompatActivity {
     private static String POKEMON_PP_NAME = "Pokemon Pointers";
 
     private static String DIR_NAME_POINTERS = "pointers";
-
-    private String POKEMON_PACK_DL_URL = "http://bit.ly/PokemonPointers";
     private static String POKEMON_POINTERS_PACKAGE_NAME;
 
     @SuppressLint("CommitPrefEdits")
@@ -150,15 +148,23 @@ public class ManagePointerActivity extends AppCompatActivity {
                 firebaseRemoteConfig.activateFetched();
 
                 if (pointersList != null) {
+                    POKEMON_POINTERS_PACKAGE_NAME = firebaseRemoteConfig.getString("pokemon_pack_play_store");
+                    Log.d(ManagePointerActivity.class.getSimpleName(), "Pointer Package name: " + POKEMON_POINTERS_PACKAGE_NAME);
                     TransitionManager.beginDelayedTransition(findViewById(R.id.content_pointer_manage_root));
                     pointersList.setVisibility(View.VISIBLE);
                     pointersList.setAdapter(pointerListAdapter);
                     findViewById(R.id.progress_manage_pointer).setVisibility(View.INVISIBLE);
                 }
             }
+        }).addOnFailureListener(this, task -> {
+            Log.d(ManagePointerActivity.class.getSimpleName(), "Can't connect to firebase, Using Default Package name instead.");
+            POKEMON_POINTERS_PACKAGE_NAME = "tk.afterroot.pokmonpointers";
+            Log.d(ManagePointerActivity.class.getSimpleName(), "Pointer Package name: " + POKEMON_POINTERS_PACKAGE_NAME);
+            TransitionManager.beginDelayedTransition(findViewById(R.id.content_pointer_manage_root));
+            pointersList.setVisibility(View.VISIBLE);
+            pointersList.setAdapter(pointerListAdapter);
+            findViewById(R.id.progress_manage_pointer).setVisibility(View.INVISIBLE);
         });
-        POKEMON_POINTERS_PACKAGE_NAME = firebaseRemoteConfig.getString("pokemon_pack_play_store");
-        Log.d(ManagePointerActivity.class.getSimpleName(), "Pointer Package name: " + POKEMON_POINTERS_PACKAGE_NAME);
 
     }
 
@@ -335,7 +341,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             }
             MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                     .title(dialogTitle)
-                    .customView(R.layout.gridview_free, false)
+                    .customView(R.layout.gridViewInd, false)
                     .show();
             materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
             View view1 = materialDialog.getCustomView();
@@ -650,7 +656,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                                 }
                                 MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                                         .title(POKEMON_PP_NAME)
-                                        .customView(R.layout.gridview_free, false)
+                                        .customView(R.layout.gridViewInd, false)
                                         .show();
                                 materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
                                 View view1 = materialDialog.getCustomView();
