@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela
+ * Copyright (C) 2016-2017 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,11 +18,9 @@ package com.afterroot.allusive;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
@@ -35,18 +33,12 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
@@ -59,11 +51,6 @@ class Utils {
 
     }
 
-    void showSnackbar(View view, String message){
-        Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.show();
-    }
-
     boolean isAppInstalled(Context context, String pName){
         try {
             context.getPackageManager().getApplicationInfo(pName, 0);
@@ -73,20 +60,26 @@ class Utils {
         }
     }
 
-    void showSnackbar(View view, String message, String action){
-        final Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.setAction(action, view1 -> snackBar.dismiss());
+    void showSnackBar(View view, String message){
+        this.showSnackBar(view, message, null);
+    }
+
+    void showSnackBar(View view, String message, String action){
+        this.showSnackBar(view, message, action, view1 -> {});
+    }
+
+    void showSnackBar(View view, String message, String action, View.OnClickListener action_listener){
+        this.showSnackBar(view, message, Snackbar.LENGTH_LONG, action, action_listener);
+    }
+
+    void showSnackBar(View view, String message, int length, String action, View.OnClickListener action_listener){
+        Snackbar snackBar = Snackbar.make(view, message, length);
+        snackBar.setAction(action, action_listener);
         snackBar.show();
     }
 
     int getDpi(Context context){
         return context.getResources().getDisplayMetrics().densityDpi;
-    }
-
-    void showSnackbar(View view, String message, String action, View.OnClickListener action_listener){
-        Snackbar snackBar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackBar.setAction(action, action_listener);
-        snackBar.show();
     }
 
     /**
@@ -156,23 +149,12 @@ class Utils {
     static class PointerAdapter extends BaseAdapter {
         private Context mContext;
         private LayoutInflater inflater;
-        private DisplayImageOptions options;
 
         static ArrayList<String> itemList = new ArrayList<>();
 
         PointerAdapter(Context context) {
             mContext = context;
             inflater = LayoutInflater.from(mContext);
-
-            options = new DisplayImageOptions.Builder()
-                    .showImageOnLoading(R.drawable.ic_image_loading)
-                    .showImageForEmptyUri(R.drawable.ic_image_broken)
-                    .showImageOnFail(R.drawable.ic_image_error)
-                    .cacheInMemory(true)
-                    .cacheOnDisk(true)
-                    .considerExifParams(true)
-                    .bitmapConfig(Bitmap.Config.ARGB_8888)
-                    .build();
         }
         void add(String path) {
             itemList.add(path);
@@ -221,9 +203,10 @@ class Utils {
                 holder = (ViewHolder) view.getTag();
             }
 
-            ImageLoader imageLoader = ImageLoader.getInstance();
-
-            imageLoader.displayImage("file:///"+itemList.get(position), holder.imageView, options);
+            Glide
+                    .with(mContext)
+                    .load(itemList.get(position))
+                    .into(holder.imageView);
 
             return view;
         }
@@ -235,83 +218,14 @@ class Utils {
 
     boolean isNetworkAvailable(Context context){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    void openFile(Context context, String filname, Uri downloadedFile){
+    void openFile(Context context, String filename, Uri uri){
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(downloadedFile, getMimeType(filname));
+        intent.setDataAndType(uri, getMimeType(filename));
         context.startActivity(intent);
-    }
-
-    String dlString(String url, boolean fetchLines) {
-        String dS = "";
-        try {
-            DownloadTxtTask downloadTxtTask = new DownloadTxtTask();
-            dS = downloadTxtTask.execute(url).get();
-            downloadTxtTask.setFetchLines(fetchLines);
-        } catch(Exception ex) {
-            //
-        }
-        return dS;
-    }
-
-    private static class DownloadTxtTask extends AsyncTask< String, Integer, String > {
-        boolean isFetchLines;
-
-        void setFetchLines(boolean fetchLines){
-            isFetchLines = fetchLines;
-        }
-
-        @Override
-        protected String doInBackground(String... downloadURL) {
-            URL url;
-            String result  = null;
-            InputStream is;
-            try {
-                url = new URL(downloadURL[0]);
-                is = url.openStream();
-                if (isFetchLines){
-                    result = convertStreamToString(is);
-                } else {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    result = br.readLine();
-                    br.close();
-                    is.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-        }
-    }
-
-    @NonNull
-    private static String convertStreamToString(InputStream inputStream) throws UnsupportedEncodingException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null){
-                sb.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
     }
 }
