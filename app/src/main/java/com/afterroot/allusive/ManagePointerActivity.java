@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela
+ * Copyright (C) 2016-2017 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -294,7 +294,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                 installedState.setText(R.string.text_installed);
             }
             mInstalledPointerEditor.putBoolean(packName, true).apply();
-            mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
+            mUtils.showSnackBar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
         }
 
         void showSpecificPointerDialog(String pointerPackName, String dialogTitle){
@@ -341,7 +341,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             }
             MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                     .title(dialogTitle)
-                    .customView(R.layout.gridViewInd, false)
+                    .customView(R.layout.grid_view_ind, false)
                     .show();
             materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
             View view1 = materialDialog.getCustomView();
@@ -545,7 +545,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                             }
                             mInstalledPointerEditor.putBoolean(POKEMON_POINTER_PACK, true).apply();
                             notifyDataSetChanged();
-                            mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
+                            mUtils.showSnackBar(findViewById(R.id.content_pointer_manage_root), "Pointer Pack Installed.");
                         } else {
                             showPokemonDownloadDialog();
                         }
@@ -587,7 +587,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                         break;
                 }
                 notifyDataSetChanged();
-                mUtils.showSnackbar(findViewById(R.id.content_pointer_manage_root),"Pointer Pack Deleted.");
+                mUtils.showSnackBar(findViewById(R.id.content_pointer_manage_root),"Pointer Pack Deleted.");
             });
 
             listCard.setOnClickListener(view14 -> {
@@ -656,7 +656,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                                 }
                                 MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                                         .title(POKEMON_PP_NAME)
-                                        .customView(R.layout.gridViewInd, false)
+                                        .customView(R.layout.grid_view_ind, false)
                                         .show();
                                 materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
                                 View view1 = materialDialog.getCustomView();

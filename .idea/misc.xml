@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="dontuseSetLastVersion" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="getFullLog" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="getLog" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="getLogDialog" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="firstRun" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="getThisVersion" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="getLastVersion" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" method="ChangeLog" />
+    <pattern value="sheetrock.panda.changelog.ChangeLog" />
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />

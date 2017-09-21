@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 Sandip Vaghela
+  ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -40,7 +40,6 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/relativeLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp">
         <Button
@@ -48,7 +47,6 @@
             android:layout_height="wrap_content"
             android:text="@string/change_background_color"
             android:onClick="changePreviewBack"
-            android:id="@+id/button"
             android:layout_below="@+id/button2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -83,7 +81,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tap_and_move_your_finger_to_see_preview"
-        android:id="@+id/textView3"
         android:textSize="15sp"
         android:layout_centerInParent="true"/>
 

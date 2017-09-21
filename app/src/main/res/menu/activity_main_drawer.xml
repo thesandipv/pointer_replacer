@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 Sandip Vaghela
+  ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -15,7 +15,7 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/one">
+    <group>
         <item android:title="@string/text_change_color"
               android:id="@+id/change_color"
               android:icon="@drawable/ic_action_color"/>
@@ -40,13 +40,13 @@
         android:id="@+id/reboot"
         android:title="@string/reboot"
         android:icon="@drawable/ic_action_reboot"/>
-    <group android:id="@+id/misc">
+    <group>
         <item
             android:id="@+id/action_changelog"
             android:title="@string/changelog_full_title"
             android:icon="@drawable/ic_action_changelog"/>
     </group>
-    <group android:id="@+id/grpSettings">
+    <group>
         <item
             android:id="@+id/settings"
             android:title="@string/title_activity_settigs"
