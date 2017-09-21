@@ -35,11 +35,10 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
@@ -107,18 +106,7 @@ class Utils {
     }
 
     void copyFile(File source, File destination) throws IOException {
-        FileChannel sourceChannel = new FileInputStream(source).getChannel();
-        FileChannel destinationChannel = new FileOutputStream(destination).getChannel();
-        try {
-            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
-        } finally {
-            try {
-                sourceChannel.close();
-                destinationChannel.close();
-            } catch (IOException io){
-                io.printStackTrace();
-            }
-        }
+        FileUtils.copyFile(source, destination);
     }
 
     void loadToBottomSheetGrid(Context context,

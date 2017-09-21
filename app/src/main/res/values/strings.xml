@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2016 Sandip Vaghela
+  ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -48,33 +48,21 @@
 
     <string name="app_name">Pointer Replacer</string>
     <string name="title_activity_pointer_preview">Pointer Preview</string>
-    <string name="title_activity_update">Update PR</string>
-    <string name="title_activity_new_pointer">New Pointer</string>
     <string name="title_activity_about">About</string>
-    <string name="title_activity_help">Help</string>
     <string name="title_activity_settigs">Settings</string>
     <string name="title_activity_manage_pointer">Install/Manage Pointers</string>
 
     <string name="xmodule_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
 
-    <string name="text_changelog">Changelog</string>
-    <string name="text_xda_thread">XDA Thread</string>
     <string name="text_will_change_to">NEW POINTER</string>
     <string name="text_change_color">Change Pointer Color</string>
     <string name="text_cur_pointer">CURRENT POINTER</string>
     <string name="text_module_info">Module Info</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
-    <string name="text_already_latest">You already have latest version. Click to Re-Download</string>
     <string name="change_background_color">Change Background Color</string>
     <string name="change_pointer_color">Change Pointer Color</string>
     <string name="reset_pointer_color">Reset Pointer Color</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
-    <string name="text_current_version">Current Version</string>
-    <string name="text_new_version">Latest Version</string>
-    <string name="text_whats_new">What\'s New</string>
-    <string name="text_update_now">Update Now</string>
-    <string name="text_no_connection">No Connection</string>
-    <string name="text_retry">Retry</string>
     <string name="text_source_code">Source Code</string>
     <string name="change_pointer">Change Pointer</string>
     <string name="import_pointer">Import Pointer</string>
@@ -103,7 +91,6 @@
 
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="apply_pointer">Apply Pointer</string>
-    <string name="pointer_settings">Pointer Settings</string>
     <string name="copy_pointers">Copy Pointers</string>
     <string name="reboot">Reboot</string>
     <string name="pointerFolderName" translatable="false">/Pointer Replacer/Pointers/</string>
@@ -116,13 +103,11 @@
         <item>Material Color Picker</item>
     </array>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="text_not_installed">Not Installed</string>
     <string name="text_installed">Installed</string>
     <string name="help">Help</string>
     <string name="install_manage_pointers">Install/Manage Pointers</string>
-    <string name="no_pointer_applied">No Pointer Applied. Please Apply Pointer</string>
+    <string name="no_pointer_applied">No Pointer Applied.\nPlease Apply Pointer</string>
     <string name="banner_ad_unit_id">ca-app-pub-6628325093439880/4128118050</string>
     <string name="interstitial_ad_1_id">ca-app-pub-6628325093439880/6191545783</string>
 

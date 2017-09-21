@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Sandip Vaghela
+ * Copyright (C) 2016-2017 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -188,7 +188,7 @@ public class PointerPreview extends AppCompatActivity implements ColorChooserDia
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    mUtils.showSnackbar(previewLayout, "Pointer Applied ");
+                    mUtils.showSnackBar(previewLayout, "Pointer Applied ");
                 }).show();
     }
 

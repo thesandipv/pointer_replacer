@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016 Sandip Vaghela
+  ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -17,7 +17,7 @@
 <com.flipboard.bottomsheet.BottomSheetLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/bottomSheet"
+    android:id="@+id/bottom_sheet_main"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -39,7 +39,7 @@
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/slidersCard"
+            android:layout_above="@+id/card_sliders"
             android:layout_marginBottom="@dimen/content_margin">
 
             <LinearLayout
@@ -48,14 +48,12 @@
                 android:orientation="vertical">
 
                 <android.support.v7.widget.CardView
-                    android:id="@+id/cardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     card_view:cardCornerRadius="@dimen/card_radius">
 
                     <RelativeLayout
-                        android:id="@+id/currPointerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
@@ -63,7 +61,7 @@
                         android:layout_marginTop="5dp">
 
                         <ImageView
-                            android:id="@+id/image_current_pointer"
+                            android:id="@+id/current_pointer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -73,28 +71,32 @@
                             android:src="@drawable/pointer"/>
 
                         <TextView
-                            android:id="@+id/textNoPointerApplied"
+                            android:id="@+id/text_no_pointer_applied"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
+                            android:layout_toEndOf="@+id/text_current_pointer"
+                            android:layout_toRightOf="@+id/text_current_pointer"
                             android:padding="@dimen/content_padding"
-                            android:text="@string/no_pointer_applied"/>
+                            android:text="@string/no_pointer_applied"
+                            android:textAlignment="textEnd"
+                            android:gravity="end" />
 
                         <TextView
-                            android:id="@+id/textCurrentPointer"
+                            android:id="@+id/text_current_pointer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignBottom="@id/image_current_pointer"
+                            android:layout_alignBottom="@id/current_pointer"
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_alignParentTop="true"
-                            android:layout_alignTop="@id/image_current_pointer"
+                            android:layout_alignTop="@id/current_pointer"
                             android:gravity="center_vertical"
                             android:text="@string/text_cur_pointer"
-                            tools:ignore="RelativeOverlap"/>
+                            tools:ignore="RelativeOverlap" />
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
 
@@ -105,7 +107,6 @@
                     app:cardCornerRadius="@dimen/card_radius">
 
                     <RelativeLayout
-                        android:id="@+id/selectedPointerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="false"
@@ -117,33 +118,33 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/textSelectedPointer"
+                            android:layout_below="@+id/text_new_pointer"
                             android:layout_centerHorizontal="true">
 
                             <ImageView
-                                android:id="@+id/pointerSelected"
+                                android:id="@+id/selected_pointer"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/pointer"/>
                         </LinearLayout>
 
                         <TextView
-                            android:id="@+id/textSelectedPointer"
+                            android:id="@+id/text_new_pointer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignBottom="@+id/buttonChangePointer"
+                            android:layout_alignBottom="@+id/button_change_pointer"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_alignParentTop="true"
-                            android:layout_alignTop="@id/buttonChangePointer"
+                            android:layout_alignTop="@id/button_change_pointer"
                             android:layout_gravity="left|center_vertical"
-                            android:layout_toLeftOf="@+id/buttonChangePointer"
-                            android:layout_toStartOf="@+id/buttonChangePointer"
+                            android:layout_toLeftOf="@+id/button_change_pointer"
+                            android:layout_toStartOf="@+id/button_change_pointer"
                             android:gravity="center_vertical"
                             android:text="@string/text_will_change_to"/>
 
                         <Button
-                            android:id="@+id/buttonChangePointer"
+                            android:id="@+id/button_change_pointer"
                             style="?attr/borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -159,10 +160,10 @@
         </ScrollView>
 
         <android.support.v7.widget.CardView
-            android:id="@+id/slidersCard"
+            android:id="@+id/card_sliders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/adView2"
+            android:layout_above="@+id/banner_ad_main"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_gravity="bottom"
@@ -175,7 +176,6 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/textSizePadding"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -184,7 +184,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView_size"
+                        android:id="@+id/text_size"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="70"
@@ -192,7 +192,7 @@
                         tools:ignore="RelativeOverlap"/>
 
                     <TextView
-                        android:id="@+id/textPadding"
+                        android:id="@+id/text_padding"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="70"
@@ -200,7 +200,7 @@
                         tools:ignore="HardcodedText"/>
 
                     <TextView
-                        android:id="@+id/textAlpha"
+                        android:id="@+id/text_alpha"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="70"
@@ -217,7 +217,6 @@
                     android:background="@android:color/darker_gray"/>
 
                 <RelativeLayout
-                    android:id="@+id/slidersLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp">
@@ -248,7 +247,7 @@
                             android:src="@drawable/ic_action_plus"/>
 
                         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                            android:id="@+id/seekBar"
+                            android:id="@+id/pointerSizeBar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
@@ -362,7 +361,7 @@
         </android.support.v7.widget.CardView>
 
         <com.google.android.gms.ads.AdView
-            android:id="@+id/adView2"
+            android:id="@+id/banner_ad_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
