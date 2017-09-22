@@ -1,3 +1,8 @@
+v1.7 [16/09/2017]
+------------------------------------
+Released on Play Store.
+Improvement: Minor Improvements.
+
 v1.6.4 [27/07/2016]
 ------------------------------------
 New: Pointer transparency settings (Disabled by default. Enable from Settings)
