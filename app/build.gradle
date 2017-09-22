@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    ext.supportLibVersion = '26.0.2'
+    ext.supportLibVersion = '26.1.0'
     implementation 'com.afollestad.material-dialogs:core:0.9.4.5'
     implementation 'com.afollestad.material-dialogs:commons:0.9.4.5'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
@@ -55,12 +55,12 @@ dependencies {
     implementation 'com.flipboard:bottomsheet-core:1.5.3'
     implementation 'com.flipboard:bottomsheet-commons:1.5.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta1'
-    implementation 'com.google.firebase:firebase-ads:11.2.2'
-    implementation 'com.google.firebase:firebase-core:11.2.2'
-    implementation 'com.google.firebase:firebase-config:11.2.2'
-    implementation 'com.google.firebase:firebase-ads:11.2.2'
+    implementation 'com.google.firebase:firebase-ads:11.4.0'
+    implementation 'com.google.firebase:firebase-core:11.4.0'
+    implementation 'com.google.firebase:firebase-config:11.4.0'
+    implementation 'com.google.firebase:firebase-ads:11.4.0'
     implementation 'com.andkulikov:transitionseverywhere:1.7.0'
-    implementation 'com.google.firebase:firebase-messaging:11.2.2'
+    implementation 'com.google.firebase:firebase-messaging:11.4.0'
     provided 'de.robv.android.xposed:api:82'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.github.bumptech.glide:glide:4.1.1'
