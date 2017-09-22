@@ -538,7 +538,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .positiveText(R.string.reboot)
                 .negativeText(R.string.text_no)
                 .neutralText(R.string.text_soft_reboot)
-                .onPositive { dialog, which ->
+                .onPositive { _, _ ->
                     try {
                         val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
                         process.waitFor()
