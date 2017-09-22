@@ -4,15 +4,7 @@
 ### Android ###
 # Built application files
 *.apk
-*.ap_
 
-# Files for the ART/Dalvik VM
-*.dex
-
-# Java class files
-*.class
-
-# Generated files
 bin/
 gen/
 out/
@@ -120,9 +112,6 @@ hs_err_pid*
 
 
 ### Gradle ###
-.gradle
-/build/
-
 # Ignore Gradle GUI config
 gradle-app.setting
 
