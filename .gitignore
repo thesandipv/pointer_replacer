@@ -5,7 +5,6 @@
 # Built application files
 *.apk
 
-bin/
 gen/
 out/
 
@@ -43,3 +42,6 @@ captures/
 
 # End of https://www.gitignore.io/api/android,java,gradle,intellij
 
+# My List
+firebase/
+.vscode/
