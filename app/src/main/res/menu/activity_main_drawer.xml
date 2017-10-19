@@ -49,7 +49,7 @@
     <group>
         <item
             android:id="@+id/settings"
-            android:title="@string/title_activity_settigs"
+            android:title="@string/title_activity_settings"
             android:icon="@drawable/ic_action_settings"/>
         <item
             android:id="@+id/about"
