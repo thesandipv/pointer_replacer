@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
-    app:theme="@style/AppTheme.Dark">
+    android:theme="@style/AppTheme">
 
     <include
         layout="@layout/app_bar_main"
