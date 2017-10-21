@@ -15,11 +15,12 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">#191919</color>
+    <color name="colorPrimary">#263238</color>
+    <color name="colorPrimaryDark">#000a12</color>
+    <color name="colorPrimaryLight">#4f5b62</color>
     <color name="colorAccent">#2979ff</color>
-    <color name="col_seek_bubble">@color/colorAccent</color>
-    <color name="col_seek_ripple">#742196f3</color>
+
+    <color name="monochrome">#BDBDBD</color>
 
     <color name="color_text_primary">#ffffff</color>
 </resources>
