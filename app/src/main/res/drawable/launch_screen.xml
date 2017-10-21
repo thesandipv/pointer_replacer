@@ -14,17 +14,16 @@
   ~ limitations under the License.
   -->
 
-<layer-list xmlns:tools="http://schemas.android.com/tools"
-            android:opacity="opaque"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            tools:targetApi="honeycomb">
-    <item android:drawable="@color/colorPrimary"/>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+    <item android:drawable="@android:color/white"/>
     <item>
         <bitmap android:src="@drawable/ic_launch_screen"
                 android:gravity="center"/>
     </item>
     <item>
-        <bitmap android:src="@drawable/ic_launch_screen_text"
+        <bitmap android:src="@drawable/ic_launch_screen_text_mc"
                 android:gravity="bottom"/>
     </item>
 </layer-list>
