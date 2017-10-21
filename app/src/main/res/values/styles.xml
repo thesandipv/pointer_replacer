@@ -15,26 +15,17 @@
 
 <resources>
 
-    <!--Style of MainActivity-->
-    <style name="AppTheme.Dark" parent="Theme.AppCompat">
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
-    <!--Style of SettingsActivity-->
-    <style name="AppTheme.AppBar" parent="Theme.AppCompat">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
-    </style>
-
-    <!--Style of DrawerLayout-->
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="AppTheme.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimaryDark">@android:color/transparent</item>
@@ -43,7 +34,7 @@
     </style>
 
     <!--Style of MainActivity-launch-->
-    <style name="AppTheme.Dark.Launch">
+    <style name="AppTheme.Launch">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
