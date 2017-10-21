@@ -42,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afterroot.allusive.adapter.PointerAdapter;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.transitionseverywhere.TransitionManager;
 
@@ -58,7 +59,7 @@ public class ManagePointerActivity extends AppCompatActivity {
 
     private String mTargetPath;
     private String mTag;
-    private Utils mUtils;
+    private Helper mUtils;
     private File[] targetFiles;
     private File target;
     private SharedPreferences mInstalledPointerPrefs;
@@ -94,11 +95,11 @@ public class ManagePointerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String pointersFolder = getString(R.string.pointerFolderName);
+        String pointersFolder = getString(R.string.pointer_folder_path);
         String extSdDir = Environment.getExternalStorageDirectory().toString();
         mTargetPath = extSdDir + pointersFolder;
         mTag = "ManagePointers";
-        mUtils = new Utils();
+        mUtils = Helper.INSTANCE;
 
         mInstalledPointerPrefs = this.getSharedPreferences(getPackageName()+".installed_pointers", Context.MODE_PRIVATE);
         mInstalledPointerEditor = mInstalledPointerPrefs.edit();
@@ -308,7 +309,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                 Log.e(mTag, e.getMessage());
             }
 
-            final Utils.PointerAdapter pointerAdapter = new Utils.PointerAdapter(mContext);
+            final PointerAdapter pointerAdapter = new PointerAdapter(mContext);
             assert files != null;
             for (String filename : files) {
                 if (filename.startsWith(pointerPackName)){
@@ -336,17 +337,17 @@ public class ManagePointerActivity extends AppCompatActivity {
             }
             for (File pointer : arrayList){
                 if (pointer.getName().startsWith(pointerPackName)){
-                    pointerAdapter.add(pointer.getPath());
+                    PointerAdapter.Companion.getItemList().add(pointer.getPath());
                 }
             }
             MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                     .title(dialogTitle)
-                    .customView(R.layout.grid_view_ind, false)
+                    .customView(R.layout.layout_grid_bottomsheet, false)
                     .show();
             materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
             View view1 = materialDialog.getCustomView();
             if (view1 != null) {
-                final GridView gridView = view1.findViewById(R.id.bs_gridView);
+                final GridView gridView = view1.findViewById(R.id.grid_pointers);
                 gridView.setAdapter(pointerAdapter);
                 gridView.setOnItemClickListener((adapterView, view, i, l) -> {
                     File source = new File(pointerAdapter.getPath(i));
@@ -618,7 +619,7 @@ public class ManagePointerActivity extends AppCompatActivity {
                                 AssetManager am = getPackageManager().getResourcesForApplication(POKEMON_POINTERS_PACKAGE_NAME).getAssets();
                                 files = am.list(DIR_NAME_POINTERS);
 
-                                final Utils.PointerAdapter pointerAdapter = new Utils.PointerAdapter(mContext);
+                                final PointerAdapter pointerAdapter = new PointerAdapter(mContext);
                                 assert files != null;
                                 for (String filename : files) {
                                     if (filename.startsWith(POKEMON_POINTER_PACK)){
@@ -651,17 +652,17 @@ public class ManagePointerActivity extends AppCompatActivity {
                                 }
                                 for (File pointer : arrayList){
                                     if (pointer.getName().startsWith(POKEMON_POINTER_PACK)){
-                                        pointerAdapter.add(pointer.getPath());
+                                        PointerAdapter.Companion.getItemList().add(pointer.getPath());
                                     }
                                 }
                                 MaterialDialog materialDialog = new MaterialDialog.Builder(mContext)
                                         .title(POKEMON_PP_NAME)
-                                        .customView(R.layout.grid_view_ind, false)
+                                        .customView(R.layout.layout_grid_bottomsheet, false)
                                         .show();
                                 materialDialog.setOnDismissListener(dialogInterface -> pointerAdapter.clear());
                                 View view1 = materialDialog.getCustomView();
                                 if (view1 != null) {
-                                    final GridView gridView = view1.findViewById(R.id.bs_gridView);
+                                    final GridView gridView = view1.findViewById(R.id.grid_pointers);
                                     gridView.setAdapter(pointerAdapter);
                                     gridView.setOnItemClickListener((adapterView, view2, i, l) -> {
                                         File source = new File(pointerAdapter.getPath(i));
