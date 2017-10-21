@@ -15,8 +15,7 @@
 
 <resources>
 
-    <!--Style of MainActivity-->
-    <style name="AppTheme.Dark" parent="Theme.AppCompat">
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -25,13 +24,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:colorButtonNormal">@color/colorAccent</item>
-    </style>
-
-    <!--Style of SettingsActivity-->
-    <style name="AppTheme.AppBar" parent="Theme.AppCompat">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 </resources>

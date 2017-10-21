@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.preference.PreferenceCategory
         android:title="Pointer Settings">
         <Preference
             android:title="@string/text_max_pointer_size"
@@ -28,11 +28,11 @@
             android:summary="Enables Slider to Change Pointer Alpha (transparency)"
             android:key="@string/key_EnablePointerAlpha"
             android:defaultValue="false"/>
-    </PreferenceCategory>
+    </android.support.v7.preference.PreferenceCategory>
     <PreferenceCategory
         android:title="Color Picker">
         <Preference
             android:key="@string/key_useMDCC"
             android:title="Change Color Picker"/>
     </PreferenceCategory>
-</PreferenceScreen>
+</android.support.v7.preference.PreferenceScreen>
