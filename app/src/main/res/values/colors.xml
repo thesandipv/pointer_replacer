@@ -17,10 +17,5 @@
 <resources>
     <color name="colorPrimary">#263238</color>
     <color name="colorPrimaryDark">#000a12</color>
-    <color name="colorPrimaryLight">#4f5b62</color>
     <color name="colorAccent">#2979ff</color>
-
-    <color name="monochrome">#BDBDBD</color>
-
-    <color name="color_text_primary">#ffffff</color>
 </resources>
