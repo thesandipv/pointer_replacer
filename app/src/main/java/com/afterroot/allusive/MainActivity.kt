@@ -67,7 +67,14 @@ class MainActivity: AppCompatActivity(), NavigationView.OnNavigationItemSelected
         nav_view.setNavigationItemSelectedListener(this)
 
         arrowDrawable = DrawerArrowDrawable(this)
-        arrowDrawable!!.color = resources.getColor(android.R.color.white)
+        arrowDrawable!!.color.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                resources.getColor(android.R.color.white, theme)
+            } else {
+                resources.getColor(android.R.color.white)
+            }
+        }
+
         toolbar.navigationIcon = arrowDrawable
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
