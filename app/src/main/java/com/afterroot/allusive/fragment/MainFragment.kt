@@ -20,12 +20,10 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.support.v4.view.GravityCompat
 import android.support.v7.graphics.drawable.DrawerArrowDrawable
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,7 +35,6 @@ import com.afterroot.allusive.MainActivity
 import com.afterroot.allusive.R
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.io.File
@@ -47,47 +44,45 @@ import java.io.IOException
 
 class MainFragment: Fragment() {
 
-    private var mSharedPreferences : SharedPreferences? = null
-    private var mEditor: SharedPreferences.Editor? = null
-    private var mFragmentView: View? = null
-    private var mExtSdDir: String? = null
-    private var mTargetPath: String? = null
-    private var mPointerPreviewPath: String? = null
-    private var mTag: String? = null
+    private var sharedPreferences: SharedPreferences? = null
+    private var editor: SharedPreferences.Editor? = null
+    private var fragmentView: View? = null
+    private var extSdDir: String? = null
+    private var targetPath: String? = null
+    private var pointerPreviewPath: String? = null
+    private var TAG: String = this::class.java.simpleName
     private var drawerArrowDrawable: DrawerArrowDrawable? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mFragmentView = inflater?.inflate(R.layout.fragment_main, container, false)
-        return mFragmentView
+        fragmentView = inflater?.inflate(R.layout.fragment_main, container, false)
+        return fragmentView
     }
 
     @SuppressLint("CommitPrefEdits")
     override fun onStart() {
         super.onStart()
 
-        mSharedPreferences = Helper.getSharedPreferences(activity)
-        mEditor = mSharedPreferences!!.edit()
+        sharedPreferences = Helper.getSharedPreferences(activity)
+        editor = sharedPreferences!!.edit()
 
         init()
     }
 
     private fun init(){
-        mTag = getString(R.string.app_name)
         val pointersFolder = getString(R.string.pointer_folder_path)
-        mExtSdDir = Environment.getExternalStorageDirectory().toString()
-        mTargetPath = mExtSdDir!! + pointersFolder
-        mPointerPreviewPath = activity.filesDir.path + "/pointerPreview.png"
+        extSdDir = Environment.getExternalStorageDirectory().toString()
+        targetPath = extSdDir!! + pointersFolder
+        pointerPreviewPath = activity.filesDir.path + "/pointerPreview.png"
         drawerArrowDrawable = MainActivity.arrowDrawable
 
         activity.card_new_pointer.setOnClickListener { showPointerChooser() }
 
         MobileAds.initialize(activity, getString(R.string.banner_ad_unit_id))
 
-        val mAdView = activity.banner_ad_main
+        val adView = activity.banner_ad_main
         val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+        adView.loadAd(adRequest)
 
-        setToggle()
         getPointer()
 
         activity.fab_apply.setOnClickListener {
@@ -101,10 +96,10 @@ class MainFragment: Fragment() {
     @Throws(IOException::class)
     private fun applyPointer() {
         val pointerPath = activity.filesDir.path + "/pointer.png"
-        mEditor!!.putString(getString(R.string.key_pointerPath), pointerPath).apply()
+        editor!!.putString(getString(R.string.key_pointerPath), pointerPath).apply()
         val bitmap = loadBitmapFromView(selected_pointer)
         val file = File(pointerPath)
-        Runtime.getRuntime().exec("chmod 666 " + pointerPath)
+        Runtime.getRuntime().exec("chmod 666 $pointerPath")
         val out: FileOutputStream
         try {
             out = FileOutputStream(file)
@@ -155,29 +150,13 @@ class MainFragment: Fragment() {
         return b
     }
 
-    private fun setToggle() {
-        drawerArrowDrawable!!.color.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                resources.getColor(android.R.color.white, activity.theme)
-            } else {
-                resources.getColor(android.R.color.white)
-            }
-        }
-
-        activity.toolbar.apply {
-            navigationIcon = drawerArrowDrawable
-            setNavigationOnClickListener { activity.drawer_layout.openDrawer(GravityCompat.START) }
-        }
-    }
-
-
     private fun showPointerChooser() {
         val pointerFragment = PointerBottomSheetFragment()
         pointerFragment.show(activity.supportFragmentManager, "POINTERS")
         pointerFragment.setTitle("Select Pointers")
         pointerFragment.setPointerSelectCallback(object: PointerBottomSheetFragment.PointerSelectCallback{
             override fun onPointerSelected(pointerPath: String) {
-                mEditor!!.putString(getString(R.string.key_selectedPointerPath), pointerPath).apply()
+                editor!!.putString(getString(R.string.key_selectedPointerPath), pointerPath).apply()
                 activity.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
                 Log.d(this::class.java.simpleName, "Selected Pointer Path: $pointerPath" )
             }
@@ -187,8 +166,8 @@ class MainFragment: Fragment() {
 
     private fun getPointer() {
         try {
-            val pointerPath = mSharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
-            val selectedPointerPath = mSharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
+            val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
+            val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
             if (pointerPath != null) {
                 current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
                 Helper.hideView(text_no_pointer_applied)
