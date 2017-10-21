@@ -22,6 +22,7 @@ import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.design.widget.CoordinatorLayout
 import android.support.v7.graphics.drawable.DrawerArrowDrawable
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -36,23 +37,6 @@ import java.io.File
 
 
 class PointerBottomSheetFragment : BottomSheetDialogFragment() {
-
-    private val mBottomSheetBehaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            when (newState) {
-                BottomSheetBehavior.STATE_HIDDEN -> {
-                    dialog.dismiss()
-                }
-            }
-        }
-
-
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            arrow!!.progress = if (slideOffset >= 0) slideOffset else 1f
-        }
-
-    }
 
     var arrow: DrawerArrowDrawable? = null
     private var mBehavior: BottomSheetBehavior<*>? = null
@@ -70,7 +54,19 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
         mBehavior = params.behavior as BottomSheetBehavior<*>?
 
         if (mBehavior != null && mBehavior is BottomSheetBehavior<*>) {
-            mBehavior!!.setBottomSheetCallback(mBottomSheetBehaviorCallback)
+            mBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            dialog.dismiss()
+                        }
+                    }
+                }
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    arrow!!.progress = if (slideOffset >= 0) slideOffset else 1f
+                }
+
+            })
             mBehavior!!.peekHeight = 300
             mBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
         }
@@ -92,8 +88,10 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         try {
-            val pointerFiles = File(Environment.getExternalStorageDirectory().toString()
-                    + getString(R.string.pointer_folder_path)).listFiles()
+            val pointersFolder = File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
+            if (!pointersFolder.exists()) pointersFolder.mkdirs()
+            val pointerFiles = pointersFolder.listFiles()
+            Log.d("TAG", "Total Pointers: ${pointerFiles.size}")
             PointerAdapter.itemList.clear()
             if (pointerFiles.isNotEmpty()){
                 contentView.info_no_pointer_installed.visibility = View.GONE
@@ -120,6 +118,9 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             } else {
                 contentView.info_no_pointer_installed.visibility = View.VISIBLE
+                contentView.bs_button_install_pointers.setOnClickListener {
+                    MainActivity.showInstallPointersDialog(activity)
+                }
             }
         } catch (npe: NullPointerException) {
             npe.printStackTrace()
