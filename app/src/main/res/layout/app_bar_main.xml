@@ -87,13 +87,12 @@
             android:id="@+id/navigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             ads:layout_constraintBottom_toBottomOf="parent"
             ads:layout_constraintEnd_toEndOf="parent"
             ads:layout_constraintStart_toStartOf="parent"
             app:itemIconTint="@drawable/selector_bottom_navigation"
             app:itemTextColor="@drawable/selector_bottom_navigation"
-            app:menu="@menu/navigation" />
+            ads:menu="@menu/bottom_navigation" />
 
     </android.support.constraint.ConstraintLayout>
 
