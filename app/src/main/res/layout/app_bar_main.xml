@@ -92,7 +92,8 @@
             ads:layout_constraintStart_toStartOf="parent"
             app:itemIconTint="@drawable/selector_bottom_navigation"
             app:itemTextColor="@drawable/selector_bottom_navigation"
-            ads:menu="@menu/bottom_navigation" />
+            ads:menu="@menu/bottom_navigation"
+            android:background="@android:color/white"/>
 
     </android.support.constraint.ConstraintLayout>
 
