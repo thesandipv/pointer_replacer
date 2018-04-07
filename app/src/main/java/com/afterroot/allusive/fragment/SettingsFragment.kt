@@ -42,7 +42,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mSharedPreferences = Helper.getSharedPreferences(activity)
+        mSharedPreferences = Helper.getSharedPreferences(activity!!)
         mEditor = mSharedPreferences!!.edit()
 
         mChooseColorPicker = findPreference(getString(R.string.key_useMDCC))
@@ -55,7 +55,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         maxPointerSize = findPreference(getString(R.string.key_maxPointerSize))
         maxPointerSize.summary = mSharedPreferences!!.getString(getString(R.string.key_maxPointerSize), "100")
         maxPointerSize.setOnPreferenceClickListener {
-            MaterialDialog.Builder(activity)
+            MaterialDialog.Builder(activity!!)
                     .title(R.string.text_max_pointer_size)
                     .inputType(InputType.TYPE_CLASS_NUMBER)
                     .inputRange(2, 3)
@@ -72,7 +72,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         maxPaddingSize = findPreference(getString(R.string.key_maxPaddingSize))
         maxPaddingSize.summary = mSharedPreferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
         maxPaddingSize.setOnPreferenceClickListener {
-            MaterialDialog.Builder(activity)
+            MaterialDialog.Builder(activity!!)
                     .title(getString(R.string.key_maxPaddingSize))
                     .inputType(InputType.TYPE_CLASS_NUMBER)
                     .inputRange(1, 3)
@@ -90,7 +90,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun showSingleChoice() {
         val selectedIndex = mSharedPreferences!!.getInt("selectedIndex", 1)
-        MaterialDialog.Builder(activity)
+        MaterialDialog.Builder(activity!!)
                 .title(R.string.choose_color_picker)
                 .items(R.array.CCItems)
                 .itemsCallbackSingleChoice(selectedIndex) { _, _, which, _ ->

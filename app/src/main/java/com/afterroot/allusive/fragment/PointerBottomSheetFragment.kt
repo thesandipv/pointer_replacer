@@ -35,7 +35,6 @@ import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import java.io.File
 
 
-
 class PointerBottomSheetFragment : BottomSheetDialogFragment() {
 
     var arrow: DrawerArrowDrawable? = null
@@ -47,8 +46,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
         val contentView = View.inflate(context, R.layout.layout_grid_bottomsheet, fragment_container)
         dialog!!.setContentView(contentView)
 
-        arrow = MainActivity.arrowDrawable
-        activity.toolbar.navigationIcon = arrow
+        arrow = MainActivity.toggle!!.drawerArrowDrawable
 
         val params = (contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams
         mBehavior = params.behavior as BottomSheetBehavior<*>?
@@ -62,6 +60,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                         }
                     }
                 }
+
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
                     arrow!!.progress = if (slideOffset >= 0) slideOffset else 1f
                 }
@@ -71,11 +70,11 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
             mBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
-        val pointerAdapter = PointerAdapter(activity)
+        val pointerAdapter = PointerAdapter(activity!!)
 
-        if (Helper.getDpi(context) <= 240) {
+        if (Helper.getDpi(context!!) <= 240) {
             pointerAdapter.setLayoutParams(49)
-        } else if (Helper.getDpi(context) >= 240) {
+        } else if (Helper.getDpi(context!!) >= 240) {
             pointerAdapter.setLayoutParams(66)
         }
 
@@ -93,22 +92,22 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
             val pointerFiles = pointersFolder.listFiles()
             Log.d("TAG", "Total Pointers: ${pointerFiles.size}")
             PointerAdapter.itemList.clear()
-            if (pointerFiles.isNotEmpty()){
+            if (pointerFiles.isNotEmpty()) {
                 contentView.info_no_pointer_installed.visibility = View.GONE
                 contentView.text_bottomsheet_header.text = mTitle
                 pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
 
                 contentView.grid_pointers.setOnItemLongClickListener { _, _, i, _ ->
                     val file = File(pointerAdapter.getPath(i))
-                    MaterialDialog.Builder(activity)
+                    MaterialDialog.Builder(activity!!)
                             .title(getString(R.string.text_delete) + file.name)
                             .content(R.string.text_delete_confirm)
                             .positiveText(R.string.text_yes)
                             .onPositive { _, _ ->
                                 if (file.delete()) {
-                                    Helper.showSnackBar(activity.coordinator_layout, "Pointer deleted.")
+                                    Helper.showSnackBar(activity!!.coordinator_layout, "Pointer deleted.")
                                 } else {
-                                    Helper.showSnackBar(activity.coordinator_layout, "Error deleting pointer.")
+                                    Helper.showSnackBar(activity!!.coordinator_layout, "Error deleting pointer.")
                                 }
                             }
                             .negativeText(R.string.text_no)
@@ -119,7 +118,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
             } else {
                 contentView.info_no_pointer_installed.visibility = View.VISIBLE
                 contentView.bs_button_install_pointers.setOnClickListener {
-                    MainActivity.showInstallPointersDialog(activity)
+                    MainActivity.showInstallPointerFragment(activity!!)
                 }
             }
         } catch (npe: NullPointerException) {
@@ -128,7 +127,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     var mTitle: String? = null
-    fun setTitle(title: String){
+    fun setTitle(title: String) {
         mTitle = title
     }
 

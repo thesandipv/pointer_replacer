@@ -13,37 +13,48 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive
+package com.afterroot.allusive.fragment
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.*
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
+import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.support.v7.graphics.drawable.DrawerArrowDrawable
+import android.transition.TransitionInflater
 import android.view.MenuItem
 import android.view.View
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.allusive.adapter.BottomNavigationAdapter
-import com.afterroot.allusive.fragment.InstallPointerFragment
-import com.afterroot.allusive.fragment.MainFragment
-import com.afterroot.allusive.fragment.SettingsFragment
+import com.afterroot.allusive.Helper
+import com.afterroot.allusive.PermissionChecker
+import com.afterroot.allusive.R
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_main.*
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+/**
+ * Created by Sandip on 26-11-2017.
+ */
 
-    private val TAG = "MainActivity"
+class MainActivity: AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private var mainFragment: MainFragment? = null
+    private var customizeFragment: CustomizeFragment? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         //Replace Launch theme with Light Theme
         setTheme(R.style.AppTheme_Light)
@@ -51,11 +62,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle!!)
-        toggle!!.syncState()
 
         //Firebase Analytics, logs every time when user starts activity.
         val analytics = FirebaseAnalytics.getInstance(this)
@@ -69,18 +75,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        init()
-    }
+        navigation.setOnNavigationItemSelectedListener(bottomNavViewListener)
 
-    private var mainFragment: MainFragment? = null
-    private fun init() {
-        val arrowDrawable = toggle!!.drawerArrowDrawable
-        arrowDrawable.color =
+        val arrowDrawable = DrawerArrowDrawable(this)
+        arrowDrawable!!.color =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     resources.getColor(android.R.color.white, theme)
                 } else {
                     resources.getColor(android.R.color.white)
                 }
+
+        toolbar.navigationIcon = arrowDrawable
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             nav_view.apply {
@@ -93,116 +98,124 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 itemIconTintList = resources.getColorStateList(R.color.nav_state_list)
                 itemTextColor = resources.getColorStateList(R.color.nav_state_list)
             }
-            if (mainFragment == null) {
-                mainFragment = MainFragment.newInstance()
-            }
-            /*Handler().postDelayed({
+            mainFragment = MainFragment.newInstance()
+            Handler().postDelayed({
                 addFragment(mainFragment!!, R.id.fragment_container)
-            }, 100)*/
+            }, 100)
         }
 
-        view_pager.setPagingEnabled(false)
-        val viewpagerAdapter = BottomNavigationAdapter(supportFragmentManager)
-        val installPointerFragment = InstallPointerFragment.newInstance()
-        val settingsFragment = SettingsFragment()
+        fab_tune.setOnClickListener {
+            if (customizeFragment == null){
+                customizeFragment = CustomizeFragment.newInstance()
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val changeTransform = TransitionInflater.from(this).inflateTransition(R.transition.change_pointer_transform)
+                val explode = TransitionInflater.from(this).inflateTransition(R.transition.explode)
 
-        viewpagerAdapter.run {
-            addFragment(mainFragment!!)
-            addFragment(installPointerFragment)
-            addFragment(settingsFragment)
-        }
-
-        view_pager.adapter = viewpagerAdapter
-
-        //BottomNavigation Click Listener
-        navigation.setOnNavigationItemSelectedListener { item ->
-
-            when (item.itemId) {
-                R.id.navigation_home -> {
-                    //replaceFragment(MainFragment.newInstance(), R.id.fragment_container)
-                    view_pager.currentItem = 0
+                customizeFragment!!.apply {
+                    sharedElementEnterTransition = changeTransform
+                    enterTransition = explode
+                    exitTransition = explode
+                    sharedElementReturnTransition = changeTransform
                 }
-                R.id.navigation_manage_pointer -> {
-                    //replaceFragment(InstallPointerFragment.newInstance(), R.id.fragment_container)
-                    view_pager.currentItem = 1
+                replaceFragment(customizeFragment!!, R.id.fragment_container) {
+                    addToBackStack("sliders")
+                    addSharedElement(selected_pointer,  ViewCompat.getTransitionName(selected_pointer))
                 }
-                R.id.navigation_settings -> {
-                    //replaceFragment(SettingsFragment(), R.id.fragment_container)
-                    view_pager.currentItem = 2
+            } else {
+                replaceFragment(customizeFragment!!, R.id.fragment_container) {
+                    addToBackStack("sliders")
                 }
             }
-            return@setOnNavigationItemSelectedListener true
-        }
-    }
 
-    private val manifestPermissions = arrayOf(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-    private fun checkPermissions() {
-        Log.d(TAG, "checkPermissions: Checking Permissions..")
-        val permissionChecker = PermissionChecker(this)
-        if (permissionChecker.lacksPermissions(manifestPermissions)) {
-            Log.d(TAG, "checkPermissions: Requesting Permissions..")
-            ActivityCompat.requestPermissions(this, manifestPermissions, REQUEST_CODE)
-        } else {
-            Log.d(TAG, "checkPermissions: Permissions Granted..")
-            if (mainFragment == null) {
-                mainFragment = MainFragment.newInstance()
-            }
-            addFragment(mainFragment!!, R.id.fragment_container)
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when (requestCode) {
-            REQUEST_CODE -> {
-                val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                if (!isPermissionGranted) {
-                    Log.d(TAG, "onRequestPermissionsResult: Permissions not Granted..")
-                    Helper.showSnackBar(this.coordinator_layout, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE, "GRANT", View.OnClickListener { checkPermissions() })
-                } else {
-                    checkPermissions()
+            ObjectAnimator.ofFloat(arrowDrawable, "progress", 0f,1f).start()
+            toolbar.setNavigationOnClickListener {
+                supportFragmentManager.popBackStack("sliders", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                ObjectAnimator.ofFloat(arrowDrawable, "progress", 1f,0f).start()
+                toolbar.setNavigationOnClickListener {
+                    drawer_layout.openDrawer(GravityCompat.START)
                 }
             }
         }
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+    //BottomNavigationView listener
+    private val bottomNavViewListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.reboot -> showRebootDialog()
+            R.id.navigation_home -> {
+                replaceFragment(mainFragment!!, R.id.fragment_container)
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_manage_pointer -> {
+                replaceFragment(InstallPointerFragment(), R.id.fragment_container)
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_settings -> {
+                replaceFragment(SettingsFragment(), R.id.fragment_container)
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+
+    //NavigationDrawer item selected callback
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+
         }
         return false
     }
 
-    private fun showRebootDialog() {
-        AlertDialog.Builder(this, R.style.Theme_AppCompat_DayNight_Dialog_Alert)
-                .setTitle(R.string.reboot)
-                .setMessage(R.string.text_reboot_confirm)
-                .setPositiveButton(R.string.reboot, { _, _ ->
-                    try {
-                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
-                        process.waitFor()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                })
-                .setNegativeButton(R.string.text_no, { _, _ ->
+    private val manifestPermissions = arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE)
 
-                })
-                .setNeutralButton(R.string.text_soft_reboot, { _, _ ->
-                    try {
-                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
-                        process.waitFor()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+    private fun checkPermissions() {
+        val permissionChecker = PermissionChecker(this)
+        if (permissionChecker.lacksPermissions(manifestPermissions)) {
+            ActivityCompat.requestPermissions(this, manifestPermissions, REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_CODE -> {
+                val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                if (!isPermissionGranted) {
+                    Helper.showSnackBar(this.coordinator_layout, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE, "GRANT", View.OnClickListener { checkPermissions() })
+                } else {
+                    if (mainFragment == null) {
+                        mainFragment = MainFragment()
                     }
-                }).show()
+                    addFragment(mainFragment!!, R.id.fragment_container)
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        checkPermissions()
+    }
+
+    private var interstitialAd: InterstitialAd? = null
+    fun setUpInterstitialAd(){
+        interstitialAd = InterstitialAd(this)
+        interstitialAd!!.apply {
+            adUnitId = getString(R.string.interstitial_ad_1_id)
+            loadAd(AdRequest.Builder().build())
+            adListener = object : AdListener() {
+                override fun onAdClosed() {
+                    interstitialAd!!.loadAd(AdRequest.Builder().build())
+                }
+            }
+        }
     }
 
     companion object {
-        var toggle: ActionBarDrawerToggle? = null
-        private val REQUEST_CODE: Int = 256
-
+        private val REQUEST_CODE = 0
         fun showInstallPointersDialog(context: Context) {
             MaterialDialog.Builder(context)
                     .title("Install Pointers")
@@ -213,7 +226,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }.show()
         }
 
-        fun showInstallPointerFragment(activity: FragmentActivity) {
+        fun showInstallPointerFragment(activity: FragmentActivity){
             activity.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, InstallPointerFragment()).commit()
         }
     }
@@ -222,20 +235,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * @see <a href="https://medium.com/thoughts-overflow/how-to-add-a-fragment-in-kotlin-way-73203c5a450b">Source: How to Add a Fragment the Kotlin way</a></p>
      */
     private inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction) {
-        beginTransaction().func().commit()
+        beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out, R.anim.slide_in, R.anim.slide_out).func().commit()
     }
-
-    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int, func: (FragmentTransaction.() -> FragmentTransaction)? = null) {
-        Log.d(TAG, "addFragment: adding ${fragment.javaClass.simpleName}")
+    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int, func: (FragmentTransaction.() -> FragmentTransaction)? = null){
         if (func != null) {
             supportFragmentManager.inTransaction { add(frameId, fragment).func() }
-        } else {
+        } else{
             supportFragmentManager.inTransaction { add(frameId, fragment) }
         }
     }
 
     private fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int, func: (FragmentTransaction.() -> FragmentTransaction)? = null) {
-        Log.d(TAG, "replaceFragment: replacing fragment with ${fragment.javaClass.simpleName}")
         if (func != null) {
             supportFragmentManager.inTransaction { replace(frameId, fragment).func() }
         } else {

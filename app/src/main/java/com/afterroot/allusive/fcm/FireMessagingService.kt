@@ -40,7 +40,7 @@ class FireMessagingService : FirebaseMessagingService() {
 
         // Check if message contains a notification payload.
         if (remoteMessage.notification != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.notification.body!!)
+            Log.d(TAG, "Message Notification Body: " + remoteMessage.notification!!.body!!)
         }
 
         val intent = Intent(this, MainActivity::class.java)
@@ -50,7 +50,7 @@ class FireMessagingService : FirebaseMessagingService() {
         val notificationBuilder = NotificationCompat.Builder(this, "Allusive")
                 .setSmallIcon(R.drawable.ic_launch_screen)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(remoteMessage.notification.body)
+                .setContentText(remoteMessage.notification!!.body)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)

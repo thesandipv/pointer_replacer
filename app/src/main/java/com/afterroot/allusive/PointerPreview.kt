@@ -127,7 +127,7 @@ class PointerPreview : AppCompatActivity(), ColorChooserDialog.ColorCallback {
                 .allowUserColorInputAlpha(true)
                 .dynamicButtonColor(false)
                 .preselect(oldColor)
-                .show()
+                .show(this)
     }
 
     override fun onColorSelection(dialog: ColorChooserDialog, @ColorInt selectedColor: Int) {
@@ -152,7 +152,7 @@ class PointerPreview : AppCompatActivity(), ColorChooserDialog.ColorCallback {
                 .allowUserColorInputAlpha(true)
                 .dynamicButtonColor(false)
                 .preselect(oldPointerColor)
-                .show()
+                .show(this)
     }
 
     private fun showSureDialog() {

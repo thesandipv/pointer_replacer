@@ -42,7 +42,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-class MainFragment: Fragment() {
+class MainFragment : Fragment() {
 
     private var sharedPreferences: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -53,8 +53,9 @@ class MainFragment: Fragment() {
     private var TAG: String = this::class.java.simpleName
     private var drawerArrowDrawable: DrawerArrowDrawable? = null
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater?.inflate(R.layout.fragment_main, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d("MainFragment", "adding view..")
+        fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
         return fragmentView
     }
 
@@ -62,32 +63,33 @@ class MainFragment: Fragment() {
     override fun onStart() {
         super.onStart()
 
-        sharedPreferences = Helper.getSharedPreferences(activity)
+        sharedPreferences = Helper.getSharedPreferences(activity!!)
         editor = sharedPreferences!!.edit()
 
         init()
     }
 
-    private fun init(){
+    private fun init() {
         val pointersFolder = getString(R.string.pointer_folder_path)
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
-        pointerPreviewPath = activity.filesDir.path + "/pointerPreview.png"
-        drawerArrowDrawable = MainActivity.arrowDrawable
+        pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
+        drawerArrowDrawable = MainActivity.toggle!!.drawerArrowDrawable
 
-        activity.card_new_pointer.setOnClickListener { showPointerChooser() }
+        activity!!.card_new_pointer.setOnClickListener { showPointerChooser() }
 
-        MobileAds.initialize(activity, getString(R.string.banner_ad_unit_id))
+        MobileAds.initialize(activity!!, getString(R.string.banner_ad_unit_id))
 
-        val adView = activity.banner_ad_main
+        val adView = activity!!.banner_ad_main
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
         getPointer()
 
-        activity.fab_apply.setOnClickListener {
+        //TODO Replace
+        /*activity!!.fab_apply.setOnClickListener {
             applyPointer()
-        }
+        }*/
     }
 
     /**
@@ -95,7 +97,7 @@ class MainFragment: Fragment() {
      */
     @Throws(IOException::class)
     private fun applyPointer() {
-        val pointerPath = activity.filesDir.path + "/pointer.png"
+        val pointerPath = activity!!.filesDir.path + "/pointer.png"
         editor!!.putString(getString(R.string.key_pointerPath), pointerPath).apply()
         val bitmap = loadBitmapFromView(selected_pointer)
         val file = File(pointerPath)
@@ -113,8 +115,8 @@ class MainFragment: Fragment() {
             e.printStackTrace()
             return
         }
-        Helper.showSnackBar(activity.coordinator_layout, "Pointer Applied", Snackbar.LENGTH_LONG, "REBOOT", View.OnClickListener {
-            MaterialDialog.Builder(activity)
+        Helper.showSnackBar(activity!!.coordinator_layout, "Pointer Applied", Snackbar.LENGTH_LONG, "REBOOT", View.OnClickListener {
+            MaterialDialog.Builder(activity!!)
                     .title(R.string.reboot)
                     .content(R.string.text_reboot_confirm)
                     .positiveText(R.string.reboot)
@@ -152,13 +154,13 @@ class MainFragment: Fragment() {
 
     private fun showPointerChooser() {
         val pointerFragment = PointerBottomSheetFragment()
-        pointerFragment.show(activity.supportFragmentManager, "POINTERS")
+        pointerFragment.show(activity!!.supportFragmentManager, "POINTERS")
         pointerFragment.setTitle("Select Pointers")
-        pointerFragment.setPointerSelectCallback(object: PointerBottomSheetFragment.PointerSelectCallback{
+        pointerFragment.setPointerSelectCallback(object : PointerBottomSheetFragment.PointerSelectCallback {
             override fun onPointerSelected(pointerPath: String) {
                 editor!!.putString(getString(R.string.key_selectedPointerPath), pointerPath).apply()
-                activity.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                Log.d(this::class.java.simpleName, "Selected Pointer Path: $pointerPath" )
+                activity!!.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
+                Log.d(this::class.java.simpleName, "Selected Pointer Path: $pointerPath")
             }
 
         })
@@ -184,10 +186,7 @@ class MainFragment: Fragment() {
         }
     }
 
-     companion object {
-         fun newInstance(): MainFragment {
-             return MainFragment()
-         }
-
+    companion object {
+        fun newInstance(): MainFragment = MainFragment()
     }
 }
