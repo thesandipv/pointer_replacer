@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@
   -->
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinator_layout"
@@ -38,63 +36,35 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/layout_bottom_navigation"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.constraint.ConstraintLayout
+        <FrameLayout
             android:id="@+id/fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            ads:layout_constraintBottom_toTopOf="@+id/navigation"
-            ads:layout_constraintEnd_toEndOf="parent"
-            ads:layout_constraintStart_toStartOf="parent"
-            ads:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription,RtlHardcoded" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_apply"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_above="@+id/navigation"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toTopOf="@+id/navigation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_action_apply" />
+            android:visibility="gone"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_tune"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            ads:layout_constraintBottom_toBottomOf="@+id/fab_apply"
-            ads:layout_constraintEnd_toStartOf="@+id/fab_apply"
-            ads:layout_constraintTop_toTopOf="@+id/fab_apply"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_action_slider"
-            android:layout_marginRight="8dp" />
+        <com.afterroot.allusive.AllusiveViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/navigation" />
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            ads:layout_constraintBottom_toBottomOf="parent"
-            ads:layout_constraintEnd_toEndOf="parent"
-            ads:layout_constraintStart_toStartOf="parent"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/white"
             app:itemIconTint="@drawable/selector_bottom_navigation"
             app:itemTextColor="@drawable/selector_bottom_navigation"
-            ads:menu="@menu/bottom_navigation"
-            android:background="@android:color/white"/>
+            app:menu="@menu/bottom_navigation" />
 
-    </android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>

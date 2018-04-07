@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2016-2017 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +15,6 @@
   -->
 
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="nav_header_height">170dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="card_radius">8dp</dimen>
+    <integer name="fragment_anim_duration">300</integer>
+    <integer name="fragment_anim_translate_duration">300</integer>
 </resources>

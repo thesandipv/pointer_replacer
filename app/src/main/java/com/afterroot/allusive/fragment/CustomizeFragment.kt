@@ -15,6 +15,7 @@
 
 package com.afterroot.allusive.fragment
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -26,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import com.afterroot.allusive.Helper
+import com.afterroot.allusive.MainActivity
 import com.afterroot.allusive.R
 import kotlinx.android.synthetic.main.fragment_customize_pointer.*
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -34,27 +36,32 @@ import java.util.*
 /**
  * Created by Sandip on 04-10-2017.
  */
-class CustomizeFragment: Fragment() {
+class CustomizeFragment : Fragment() {
     private var mFragmentView: View? = null
-    private var mSharedPreferences : SharedPreferences? = null
+    private var mSharedPreferences: SharedPreferences? = null
     var mEditor: SharedPreferences.Editor? = null
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mFragmentView = inflater?.inflate(R.layout.fragment_customize_pointer, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mFragmentView = inflater.inflate(R.layout.fragment_customize_pointer, container, false)
         return mFragmentView
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        ObjectAnimator.ofFloat(MainActivity.toggle!!.drawerArrowDrawable, "progress", 1f, 0f).start()
     }
 
     @SuppressLint("CommitPrefEdits")
     override fun onStart() {
         super.onStart()
 
-        mSharedPreferences = Helper.getSharedPreferences(activity)
+        mSharedPreferences = Helper.getSharedPreferences(activity!!)
         mEditor = mSharedPreferences!!.edit()
     }
 
     private val minSize: Int
-        get() = if (Helper.getDpi(activity) <= 240) {
+        get() = if (Helper.getDpi(activity!!) <= 240) {
             49
         } else {
             66
@@ -159,9 +166,9 @@ class CustomizeFragment: Fragment() {
     }
 
     private fun setPointerImageParams(size: Int, padding: Int, isApplyPadding: Boolean) {
-        activity.image_customize_pointer.layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
+        activity!!.image_customize_pointer.layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
         if (isApplyPadding) {
-            activity.image_customize_pointer.setPadding(padding, padding, padding, padding)
+            activity!!.image_customize_pointer.setPadding(padding, padding, padding, padding)
         }
     }
 

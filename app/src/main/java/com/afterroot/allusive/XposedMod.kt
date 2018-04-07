@@ -30,11 +30,11 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
 
     @Throws(Throwable::class)
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
-        val XSharedPreferences = XSharedPreferences(BuildConfig.APPLICATION_ID)
-        XSharedPreferences.makeWorldReadable()
-        val POINTER_PATH = XSharedPreferences.getString("POINTER_PATH", "/data/data/" + BuildConfig.APPLICATION_ID + "/files/pointer.png")
-        drawable = Drawable.createFromPath(POINTER_PATH)
-        XposedBridge.log("Loaded Pointer from " + POINTER_PATH!!)
+        val xSharedPreferences = XSharedPreferences(BuildConfig.APPLICATION_ID)
+        xSharedPreferences.makeWorldReadable()
+        val pointerPath = xSharedPreferences.getString("POINTER_PATH", "/data/data/" + BuildConfig.APPLICATION_ID + "/files/pointer.png")
+        drawable = Drawable.createFromPath(pointerPath)
+        XposedBridge.log("Loaded Pointer from " + pointerPath!!)
         XposedBridge.log(Throwable())
     }
 

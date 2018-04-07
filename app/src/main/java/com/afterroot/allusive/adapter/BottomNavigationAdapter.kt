@@ -13,20 +13,24 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive
+package com.afterroot.allusive.adapter
 
-import android.content.Context
-import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 
-class PermissionChecker(private val mContext: Context) {
+class BottomNavigationAdapter(fragmentManager: FragmentManager) : SmartFragmentStatePagerAdapter(fragmentManager) {
 
-    fun lacksPermissions(permissions: Array<String>) : Boolean {
-        return permissions.any { lacksPermission(it) }
+    private val fragments = ArrayList<Fragment>()
+
+    override fun getItem(position: Int): Fragment {
+        return fragments[position]
     }
 
-    private fun lacksPermission(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_DENIED
+    override fun getCount(): Int {
+        return fragments.size
+    }
+
+    fun addFragment(fragment: Fragment) {
+        fragments.add(fragment)
     }
 }
-

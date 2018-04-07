@@ -206,7 +206,7 @@ public class ManagePointerActivity extends AppCompatActivity {
 
     private class PointerListAdapter extends BaseAdapter implements ListAdapter {
 
-        private ArrayList<String> mArrayList = new ArrayList<>();
+        private ArrayList<String> mArrayList;
         private Context mContext;
         private TextView installedState = null;
 
@@ -396,7 +396,7 @@ public class ManagePointerActivity extends AppCompatActivity {
             }
 
             assert view != null;
-            TextView listItemText = view.findViewById(R.id.text_pointer_list_item);
+            TextView listItemText = view.findViewById(R.id.item_pointer_pack_name);
             installedState = view.findViewById(R.id.text_installed_state);
             listItemText.setText(mArrayList.get(position));
 
