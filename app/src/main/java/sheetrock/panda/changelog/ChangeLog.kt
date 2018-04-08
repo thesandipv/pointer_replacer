@@ -47,14 +47,12 @@ private constructor(private val context: Context, sp: SharedPreferences) {
      * ChangeLog is instantiated).
      * //@see AndroidManifest.xml#android:versionName
      */
-    var lastVersion: String? = null
-        private set
+    private var lastVersion: String? = null
     /**
      * @return The version name of this app as described in the manifest.
      * //@see AndroidManifest.xml#android:versionName
      */
-    var thisVersion: String? = null
-        private set
+    private var thisVersion: String? = null
     private var listMode = Listmode.NONE
     private var sb: StringBuffer? = null
 
