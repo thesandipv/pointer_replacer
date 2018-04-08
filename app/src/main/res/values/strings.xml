@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2016-2017 Sandip Vaghela
+  ~ Copyright (C) 2016-2018 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -32,11 +32,10 @@
     <string name="key_maxPaddingSize" translatable="false">maxPaddingSize</string>
 
     <!-- urls -->
-    <string name="url_xda_thread" translatable="false">http://goo.gl/mpj4S8</string>
-    <string name="url_ar" translatable="false">http://goo.gl/7wV9LR</string>
-    <string name="url_prx" translatable="false">http://repo.xposed.info/module/afterroot.pointerreplacer</string>
-    <string name="url_g_plus" translatable="false">http://goo.gl/r8A681</string>
-    <string name="url_source_code" translatable="false">http://goo.gl/7jipGN</string>
+    <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="url_g_plus" translatable="false">https://m8rg7.app.goo.gl/gplusComm</string>
+    <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
+    <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
 
     <!--changelog dialog-->
     <string name="changelog_full_title">Changelog</string>
@@ -50,8 +49,6 @@
     <string name="title_activity_about">About</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_manage_pointer">Install Pointers</string>
-
-    <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
 
     <string name="text_will_change_to">New Pointer</string>
     <string name="text_change_color">Change Pointer Color</string>
@@ -100,8 +97,8 @@
     <string name="help">Help</string>
     <string name="install_manage_pointers">Install Pointers</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Apply Pointer</string>
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-6628325093439880/4128118050</string>
-    <string name="interstitial_ad_1_id" translatable="false">ca-app-pub-6628325093439880/6191545783</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
+    <string name="interstitial_ad_1_id" translatable="false">ca-app-pub-6628325093439880/7473207984</string>
     <string name="text_click_to_change_pointer">Click to Change Pointer</string>
 
     <string name="main_fragment_transition">main_fragment_transition</string>
