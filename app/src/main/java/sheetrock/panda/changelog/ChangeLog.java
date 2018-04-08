@@ -25,7 +25,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.webkit.WebView;
 
-import com.afterroot.allusive.R;
+import com.afterroot.pointerdash.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;

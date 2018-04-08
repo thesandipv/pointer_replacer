@@ -8,25 +8,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:302054959566:android:44dc81093d5f8738",
+        "mobilesdk_app_id": "1:302054959566:android:57b289ce2c9d5196",
         "android_client_info": {
-          "package_name": "afterroot.pointerreplacer"
+          "package_name": "com.afterroot.allusive"
         }
       },
       "oauth_client": [
         {
-          "client_id": "302054959566-h0krcs36gr19rrftl4unjifc824vmk97.apps.googleusercontent.com",
+          "client_id": "302054959566-tc6fis9olso29ap3l1ckv1thmrkvqbpg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "afterroot.pointerreplacer",
-            "certificate_hash": "2d896881a521211b3853e39dd18194b00392da3d"
+            "package_name": "com.afterroot.allusive",
+            "certificate_hash": "99b688c0fc75fe635e30507a1049c6cdbb86b6fa"
           }
         },
         {
-          "client_id": "302054959566-rtse1nol5egmpgjkss9c2i0oekjdmj2i.apps.googleusercontent.com",
+          "client_id": "302054959566-cdg90huhtjn965og3khj3jiq0rc7a2sd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "afterroot.pointerreplacer",
+            "package_name": "com.afterroot.allusive",
             "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
           }
         },
@@ -60,18 +60,18 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:302054959566:android:57b289ce2c9d5196",
+        "mobilesdk_app_id": "1:302054959566:android:59f49ed6e5ccf5ac",
         "android_client_info": {
-          "package_name": "com.afterroot.allusive"
+          "package_name": "com.afterroot.pointerdash"
         }
       },
       "oauth_client": [
         {
-          "client_id": "302054959566-cdg90huhtjn965og3khj3jiq0rc7a2sd.apps.googleusercontent.com",
+          "client_id": "302054959566-6659c6o9mpkvc2n933mn54jq8id3ogrf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.afterroot.allusive",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+            "package_name": "com.afterroot.pointerdash",
+            "certificate_hash": "b0fc23905191f8994eb7fe75827a43257f88c9b4"
           }
         },
         {
