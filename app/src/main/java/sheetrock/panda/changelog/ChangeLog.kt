@@ -181,7 +181,7 @@ private constructor(private val context: Context, sp: SharedPreferences) {
             // sections
             while ((br.readLine()) != null) {
                 line = line!!.trim { it <= ' ' }
-                val marker = if (line.isNotEmpty()) line[0] else 0
+                val marker = if (line.isNotEmpty()) line[0] else 0.toChar()
                 if (marker == '$') {
                     // begin of a version section
                     this.closeList()
