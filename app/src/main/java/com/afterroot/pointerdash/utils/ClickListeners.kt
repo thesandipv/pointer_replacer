@@ -13,4 +13,13 @@
  * limitations under the License.
  */
 
-include ':app', ':xposed', ':touchesenabler'
+package com.afterroot.pointerdash.utils
+
+interface ListClickCallbacks<in T> {
+    fun onListItemClick(item: T?, docId: String)
+    fun onListItemLongClick(item: T?, docId: String)
+}
+
+interface OnSaveButtonClick {
+    fun onSaveButtonClicked()
+}

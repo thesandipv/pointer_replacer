@@ -44,7 +44,7 @@
     <string name="changelog_show_full">Full Changelog</string>
 
 
-    <string name="app_name">Allusive</string>
+    <string name="app_name">Pointers Dashboard</string>
     <string name="title_activity_pointer_preview">Pointer Preview</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_settings">Settings</string>
@@ -106,5 +106,6 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="text_edit_profile">Edit Profile</string>
 
 </resources>

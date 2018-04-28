@@ -17,10 +17,15 @@ package com.afterroot.pointerdash.adapter
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentStatePagerAdapter
+import android.util.SparseArray
+import android.view.ViewGroup
 
-class BottomNavigationAdapter(fragmentManager: FragmentManager) : SmartFragmentStatePagerAdapter(fragmentManager) {
+class BottomNavigationAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
 
+    private val registeredFragments = SparseArray<Fragment>()
     private val fragments = ArrayList<Fragment>()
+    private val titles = ArrayList<CharSequence>()
 
     override fun getItem(position: Int): Fragment {
         return fragments[position]
@@ -30,7 +35,23 @@ class BottomNavigationAdapter(fragmentManager: FragmentManager) : SmartFragmentS
         return fragments.size
     }
 
-    fun addFragment(fragment: Fragment) {
+    fun addFragment(fragment: Fragment, title: CharSequence) {
         fragments.add(fragment)
+        titles.add(title)
+    }
+
+    override fun getPageTitle(position: Int): CharSequence? {
+        return titles[position]
+    }
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val fragment = super.instantiateItem(container, position) as Fragment
+        registeredFragments.put(position, fragment)
+        return fragment
+    }
+
+    override fun destroyItem(container: ViewGroup, position: Int, item: Any) {
+        registeredFragments.remove(position)
+        super.destroyItem(container, position, item)
     }
 }

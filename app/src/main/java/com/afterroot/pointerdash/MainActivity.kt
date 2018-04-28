@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.*
@@ -34,16 +35,19 @@ import android.view.View
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.pointerdash.adapter.BottomNavigationAdapter
-import com.afterroot.pointerdash.fragment.InstallPointerFragment
-import com.afterroot.pointerdash.fragment.MainFragment
-import com.afterroot.pointerdash.fragment.PointersRepoFragment
-import com.afterroot.pointerdash.fragment.SettingsFragment
+import com.afterroot.pointerdash.fragment.*
+import com.afterroot.pointerdash.utils.DatabaseFields
+import com.afterroot.pointerdash.utils.User
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -57,6 +61,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -67,6 +75,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val analytics = FirebaseAnalytics.getInstance(this)
         val bundle = Bundle()
         bundle.putString("Device_Name", Build.DEVICE)
+        bundle.putString("Manufacturer", Build.MANUFACTURER)
         bundle.putString("AndroidVersion", Build.VERSION.RELEASE)
         analytics.logEvent("DeviceInfo", bundle)
 
@@ -78,15 +87,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         init()
     }
 
-    private var mainFragment: MainFragment? = null
     private fun init() {
-        val arrowDrawable = toggle!!.drawerArrowDrawable
-        arrowDrawable.color =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    resources.getColor(android.R.color.white, theme)
-                } else {
-                    resources.getColor(android.R.color.white)
-                }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             nav_view.apply {
@@ -99,44 +100,77 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 itemIconTintList = resources.getColorStateList(R.color.nav_state_list)
                 itemTextColor = resources.getColorStateList(R.color.nav_state_list)
             }
-            if (mainFragment == null) {
-                mainFragment = MainFragment.newInstance()
+
+            loadFragments()
+
+            if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
+                indefiniteSnackbar(view_pager, "Show touches disabled. Would you like to enable", "ENABLE", {
+                    Settings.System.putInt(contentResolver,
+                            "show_touches", 1)
+                }).show()
             }
         }
 
+        nav_view.getHeaderView(0)?.let {
+            FirebaseAuth.getInstance().currentUser.let {
+                if (it != null) {
+                    header_username?.text = it.displayName
+                    header_email?.text = it.email
+                }
+            }
+        }
+
+        val db = FirebaseFirestore.getInstance()
+
+        FirebaseAuth.getInstance().currentUser.let {
+            if (it != null) {
+                db.collection(DatabaseFields.USERS)
+                        .document(it.uid).set(User(it.displayName!!, it.email!!, it.uid))
+            }
+        }
+    }
+
+    private var viewpagerAdapter: BottomNavigationAdapter? = null
+    private fun loadFragments() {
         view_pager.setPagingEnabled(false)
-        val viewpagerAdapter = BottomNavigationAdapter(supportFragmentManager)
+        viewpagerAdapter = BottomNavigationAdapter(supportFragmentManager)
+        val mainFragment = MainFragment.newInstance()
         val installPointerFragment = InstallPointerFragment.newInstance()
         val settingsFragment = SettingsFragment()
-        val pointersRepoFragment = PointersRepoFragment()
+        val pointersRepoFragment = RepoHolderFragment()
 
-        viewpagerAdapter.run {
-            addFragment(mainFragment!!)
-            addFragment(pointersRepoFragment)
-            addFragment(settingsFragment)
+        viewpagerAdapter!!.run {
+            addFragment(mainFragment, "Allusive")
+            addFragment(pointersRepoFragment, "Browse Pointers")
+            addFragment(settingsFragment, "Settings")
         }
 
         view_pager.adapter = viewpagerAdapter
 
         navigation.setOnNavigationItemSelectedListener { item ->
-
+            var title = getString(R.string.app_name)
             when (item.itemId) {
                 R.id.navigation_home -> {
                     view_pager.currentItem = 0
+                    title = viewpagerAdapter!!.getPageTitle(0).toString()
                 }
                 R.id.navigation_manage_pointer -> {
                     view_pager.currentItem = 1
+                    title = viewpagerAdapter!!.getPageTitle(1).toString()
                 }
                 R.id.navigation_settings -> {
                     view_pager.currentItem = 2
+                    title = viewpagerAdapter!!.getPageTitle(2).toString()
                 }
             }
+            toolbar.title = title
             return@setOnNavigationItemSelectedListener true
         }
     }
 
     private val manifestPermissions = arrayOf(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_SETTINGS)
 
     private fun checkPermissions() {
         Log.d(TAG, "checkPermissions: Checking Permissions..")
@@ -146,10 +180,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             ActivityCompat.requestPermissions(this, manifestPermissions, REQUEST_CODE)
         } else {
             Log.d(TAG, "checkPermissions: Permissions Granted..")
-            if (mainFragment == null) {
-                mainFragment = MainFragment.newInstance()
-            }
-            addFragment(mainFragment!!, R.id.fragment_container)
+            loadFragments()
+
+            //TODO
+            /*when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
+                    when {
+                        Settings.System.canWrite(this) ->
+                            when {
+                                Settings.System.getInt(contentResolver, "show_touches") == 0 ->
+                                    indefiniteSnackbar(view_pager, "Show touches disabled. Would you like to enable", "ENABLE", {
+                                        Settings.System.putInt(contentResolver,
+                                                "show_touches", 1)
+                                    }).show()
+                            }
+                        else -> {
+                            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                            intent.data = Uri.parse("package:$packageName")
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent)
+                        }
+                    }
+            }*/
         }
     }
 
@@ -198,6 +250,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return false
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item!!.title) {
+            getString(R.string.text_edit_profile) -> {
+                replaceFragment(EditProfileFragment.newInstance(), R.id.root_fragment_repo) {
+                    addToBackStack("REPO")
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun showRebootDialog() {
         AlertDialog.Builder(this, R.style.Theme_AppCompat_DayNight_Dialog_Alert)
                 .setTitle(R.string.reboot)
@@ -212,6 +275,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 })
                 .setNegativeButton(R.string.text_no, { _, _ ->
 
+                    0
                 })
                 .setNeutralButton(R.string.text_soft_reboot, { _, _ ->
                     try {
