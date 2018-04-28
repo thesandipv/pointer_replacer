@@ -15,14 +15,43 @@
 
 package com.afterroot.pointerdash.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import com.afterroot.pointerdash.R
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+
+//Fragment which acts as holder for other fragments.
+class RepoHolderFragment : Fragment() {
+
+    private val TAG = "RepoHolderFragment"
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
+        return inflater.inflate(R.layout.fragment_repo_holder, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fragmentManager!!.beginTransaction().add(R.id.root_fragment_repo, PointersRepoFragment()).commit()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        menu.removeItem(editProfileMenuItem!!.itemId)
+    }
+
+    lateinit var menu: Menu
+    var editProfileMenuItem : MenuItem? = null
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        this.menu = menu!!
+        Log.d(TAG, "onCreateOptionsMenu: Menu Created")
+        editProfileMenuItem = menu.add(getString(R.string.text_edit_profile))
+    }
+}
 
 class PointersRepoFragment : Fragment() {
 
@@ -33,8 +62,9 @@ class PointersRepoFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+
         if (auth.currentUser == null) {
             startActivityForResult(AuthUI.getInstance()
                     .createSignInIntentBuilder()

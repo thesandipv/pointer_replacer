@@ -14,11 +14,7 @@
   -->
 
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="nav_header_height">170dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="card_radius">8dp</dimen>
-    <dimen name="card_corner_radius">8dp</dimen>
+    <string name="app_name">ShowTouchesEnabler</string>
+    <string name="banner_ad_1_id">ca-app-pub-6628325093439880/1174946806</string>
+    <string name="key_show_touches">show_touches</string>
 </resources>

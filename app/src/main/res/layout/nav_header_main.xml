@@ -14,11 +14,11 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="bottom"
     android:background="@drawable/side_nav_bar"
     android:orientation="vertical"
@@ -30,39 +30,30 @@
     android:weightSum="1"
     tools:ignore="RtlHardcoded">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_above="@+id/header_text_app_name"
-        android:layout_alignLeft="@+id/header_text_app_name"
-        android:layout_alignStart="@+id/header_text_app_name"
-        android:layout_marginBottom="10dp"
-        tools:ignore="ContentDescription"/>
-
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/header_username"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="25sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-light"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:id="@+id/header_text_app_name"
-        android:fontFamily="sans-serif-light"
-        android:layout_above="@+id/header_text_version"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="5dp"/>
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="First Last"
+        android:layout_marginLeft="8dp" />
 
     <TextView
-        android:id="@+id/header_text_version"
+        android:id="@+id/header_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/version"
-        android:fontFamily="sans-serif-light"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="5dp"
-        android:textStyle="italic"/>
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_username"
+        tools:text="test@example.com"
+        android:layout_marginLeft="8dp" />
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
