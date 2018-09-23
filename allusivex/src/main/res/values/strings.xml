@@ -14,7 +14,7 @@
   -->
 
 <resources>
-    <string name="app_name">Allusive</string>
+    <string name="app_name">AllusiveX</string>
     <string name="version">v1.7.1 (25)</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="pref_key_open_dash">key_open_dash</string>

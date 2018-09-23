@@ -28,7 +28,7 @@
     <PreferenceCategory android:title="About">
         <Preference
             android:summary="@string/version"
-            android:title="Pointer Replacer - Allusive" />
+            android:title="AllusiveX" />
         <Preference
             android:summary="tap to visit official XDA thread"
             android:title="@string/TITLE_XDA_THREAD">
