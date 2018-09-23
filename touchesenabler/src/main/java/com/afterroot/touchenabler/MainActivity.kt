@@ -16,11 +16,7 @@
 package com.afterroot.touchenabler
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import com.google.android.gms.ads.AdRequest
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -31,18 +27,6 @@ class MainActivity : Activity() {
 
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(this)) {
-                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.data = Uri.parse("package:$packageName")
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            } else {
-                fragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
-            }
-        } else {
-            fragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
-        }
+        fragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
     }
 }
