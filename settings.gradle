@@ -13,4 +13,4 @@
  * limitations under the License.
  */
 
-include ':dashboard', ':xposed', ':touchesenabler'
+include ':allusive', ':allusivex', ':touchesenabler'
