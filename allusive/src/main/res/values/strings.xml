@@ -43,7 +43,6 @@
     <string name="changelog_ok_button">OK</string>
     <string name="changelog_show_full">Full Changelog</string>
 
-
     <string name="app_name">Pointers Dashboard</string>
     <string name="title_activity_pointer_preview">Pointer Preview</string>
     <string name="title_activity_about">About</string>
@@ -92,22 +91,22 @@
         <item>Material Color Picker</item>
     </array>
 
-    <string name="text_not_installed">Not Installed</string>
-    <string name="text_installed">Installed</string>
+    <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
+    <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/7473207984</string>
+    <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~2651384855</string>
+    <string name="edit_profile">Edit Profile</string>
     <string name="help">Help</string>
     <string name="install_manage_pointers">Install Pointers</string>
-    <string name="no_pointer_applied">No Pointer Applied.\nPlease Apply Pointer</string>
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
-    <string name="interstitial_ad_1_id" translatable="false">ca-app-pub-6628325093439880/7473207984</string>
-    <string name="text_click_to_change_pointer">Click to Change Pointer</string>
-
     <string name="main_fragment_transition">main_fragment_transition</string>
-    <string name="title_home">Home</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="text_edit_profile">Edit Profile</string>
-    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="no_pointer_applied">No Pointer Applied.\nPlease Apply Pointer</string>
+    <string name="text_click_to_change_pointer">Click to Change Pointer</string>
+    <string name="text_installed">Installed</string>
+    <string name="text_not_installed">Not Installed</string>
     <string name="title_dashboard">Dashboard</string>
+    <string name="title_home">Home</string>
+    <string name="mouse_pointer">Mouse Pointer</string>
+    <string name="texet_click_to_mouse">Click to change mouse pointer</string>
 
 </resources>

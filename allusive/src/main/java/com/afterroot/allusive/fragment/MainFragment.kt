@@ -30,8 +30,10 @@ import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.Helper
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.io.File
 import java.io.FileNotFoundException
@@ -72,12 +74,11 @@ class MainFragment : Fragment() {
 
         activity!!.card_new_pointer.setOnClickListener { showPointerChooser() }
 
-        //TODO enable ads
-        /*MobileAds.initialize(activity!!, getString(R.string.banner_ad_unit_id))
+        MobileAds.initialize(activity!!, getString(R.string.ad_banner_unit_id))
 
         val adView = activity!!.banner_ad_main
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)*/
+        adView.loadAd(adRequest)
 
         getPointer()
 
@@ -110,7 +111,7 @@ class MainFragment : Fragment() {
             e.printStackTrace()
             return
         }
-        Helper.showSnackBar(activity!!.coordinator_layout, "Pointer Applied", Snackbar.LENGTH_LONG, "REBOOT", View.OnClickListener {
+        Helper.showSnackBar(activity!!.container, "Pointer Applied", Snackbar.LENGTH_LONG, "REBOOT", View.OnClickListener {
             MaterialDialog.Builder(activity!!)
                     .title(R.string.reboot)
                     .content(R.string.text_reboot_confirm)
