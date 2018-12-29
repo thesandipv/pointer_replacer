@@ -23,6 +23,7 @@ import android.widget.BaseAdapter
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.afterroot.allusive.R
+import com.bumptech.glide.Glide
 import java.util.*
 
 /**GridView Image Adapter. */
@@ -73,7 +74,7 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
             holder = view.tag as ViewHolder
         }
 
-        //Glide.with(mContext).load(itemList[position]).into(holder.imageView!!)
+        Glide.with(mContext).load(itemList[position]).into(holder.imageView!!)
 
         return view
     }
