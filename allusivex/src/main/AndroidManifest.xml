@@ -31,7 +31,9 @@
         <meta-data
             android:name="xposeddescription"
             android:value="@string/module_description" />
-
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
