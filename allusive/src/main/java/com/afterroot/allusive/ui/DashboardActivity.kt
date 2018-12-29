@@ -6,17 +6,18 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.*
 import com.afterroot.allusive.R
-import com.afterroot.allusive.adapter.BottomNavigationAdapter
 import com.afterroot.allusive.fragment.InstallPointerFragment
-import com.afterroot.allusive.fragment.MainFragment
-import com.afterroot.allusive.fragment.RepoHolderFragment
-import com.afterroot.allusive.fragment.SettingsFragment
 import com.afterroot.allusive.utils.DatabaseFields
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.allusive.utils.User
@@ -38,7 +39,7 @@ class DashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
         toolbar = supportActionBar!!
-        navigationold.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 
     override fun onStart() {
@@ -54,16 +55,16 @@ class DashboardActivity : AppCompatActivity() {
         FirebaseAnalytics.getInstance(this).logEvent("DeviceInfo", bundle)
 
         //Initialize Interstitial Ad
-        MobileAds.initialize(this, getString(R.string.interstitial_ad_1_id))
+        MobileAds.initialize(this, getString(R.string.ad_interstitial_1_id))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions()
         } else {
             Log.d(TAG, "onStart: Loading fragments..")
-            loadFragments()
+            //loadFragments()
 
             if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
-                Snackbar.make(view_pager, "Show touches disabled. Would you like to enable", Snackbar.LENGTH_INDEFINITE).setAction("ENABLE") {
+                Snackbar.make(fragment_repo_nav.view!!, "Show touches disabled. Would you like to enable", Snackbar.LENGTH_INDEFINITE).setAction("ENABLE") {
                     Settings.System.putInt(contentResolver,
                             "show_touches", 1)
                 }.show()
@@ -134,53 +135,51 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private var viewpagerAdapter: BottomNavigationAdapter? = null
+    lateinit var appBarConfiguration: AppBarConfiguration
     private fun loadFragments() {
-        view_pager.setPagingEnabled(false)
-        viewpagerAdapter = BottomNavigationAdapter(supportFragmentManager)
-        val mainFragment = MainFragment.newInstance()
-        val installPointerFragment = InstallPointerFragment.newInstance()
-        val settingsFragment = SettingsFragment()
-        val pointersRepoFragment = RepoHolderFragment()
+        val host: NavHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
+                ?: return
+        val navController = host.navController
 
+        appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        viewpagerAdapter!!.run {
-            addFragment(mainFragment, "Allusive")
-            addFragment(pointersRepoFragment, "Browse Pointers")
-            addFragment(settingsFragment, "Settings")
-        }
-
-        view_pager.adapter = viewpagerAdapter
-
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navigation.setupWithNavController(navController)
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        val title = getString(R.string.app_name)
         when (item.itemId) {
-            R.id.navigation_home -> {
-                view_pager.currentItem = 0
-                toolbar.title = viewpagerAdapter!!.getPageTitle(0).toString()
+            R.id.home_dest -> {
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_dashboard -> {
-                view_pager.currentItem = 1
-                toolbar.title = viewpagerAdapter!!.getPageTitle(1).toString()
+            R.id.repo_dest -> {
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_settings -> {
-                view_pager.currentItem = 2
-                toolbar.title = viewpagerAdapter!!.getPageTitle(2).toString()
+            R.id.settings_dest -> {
                 return@OnNavigationItemSelectedListener true
             }
         }
         false
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(findNavController(R.id.fragment_repo_nav)) || super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
+    }
+
     companion object {
         val REQUEST_CODE = 256
 
         fun showInstallPointerFragment(activity: FragmentActivity) {
-            activity.supportFragmentManager.beginTransaction().replace(R.id.fragment_container, InstallPointerFragment()).commit()
+            activity.supportFragmentManager.beginTransaction().replace(R.id.container, InstallPointerFragment()).commit()
         }
     }
 }

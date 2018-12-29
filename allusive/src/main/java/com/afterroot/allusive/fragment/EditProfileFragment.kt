@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.*
 import org.jetbrains.anko.design.snackbar
 
@@ -45,8 +44,6 @@ class EditProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        activity!!.toolbar.title = "Edit Profile"
 
         if (FirebaseUtils.isUserSignedIn) {
             user = FirebaseUtils.auth!!.currentUser
@@ -67,11 +64,11 @@ class EditProfileFragment : Fragment() {
                                                 user!!.email!!,
                                                 user!!.uid))
                                         .addOnSuccessListener {
-                                            activity!!.view_pager.snackbar("Profile Updated")
+                                            activity!!.container.snackbar("Profile Updated")
                                         }
                             }
                         }
-                    } else activity!!.view_pager.snackbar("No Changes to Save.")
+                    } else activity!!.container.snackbar("No Changes to Save.")
                     //listener!!.onSaveButtonClicked()
                 }
             }

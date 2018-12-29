@@ -15,16 +15,18 @@
 
 package com.afterroot.allusive.fragment
 
+
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 
 //Fragment which acts as holder for other fragments.
-class RepoHolderFragment : Fragment() {
+/*class RepoHolderFragment : Fragment() {
 
     private val TAG = "RepoHolderFragment"
 
@@ -35,17 +37,17 @@ class RepoHolderFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        menu.removeItem(editProfileMenuItem!!.itemId)
     }
 
-    lateinit var menu: Menu
-    private var editProfileMenuItem: MenuItem? = null
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        this.menu = menu!!
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         Log.d(TAG, "onCreateOptionsMenu: Menu Created")
-        editProfileMenuItem = menu.add(getString(R.string.text_edit_profile))
+        inflater.inflate(R.menu.menu_dashboard_activity, menu)
     }
-}
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(findNavController(fragment_repo_nav)) || super.onOptionsItemSelected(item)
+    }
+}*/
 
 class PointersRepoFragment : Fragment() {
 

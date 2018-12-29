@@ -30,7 +30,7 @@ import com.afterroot.allusive.ui.DashboardActivity
 import com.afterroot.allusive.utils.Helper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import java.io.File
 
@@ -43,7 +43,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog?, style: Int) {
         super.setupDialog(dialog, style)
-        val contentView = View.inflate(context, R.layout.layout_grid_bottomsheet, fragment_container)
+        val contentView = View.inflate(context, R.layout.layout_grid_bottomsheet, container)
         dialog!!.setContentView(contentView)
 
         val params = (contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams
@@ -106,9 +106,9 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                             .positiveText(R.string.text_yes)
                             .onPositive { _, _ ->
                                 if (file.delete()) {
-                                    Helper.showSnackBar(activity!!.coordinator_layout, "Pointer deleted.")
+                                    Helper.showSnackBar(activity!!.container, "Pointer deleted.")
                                 } else {
-                                    Helper.showSnackBar(activity!!.coordinator_layout, "Error deleting pointer.")
+                                    Helper.showSnackBar(activity!!.container, "Error deleting pointer.")
                                 }
                             }
                             .negativeText(R.string.text_no)

@@ -49,12 +49,12 @@ class CustomizeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        mSharedPreferences = Helper.getSharedPreferences(activity!!)
+        mSharedPreferences = Helper.getSharedPreferences(context!!)
         mEditor = mSharedPreferences!!.edit()
     }
 
     private val minSize: Int
-        get() = if (Helper.getDpi(activity!!) <= 240) {
+        get() = if (Helper.getDpi(context!!) <= 240) {
             49
         } else {
             66

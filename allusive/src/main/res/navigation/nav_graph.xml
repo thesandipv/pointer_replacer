@@ -1,18 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    app:startDestination="@id/pointersRepoFragment">
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@+id/home_dest">
 
     <fragment
-        android:id="@+id/pointersRepoFragment"
+        android:id="@+id/repo_dest"
         android:name="com.afterroot.allusive.fragment.PointersRepoFragment"
-        android:label="PointersRepoFragment" >
+        android:label="Pointer Repository"
+        tools:layout="@layout/fragment_pointer_repo">
         <action
-            android:id="@+id/action_pointersRepoFragment_to_editProfileFragment"
-            app:destination="@id/editProfileFragment" />
+            android:id="@+id/action_repo_dest_to_settings_dest"
+            app:destination="@id/settings_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@+id/home_dest" />
+        <action
+            android:id="@+id/action_repo_dest_to_editProfileFragment2"
+            app:destination="@id/edit_profile_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
-        android:id="@+id/editProfileFragment"
+        android:id="@+id/home_dest"
+        android:name="com.afterroot.allusive.fragment.MainFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_home_dest_to_repo_dest"
+            app:destination="@id/repo_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_home_dest_to_editProfileFragment2"
+            app:destination="@id/edit_profile_dest"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/settings_dest"
+        android:name="com.afterroot.allusive.fragment.SettingsFragment"
+        android:label="Settings" />
+    <fragment
+        android:id="@+id/edit_profile_dest"
         android:name="com.afterroot.allusive.fragment.EditProfileFragment"
-        android:label="EditProfileFragment" />
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile" />
 </navigation>
