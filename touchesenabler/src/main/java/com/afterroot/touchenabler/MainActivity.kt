@@ -15,18 +15,25 @@
 
 package com.afterroot.touchenabler
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
-class MainActivity : Activity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val adRequest = AdRequest.Builder().build()
+        setSupportActionBar(toolbar)
+
+        supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
+        val builder = AdRequest.Builder()
+        val adRequest = if (BuildConfig.DEBUG) builder.addTestDevice("3EF23172265CC4E95B90A7A8A0AA8DE5").build() else builder.build()
         adView.loadAd(adRequest)
-        fragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
+
+        MobileAds.initialize(this, getString(R.string.admob_app_id))
     }
 }

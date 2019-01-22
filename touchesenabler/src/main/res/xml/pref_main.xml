@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2018 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,13 +13,44 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <SwitchPreference
-        android:title="Show Touches"
-        android:summary="enable show touches"
-        android:defaultValue="false"
-        android:key="show_touches"
-        android:summaryOff="disabled"
-        android:summaryOn="enabled"/>
-</PreferenceScreen>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.preference.SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="@string/key_show_touches"
+        app:summaryOff="@string/msg_touch_disabled"
+        app:summaryOn="@string/msg_touch_enabled"
+        app:title="Show Touches" />
+    <Preference
+        app:key="@string/key_grant_permission"
+        app:summary="@string/pref_summary_grant_ss"
+        app:title="@string/pref_title_grant_ss" />
+    <PreferenceCategory app:title="Support Development">
+        <Preference
+            app:key="@string/key_pref_donate"
+            app:summary="@string/pref_summary_donation"
+            app:title="@string/pref_key_donate_dev" />
+        <Preference
+            app:key="@string/key_watch_ads"
+            app:summary="@string/pref_summary_watch_ad"
+            app:title="@string/pref_title_watch_ad" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="About">
+        <Preference
+            app:key="@string/key_other_apps"
+            app:summary="Check out my other apps!"
+            app:title="Other Apps">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_play_store_developer" />
+        </Preference>
+        <Preference
+            app:key="@string/key_rate_on_g_play"
+            app:title="Rate on Google Play">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_play_store_app_page" />
+        </Preference>
+        <Preference app:key="@string/key_version" />
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>
