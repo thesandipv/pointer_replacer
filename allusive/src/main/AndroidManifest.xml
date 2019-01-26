@@ -28,8 +28,18 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name="androidx.multidex.MultiDexApplication"
         android:theme="@style/AppTheme.Light">
 
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="42" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="@string/module_description" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
