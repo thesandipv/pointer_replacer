@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,21 +16,23 @@
 package com.afterroot.touchenabler
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.anjlab.android.iab.v3.BillingProcessor
 import com.anjlab.android.iab.v3.TransactionDetails
-import com.crashlytics.android.Crashlytics
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
@@ -38,14 +40,14 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import kotlinx.android.synthetic.main.content_main.*
+import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.snackbar
 
 class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandler {
 
-    private lateinit var billingProcessor: BillingProcessor
+    private var billingProcessor: BillingProcessor? = null
     private lateinit var donatePreference: Preference
     private lateinit var editor: SharedPreferences.Editor
-    private lateinit var grantPermissionPref: Preference
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var showTouchPref: SwitchPreferenceCompat
     private val _tag: String = "TouchEnabler"
@@ -64,28 +66,12 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
         showTouchPref = preferenceScreen.findPreference(getString(R.string.key_show_touches)) as SwitchPreferenceCompat
         showTouchPref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            when (newValue) {
-                true -> {
-                    setShowTouches(1)
-                    activity!!.root_layout.snackbar(getString(R.string.msg_touch_enabled))
-                }
-                else -> {
-                    setShowTouches(0)
-                    activity!!.root_layout.snackbar(getString(R.string.msg_touch_disabled))
-                }
+            val i = Intent().apply {
+                action = ACTION_OPEN_TEL
+                putExtra("com.afterroot.toucherlegacy.EXTRA_TOUCH_VAL", if (newValue == true) 1 else 0)
             }
+            startActivityForResult(i, RC_OPEN_TEL)
             true
-        }
-
-        //Grant Write Settings Permission if not
-        grantPermissionPref = preferenceScreen.findPreference(getString(R.string.key_grant_permission))
-        if (isMUp()) {
-            grantPermissionPref.setOnPreferenceClickListener {
-                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.data = Uri.parse("package:" + activity!!.packageName)
-                startActivity(intent)
-                true
-            }
         }
 
         //Open Other Apps on Play Store
@@ -159,12 +145,12 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                         firebaseRemoteConfig.getString(INAPP_LICENCE_KEY),
                         this
                 )
-                billingProcessor.initialize()
+                billingProcessor?.initialize()
 
-                val purchased = billingProcessor.isPurchased(firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1))
+                val purchased = billingProcessor?.isPurchased(firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1))
                 //Donate Preference
                 donatePreference.apply {
-                    isEnabled = !purchased
+                    isEnabled = !purchased!!
                     summary = if (purchased) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
                 }
 
@@ -192,33 +178,80 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             if (BuildConfig.DEBUG) {
                 Toast.makeText(activity!!, firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1), Toast.LENGTH_SHORT).show()
             }
-            billingProcessor.purchase(this.activity, firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1))
+            billingProcessor!!.purchase(this.activity, firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1))
         }
     }
 
+    var dialog: AlertDialog? = null
     override fun onResume() {
         super.onResume()
-        if (!checkSystemWritePermission() && isMUp()) {
-            showTouchPref.isEnabled = false
-            preferenceScreen.addPreference(grantPermissionPref)
-        } else {
-            preferenceScreen.removePreference(grantPermissionPref)
-            showTouchPref.isEnabled = true
-        }
 
-        val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches)) == 1
-        editor.putBoolean(getString(R.string.key_show_touches), showTouchesCurr).apply()
-        showTouchPref.isChecked = showTouchesCurr
+        if (!isAppInstalled(activity!!, "com.afterroot.toucherlegacy")) {
+            dialog = AlertDialog.Builder(activity!!).setTitle("Install Extension")
+                    .setMessage("Please install small extension package for changing system settings")
+                    .setCancelable(false)
+                    .setNegativeButton("Cancel") { _, _ ->
+                        activity!!.finish()
+                    }
+                    .setPositiveButton("Install") { _, _ ->
+                        activity!!.browse("https://m8rg7.app.goo.gl/touchel")
+                    }.create()
+            dialog?.show()
+
+        }
+        try {
+            val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches)) == 1
+            editor.putBoolean(getString(R.string.key_show_touches), showTouchesCurr).apply()
+            showTouchPref.isChecked = showTouchesCurr
+        } catch (e: Settings.SettingNotFoundException) {
+            activity!!.root_layout.snackbar(getString(R.string.msg_error))
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dialog?.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        billingProcessor.release()
+        billingProcessor?.release()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data))
+        if (!billingProcessor!!.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data)
+            if (requestCode == RC_OPEN_TEL) {
+                when (resultCode) {
+                    1 -> { //Result OK
+                        activity!!.root_layout.snackbar("Done")
+                        if (interstitialAd.isLoaded) {
+                            interstitialAd.show()
+                        }
+                    }
+                    2 -> { //Write Setting Permission not Granted
+                        activity!!.root_layout.snackbar(getString(R.string.msg_secure_settings_permission)).setAction("GRANT") {
+                            if (isMUp()) {
+                                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                                intent.data = Uri.parse("package:com.afterroot.toucherlegacy")
+                                startActivity(intent)
+                            }
+
+                        }
+                    }
+                    3 -> activity!!.root_layout.snackbar(getString(R.string.msg_error)) //Other error
+                }
+            }
+        }
+    }
+
+    fun isAppInstalled(context: Context, pName: String): Boolean {
+        return try {
+            context.packageManager.getApplicationInfo(pName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
     }
 
     override fun onBillingInitialized() {
@@ -226,6 +259,13 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             activity!!.root_layout.snackbar("Billing Initialized")
         }
         isReadyToPurchase = true
+        billingProcessor?.loadOwnedPurchasesFromGoogle()
+        if (billingProcessor!!.isPurchased(PRODUCT_ID_KEY_1)) {
+            donatePreference.apply {
+                isEnabled = false
+                summary = getString(R.string.msg_donation_done)
+            }
+        }
     }
 
     override fun onPurchaseHistoryRestored() {
@@ -291,33 +331,6 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         }
     }
 
-    private fun checkSystemWritePermission(): Boolean {
-        val retVal: Boolean
-        if (isMUp()) {
-            retVal = Settings.System.canWrite(activity)
-            Log.d(_tag, "Can Write Settings: $retVal")
-            if (!retVal) {
-                activity!!.root_layout.snackbar(getString(R.string.msg_setting_not_allowed))
-            }
-        } else retVal = true
-        return retVal
-    }
-
-    private fun setShowTouches(touches: Int) {
-        if (checkSystemWritePermission()) {
-            try {
-                Settings.System.putInt(activity!!.contentResolver, getString(R.string.key_show_touches), touches)
-            } catch (e: Exception) {
-                Log.e(_tag, e.toString())
-                Crashlytics.logException(e)
-                Toast.makeText(activity, getString(R.string.msg_error), Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(activity, getString(R.string.msg_secure_settings_permission), Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
     private fun isMUp(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     }
@@ -326,5 +339,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         const val INAPP_LICENCE_KEY = "inapp_licence_key"
         const val PRODUCT_ID_KEY_1 = "product_id_1"
         const val PRODUCT_ID_KEY_2 = "product_id_2"
+        const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
+        const val RC_OPEN_TEL = 245
     }
 }
