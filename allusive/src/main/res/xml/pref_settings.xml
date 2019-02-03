@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2016-2018 Sandip Vaghela
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -14,25 +13,63 @@
   ~ limitations under the License.
   -->
 
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.preference.PreferenceCategory
-        android:title="Pointer Settings">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="Pointer Settings">
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="show_touches"
+            app:title="Show Touches" />
         <Preference
-            android:title="@string/text_max_pointer_size"
-            android:key="@string/key_maxPointerSize"/>
+            app:key="@string/key_maxPointerSize"
+            app:title="@string/text_max_pointer_size" />
         <Preference
-            android:title="@string/text_max_padding_size"
-            android:key="@string/key_maxPaddingSize"/>
+            app:key="@string/key_maxPaddingSize"
+            app:title="@string/text_max_padding_size" />
         <SwitchPreference
-            android:title="Enable Pointer Alpha"
-            android:summary="Enables Slider to Change Pointer Alpha (transparency)"
-            android:key="@string/key_EnablePointerAlpha"
-            android:defaultValue="false"/>
-    </androidx.preference.PreferenceCategory>
-    <PreferenceCategory
-        android:title="Color Picker">
+            app:defaultValue="false"
+            app:key="@string/key_EnablePointerAlpha"
+            app:summary="Enables Slider to Change Pointer Alpha (transparency)"
+            app:title="Enable Pointer Alpha" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="Color Picker">
         <Preference
-            android:key="@string/key_useMDCC"
-            android:title="Change Color Picker"/>
+            app:key="@string/key_useMDCC"
+            app:title="Change Color Picker" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="About">
+        <Preference
+            app:icon="@mipmap/ic_launcher"
+            app:key="pref_version"
+            app:summary="@string/version"
+            app:title="@string/app_name" />
+        <Preference
+            app:summary="tap to visit official XDA thread"
+            app:title="@string/TITLE_XDA_THREAD">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_xda_thread" />
+        </Preference>
+        <Preference
+            app:summary="tap to visit official Google+ Community"
+            app:title="@string/TITLE_VISIT_G_PLUS">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_g_plus" />
+        </Preference>
+        <Preference
+            app:summary="tap to visit GitHub Repository"
+            app:title="@string/text_source_code">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_source_code" />
+        </Preference>
+        <Preference
+            app:summary="tap to open Xposed Module Repo"
+            app:title="@string/text_module_info">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_prx" />
+        </Preference>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
