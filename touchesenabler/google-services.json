@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "302054959566-ebvh92jg8npbhnbopoab48gnkd2mjrlh.apps.googleusercontent.com",
+          "client_id": "302054959566-cdg90huhtjn965og3khj3jiq0rc7a2sd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.afterroot.allusive",
-            "certificate_hash": "b0fc23905191f8994eb7fe75827a43257f88c9b4"
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
           }
         },
         {
@@ -31,62 +31,10 @@
           }
         },
         {
-          "client_id": "302054959566-cdg90huhtjn965og3khj3jiq0rc7a2sd.apps.googleusercontent.com",
+          "client_id": "302054959566-ebvh92jg8npbhnbopoab48gnkd2mjrlh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.afterroot.allusive",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
-          }
-        },
-        {
-          "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC-O1qrPjqq9N_S5bHO1viRIac7bYc0wCE"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:302054959566:android:59f49ed6e5ccf5ac",
-        "android_client_info": {
-          "package_name": "com.afterroot.pointerdash"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "302054959566-aa08rrtpnacci7udc0dor22jbj5uqvt4.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afterroot.pointerdash",
-            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
-          }
-        },
-        {
-          "client_id": "302054959566-6659c6o9mpkvc2n933mn54jq8id3ogrf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afterroot.pointerdash",
             "certificate_hash": "b0fc23905191f8994eb7fe75827a43257f88c9b4"
           }
         },
@@ -116,7 +64,8 @@
         "ads_service": {
           "status": 2
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-6628325093439880~2651384855"
     },
     {
       "client_info": {
@@ -135,6 +84,14 @@
           }
         },
         {
+          "client_id": "302054959566-sfvj95uvhogd9u4b79dj541i7jsb87jf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.touchenabler",
+            "certificate_hash": "f43084754b6c74fdda18693d14edf2a2b0e153e6"
+          }
+        },
+        {
           "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -160,7 +117,8 @@
         "ads_service": {
           "status": 2
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-6628325093439880~3997794533"
     }
   ],
   "configuration_version": "1"
