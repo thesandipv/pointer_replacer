@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +17,22 @@ package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.InputType
+import android.util.Log
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.Helper
+import com.crashlytics.android.Crashlytics
+import kotlinx.android.synthetic.main.activity_dashboard.*
+import org.jetbrains.anko.design.snackbar
 
 @SuppressLint("ValidFragment")
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -33,9 +42,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mEditor: SharedPreferences.Editor? = null
     private lateinit var maxPointerSize: Preference
     private lateinit var maxPaddingSize: Preference
+    private lateinit var showTouches: SwitchPreferenceCompat
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.pref_settings)
+        setPreferencesFromResource(R.xml.pref_settings, rootKey)
+
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -84,6 +95,63 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         maxPointerSize.summary = input
                     }.show()
             false
+        }
+
+        showTouches = findPreference("show_touches") as SwitchPreferenceCompat
+        showTouches.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+            if (newValue == true) {
+                setShowTouches(1)
+                activity!!.container.snackbar("Touches Enabled")
+            } else {
+                setShowTouches(0)
+                activity!!.container.snackbar("Touches Disabled")
+            }
+            return@OnPreferenceChangeListener true
+        }
+
+        findPreference("pref_version").apply {
+            summary = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, "show_touches") == 1
+        mEditor!!.putBoolean("show_touches", showTouchesCurr).apply()
+        showTouches.isChecked = showTouchesCurr
+    }
+
+    private fun isMUp(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    }
+
+    private fun checkSystemWritePermission(): Boolean {
+        var retVal = false
+        if (isMUp()) {
+            retVal = Settings.System.canWrite(activity)
+            Log.d(TAG, "Can Write Settings: $retVal")
+            if (retVal) {
+                Toast.makeText(activity, "Write allowed", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(activity, "Write not allowed", Toast.LENGTH_LONG).show()
+            }
+        } else retVal = true
+        return retVal
+    }
+
+    val TAG = "SettingsFragment"
+    private fun setShowTouches(touches: Int) {
+        if (checkSystemWritePermission()) {
+            try {
+                Settings.System.putInt(activity!!.contentResolver, "show_touches", touches)
+            } catch (e: Exception) {
+                Log.e(TAG, e.toString())
+                Crashlytics.logException(e)
+                Toast.makeText(activity, "Opps! Some Error occurred.", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(activity, "Please grant app to write Secure Settings permission", Toast.LENGTH_SHORT).show()
         }
 
     }

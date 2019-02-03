@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,9 +23,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
@@ -52,13 +50,14 @@ class MainFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "adding view..")
+        setHasOptionsMenu(true)
         fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
         return fragmentView
     }
 
     @SuppressLint("CommitPrefEdits")
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         sharedPreferences = Helper.getSharedPreferences(activity!!)
         editor = sharedPreferences!!.edit()
@@ -77,15 +76,15 @@ class MainFragment : Fragment() {
         MobileAds.initialize(activity!!, getString(R.string.ad_banner_unit_id))
 
         val adView = activity!!.banner_ad_main
-        val adRequest = AdRequest.Builder().build()
+        val adRequest = AdRequest.Builder().addTestDevice("0C5DB27412563CE00EF337AD5D89AF00").build()
         adView.loadAd(adRequest)
 
         getPointer()
 
-        //TODO Replace
-        /*activity!!.fab_apply.setOnClickListener {
+
+        activity!!.fab_apply.setOnClickListener {
             applyPointer()
-        }*/
+        }
     }
 
     /**
@@ -156,7 +155,7 @@ class MainFragment : Fragment() {
             override fun onPointerSelected(pointerPath: String) {
                 editor!!.putString(getString(R.string.key_selectedPointerPath), pointerPath).apply()
                 activity!!.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                Log.d(this::class.java.simpleName, "Selected Pointer Path: $pointerPath")
+                Log.d(TAG, "onPointerSelected: Selected Pointer Path: $pointerPath")
             }
 
         })
@@ -182,7 +181,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    companion object {
-        fun newInstance(): MainFragment = MainFragment()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_dashboard_activity, menu)
     }
 }

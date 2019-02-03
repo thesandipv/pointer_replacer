@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusivex
+package com.afterroot.allusive.fragment
 
-import android.app.Activity
 import android.os.Bundle
-import com.google.android.gms.ads.AdRequest
-import kotlinx.android.synthetic.main.activity_main.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.afterroot.allusive.R
 
-class MainActivity : Activity() {
+class NewPointerPost : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        fragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
-
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_new_pointer_post, container, false)
     }
 }
