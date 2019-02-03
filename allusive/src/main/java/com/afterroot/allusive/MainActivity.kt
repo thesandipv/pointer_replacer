@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,68 +11,59 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *//*
+ */
 
-
+/*
 package com.afterroot.pointerdash
 
-import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.Navigation
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.pointerdash.adapter.BottomNavigationAdapter
-import com.afterroot.pointerdash.fragment.*
-import com.afterroot.pointerdash.utils.DatabaseFields
-import com.afterroot.pointerdash.utils.Helper
-import com.afterroot.pointerdash.utils.PermissionChecker
-import com.afterroot.pointerdash.utils.User
+import com.afterroot.allusive.R
+import com.afterroot.allusive.fragment.InstallPointerFragment
+import com.afterroot.allusive.fragment.MainFragment
+import com.afterroot.allusive.fragment.PointersRepoFragment
+import com.afterroot.allusive.fragment.SettingsFragment
+import com.afterroot.allusive.utils.DatabaseFields
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val TAG = "MainActivity"
 
-
-    */
-/*override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         //Replace Launch theme with Light Theme
         setTheme(R.style.AppTheme_Light)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-    }*//*
+    }
 
 
     override fun onResume() {
         super.onResume()
 
-        */
-/*toggle = ActionBarDrawerToggle(
+        toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle!!)
         toggle!!.syncState()
@@ -91,7 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        init()*//*
+        init()
 
     }
 
@@ -112,7 +103,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             loadFragments()
 
             if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
-            indefiniteSnackbar(view_pagerold, "Show touches disabled. Would you like to enable", "ENABLE", {
+                indefiniteSnackbar(view_pagerold, "Show touches disabled. Would you like to enable", "ENABLE", {
                     Settings.System.putInt(contentResolver,
                             "show_touches", 1)
                 }).show()
@@ -125,7 +116,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     header_username?.text = it.displayName
                     header_email?.text = it.email
                 }
-        }
+            }
         }
 
         val db = FirebaseFirestore.getInstance()
@@ -185,14 +176,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val permissionChecker = PermissionChecker(this)
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
             Log.d(TAG, "checkPermissions: Requesting Permissions..")
-            ActivityCompat.requestPermissions(this, manifestPermissions, REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, manifestPermissions, RC_PERMISSION)
         } else {
             Log.d(TAG, "checkPermissions: Permissions Granted..")
             loadFragments()
 
             //TODO
-            */
-/*when {
+            when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
                     when {
                         Settings.System.canWrite(this) ->
@@ -210,14 +200,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             startActivity(intent)
                         }
                     }
-            }*//*
+            }
 
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
-            REQUEST_CODE -> {
+            RC_PERMISSION -> {
                 val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
                     Log.d(TAG, "onRequestPermissionsResult: Permissions not Granted..")
@@ -277,30 +267,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         AlertDialog.Builder(this, R.style.Theme_AppCompat_DayNight_Dialog_Alert)
                 .setTitle(R.string.reboot)
                 .setMessage(R.string.text_reboot_confirm)
-                .setPositiveButton(R.string.reboot, { _, _ ->
+                .setPositiveButton(R.string.reboot) { _, _ ->
                     try {
                         val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
                         process.waitFor()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                })
-                .setNegativeButton(R.string.text_no, { _, _ ->
+                }
+                .setNegativeButton(R.string.text_no) { _, _ ->
 
-                })
-                .setNeutralButton(R.string.text_soft_reboot, { _, _ ->
+                }
+                .setNeutralButton(R.string.text_soft_reboot) { _, _ ->
                     try {
                         val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                         process.waitFor()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                }).show()
+                }.show()
     }
 
     companion object {
         var toggle: ActionBarDrawerToggle? = null
-        private val REQUEST_CODE: Int = 256
+        private val RC_PERMISSION: Int = 256
 
         fun showInstallPointersDialog(context: Context) {
             MaterialDialog.Builder(context)
