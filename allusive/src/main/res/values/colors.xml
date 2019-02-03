@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2016-2018 Sandip Vaghela
+  ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -15,8 +15,13 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#263238</color>
-    <color name="colorPrimaryDark">#000a12</color>
-    <color name="colorAccent">#2979ff</color>
     <color name="grey">#424242</color>
+    <color name="primaryColor">#fafafa</color>
+    <color name="primaryLightColor">#ffffff</color>
+    <color name="primaryDarkColor">#c7c7c7</color>
+    <color name="secondaryColor">#1976d2</color>
+    <color name="secondaryLightColor">#63a4ff</color>
+    <color name="secondaryDarkColor">#004ba0</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#ffffff</color>
 </resources>
