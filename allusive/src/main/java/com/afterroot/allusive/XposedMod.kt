@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Sandip Vaghela
+ * Copyright (C) 2016-2019 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusivex
+package com.afterroot.allusive
 
+import android.annotation.SuppressLint
 import android.content.res.XResources
 import android.graphics.drawable.Drawable
 import de.robv.android.xposed.IXposedHookInitPackageResources
@@ -28,11 +29,12 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
     private var drawable: Drawable? = null
     private var mousePointer: Drawable? = null
 
+    @SuppressLint("SdCardPath")
     @Throws(Throwable::class)
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
         val xSharedPreferences = XSharedPreferences(BuildConfig.APPLICATION_ID)
         xSharedPreferences.makeWorldReadable()
-        val dataPath = "/data/data/com.afterroot.allusive/files/"
+        val dataPath = "/data/data/${BuildConfig.APPLICATION_ID}/files/"
         val pointerPath = xSharedPreferences.getString("POINTER_PATH", dataPath + "pointer.png")
         val mousePath = xSharedPreferences.getString("MOUSE_PATH", dataPath + "mouse.png")
         drawable = Drawable.createFromPath(pointerPath)
