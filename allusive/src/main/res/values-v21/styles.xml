@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2016-2018 Sandip Vaghela
+  ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -15,13 +15,13 @@
 
 <resources>
 
-    <style name="AppTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
-        <item name="android:colorButtonNormal">@color/colorAccent</item>
+    <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="android:statusBarColor">@color/primaryDarkColor</item>
+        <item name="android:navigationBarColor">@color/primaryDarkColor</item>
+        <item name="android:colorButtonNormal">@color/secondaryColor</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
