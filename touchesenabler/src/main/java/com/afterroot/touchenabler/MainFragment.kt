@@ -70,7 +70,12 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 action = ACTION_OPEN_TEL
                 putExtra("com.afterroot.toucherlegacy.EXTRA_TOUCH_VAL", if (newValue == true) 1 else 0)
             }
-            startActivityForResult(i, RC_OPEN_TEL)
+            if (i.resolveActivity(activity!!.packageManager) != null) {
+                startActivityForResult(i, RC_OPEN_TEL)
+            } else {
+                Toast.makeText(activity!!, "Please install Extension First", Toast.LENGTH_SHORT).show()
+                installExtensionDialog()
+            }
             true
         }
 
@@ -182,22 +187,25 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         }
     }
 
-    var dialog: AlertDialog? = null
+    lateinit var dialog: AlertDialog
+    private fun installExtensionDialog(): AlertDialog {
+        dialog = AlertDialog.Builder(activity!!).setTitle("Install Extension")
+                .setMessage("Please install small extension package for changing system settings")
+                .setCancelable(false)
+                .setNegativeButton("Cancel") { _, _ ->
+                    activity!!.finish()
+                }
+                .setPositiveButton("Install") { _, _ ->
+                    activity!!.browse("https://m8rg7.app.goo.gl/touchel")
+                }.create()
+        return dialog
+    }
+
     override fun onResume() {
         super.onResume()
 
         if (!isAppInstalled(activity!!, "com.afterroot.toucherlegacy")) {
-            dialog = AlertDialog.Builder(activity!!).setTitle("Install Extension")
-                    .setMessage("Please install small extension package for changing system settings")
-                    .setCancelable(false)
-                    .setNegativeButton("Cancel") { _, _ ->
-                        activity!!.finish()
-                    }
-                    .setPositiveButton("Install") { _, _ ->
-                        activity!!.browse("https://m8rg7.app.goo.gl/touchel")
-                    }.create()
-            dialog?.show()
-
+            installExtensionDialog().show()
         }
         try {
             val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches)) == 1
@@ -210,7 +218,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
     override fun onPause() {
         super.onPause()
-        dialog?.dismiss()
+        dialog.dismiss()
     }
 
     override fun onDestroy() {
