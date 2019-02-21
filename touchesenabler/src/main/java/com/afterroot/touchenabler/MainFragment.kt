@@ -27,6 +27,7 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
@@ -39,9 +40,12 @@ import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.browse
+import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.io.File
 
 class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandler {
 
@@ -187,7 +191,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         }
     }
 
-    lateinit var dialog: AlertDialog
+    private var dialog: AlertDialog? = null
     private fun installExtensionDialog(): AlertDialog {
         dialog = AlertDialog.Builder(activity!!).setTitle("Install Extension")
                 .setMessage("Please install small extension package for changing system settings")
@@ -196,9 +200,37 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                     activity!!.finish()
                 }
                 .setPositiveButton("Install") { _, _ ->
-                    activity!!.browse("https://m8rg7.app.goo.gl/touchel")
+                    when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
+                        true -> {
+                            val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
+                            val tmpFile = File(context!!.cacheDir, "app.apk")
+                            activity!!.root_layout.longSnackbar("Downloading Extension")
+                            reference.getFile(tmpFile).addOnSuccessListener {
+                                activity!!.root_layout.snackbar("Extension Downloaded")
+                                Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    val uri = FileProvider.getUriForFile(context!!.applicationContext,
+                                            BuildConfig.APPLICATION_ID + ".provider", tmpFile)
+                                    val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                                            .setDataAndType(uri, "application/vnd.android.package-archive")
+                                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    startActivity(installIntent)
+                                } else {
+                                    val installIntent = Intent(Intent.ACTION_VIEW)
+                                            .setDataAndType(Uri.fromFile(tmpFile),
+                                                    "application/vnd.android.package-archive")
+                                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    startActivity(installIntent)
+                                }
+
+                            }
+                        }
+                        false -> {
+                            activity!!.browse("https://m8rg7.app.goo.gl/touchel")
+                        }
+                    }
                 }.create()
-        return dialog
+        return dialog as AlertDialog
     }
 
     override fun onResume() {
@@ -218,7 +250,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
     override fun onPause() {
         super.onPause()
-        dialog.dismiss()
+        dialog?.dismiss()
     }
 
     override fun onDestroy() {
