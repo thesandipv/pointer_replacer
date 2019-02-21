@@ -78,34 +78,34 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 startActivityForResult(i, RC_OPEN_TEL)
             } else {
                 Toast.makeText(activity!!, "Please install Extension First", Toast.LENGTH_SHORT).show()
-                installExtensionDialog()
+                installExtensionDialog().show()
             }
             true
         }
 
         //Open Other Apps on Play Store
         preferenceScreen.findPreference(getString(R.string.key_other_apps)).setOnPreferenceClickListener {
-            val bundle = Bundle()
-            with(bundle) {
+            Bundle().apply {
                 putString(FirebaseAnalytics.Param.ITEM_NAME, getString(R.string.key_other_apps))
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
             }
-            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle)
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(getString(R.string.url_play_store_developer))
-            startActivity(intent)
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(getString(R.string.url_play_store_developer))
+                startActivity(this)
+            }
             true
         }
 
         //Rate On Google Play
         preferenceScreen.findPreference(getString(R.string.key_rate_on_g_play)).setOnPreferenceClickListener {
-            val bundle = Bundle()
-            with(bundle) {
+            Bundle().apply {
                 putString(FirebaseAnalytics.Param.ITEM_NAME, getString(R.string.key_rate_on_g_play))
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
             }
-            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle)
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(getString(R.string.url_play_store_app_page))
-            startActivity(intent)
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(getString(R.string.url_play_store_app_page))
+                startActivity(this)
+            }
             true
         }
 
@@ -113,15 +113,13 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
         val isFirstInstall = sharedPreferences.getBoolean("first_install", true)
         if (isFirstInstall) {
-            val bundle = Bundle()
-            with(bundle) {
+            Bundle().apply {
                 putString("Device_Name", Build.DEVICE)
                 putString("Manufacturer", Build.MANUFACTURER)
                 putString("AndroidVersion", Build.VERSION.RELEASE)
+                firebaseAnalytics.logEvent("DeviceInfo", this)
             }
-            firebaseAnalytics.logEvent("DeviceInfo", bundle)
             editor.putBoolean("first_install", false)
-            Log.d(_tag, "DeviceInfo: $bundle")
         }
     }
 
@@ -129,10 +127,11 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        val configSettings: FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings.Builder()
+        FirebaseRemoteConfigSettings.Builder()
                 .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build()
-        firebaseRemoteConfig.setConfigSettings(configSettings)
+                .build().apply {
+                    firebaseRemoteConfig.setConfigSettings(this)
+                }
 
         val isUsingDeveloperMode = firebaseRemoteConfig.info.configSettings.isDeveloperModeEnabled
         val cacheExpiration: Long = if (isUsingDeveloperMode) {
@@ -193,20 +192,20 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
     private var dialog: AlertDialog? = null
     private fun installExtensionDialog(): AlertDialog {
-        dialog = AlertDialog.Builder(activity!!).setTitle("Install Extension")
-                .setMessage("Please install small extension package for changing system settings")
+        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
+                .setMessage(getString(R.string.msg_install_ext_dialog))
                 .setCancelable(false)
-                .setNegativeButton("Cancel") { _, _ ->
+                .setNegativeButton(getString(R.string.text_button_cancel)) { _, _ ->
                     activity!!.finish()
                 }
-                .setPositiveButton("Install") { _, _ ->
+                .setPositiveButton(getString(R.string.text_button_install)) { _, _ ->
                     when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
                         true -> {
                             val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
                             val tmpFile = File(context!!.cacheDir, "app.apk")
-                            activity!!.root_layout.longSnackbar("Downloading Extension")
+                            activity!!.root_layout.longSnackbar(getString(R.string.msg_downloading_ext))
                             reference.getFile(tmpFile).addOnSuccessListener {
-                                activity!!.root_layout.snackbar("Extension Downloaded")
+                                activity!!.root_layout.snackbar(getString(R.string.msg_ext_downloaded))
                                 Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     val uri = FileProvider.getUriForFile(context!!.applicationContext,
@@ -229,6 +228,8 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                             activity!!.browse("https://m8rg7.app.goo.gl/touchel")
                         }
                     }
+                }.setNeutralButton("Learn More") { _, _ ->
+                    activity!!.browse("https://pointerreplacer.page.link/ext_learn_more")
                 }.create()
         return dialog as AlertDialog
     }
@@ -236,7 +237,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     override fun onResume() {
         super.onResume()
 
-        if (!isAppInstalled(activity!!, "com.afterroot.toucherlegacy")) {
+        if (!activity!!.isAppInstalled("com.afterroot.toucherlegacy")) {
             installExtensionDialog().show()
         }
         try {
@@ -259,9 +260,9 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (!billingProcessor!!.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data)
+        try {
             if (requestCode == RC_OPEN_TEL) {
+                super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
                         activity!!.root_layout.snackbar("Done")
@@ -282,12 +283,17 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                     3 -> activity!!.root_layout.snackbar(getString(R.string.msg_error)) //Other error
                 }
             }
+            if (!billingProcessor?.handleActivityResult(requestCode, resultCode, data)!!) {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    fun isAppInstalled(context: Context, pName: String): Boolean {
+    private fun Context.isAppInstalled(pName: String): Boolean {
         return try {
-            context.packageManager.getApplicationInfo(pName, 0)
+            packageManager.getApplicationInfo(pName, 0)
             true
         } catch (e: PackageManager.NameNotFoundException) {
             false
@@ -342,7 +348,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 if (interstitialAd.isLoaded) {
                     interstitialAd.show()
                 } else {
-                    activity!!.root_layout.snackbar("Ad Not Loaded yet")
+                    activity!!.root_layout.snackbar(getString(R.string.msg_ad_not_loaded))
                 }
                 true
             }
@@ -354,7 +360,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             override fun onAdClosed() {
                 super.onAdClosed()
                 watchAds.apply {
-                    summary = "Ad Loading"
+                    summary = getString(R.string.msg_ad_loading)
                     isEnabled = false
                 }
                 interstitialAd.loadAd(AdRequest.Builder().build())
@@ -363,7 +369,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             override fun onAdLoaded() {
                 super.onAdLoaded()
                 watchAds.apply {
-                    summary = "Ad Loaded"
+                    summary = getString(R.string.msg_ad_loaded)
                     isEnabled = true
                 }
             }
@@ -382,4 +388,5 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
         const val RC_OPEN_TEL = 245
     }
+
 }
