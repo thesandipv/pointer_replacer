@@ -32,8 +32,8 @@ android {
         applicationId "com.afterroot.touchenabler"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 5
-        versionName "1.2"
+        versionCode 6
+        versionName "1.2.1"
     }
     buildTypes {
         release {
