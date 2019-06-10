@@ -14,5 +14,10 @@
   -->
 
 <resources>
-    <integer name="fragment_anim_time">200</integer>
+
+    <style name="AppTheme.Launch">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
 </resources>

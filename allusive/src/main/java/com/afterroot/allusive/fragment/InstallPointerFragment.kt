@@ -28,7 +28,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat.startActivity
@@ -36,10 +35,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.utils.Helper
 import kotlinx.android.synthetic.main.fragment_install_pointer.*
+import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import kotlinx.android.synthetic.main.manage_pointer_list_item.view.*
 import java.io.*
 import java.util.*
@@ -212,16 +214,15 @@ class InstallPointerFragment : Fragment() {
             }
             arrayList.filter { it.name.startsWith(pointerPackName) }
                     .forEach { PointerAdapter.itemList.add(it.path) }
-            val materialDialog = MaterialDialog.Builder(mContext)
-                    .title(dialogTitle)
-                    .customView(R.layout.layout_grid_bottomsheet, false)
-                    .show()
-            materialDialog.setOnDismissListener { dialogInterface -> pointerAdapter.clear() }
-            val view1 = materialDialog.customView
-            if (view1 != null) {
-                val gridView = view1.findViewById<GridView>(R.id.grid_pointers)
-                gridView.adapter = pointerAdapter
-                gridView.setOnItemClickListener { adapterView, view, i, l ->
+            val materialDialog = MaterialDialog(mContext).show {
+                title(text = dialogTitle)
+                customView(viewRes = R.layout.layout_grid_bottomsheet)
+                setOnDismissListener { pointerAdapter.clear() }
+            }
+            val dialogView = materialDialog.getCustomView()
+            dialogView.grid_pointers.apply {
+                adapter = pointerAdapter
+                setOnItemClickListener { _, _, i, _ ->
                     val source = File(pointerAdapter.getPath(i))
                     val targetFile = File(mTargetPath + source.name)
                     if (!targetFile.exists()) {
@@ -243,23 +244,22 @@ class InstallPointerFragment : Fragment() {
 
         internal fun showPokemonDownloadDialog() {
 
-            MaterialDialog.Builder(mContext)
-                    .title("Download Pokemon Pointers Pack")
-                    .content("Pokemon Pointers is not installed. Do you want to download it now?")
-                    .positiveText("Install")
-                    .negativeText("No")
-                    .onPositive { _, _ ->
-                        try {
-                            startActivity(mContext,
-                                    Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
-                                    null)
-                        } catch (exception: ActivityNotFoundException) {
-                            startActivity(mContext,
-                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
-                                    null)
-                        }
+            MaterialDialog(mContext).show {
+                title(text = "Download Pokemon Pointers Pack")
+                message(text = "Pokemon Pointers is not installed. Do you want to download it now?")
+                positiveButton(text = "Install") {
+                    try {
+                        startActivity(mContext,
+                                Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
+                                null)
+                    } catch (exception: ActivityNotFoundException) {
+                        startActivity(mContext,
+                                Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
+                                null)
                     }
-                    .show()
+                }
+                negativeButton(text = "No")
+            }
         }
     }
 

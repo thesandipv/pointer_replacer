@@ -24,15 +24,22 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.*
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.Helper
+import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.allusive.utils.getPrefs
+import com.afterroot.allusive.utils.visible
+import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
+import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.design.snackbar
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -40,16 +47,15 @@ import java.io.IOException
 
 class MainFragment : Fragment() {
 
-    private var sharedPreferences: SharedPreferences? = null
-    private var editor: SharedPreferences.Editor? = null
-    private var fragmentView: View? = null
+    private val _tag = "MainFragment"
     private var extSdDir: String? = null
-    private var targetPath: String? = null
+    private var fragmentView: View? = null
     private var pointerPreviewPath: String? = null
-    private val TAG = "MainFragment"
+    private var sharedPreferences: SharedPreferences? = null
+    private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(TAG, "adding view..")
+        Log.d(_tag, "adding view..")
         setHasOptionsMenu(true)
         fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
         return fragmentView
@@ -59,8 +65,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPreferences = Helper.getSharedPreferences(activity!!)
-        editor = sharedPreferences!!.edit()
+        sharedPreferences = context!!.getPrefs()
 
         init()
     }
@@ -76,14 +81,16 @@ class MainFragment : Fragment() {
         MobileAds.initialize(activity!!, getString(R.string.ad_banner_unit_id))
 
         val adView = activity!!.banner_ad_main
-        val adRequest = AdRequest.Builder().addTestDevice("0C5DB27412563CE00EF337AD5D89AF00").build()
+        val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
         adView.loadAd(adRequest)
 
         getPointer()
 
-
-        activity!!.fab_apply.setOnClickListener {
-            applyPointer()
+        activity!!.fab_apply.apply {
+            setOnClickListener {
+                applyPointer()
+            }
+            icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
         }
     }
 
@@ -93,7 +100,9 @@ class MainFragment : Fragment() {
     @Throws(IOException::class)
     private fun applyPointer() {
         val pointerPath = activity!!.filesDir.path + "/pointer.png"
-        editor!!.putString(getString(R.string.key_pointerPath), pointerPath).apply()
+        sharedPreferences!!.edit(true) {
+            putString(getString(R.string.key_pointerPath), pointerPath)
+        }
         val bitmap = loadBitmapFromView(selected_pointer)
         val file = File(pointerPath)
         Runtime.getRuntime().exec("chmod 666 $pointerPath")
@@ -103,47 +112,44 @@ class MainFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
-            Helper.showView(current_pointer)
-            Helper.hideView(text_no_pointer_applied)
+            current_pointer.visible(true)
+            text_no_pointer_applied.visible(false)
             current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
             return
         }
-        Helper.showSnackBar(activity!!.container, "Pointer Applied", Snackbar.LENGTH_LONG, "REBOOT", View.OnClickListener {
-            MaterialDialog.Builder(activity!!)
-                    .title(R.string.reboot)
-                    .content(R.string.text_reboot_confirm)
-                    .positiveText(R.string.reboot)
-                    .negativeText(R.string.text_no)
-                    .neutralText(R.string.text_soft_reboot)
-                    .onPositive { _, _ ->
-                        try {
-                            val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
-                            process.waitFor()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+        activity!!.container.longSnackbar(getString(R.string.text_pointer_applied), getString(R.string.reboot)) {
+            MaterialDialog(activity!!).show {
+                title(res = R.string.reboot)
+                message(res = R.string.text_reboot_confirm)
+                positiveButton(res = R.string.reboot) {
+                    try {
+                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
+                        process.waitFor()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                    .onNeutral { _, _ ->
-                        try {
-                            val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
-                            process.waitFor()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                }
+                negativeButton(res = R.string.text_no) {
+                    try {
+                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
+                        process.waitFor()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                    .show()
-        })
+                }
+            }
+        }
     }
 
-    private fun loadBitmapFromView(v: View?): Bitmap {
-        val w = v!!.width
-        val h = v.height
-        val b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    private fun loadBitmapFromView(view: View): Bitmap {
+        val b = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val c = Canvas(b)
-        v.layout(v.left, v.top, v.right, v.bottom)
-        v.draw(c)
+        view.run {
+            layout(view.left, view.top, view.right, view.bottom)
+            draw(c)
+        }
         return b
     }
 
@@ -153,9 +159,11 @@ class MainFragment : Fragment() {
         pointerFragment.setTitle("Select Pointers")
         pointerFragment.setPointerSelectCallback(object : PointerBottomSheetFragment.PointerSelectCallback {
             override fun onPointerSelected(pointerPath: String) {
-                editor!!.putString(getString(R.string.key_selectedPointerPath), pointerPath).apply()
+                sharedPreferences!!.edit(true) {
+                    putString(getString(R.string.key_selectedPointerPath), pointerPath)
+                }
                 activity!!.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                Log.d(TAG, "onPointerSelected: Selected Pointer Path: $pointerPath")
+                Log.d(_tag, "onPointerSelected: Selected Pointer Path: $pointerPath")
             }
 
         })
@@ -167,10 +175,10 @@ class MainFragment : Fragment() {
             val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
             if (pointerPath != null) {
                 current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                Helper.hideView(text_no_pointer_applied)
+                text_no_pointer_applied.visible(false)
             } else {
-                Helper.showView(text_no_pointer_applied)
-                Helper.hideView(current_pointer)
+                text_no_pointer_applied.visible(true)
+                current_pointer.visible(false)
             }
 
             if (selectedPointerPath != null) {
@@ -183,5 +191,19 @@ class MainFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_dashboard_activity, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.profile_logout -> {
+                AuthUI.getInstance().signOut(context!!).addOnCompleteListener {
+                    activity!!.container.snackbar("Signed Out")
+                }
+            }
+            else -> {
+                return item.onNavDestinationSelected(activity!!.findNavController(R.id.fragment_repo_nav)) || super.onOptionsItemSelected(item)
+            }
+        }
+        return true
     }
 }

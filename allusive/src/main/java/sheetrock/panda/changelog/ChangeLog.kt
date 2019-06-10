@@ -97,7 +97,7 @@ private constructor(private val context: Context, sp: SharedPreferences) {
 
         // get version numbers
         this.lastVersion = sp.getString(VERSION_KEY, NO_VERSION)
-        //Log.d(TAG, "lastVersion: " + lastVersion);
+        //Log.d(_tag, "lastVersion: " + lastVersion);
         try {
             this.thisVersion = context.packageManager.getPackageInfo(context.packageName,
                     0).versionName
@@ -107,7 +107,7 @@ private constructor(private val context: Context, sp: SharedPreferences) {
             e.printStackTrace()
         }
 
-        //Log.d(TAG, "appVersion: " + this.thisVersion);
+        //Log.d(_tag, "appVersion: " + this.thisVersion);
     }
 
     /**

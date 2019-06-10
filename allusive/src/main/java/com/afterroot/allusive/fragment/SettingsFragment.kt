@@ -23,13 +23,16 @@ import android.provider.Settings
 import android.text.InputType
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.Helper
+import com.afterroot.allusive.utils.getPrefs
 import com.crashlytics.android.Crashlytics
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.snackbar
@@ -37,68 +40,63 @@ import org.jetbrains.anko.design.snackbar
 @SuppressLint("ValidFragment")
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private var mChooseColorPicker: Preference? = null
-    private var mSharedPreferences: SharedPreferences? = null
-    private var mEditor: SharedPreferences.Editor? = null
-    private lateinit var maxPointerSize: Preference
     private lateinit var maxPaddingSize: Preference
+    private lateinit var maxPointerSize: Preference
+    private lateinit var mChooseColorPicker: Preference
     private lateinit var showTouches: SwitchPreferenceCompat
+    private var preferences: SharedPreferences? = null
+    val _tag = "SettingsFragment"
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
-
     }
 
     @SuppressLint("CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mSharedPreferences = Helper.getSharedPreferences(activity!!)
-        mEditor = mSharedPreferences!!.edit()
+        preferences = context!!.getPrefs()
 
-        mChooseColorPicker = findPreference(getString(R.string.key_useMDCC))
+        mChooseColorPicker = findPreference(getString(R.string.key_useMDCC))!!
         updateCCSummary()
-        mChooseColorPicker!!.setOnPreferenceClickListener {
+        mChooseColorPicker.setOnPreferenceClickListener {
             showSingleChoice()
             false
         }
 
-        maxPointerSize = findPreference(getString(R.string.key_maxPointerSize))
-        maxPointerSize.summary = mSharedPreferences!!.getString(getString(R.string.key_maxPointerSize), "100")
+        maxPointerSize = findPreference(getString(R.string.key_maxPointerSize))!!
+        maxPointerSize.summary = preferences!!.getString(getString(R.string.key_maxPointerSize), "100")
         maxPointerSize.setOnPreferenceClickListener {
-            MaterialDialog.Builder(activity!!)
-                    .title(R.string.text_max_pointer_size)
-                    .inputType(InputType.TYPE_CLASS_NUMBER)
-                    .inputRange(2, 3)
-                    .input("Enter Max Pointer Size",
-                            mSharedPreferences!!.getString(getString(R.string.key_maxPointerSize), "100")
-                    ) { _, input ->
-                        mEditor!!.putString(getString(R.string.key_maxPointerSize), input.toString())
-                        mEditor!!.apply()
-                        maxPointerSize.summary = input
-                    }.show()
+            MaterialDialog(activity!!).show {
+                title(res = R.string.text_max_pointer_size)
+                input(hint = "Enter Max Pointer Size",
+                        prefill = preferences!!.getString(getString(R.string.key_maxPointerSize), "100"),
+                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false) { _, input ->
+                    preferences!!.edit(true) { putString(getString(R.string.key_maxPointerSize), input.toString()) }
+                    maxPointerSize.summary = input
+                }
+            }
             false
         }
 
-        maxPaddingSize = findPreference(getString(R.string.key_maxPaddingSize))
-        maxPaddingSize.summary = mSharedPreferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
+        maxPaddingSize = findPreference(getString(R.string.key_maxPaddingSize))!!
+        maxPaddingSize.summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
         maxPaddingSize.setOnPreferenceClickListener {
-            MaterialDialog.Builder(activity!!)
-                    .title(getString(R.string.key_maxPaddingSize))
-                    .inputType(InputType.TYPE_CLASS_NUMBER)
-                    .inputRange(1, 3)
-                    .input("Enter Max Padding Size",
-                            mSharedPreferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
-                    ) { _, input ->
-                        mEditor!!.putString(getString(R.string.key_maxPaddingSize), input.toString())
-                        mEditor!!.apply()
-                        maxPointerSize.summary = input
-                    }.show()
+            MaterialDialog(activity!!).show {
+                title(res = R.string.key_maxPaddingSize)
+                input(hint = "Enter Max Padding Size",
+                        prefill = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25"),
+                        allowEmpty = false, maxLength = 3,
+                        inputType = InputType.TYPE_CLASS_NUMBER) { _, input ->
+                    preferences!!.edit(true) { putString(getString(R.string.key_maxPaddingSize), input.toString()) }
+                    maxPointerSize.summary = input
+                }.show()
+            }
             false
         }
 
-        showTouches = findPreference("show_touches") as SwitchPreferenceCompat
-        showTouches.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+        showTouches = findPreference("show_touches")!!
+        showTouches.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             if (newValue == true) {
                 setShowTouches(1)
                 activity!!.container.snackbar("Touches Enabled")
@@ -109,7 +107,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             return@OnPreferenceChangeListener true
         }
 
-        findPreference("pref_version").apply {
+        findPreference<Preference>("pref_version")?.apply {
             summary = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
         }
     }
@@ -118,68 +116,55 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onResume()
 
         val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, "show_touches") == 1
-        mEditor!!.putBoolean("show_touches", showTouchesCurr).apply()
+        preferences!!.edit(true) { putBoolean("show_touches", showTouchesCurr) }
         showTouches.isChecked = showTouchesCurr
     }
 
-    private fun isMUp(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-    }
-
-    private fun checkSystemWritePermission(): Boolean {
-        var retVal = false
-        if (isMUp()) {
-            retVal = Settings.System.canWrite(activity)
-            Log.d(TAG, "Can Write Settings: $retVal")
-            if (retVal) {
-                Toast.makeText(activity, "Write allowed", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(activity, "Write not allowed", Toast.LENGTH_LONG).show()
-            }
-        } else retVal = true
-        return retVal
-    }
-
-    val TAG = "SettingsFragment"
     private fun setShowTouches(touches: Int) {
-        if (checkSystemWritePermission()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(activity)) {
+                try {
+                    Settings.System.putInt(activity!!.contentResolver, "show_touches", touches)
+                } catch (e: Exception) {
+                    Log.e(_tag, e.toString())
+                    Crashlytics.logException(e)
+                    Toast.makeText(activity, "Opps! Some Error occurred.", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(activity, "Please grant app to write Secure Settings permission", Toast.LENGTH_SHORT).show()
+            }
+        } else {
             try {
                 Settings.System.putInt(activity!!.contentResolver, "show_touches", touches)
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Log.e(_tag, e.toString())
                 Crashlytics.logException(e)
                 Toast.makeText(activity, "Opps! Some Error occurred.", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(activity, "Please grant app to write Secure Settings permission", Toast.LENGTH_SHORT).show()
         }
-
     }
 
+
     private fun showSingleChoice() {
-        val selectedIndex = mSharedPreferences!!.getInt("selectedIndex", 1)
-        MaterialDialog.Builder(activity!!)
-                .title(R.string.choose_color_picker)
-                .items(R.array.CCItems)
-                .itemsCallbackSingleChoice(selectedIndex) { _, _, which, _ ->
-                    mEditor!!.putInt("selectedIndex", which).apply()
-                    if (which == 0) {
-                        mEditor!!.putBoolean(getString(R.string.key_useMDCC), false).apply()
-                    } else if (which == 1) {
-                        mEditor!!.putBoolean(getString(R.string.key_useMDCC), true).apply()
-                    }
-                    updateCCSummary()
-                    true
+        val selectedIndex = preferences!!.getInt("selectedIndex", 1)
+        MaterialDialog(activity!!).show {
+            title(R.string.choose_color_picker)
+            listItemsSingleChoice(res = R.array.CCItems, initialSelection = selectedIndex) { _, index, _ ->
+                preferences!!.edit(true) {
+                    putInt("selectedIndex", index)
+                    putBoolean(getString(R.string.key_useMDCC), index != 0)
                 }
-                .positiveText(R.string.changelog_ok_button)
-                .show()
+                updateCCSummary()
+            }
+            positiveButton(R.string.changelog_ok_button)
+        }
     }
 
     private fun updateCCSummary() {
-        if (mSharedPreferences!!.getBoolean(getString(R.string.key_useMDCC), true)) {
-            mChooseColorPicker!!.summary = "Material Color Picker"
+        if (preferences!!.getBoolean(getString(R.string.key_useMDCC), true)) {
+            mChooseColorPicker.summary = "Material Color Picker"
         } else {
-            mChooseColorPicker!!.summary = "HSV Color Picker"
+            mChooseColorPicker.summary = "HSV Color Picker"
         }
     }
 }

@@ -48,7 +48,7 @@ import org.jetbrains.anko.design.indefiniteSnackbar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val TAG = "MainActivity"
+    private val _tag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //Replace Launch theme with Light Theme
@@ -172,13 +172,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Manifest.permission.WRITE_SETTINGS)
 
     private fun checkPermissions() {
-        Log.d(TAG, "checkPermissions: Checking Permissions..")
+        Log.d(_tag, "checkPermissions: Checking Permissions..")
         val permissionChecker = PermissionChecker(this)
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
-            Log.d(TAG, "checkPermissions: Requesting Permissions..")
+            Log.d(_tag, "checkPermissions: Requesting Permissions..")
             ActivityCompat.requestPermissions(this, manifestPermissions, RC_PERMISSION)
         } else {
-            Log.d(TAG, "checkPermissions: Permissions Granted..")
+            Log.d(_tag, "checkPermissions: Permissions Granted..")
             loadFragments()
 
             //TODO
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             RC_PERMISSION -> {
                 val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
-                    Log.d(TAG, "onRequestPermissionsResult: Permissions not Granted..")
+                    Log.d(_tag, "onRequestPermissionsResult: Permissions not Granted..")
                     Helper.showSnackBar(this.coordinator_layout, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE, "GRANT", View.OnClickListener { checkPermissions() })
                 } else {
                     checkPermissions()
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 toast("Unknown Error")
-                Log.e(TAG, "onActivityResult: Sign In Error", response.error)
+                Log.e(_tag, "onActivityResult: Sign In Error", response.error)
             }
         }
     }

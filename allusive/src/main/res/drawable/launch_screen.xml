@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,16 +13,26 @@
   ~ limitations under the License.
   -->
 
-<layer-list
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:opacity="opaque">
-    <item android:drawable="@android:color/white"/>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <bitmap android:src="@drawable/ic_launch_screen"
-                android:gravity="center"/>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+        </shape>
     </item>
-    <item>
-        <bitmap android:src="@drawable/ic_launch_screen_text_mc"
-                android:gravity="bottom"/>
+    <item android:gravity="center">
+        <bitmap
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:src="@drawable/ic_launch_screen" />
+    </item>
+    <item
+        android:bottom="80dp"
+        android:gravity="bottom|center">
+        <bitmap
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ar_logo"
+            android:tint="@color/onSecondary" />
     </item>
 </layer-list>
