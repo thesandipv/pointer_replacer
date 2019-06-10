@@ -23,13 +23,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.afterroot.allusive.R
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.fragment_pointer_repo.*
+import com.afterroot.allusive.utils.getDrawableExt
+import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class PointersRepoFragment : Fragment() {
-
-    var auth = FirebaseAuth.getInstance()!!
-    val TAG = "PointersRepoFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -38,12 +35,11 @@ class PointersRepoFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        fab_new_pointer_post.setOnClickListener {
-            it.findNavController().navigate(R.id.new_post_dest)
+        activity!!.fab_apply.apply {
+            setOnClickListener {
+                activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.new_post_dest)
+            }
+            icon = context!!.getDrawableExt(R.drawable.ic_add)
         }
-    }
-
-    companion object {
-        const val rcSignIn = 468
     }
 }

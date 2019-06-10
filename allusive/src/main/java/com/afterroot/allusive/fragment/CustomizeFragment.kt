@@ -24,9 +24,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.Helper
+import com.afterroot.allusive.utils.getPrefs
+import com.afterroot.allusive.utils.visible
 import kotlinx.android.synthetic.main.fragment_customize_pointer.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.util.*
@@ -37,7 +40,6 @@ import java.util.*
 class CustomizeFragment : Fragment() {
     private var mFragmentView: View? = null
     private var mSharedPreferences: SharedPreferences? = null
-    var mEditor: SharedPreferences.Editor? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,8 +51,7 @@ class CustomizeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        mSharedPreferences = Helper.getSharedPreferences(context!!)
-        mEditor = mSharedPreferences!!.edit()
+        mSharedPreferences = context!!.getPrefs()
     }
 
     private val minSize: Int
@@ -75,17 +76,10 @@ class CustomizeFragment : Fragment() {
 
 //        seekBarSize.min = minSize
 
-        if (mSharedPreferences!!.getBoolean(getString(R.string.key_EnablePointerAlpha), false)) {
-            if (alphaBarLayout != null) {
-                Helper.showView(alphaBarLayout)
-                Helper.showView(textAlpha)
-            }
-        } else {
-            if (alphaBarLayout != null) {
-                Helper.hideView(alphaBarLayout)
-                Helper.hideView(textAlpha)
-            }
-        }
+        val alphaEnabled = mSharedPreferences!!.getBoolean(getString(R.string.key_EnablePointerAlpha), false)
+        alphaBarLayout?.visible(alphaEnabled)
+        textAlpha?.visible(alphaEnabled)
+
         selected_pointer.imageAlpha = alpha
 
         //pointer size
@@ -108,7 +102,7 @@ class CustomizeFragment : Fragment() {
         seekBarSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 currentSize = minSize + (progress * step)
-                mEditor!!.putInt(getString(R.string.key_pointerSize), currentSize).apply()
+                mSharedPreferences!!.edit(true) { putInt(getString(R.string.key_pointerSize), currentSize) }
                 textSize.text = String.format(Locale.US, formatTextSize, getString(R.string.text_size), currentSize, currentSize)
                 setPointerImageParams(currentSize, seekBarPadding.progress, false)
             }
@@ -126,7 +120,7 @@ class CustomizeFragment : Fragment() {
         seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var imagePadding: Int = 0
             override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                mEditor!!.putInt(getString(R.string.key_pointerPadding), value).apply()
+                mSharedPreferences!!.edit(true) { putInt(getString(R.string.key_pointerPadding), value) }
                 textPadding.text = String.format(Locale.US, formatPadding, getString(R.string.text_padding), value)
                 setPointerImageParams(currentSize, value, true)
                 imagePadding = value
@@ -143,7 +137,7 @@ class CustomizeFragment : Fragment() {
 
         seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                mEditor!!.putInt("pointerAlpha", value).apply()
+                mSharedPreferences!!.edit(true) { putInt("pointerAlpha", value) }
                 textAlpha.text = String.format(Locale.US, formatPadding, getString(R.string.text_alpha), value)
                 selected_pointer.imageAlpha = value
             }

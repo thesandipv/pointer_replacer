@@ -21,8 +21,8 @@ import java.util.*
 //[START Data Classes for FireStore]
 
 //Collection 'users'
-data class User(var name: String,
-                var email: String,
+data class User(var name: String?,
+                var email: String?,
                 var uid: String) : Serializable {
     constructor() : this("", "", "")
 }

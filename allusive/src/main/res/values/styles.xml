@@ -15,32 +15,17 @@
 
 <resources>
 
-    <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light">
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-        <item name="colorButtonNormal">@color/secondaryColor</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-    </style>
-
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorAccent">@color/secondaryColor</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <!--Style of MainActivity-launch-->
     <style name="AppTheme.Launch">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
-
-    <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
-
-    <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 </resources>

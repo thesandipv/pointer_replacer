@@ -23,28 +23,29 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.navigation.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
-import com.afterroot.allusive.ui.DashboardActivity
 import com.afterroot.allusive.utils.Helper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
+import org.jetbrains.anko.design.snackbar
 import java.io.File
 
 
 class PointerBottomSheetFragment : BottomSheetDialogFragment() {
-
     var arrow: DrawerArrowDrawable? = null
     private var mBehavior: BottomSheetBehavior<*>? = null
+    var mTitle: String? = null
 
     @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog?, style: Int) {
+    override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
         val contentView = View.inflate(context, R.layout.layout_grid_bottomsheet, container)
-        dialog!!.setContentView(contentView)
+        dialog.setContentView(contentView)
 
         val params = (contentView.parent as View).layoutParams as CoordinatorLayout.LayoutParams
         mBehavior = params.behavior as BottomSheetBehavior<*>?
@@ -92,7 +93,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
             val pointersFolder = File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
             if (!pointersFolder.exists()) pointersFolder.mkdirs()
             val pointerFiles = pointersFolder.listFiles()
-            Log.d("TAG", "Total Pointers: ${pointerFiles.size}")
+            Log.d("_tag", "Total Pointers: ${pointerFiles.size}")
             PointerAdapter.itemList.clear()
             if (pointerFiles.isNotEmpty()) {
                 contentView.info_no_pointer_installed.visibility = View.GONE
@@ -101,26 +102,27 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
 
                 contentView.grid_pointers.setOnItemLongClickListener { _, _, i, _ ->
                     val file = File(pointerAdapter.getPath(i))
-                    MaterialDialog.Builder(activity!!)
-                            .title(getString(R.string.text_delete) + file.name)
-                            .content(R.string.text_delete_confirm)
-                            .positiveText(R.string.text_yes)
-                            .onPositive { _, _ ->
-                                if (file.delete()) {
-                                    Helper.showSnackBar(activity!!.container, "Pointer deleted.")
-                                } else {
-                                    Helper.showSnackBar(activity!!.container, "Error deleting pointer.")
-                                }
+                    MaterialDialog(activity!!).show {
+                        title(text = getString(R.string.text_delete) + file.name)
+                        message(res = R.string.text_delete_confirm)
+                        positiveButton(res = R.string.text_yes) {
+                            if (file.delete()) {
+                                activity!!.container.snackbar("Pointer deleted.")
+                            } else {
+                                activity!!.container.snackbar("Error deleting pointer.")
                             }
-                            .negativeText(R.string.text_no)
-                            .show()
-
+                        }
+                        negativeButton(res = R.string.text_no)
+                    }
                     false
                 }
             } else {
-                contentView.info_no_pointer_installed.visibility = View.VISIBLE
-                contentView.bs_button_install_pointers.setOnClickListener {
-                    DashboardActivity.showInstallPointerFragment(activity!!)
+                contentView.apply {
+                    info_no_pointer_installed.visibility = View.VISIBLE
+                    bs_button_install_pointers.setOnClickListener {
+                        dialog.dismiss()
+                        activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.repo_dest)
+                    }
                 }
             }
         } catch (npe: NullPointerException) {
@@ -128,7 +130,6 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    var mTitle: String? = null
     fun setTitle(title: String) {
         mTitle = title
     }

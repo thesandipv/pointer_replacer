@@ -17,14 +17,9 @@ package com.afterroot.allusive.utils
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import android.net.Uri
-import android.preference.PreferenceManager
-import android.view.View
 import android.webkit.MimeTypeMap
-import com.google.android.material.snackbar.Snackbar
 
 /**
  * Helper Class
@@ -40,27 +35,8 @@ object Helper {
         }
     }
 
-    fun getSharedPreferences(context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-    }
-
-    @JvmOverloads
-    fun showSnackBar(view: View, message: String, length: Int = Snackbar.LENGTH_LONG, action: String? = null, action_listener: View.OnClickListener? = null) {
-        val snackBar = Snackbar.make(view, message, length)
-        snackBar.setAction(action, action_listener)
-        snackBar.show()
-    }
-
     fun getDpi(context: Context): Int {
         return context.resources.displayMetrics.densityDpi
-    }
-
-    fun hideView(view: View?) {
-        view!!.visibility = View.GONE
-    }
-
-    fun showView(view: View?) {
-        view!!.visibility = View.VISIBLE
     }
 
     /**
@@ -84,12 +60,6 @@ object Helper {
             e.printStackTrace()
         }
         return type
-    }
-
-    fun isNetworkAvailable(context: Context): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = cm.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
     }
 
     fun openFile(context: Context, filename: String, uri: Uri) {

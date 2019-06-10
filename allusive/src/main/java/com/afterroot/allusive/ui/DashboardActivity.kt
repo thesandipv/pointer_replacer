@@ -18,86 +18,84 @@ package com.afterroot.allusive.ui
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
+import androidx.core.content.edit
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.*
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive.R
-import com.afterroot.allusive.fragment.InstallPointerFragment
-import com.afterroot.allusive.utils.DatabaseFields
-import com.afterroot.allusive.utils.Helper
-import com.afterroot.allusive.utils.PermissionChecker
-import com.afterroot.allusive.utils.User
+import com.afterroot.allusive.database.Database
+import com.afterroot.allusive.utils.*
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.design.snackbar
 
 class DashboardActivity : AppCompatActivity() {
 
-    private lateinit var toolbar: ActionBar
-    val TAG = "DashboardActivity"
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var sharedPreferences: SharedPreferences
+    private val _tag = "DashboardActivity"
+    private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
     private val showTouches = "show_touches"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_Light)
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        toolbar = supportActionBar!!
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        setSupportActionBar(toolbar)
+        sharedPreferences = this.getPrefs()
     }
 
     override fun onStart() {
         super.onStart()
-
-        when {
-            FirebaseAuth.getInstance().currentUser == null && Helper.isNetworkAvailable(this) ->
-                startActivityForResult(AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.EmailBuilder().build(),
-                                AuthUI.IdpConfig.GoogleBuilder().build()))
-                        .setLogo(R.drawable.ic_launch_screen)
-                        .build(), RC_LOGIN)
-            !Helper.isNetworkAvailable(this) -> AlertDialog.Builder(this)
+        if (FirebaseAuth.getInstance().currentUser == null && this.isNetworkAvailable()) {
+            startActivityForResult(AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.EmailBuilder().build(),
+                            AuthUI.IdpConfig.GoogleBuilder().build()))
+                    .setLogo(R.drawable.ic_launch_screen)
+                    .build(), RC_LOGIN)
+        } else if (!this.isNetworkAvailable()) {
+            AlertDialog.Builder(this)
                     .setMessage("No Network Available")
                     .setTitle("No Network")
                     .setPositiveButton("RETRY") { _, _ -> onStart() }
                     .setNegativeButton("Cancel") { _, _ -> finish() }
                     .setCancelable(false)
                     .show()
-            else -> initialize()
-        }
+        } else initialize()
 
     }
 
     private fun initialize() {
-        //Firebase Analytics
-        val bundle = Bundle()
-        with(bundle) {
-            putString("Device_Name", Build.DEVICE)
-            putString("Manufacturer", Build.MANUFACTURER)
-            putString("AndroidVersion", Build.VERSION.RELEASE)
+        if (sharedPreferences.getBoolean("first_install", true)) {
+            Bundle().apply {
+                putString("Device_Name", Build.DEVICE)
+                putString("Manufacturer", Build.MANUFACTURER)
+                putString("AndroidVersion", Build.VERSION.RELEASE)
+                FirebaseAnalytics.getInstance(this@DashboardActivity).logEvent("DeviceInfo", this)
+            }
+            sharedPreferences.edit(true) { putBoolean("first_install", false) }
         }
-        FirebaseAnalytics.getInstance(this).logEvent("DeviceInfo", bundle)
 
         //Initialize Interstitial Ad
         MobileAds.initialize(this, getString(R.string.ad_interstitial_1_id))
@@ -105,7 +103,7 @@ class DashboardActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions()
         } else {
-            Log.d(TAG, "onStart: Loading fragments..")
+            Log.d(_tag, "onStart: Loading fragments..")
             loadFragments()
 
             if (Settings.System.getInt(contentResolver, showTouches) == 0) {
@@ -116,17 +114,46 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         //Add user in db if not available
-        val db = FirebaseFirestore.getInstance()
-        FirebaseAuth.getInstance().currentUser.let {
-            if (it != null) {
-                db.collection(DatabaseFields.USERS)
-                        .document(it.uid).set(User(it.displayName!!, it.email!!, it.uid))
-                Toast.makeText(this, it.displayName, Toast.LENGTH_SHORT).show()
+        //addUserInfoInDB()
+    }
+
+    private fun addUserInfoInDB() {
+        try {
+            val auth = FirebaseAuth.getInstance()
+            val curUser = auth.currentUser
+            /*if (curUser?.displayName == null || curUser.email == null || curUser.phoneNumber == null) {
+            createdView.findNavController().navigate(R.id.edit_profile)
+            return
+        }*/
+            val userRef = Database.getDb().collection(DatabaseFields.USERS).document(curUser!!.uid)
+            userRef.get().addOnCompleteListener { getUserTask ->
+                when {
+                    getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
+                        container.snackbar("User not available. Creating User..")
+                        val user = User(curUser.displayName!!,
+                                curUser.email!!,
+                                curUser.uid)
+                        Log.d(_tag, "addUserInfoInDB: $user")
+                        //TODO add dialog to add phone number
+                        userRef.set(user).addOnCompleteListener { setUserTask ->
+                            when {
+                                setUserTask.isSuccessful -> {
+                                }
+                                else -> Log.e(_tag, "Can't create firebaseUser", setUserTask.exception)
+                            }
+                        }
+                    }
+                    else -> Log.e(_tag, "Unknown Error", getUserTask.exception)
+                }
+                //initFirebaseDb()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RC_LOGIN -> {
                 when (resultCode) {
@@ -142,38 +169,33 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private val manifestPermissions = arrayOf(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_SETTINGS)
-
     private fun checkPermissions() {
-        Log.d(TAG, "checkPermissions: Checking Permissions..")
+        Log.d(_tag, "checkPermissions: Checking Permissions..")
         val permissionChecker = PermissionChecker(this)
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
-            Log.d(TAG, "checkPermissions: Requesting Permissions..")
+            Log.d(_tag, "checkPermissions: Requesting Permissions..")
             ActivityCompat.requestPermissions(this, manifestPermissions, RC_PERMISSION)
         } else {
-            Log.d(TAG, "checkPermissions: Permissions Granted..")
+            Log.d(_tag, "checkPermissions: Permissions Granted..")
             loadFragments()
 
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
-                    when {
-                        Settings.System.canWrite(this) ->
-                            when {
-                                Settings.System.getInt(contentResolver, "show_touches") == 0 ->
-                                    container.indefiniteSnackbar(getString(R.string.enable_touches_prompt), getString(R.string.prompt_button_enable)) {
-                                        Settings.System.putInt(contentResolver,
-                                                "show_touches", 1)
-                                    }.show()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                when (Settings.System.canWrite(this)) {
+                    true -> {
+                        if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
+                            container.indefiniteSnackbar(getString(R.string.enable_touches_prompt), getString(R.string.prompt_button_enable)) {
+                                Settings.System.putInt(contentResolver,
+                                        "show_touches", 1)
                             }
-                        else -> {
-                            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                            intent.data = Uri.parse("package:$packageName")
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(intent)
                         }
                     }
+                    false -> {
+                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.data = Uri.parse("package:$packageName")
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                    }
+                }
             }
         }
     }
@@ -183,7 +205,7 @@ class DashboardActivity : AppCompatActivity() {
             RC_PERMISSION -> {
                 val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
-                    Log.d(TAG, "onRequestPermissionsResult: Permissions not Granted..")
+                    Log.d(_tag, "onRequestPermissionsResult: Permissions not Granted..")
                     Snackbar.make(this.container, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE).setAction("GRANT") {
                         checkPermissions()
                     }
@@ -194,34 +216,38 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    lateinit var appBarConfiguration: AppBarConfiguration
     private fun loadFragments() {
         val host: NavHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
                 ?: return
         val navController = host.navController
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            fab_apply.hide()
+            when (destination.id) {
+                R.id.home_dest -> {
+                    fab_apply.apply {
+                        show()
+                        text = getString(R.string.text_action_apply)
+                    }
+                }
+                R.id.repo_dest -> {
+                    fab_apply.apply {
+                        show()
+                        text = "POST"
+                    }
+                }
+                R.id.settings_dest -> {
+                }
+            }
 
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        }
+
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.home_dest, R.id.repo_dest, R.id.settings_dest))
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navigation.setupWithNavController(navController)
     }
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.home_dest -> {
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.repo_dest -> {
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.settings_dest -> {
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
         return true
     }
@@ -238,7 +264,7 @@ class DashboardActivity : AppCompatActivity() {
             }
         }
         return true
-    }
+    }*/
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
@@ -247,10 +273,5 @@ class DashboardActivity : AppCompatActivity() {
     companion object {
         const val RC_PERMISSION = 256
         const val RC_LOGIN = 42
-
-
-        fun showInstallPointerFragment(activity: FragmentActivity) {
-            activity.supportFragmentManager.beginTransaction().replace(R.id.container, InstallPointerFragment()).commit()
-        }
     }
 }
