@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-        <item name="android:statusBarColor">@color/primaryDarkColor</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-    </style>
-</resources>
+<paths>
+    <files-path
+        name="files"
+        path="." />
+    <external-path
+        name="external_files"
+        path="." />
+    <cache-path
+        name="cache"
+        path="." />
+</paths>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,16 +14,29 @@
   -->
 
 <resources>
-    <color name="grey">#424242</color>
-    <color name="primaryColor">#4fc3f7</color>
+    <color name="color_primary">#4fc3f7</color>
     <color name="primaryLightColor">#8bf6ff</color>
-    <color name="primaryDarkColor">#0093c4</color>
-    <color name="secondaryColor">#dd2c00</color>
-    <color name="secondaryLightColor">#ff6434</color>
-    <color name="secondaryDarkColor">#a30000</color>
-    <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#ffffff</color>
+    <color name="color_primary_variant">#0093c4</color>
 
-    <color name="onSecondary">#000000</color>
-    <color name="onPrimary">#ffffff</color>
+    <color name="color_secondary">#dd2c00</color>
+    <color name="secondaryLightColor">#ff6434</color>
+    <color name="color_secondary_variant">#a30000</color>
+
+    <!--colorBackground appears behind scrollable content and is used for the default window-->
+    <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
+    <!--and menus. colorError is used to indicate an error state for components such as-->
+    <!--text fields.-->
+    <color name="color_background">#ffffff</color>
+    <color name="color_surface">#ffffff</color>
+    <color name="color_error">#b00020</color>
+
+    <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+    <!--on which they appear.-->
+    <color name="color_on_background">#000000</color>
+    <color name="color_on_surface">#000000</color>
+    <color name="color_on_primary">#ffffff</color>
+    <color name="color_on_secondary">#ffffff</color>
+    <color name="color_on_error">#ffffff</color>
+
+    <color name="grey">#42 4242</color>
 </resources>
