@@ -54,11 +54,11 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var sharedPreferences: SharedPreferences
     private val _tag = "DashboardActivity"
-    private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
+    private val manifestPermissions =
+        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
     private val showTouches = "show_touches"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
         setSupportActionBar(toolbar)
@@ -68,20 +68,26 @@ class DashboardActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (FirebaseAuth.getInstance().currentUser == null && this.isNetworkAvailable()) {
-            startActivityForResult(AuthUI.getInstance()
+            startActivityForResult(
+                AuthUI.getInstance()
                     .createSignInIntentBuilder()
-                    .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.EmailBuilder().build(),
-                            AuthUI.IdpConfig.GoogleBuilder().build()))
+                    .setAvailableProviders(
+                        arrayListOf(
+                            AuthUI.IdpConfig.EmailBuilder().build(),
+                            AuthUI.IdpConfig.GoogleBuilder().build()
+                        )
+                    )
                     .setLogo(R.drawable.ic_launch_screen)
-                    .build(), RC_LOGIN)
+                    .build(), RC_LOGIN
+            )
         } else if (!this.isNetworkAvailable()) {
             AlertDialog.Builder(this)
-                    .setMessage("No Network Available")
-                    .setTitle("No Network")
-                    .setPositiveButton("RETRY") { _, _ -> onStart() }
-                    .setNegativeButton("Cancel") { _, _ -> finish() }
-                    .setCancelable(false)
-                    .show()
+                .setMessage("No Network Available")
+                .setTitle("No Network")
+                .setPositiveButton("RETRY") { _, _ -> onStart() }
+                .setNegativeButton("Cancel") { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
         } else initialize()
 
     }
@@ -107,7 +113,10 @@ class DashboardActivity : AppCompatActivity() {
             loadFragments()
 
             if (Settings.System.getInt(contentResolver, showTouches) == 0) {
-                container.longSnackbar(getString(R.string.enable_touches_prompt), getString(R.string.prompt_button_enable)) {
+                container.longSnackbar(
+                    getString(R.string.enable_touches_prompt),
+                    getString(R.string.prompt_button_enable)
+                ) {
                     Settings.System.putInt(contentResolver, showTouches, 1)
                 }
             }
@@ -130,9 +139,11 @@ class DashboardActivity : AppCompatActivity() {
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
                         container.snackbar("User not available. Creating User..")
-                        val user = User(curUser.displayName!!,
-                                curUser.email!!,
-                                curUser.uid)
+                        val user = User(
+                            curUser.displayName!!,
+                            curUser.email!!,
+                            curUser.uid
+                        )
                         Log.d(_tag, "addUserInfoInDB: $user")
                         //TODO add dialog to add phone number
                         userRef.set(user).addOnCompleteListener { setUserTask ->
@@ -183,9 +194,14 @@ class DashboardActivity : AppCompatActivity() {
                 when (Settings.System.canWrite(this)) {
                     true -> {
                         if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
-                            container.indefiniteSnackbar(getString(R.string.enable_touches_prompt), getString(R.string.prompt_button_enable)) {
-                                Settings.System.putInt(contentResolver,
-                                        "show_touches", 1)
+                            container.indefiniteSnackbar(
+                                getString(R.string.enable_touches_prompt),
+                                getString(R.string.prompt_button_enable)
+                            ) {
+                                Settings.System.putInt(
+                                    contentResolver,
+                                    "show_touches", 1
+                                )
                             }
                         }
                     }
@@ -203,12 +219,14 @@ class DashboardActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             RC_PERMISSION -> {
-                val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val isPermissionGranted =
+                    grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
                     Log.d(_tag, "onRequestPermissionsResult: Permissions not Granted..")
-                    Snackbar.make(this.container, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE).setAction("GRANT") {
-                        checkPermissions()
-                    }
+                    Snackbar.make(this.container, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("GRANT") {
+                            checkPermissions()
+                        }
                 } else {
                     loadFragments()
                 }
@@ -218,7 +236,7 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun loadFragments() {
         val host: NavHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
-                ?: return
+            ?: return
         val navController = host.navController
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             fab_apply.hide()

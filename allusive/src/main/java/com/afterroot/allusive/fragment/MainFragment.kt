@@ -131,7 +131,7 @@ class MainFragment : Fragment() {
                         e.printStackTrace()
                     }
                 }
-                negativeButton(res = R.string.text_no) {
+                negativeButton(res = R.string.text_soft_reboot) {
                     try {
                         val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                         process.waitFor()
