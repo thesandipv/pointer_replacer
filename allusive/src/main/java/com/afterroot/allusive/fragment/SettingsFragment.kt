@@ -16,13 +16,17 @@
 package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputType
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -33,19 +37,23 @@ import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.getPrefs
-import com.crashlytics.android.Crashlytics
+import com.afterroot.allusive.utils.isAppInstalled
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import org.jetbrains.anko.browse
+import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.io.File
 
 @SuppressLint("ValidFragment")
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private lateinit var maxPaddingSize: Preference
-    private lateinit var maxPointerSize: Preference
-    private lateinit var mChooseColorPicker: Preference
-    private lateinit var showTouches: SwitchPreferenceCompat
+    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+    private val _tag = "SettingsFragment"
+    private var dialog: AlertDialog? = null
     private var preferences: SharedPreferences? = null
-    val _tag = "SettingsFragment"
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -57,54 +65,81 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         preferences = context!!.getPrefs()
 
-        mChooseColorPicker = findPreference(getString(R.string.key_useMDCC))!!
-        updateCCSummary()
-        mChooseColorPicker.setOnPreferenceClickListener {
-            showSingleChoice()
-            false
-        }
+        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        firebaseRemoteConfig.let { config ->
+            FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
+                .build().apply {
+                    config.setConfigSettingsAsync(this)
+                }
 
-        maxPointerSize = findPreference(getString(R.string.key_maxPointerSize))!!
-        maxPointerSize.summary = preferences!!.getString(getString(R.string.key_maxPointerSize), "100")
-        maxPointerSize.setOnPreferenceClickListener {
-            MaterialDialog(activity!!).show {
-                title(res = R.string.text_max_pointer_size)
-                input(hint = "Enter Max Pointer Size",
-                        prefill = preferences!!.getString(getString(R.string.key_maxPointerSize), "100"),
-                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false) { _, input ->
-                    preferences!!.edit(true) { putString(getString(R.string.key_maxPointerSize), input.toString()) }
-                    maxPointerSize.summary = input
+            config.fetch(config.info.fetchTimeMillis).addOnCompleteListener(activity!!) { result ->
+                if (result.isSuccessful) {
+                    firebaseRemoteConfig.activate()
                 }
             }
-            false
         }
 
-        maxPaddingSize = findPreference(getString(R.string.key_maxPaddingSize))!!
-        maxPaddingSize.summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
-        maxPaddingSize.setOnPreferenceClickListener {
-            MaterialDialog(activity!!).show {
-                title(res = R.string.key_maxPaddingSize)
-                input(hint = "Enter Max Padding Size",
+
+        findPreference<Preference>(getString(R.string.key_useMDCC))!!.apply {
+            updateCCSummary(this)
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                showSingleChoice()
+                false
+            }
+        }
+
+
+        findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
+            summary = preferences!!.getString(getString(R.string.key_maxPointerSize), "100")
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                MaterialDialog(activity!!).show {
+                    title(res = R.string.text_max_pointer_size)
+                    input(
+                        hint = "Enter Max Pointer Size",
+                        prefill = preferences!!.getString(getString(R.string.key_maxPointerSize), "100"),
+                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
+                    ) { _, input ->
+                        preferences!!.edit(true) { putString(getString(R.string.key_maxPointerSize), input.toString()) }
+                        this@apply.summary = input
+                    }
+                }
+                false
+            }
+        }
+
+        findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
+            summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                MaterialDialog(activity!!).show {
+                    title(res = R.string.key_maxPaddingSize)
+                    input(
+                        hint = "Enter Max Padding Size",
                         prefill = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25"),
                         allowEmpty = false, maxLength = 3,
-                        inputType = InputType.TYPE_CLASS_NUMBER) { _, input ->
-                    preferences!!.edit(true) { putString(getString(R.string.key_maxPaddingSize), input.toString()) }
-                    maxPointerSize.summary = input
-                }.show()
+                        inputType = InputType.TYPE_CLASS_NUMBER
+                    ) { _, input ->
+                        preferences!!.edit(true) { putString(getString(R.string.key_maxPaddingSize), input.toString()) }
+                        this@apply.summary = input
+                    }.show()
+                }
+                false
             }
-            false
         }
 
-        showTouches = findPreference("show_touches")!!
-        showTouches.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            if (newValue == true) {
-                setShowTouches(1)
-                activity!!.container.snackbar("Touches Enabled")
-            } else {
-                setShowTouches(0)
-                activity!!.container.snackbar("Touches Disabled")
+        findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!
+            .onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            val i = Intent().apply {
+                action = ACTION_OPEN_TEL
+                putExtra("com.afterroot.toucherlegacy.EXTRA_TOUCH_VAL", if (newValue == true) 1 else 0)
             }
-            return@OnPreferenceChangeListener true
+            if (i.resolveActivity(activity!!.packageManager) != null) {
+                startActivityForResult(i, RC_OPEN_TEL)
+            } else {
+                Toast.makeText(activity!!, "Please install Extension First", Toast.LENGTH_SHORT).show()
+                installExtensionDialog().show()
+            }
+            true
         }
 
         findPreference<Preference>("pref_version")?.apply {
@@ -112,38 +147,108 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun installExtensionDialog(): AlertDialog {
+        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
+            .setMessage(getString(R.string.msg_install_ext_dialog))
+            .setCancelable(false)
+            .setNegativeButton(getString(R.string.text_button_cancel)) { _, _ ->
+                activity!!.finish()
+            }
+            .setPositiveButton(getString(R.string.text_button_install)) { _, _ ->
+                when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
+                    true -> {
+                        val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
+                        val tmpFile = File(context!!.cacheDir, "app.apk")
+                        activity!!.container.longSnackbar(getString(R.string.msg_downloading_ext))
+                        reference.getFile(tmpFile).addOnSuccessListener {
+                            activity!!.container.snackbar(getString(R.string.msg_ext_downloaded))
+                            Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                val uri = FileProvider.getUriForFile(
+                                    context!!.applicationContext,
+                                    BuildConfig.APPLICATION_ID + ".provider", tmpFile
+                                )
+                                val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                                    .setDataAndType(uri, "application/vnd.android.package-archive")
+                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                startActivity(installIntent)
+                            } else {
+                                val installIntent = Intent(Intent.ACTION_VIEW)
+                                    .setDataAndType(
+                                        Uri.fromFile(tmpFile),
+                                        "application/vnd.android.package-archive"
+                                    )
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                startActivity(installIntent)
+                            }
+
+                        }
+                    }
+                    false -> {
+                        activity!!.browse("https://m8rg7.app.goo.gl/touchel")
+                    }
+                }
+            }.setNeutralButton("Learn More") { _, _ ->
+                activity!!.browse("https://pointerreplacer.page.link/ext_learn_more")
+            }.create()
+        return dialog as AlertDialog
+    }
+
+
     override fun onResume() {
         super.onResume()
 
-        val showTouchesCurr = Settings.System.getInt(activity!!.contentResolver, "show_touches") == 1
-        preferences!!.edit(true) { putBoolean("show_touches", showTouchesCurr) }
-        showTouches.isChecked = showTouchesCurr
-    }
-
-    private fun setShowTouches(touches: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(activity)) {
-                try {
-                    Settings.System.putInt(activity!!.contentResolver, "show_touches", touches)
-                } catch (e: Exception) {
-                    Log.e(_tag, e.toString())
-                    Crashlytics.logException(e)
-                    Toast.makeText(activity, "Opps! Some Error occurred.", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(activity, "Please grant app to write Secure Settings permission", Toast.LENGTH_SHORT).show()
+        if (!activity!!.isAppInstalled("com.afterroot.toucherlegacy")) {
+            installExtensionDialog().show()
+        }
+        try {
+            val showTouchesCurr =
+                Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches)) == 1
+            preferences!!.edit(true) {
+                putBoolean(getString(R.string.key_show_touches), showTouchesCurr)
             }
-        } else {
-            try {
-                Settings.System.putInt(activity!!.contentResolver, "show_touches", touches)
-            } catch (e: Exception) {
-                Log.e(_tag, e.toString())
-                Crashlytics.logException(e)
-                Toast.makeText(activity, "Opps! Some Error occurred.", Toast.LENGTH_SHORT).show()
-            }
+            findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = showTouchesCurr
+        } catch (e: Settings.SettingNotFoundException) {
+            activity!!.container.snackbar(getString(R.string.msg_error))
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        dialog?.dismiss()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        try {
+            if (requestCode == RC_OPEN_TEL) {
+                super.onActivityResult(requestCode, resultCode, data)
+                when (resultCode) {
+                    1 -> { //Result OK
+                        activity!!.container.snackbar("Done")
+                        /* if (interstitialAd.isLoaded) {
+                             interstitialAd.show()
+                         }*/
+                    }
+                    2 -> { //Write Setting Permission not Granted
+                        activity!!.container.snackbar(getString(R.string.msg_secure_settings_permission))
+                            .setAction("GRANT") {
+                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                                    intent.data = Uri.parse("package:com.afterroot.toucherlegacy")
+                                    startActivity(intent)
+                                }
+
+                            }
+                    }
+                    3 -> activity!!.container.snackbar(getString(R.string.msg_error)) //Other error
+                }
+            } else {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     private fun showSingleChoice() {
         val selectedIndex = preferences!!.getInt("selectedIndex", 1)
@@ -154,17 +259,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     putInt("selectedIndex", index)
                     putBoolean(getString(R.string.key_useMDCC), index != 0)
                 }
-                updateCCSummary()
+                updateCCSummary(findPreference(getString(R.string.key_useMDCC))!!)
             }
             positiveButton(R.string.changelog_ok_button)
         }
     }
 
-    private fun updateCCSummary() {
-        if (preferences!!.getBoolean(getString(R.string.key_useMDCC), true)) {
-            mChooseColorPicker.summary = "Material Color Picker"
+    private fun updateCCSummary(preference: Preference) {
+        preference.summary = if (preferences!!.getBoolean(getString(R.string.key_useMDCC), true)) {
+            "Material Color Picker"
         } else {
-            mChooseColorPicker.summary = "HSV Color Picker"
+            "HSV Color Picker"
         }
+    }
+
+    companion object {
+        const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
+        const val RC_OPEN_TEL = 245
     }
 }
