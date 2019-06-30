@@ -18,7 +18,9 @@ package com.afterroot.allusive.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.afterroot.allusive.R
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 
@@ -32,12 +34,14 @@ class SplashActivity : AppCompatActivity() {
             startActivityForResult(
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
+                    .setLogo(R.drawable.ic_launch_screen)
+                    .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
                     .setAvailableProviders(
                         listOf(
                             AuthUI.IdpConfig.GoogleBuilder().build(),
                             AuthUI.IdpConfig.PhoneBuilder().build()
                         )
-                    ).build(), 112
+                    ).build(), RC_LOGIN
             )
         } else {
             launchDashboard()
@@ -45,9 +49,11 @@ class SplashActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 112) {
+        if (requestCode == RC_LOGIN) {
             if (resultCode == Activity.RESULT_OK) {
                 launchDashboard()
+            } else {
+                Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
@@ -57,5 +63,9 @@ class SplashActivity : AppCompatActivity() {
     private fun launchDashboard() {
         startActivity(Intent(this, DashboardActivity::class.java))
         finish()
+    }
+
+    companion object {
+        const val RC_LOGIN = 42
     }
 }

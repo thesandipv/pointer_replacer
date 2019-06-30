@@ -37,7 +37,7 @@ class PointersRepoFragment : Fragment() {
 
         activity!!.fab_apply.apply {
             setOnClickListener {
-                activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.new_post_dest)
+                activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
             }
             icon = context!!.getDrawableExt(R.drawable.ic_add)
         }

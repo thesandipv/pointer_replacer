@@ -41,6 +41,7 @@ import com.afterroot.allusive.utils.isAppInstalled
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
+import de.psdev.licensesdialog.LicensesDialog
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.longSnackbar
@@ -81,7 +82,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
 
-        findPreference<Preference>(getString(R.string.key_useMDCC))!!.apply {
+        findPreference<Preference>(getString(R.string.key_use_material_cc))!!.apply {
             updateCCSummary(this)
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 showSingleChoice()
@@ -145,16 +146,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("pref_version")?.apply {
             summary = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
         }
+
+        findPreference<Preference>("licenses")?.apply {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                LicensesDialog.Builder(context!!).setNotices(R.raw.notices).build().show()
+                return@OnPreferenceClickListener true
+            }
+        }
     }
 
     private fun installExtensionDialog(): AlertDialog {
         dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
-            .setNegativeButton(getString(R.string.text_button_cancel)) { _, _ ->
+            .setNegativeButton(getString(R.string.dialog_button_cancel)) { _, _ ->
                 activity!!.finish()
             }
-            .setPositiveButton(getString(R.string.text_button_install)) { _, _ ->
+            .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
                 when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
                     true -> {
                         val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
@@ -257,16 +265,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
             listItemsSingleChoice(res = R.array.CCItems, initialSelection = selectedIndex) { _, index, _ ->
                 preferences!!.edit(true) {
                     putInt("selectedIndex", index)
-                    putBoolean(getString(R.string.key_useMDCC), index != 0)
+                    putBoolean(getString(R.string.key_use_material_cc), index != 0)
                 }
-                updateCCSummary(findPreference(getString(R.string.key_useMDCC))!!)
+                updateCCSummary(findPreference(getString(R.string.key_use_material_cc))!!)
             }
             positiveButton(R.string.changelog_ok_button)
         }
     }
 
     private fun updateCCSummary(preference: Preference) {
-        preference.summary = if (preferences!!.getBoolean(getString(R.string.key_useMDCC), true)) {
+        preference.summary =
+            if (preferences!!.getBoolean(getString(R.string.key_use_material_cc), true)) {
             "Material Color Picker"
         } else {
             "HSV Color Picker"

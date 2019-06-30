@@ -16,61 +16,61 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@+id/home_dest">
+    app:startDestination="@+id/mainFragment">
 
     <fragment
-        android:id="@+id/repo_dest"
+        android:id="@+id/repoFragment"
         android:name="com.afterroot.allusive.fragment.PointersRepoFragment"
         android:label="Pointer Repository"
         tools:layout="@layout/fragment_pointer_repo">
         <action
             android:id="@+id/action_repo_dest_to_settings_dest"
-            app:destination="@id/settings_dest"
+            app:destination="@id/settingsFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
-            app:popUpTo="@+id/home_dest" />
+            app:popUpTo="@+id/mainFragment" />
         <action
             android:id="@+id/action_repo_dest_to_newPointerPost"
-            app:destination="@id/new_post_dest"
+            app:destination="@id/newPostFragment"
             app:enterAnim="@anim/fui_slide_in_right"
             app:exitAnim="@anim/fui_slide_out_left"
             app:popEnterAnim="@anim/fui_slide_in_right"
             app:popExitAnim="@anim/fui_slide_out_left"
-            app:popUpTo="@+id/repo_dest" />
+            app:popUpTo="@+id/repoFragment" />
     </fragment>
     <fragment
-        android:id="@+id/home_dest"
+        android:id="@+id/mainFragment"
         android:name="com.afterroot.allusive.fragment.MainFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
-            android:id="@+id/action_home_dest_to_repo_dest"
-            app:destination="@id/repo_dest"
+            android:id="@+id/toRepo"
+            app:destination="@id/repoFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_home_dest_to_editProfileFragment2"
-            app:destination="@id/edit_profile_dest"
+            android:id="@+id/toEditProfile"
+            app:destination="@id/editProfileFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
-        android:id="@+id/settings_dest"
+        android:id="@+id/settingsFragment"
         android:name="com.afterroot.allusive.fragment.SettingsFragment"
         android:label="Settings" />
     <fragment
-        android:id="@+id/edit_profile_dest"
+        android:id="@+id/editProfileFragment"
         android:name="com.afterroot.allusive.fragment.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
-        android:id="@+id/new_post_dest"
+        android:id="@+id/newPostFragment"
         android:name="com.afterroot.allusive.fragment.NewPointerPost"
         android:label="New Pointer"
         tools:layout="@layout/fragment_new_pointer_post" />

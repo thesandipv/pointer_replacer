@@ -16,7 +16,6 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -25,7 +24,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -38,6 +36,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.Database
+import com.afterroot.allusive.ui.SplashActivity.Companion.RC_LOGIN
 import com.afterroot.allusive.utils.*
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.MobileAds
@@ -163,23 +162,6 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            RC_LOGIN -> {
-                when (resultCode) {
-                    Activity.RESULT_OK -> {
-                        Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show()
-                        initialize()
-                    }
-                    else -> {
-                        Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-    }
-
     private fun checkPermissions() {
         Log.d(_tag, "checkPermissions: Checking Permissions..")
         val permissionChecker = PermissionChecker(this)
@@ -241,25 +223,26 @@ class DashboardActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             fab_apply.hide()
             when (destination.id) {
-                R.id.home_dest -> {
+                R.id.mainFragment -> {
                     fab_apply.apply {
                         show()
                         text = getString(R.string.text_action_apply)
                     }
                 }
-                R.id.repo_dest -> {
+                R.id.repoFragment -> {
                     fab_apply.apply {
                         show()
                         text = "POST"
                     }
                 }
-                R.id.settings_dest -> {
+                R.id.settingsFragment -> {
                 }
             }
 
         }
 
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.home_dest, R.id.repo_dest, R.id.settings_dest))
+        appBarConfiguration =
+            AppBarConfiguration(setOf(R.id.mainFragment, R.id.repoFragment, R.id.settingsFragment))
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navigation.setupWithNavController(navController)
@@ -290,6 +273,5 @@ class DashboardActivity : AppCompatActivity() {
 
     companion object {
         const val RC_PERMISSION = 256
-        const val RC_LOGIN = 42
     }
 }

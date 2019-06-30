@@ -34,7 +34,7 @@
     </PreferenceCategory>
     <PreferenceCategory app:title="Color Picker">
         <Preference
-            app:key="@string/key_useMDCC"
+            app:key="@string/key_use_material_cc"
             app:title="Change Color Picker" />
     </PreferenceCategory>
     <PreferenceCategory app:title="About">
@@ -44,18 +44,15 @@
             app:summary="@string/version"
             app:title="@string/app_name" />
         <Preference
+            android:key="licenses"
+            android:summary="Click to view licenses of third party libraries"
+            android:title="Licenses" />
+        <Preference
             app:summary="tap to visit official XDA thread"
-            app:title="@string/TITLE_XDA_THREAD">
+            app:title="@string/title_xda_thread">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_xda_thread" />
-        </Preference>
-        <Preference
-            app:summary="tap to visit official Google+ Community"
-            app:title="@string/TITLE_VISIT_G_PLUS">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/url_g_plus" />
         </Preference>
         <Preference
             app:summary="tap to visit GitHub Repository"

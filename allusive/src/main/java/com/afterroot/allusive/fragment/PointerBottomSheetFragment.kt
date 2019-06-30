@@ -90,7 +90,8 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         try {
-            val pointersFolder = File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
+            val pointersFolder =
+                File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
             if (!pointersFolder.exists()) pointersFolder.mkdirs()
             val pointerFiles = pointersFolder.listFiles()
             Log.d("_tag", "Total Pointers: ${pointerFiles.size}")
@@ -100,28 +101,30 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                 contentView.text_bottomsheet_header.text = mTitle
                 pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
 
-                contentView.grid_pointers.setOnItemLongClickListener { _, _, i, _ ->
-                    val file = File(pointerAdapter.getPath(i))
-                    MaterialDialog(activity!!).show {
-                        title(text = getString(R.string.text_delete) + file.name)
-                        message(res = R.string.text_delete_confirm)
-                        positiveButton(res = R.string.text_yes) {
-                            if (file.delete()) {
-                                activity!!.container.snackbar("Pointer deleted.")
-                            } else {
-                                activity!!.container.snackbar("Error deleting pointer.")
+                contentView.grid_pointers.onItemLongClickListener =
+                    AdapterView.OnItemLongClickListener { _, _, i, _ ->
+                        val file = File(pointerAdapter.getPath(i))
+                        MaterialDialog(activity!!).show {
+                            title(text = getString(R.string.text_delete) + file.name)
+                            message(res = R.string.text_delete_confirm)
+                            positiveButton(res = R.string.text_yes) {
+                                if (file.delete()) {
+                                    activity!!.container.snackbar("Pointer deleted.")
+                                } else {
+                                    activity!!.container.snackbar("Error deleting pointer.")
+                                }
                             }
+                            negativeButton(res = R.string.text_no)
                         }
-                        negativeButton(res = R.string.text_no)
+                        false
                     }
-                    false
-                }
             } else {
                 contentView.apply {
                     info_no_pointer_installed.visibility = View.VISIBLE
                     bs_button_install_pointers.setOnClickListener {
                         dialog.dismiss()
-                        activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.repo_dest)
+                        activity!!.findNavController(R.id.fragment_repo_nav)
+                            .navigate(R.id.repoFragment)
                     }
                 }
             }
