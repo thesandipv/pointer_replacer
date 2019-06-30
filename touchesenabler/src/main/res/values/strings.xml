@@ -14,42 +14,42 @@
   -->
 
 <resources>
-    <string name="app_name">ShowTouchesEnabler</string>
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~3997794533</string>
+    <string name="app_name">ShowTouchesEnabler</string>
     <string name="banner_ad_1_id" translatable="false">ca-app-pub-6628325093439880/1174946806</string>
     <string name="interstitial_ad_2_id" translatable="false">ca-app-pub-6628325093439880/5308407476</string>
     <string name="key_grant_permission" translatable="false">pref_grant_permission</string>
-    <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
-    <string name="key_show_touches" translatable="false">show_touches</string>
-    <string name="key_watch_ads" translatable="false">pref_watch_ads</string>
     <string name="key_other_apps" translatable="false">pref_other_apps</string>
+    <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
     <string name="key_rate_on_g_play" translatable="false">key_rate_on_gplay</string>
+    <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_version">pref_version</string>
-    <string name="msg_touch_enabled">Touches Enabled</string>
-    <string name="msg_touch_disabled">Touches Disabled</string>
-    <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
-    <string name="msg_error">Some Error occurred.</string>
-    <string name="msg_donation_thanks">Thank you for your contribution</string>
-    <string name="msg_info_iab_na">In-app billing service is unavailable</string>
-    <string name="msg_donation_done">Thanks for your support</string>
+    <string name="key_watch_ads" translatable="false">pref_watch_ads</string>
+    <string name="msg_ad_loaded">Ad Loaded</string>
+    <string name="msg_ad_loading">Ad Loading</string>
+    <string name="msg_ad_not_loaded">Ad Not Loaded yet</string>
     <string name="msg_billing_error">Billing Error</string>
+    <string name="msg_donation_done">Thanks for your support</string>
+    <string name="msg_donation_thanks">Thank you for your contribution</string>
+    <string name="msg_downloading_ext">Downloading Extension</string>
+    <string name="msg_error">Some Error occurred.</string>
+    <string name="msg_ext_downloaded">Extension Downloaded</string>
+    <string name="msg_info_iab_na">In-app billing service is unavailable</string>
+    <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
+    <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
     <string name="msg_setting_not_allowed">Write not allowed</string>
-    <string name="pref_title_watch_ad">Watch Ads to Support Development</string>
-    <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
+    <string name="msg_touch_disabled">Touches Disabled</string>
+    <string name="msg_touch_enabled">Touches Enabled</string>
+    <string name="msg_update_available">Update Available. Click to Update</string>
     <string name="pref_key_donate_dev">Donate Developer</string>
     <string name="pref_summary_donation">to support development</string>
     <string name="pref_summary_grant_ss">Click to open system settings to grant write settings permission.</string>
+    <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
     <string name="pref_title_grant_ss">Grant Permission</string>
-    <string name="url_play_store_developer" translatable="false">https://play.google.com/store/apps/dev?id=5302118761742285445</string>
-    <string name="url_play_store_app_page" translatable="false">https://play.google.com/store/apps/details?id=com.afterroot.touchenabler</string>
-    <string name="msg_update_available">Update Available. Click to Update</string>
-    <string name="title_install_ext_dialog">Install Extension</string>
-    <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
+    <string name="pref_title_watch_ad">Watch Ads to Support Development</string>
     <string name="text_button_cancel">Cancel</string>
     <string name="text_button_install">Install</string>
-    <string name="msg_downloading_ext">Downloading Extension</string>
-    <string name="msg_ext_downloaded">Extension Downloaded</string>
-    <string name="msg_ad_not_loaded">Ad Not Loaded yet</string>
-    <string name="msg_ad_loading">Ad Loading</string>
-    <string name="msg_ad_loaded">Ad Loaded</string>
+    <string name="title_install_ext_dialog">Install Extension</string>
+    <string name="url_play_store_app_page" translatable="false">https://play.google.com/store/apps/details?id=com.afterroot.touchenabler</string>
+    <string name="url_play_store_developer" translatable="false">https://play.google.com/store/apps/dev?id=5302118761742285445</string>
 </resources>
