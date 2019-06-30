@@ -16,6 +16,7 @@
 package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -24,12 +25,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.*
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
+import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.visible
@@ -39,7 +43,6 @@ import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import org.jetbrains.anko.design.longSnackbar
-import org.jetbrains.anko.design.snackbar
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -196,14 +199,36 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.profile_logout -> {
-                AuthUI.getInstance().signOut(context!!).addOnCompleteListener {
-                    activity!!.container.snackbar("Signed Out")
-                }
+                signOutDialog().show()
             }
             else -> {
-                return item.onNavDestinationSelected(activity!!.findNavController(R.id.fragment_repo_nav)) || super.onOptionsItemSelected(item)
+                return item.onNavDestinationSelected(
+                    activity!!.findNavController(R.id.fragment_repo_nav)
+                ) || super.onOptionsItemSelected(
+                    item
+                )
             }
         }
         return true
+    }
+
+    private fun signOutDialog(): AlertDialog.Builder {
+        return AlertDialog.Builder(context!!)
+            .setTitle(getString(R.string.dialog_title_sign_out))
+            .setMessage(getString(R.string.dialog_msg_sign_out))
+            .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
+                AuthUI.getInstance().signOut(context!!).addOnSuccessListener {
+                    Toast.makeText(
+                        context!!,
+                        getString(R.string.dialog_sign_out_result_success),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    startActivity(Intent(context!!, SplashActivity::class.java))
+                }
+            }
+            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+
+            }.setCancelable(true)
     }
 }

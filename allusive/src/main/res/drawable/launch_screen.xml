@@ -33,6 +33,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ar_logo"
-            android:tint="@color/color_on_secondary" />
+            android:tint="@color/color_on_background" />
     </item>
 </layer-list>

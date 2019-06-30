@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
             app:title="@string/app_name" />
 
@@ -69,12 +69,12 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
+        style="@style/Widget.MaterialComponents.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
-        app:itemIconTint="@drawable/selector_bottom_navigation"
-        app:itemTextColor="@drawable/selector_bottom_navigation"
+        app:labelVisibilityMode="selected"
         app:layout_behavior=".ui.BottomNavigationBehavior"
         app:menu="@menu/navigation" />
 
