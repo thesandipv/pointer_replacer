@@ -61,7 +61,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun launchDashboard() {
-        startActivity(Intent(this, DashboardActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 
