@@ -48,11 +48,11 @@ import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 
-class DashboardActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var sharedPreferences: SharedPreferences
-    private val _tag = "DashboardActivity"
+    private val _tag = this.javaClass.simpleName
     private val manifestPermissions =
         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
     private val showTouches = "show_touches"
@@ -97,7 +97,7 @@ class DashboardActivity : AppCompatActivity() {
                 putString("Device_Name", Build.DEVICE)
                 putString("Manufacturer", Build.MANUFACTURER)
                 putString("AndroidVersion", Build.VERSION.RELEASE)
-                FirebaseAnalytics.getInstance(this@DashboardActivity).logEvent("DeviceInfo", this)
+                FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo", this)
             }
             sharedPreferences.edit(true) { putBoolean("first_install", false) }
         }
@@ -149,7 +149,11 @@ class DashboardActivity : AppCompatActivity() {
                             when {
                                 setUserTask.isSuccessful -> {
                                 }
-                                else -> Log.e(_tag, "Can't create firebaseUser", setUserTask.exception)
+                                else -> Log.e(
+                                    _tag,
+                                    "Can't create firebaseUser",
+                                    setUserTask.exception
+                                )
                             }
                         }
                     }
@@ -198,14 +202,22 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         when (requestCode) {
             RC_PERMISSION -> {
                 val isPermissionGranted =
                     grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
                     Log.d(_tag, "onRequestPermissionsResult: Permissions not Granted..")
-                    Snackbar.make(this.container, "Please Grant Permissions", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(
+                        this.container,
+                        "Please Grant Permissions",
+                        Snackbar.LENGTH_INDEFINITE
+                    )
                         .setAction("GRANT") {
                             checkPermissions()
                         }
@@ -217,8 +229,9 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun loadFragments() {
-        val host: NavHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
-            ?: return
+        val host: NavHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
+                ?: return
         val navController = host.navController
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             fab_apply.hide()
@@ -236,6 +249,12 @@ class DashboardActivity : AppCompatActivity() {
                     }
                 }
                 R.id.settingsFragment -> {
+                }
+                R.id.editProfileFragment -> {
+                    fab_apply.apply {
+                        show()
+                        text = "Save"
+                    }
                 }
             }
 

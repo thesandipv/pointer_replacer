@@ -23,7 +23,7 @@ import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.afterroot.allusive.R
-import com.afterroot.allusive.ui.DashboardActivity
+import com.afterroot.allusive.ui.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -51,7 +51,7 @@ class FireMessagingService : FirebaseMessagingService() {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.notification!!.body!!)
         }
 
-        val intent = Intent(this, DashboardActivity::class.java)
+        val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
