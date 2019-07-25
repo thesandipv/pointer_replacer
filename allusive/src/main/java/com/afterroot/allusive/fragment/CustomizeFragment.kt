@@ -27,7 +27,7 @@ import android.widget.SeekBar
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.Helper
+import com.afterroot.allusive.utils.getDpi
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.visible
 import kotlinx.android.synthetic.main.fragment_customize_pointer.*
@@ -55,7 +55,7 @@ class CustomizeFragment : Fragment() {
     }
 
     private val minSize: Int
-        get() = if (Helper.getDpi(context!!) <= 240) {
+        get() = if (context!!.getDpi() <= 240) {
             49
         } else {
             66

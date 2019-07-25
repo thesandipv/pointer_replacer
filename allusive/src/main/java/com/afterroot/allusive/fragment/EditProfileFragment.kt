@@ -21,9 +21,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.DatabaseFields
+import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
-import com.afterroot.allusive.utils.User
+import com.afterroot.allusive.utils.getDrawableExt
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,37 +40,39 @@ class EditProfileFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_edit_profile, container, false)
     }
 
-    var user: FirebaseUser? = null
+    lateinit var user: FirebaseUser
     private val db = FirebaseFirestore.getInstance()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         if (FirebaseUtils.isUserSignedIn) {
-            user = FirebaseUtils.auth!!.currentUser
+            user = FirebaseUtils.auth!!.currentUser!!
             with(view) {
-                input_profile_name.setText(user!!.displayName)
-                input_email.setText(user!!.email)
+                input_profile_name.setText(user.displayName)
+                input_email.setText(user.email)
                 input_email.isEnabled = false
-                button_save_profile.setOnClickListener { it ->
-                    if (user!!.displayName != input_profile_name.text.toString()) {
-                        val request = UserProfileChangeRequest.Builder()
-                                .setDisplayName(input_profile_name.text.toString())
+                activity!!.fab_apply.apply {
+                    setOnClickListener {
+                        val newName = this@with.input_profile_name.text.toString()
+                        if (user.displayName != newName) {
+                            val request = UserProfileChangeRequest.Builder()
+                                .setDisplayName(newName)
                                 .build()
-                        user!!.updateProfile(request).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                db.collection(DatabaseFields.USERS)
-                                        .document(FirebaseUtils.auth!!.currentUser!!.uid)
-                                        .set(User(input_profile_name.text.toString(),
-                                                user!!.email!!,
-                                                user!!.uid))
-                                        .addOnSuccessListener {
-                                            activity!!.container.snackbar("Profile Updated")
-                                        }
+                            user.updateProfile(request).addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    activity!!.container.snackbar("Profile Updated")
+                                    db.collection(DatabaseFields.USERS)
+                                        .document(user.uid)
+                                        .set(
+                                            User(newName, user.email, user.uid)
+                                        )
+                                }
                             }
-                        }
-                    } else activity!!.container.snackbar("No Changes to Save.")
-                    //listener!!.onSaveButtonClicked()
+                        } else activity!!.container.snackbar("No Changes to Save.")
+                        //listener!!.onSaveButtonClicked()
+                    }
+                    icon = context!!.getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
                 }
             }
         } else {
