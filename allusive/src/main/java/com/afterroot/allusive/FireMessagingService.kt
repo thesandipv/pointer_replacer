@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.fcm
+package com.afterroot.allusive
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -22,7 +22,6 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.afterroot.allusive.R
 import com.afterroot.allusive.ui.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
