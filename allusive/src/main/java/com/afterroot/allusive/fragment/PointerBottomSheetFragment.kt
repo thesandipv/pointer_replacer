@@ -27,7 +27,7 @@ import androidx.navigation.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
-import com.afterroot.allusive.utils.Helper
+import com.afterroot.allusive.utils.getDpi
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -75,9 +75,9 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
 
         val pointerAdapter = PointerAdapter(activity!!)
 
-        if (Helper.getDpi(context!!) <= 240) {
+        if (context!!.getDpi() <= 240) {
             pointerAdapter.setLayoutParams(49)
-        } else if (Helper.getDpi(context!!) >= 240) {
+        } else if (context!!.getDpi() >= 240) {
             pointerAdapter.setLayoutParams(66)
         }
 
