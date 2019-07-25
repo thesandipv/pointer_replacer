@@ -36,8 +36,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.Database
+import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.model.User
 import com.afterroot.allusive.ui.SplashActivity.Companion.RC_LOGIN
-import com.afterroot.allusive.utils.*
+import com.afterroot.allusive.utils.PermissionChecker
+import com.afterroot.allusive.utils.getPrefs
+import com.afterroot.allusive.utils.isNetworkAvailable
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
