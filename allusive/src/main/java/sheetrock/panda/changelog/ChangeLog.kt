@@ -142,7 +142,7 @@ private constructor(private val context: Context, sp: SharedPreferences) {
                 .setCancelable(false)
                 // OK button
                 .setPositiveButton(context.resources.getString(R.string.changelog_ok_button)
-                ) { dialog, which -> updateVersionInPreferences() }
+                ) { _, _ -> updateVersionInPreferences() }
 
         if (!full) {
             // "more ..." button
