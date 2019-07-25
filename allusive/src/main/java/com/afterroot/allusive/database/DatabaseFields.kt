@@ -13,30 +13,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.utils
-
-import java.io.Serializable
-import java.util.*
-
-//[START Data Classes for FireStore]
-
-//Collection 'users'
-data class User(var name: String?,
-                var email: String?,
-                var uid: String) : Serializable {
-    constructor() : this("", "", "")
-}
-
-//Collection 'pointers'
-data class Pointer(var name: String,
-                   var filename: String,
-                   var description: String,
-                   var uploadedBy: String,
-                   var time: Date?) : Serializable {
-    constructor() : this("", "", "", "", null)
-}
-
-//[END]
+package com.afterroot.allusive.database
 
 object DatabaseFields {
     val USERS = "users"
