@@ -16,11 +16,10 @@
 package com.afterroot.allusive.database
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 object Database {
-
-    fun getDb(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
+    fun getInstance() = FirebaseFirestore.getInstance().apply {
+        firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
     }
-
 }
