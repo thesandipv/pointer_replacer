@@ -16,9 +16,16 @@
 package com.afterroot.allusive.database
 
 object DatabaseFields {
+    //table 'users'
     val USERS = "users"
-
     val FIELD_NAME = "name"
     val FIELD_EMAIL = "email"
     val FIELD_UID = "uid"
+
+    //table 'pointers'
+    val POINTERS = "pointers"
+    val FIELD_DESC = "description"
+    val FIELD_FILENAME = "filename"
+    val FIELD_TIME = "time"
+    val FIELD_UPLOAD_BY = "uploadedBy"
 }

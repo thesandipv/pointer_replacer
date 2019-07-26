@@ -15,36 +15,12 @@
 
 package com.afterroot.allusive.fragment
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
-import com.afterroot.allusive.adapter.PointerAdapter
-import com.afterroot.allusive.utils.Helper
-import kotlinx.android.synthetic.main.fragment_install_pointer.*
-import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
-import kotlinx.android.synthetic.main.manage_pointer_list_item.view.*
-import java.io.*
-import java.util.*
 
 class InstallPointerFragment : Fragment() {
 
@@ -55,6 +31,8 @@ class InstallPointerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
     }
+}
+/*
 
     @SuppressLint("CommitPrefEdits")
     override fun onStart() {
@@ -63,9 +41,9 @@ class InstallPointerFragment : Fragment() {
         val extSdDir = Environment.getExternalStorageDirectory().toString()
         mTargetPath = extSdDir + pointersFolder
         mTag = "ManagePointers"
-        mUtils = Helper
 
-        mInstalledPointerPrefs = activity!!.getSharedPreferences(activity!!.packageName + ".installed_pointers", Context.MODE_PRIVATE)
+        mInstalledPointerPrefs =
+            activity!!.getSharedPreferences(activity!!.packageName + ".installed_pointers", Context.MODE_PRIVATE)
         mInstalledPointerEditor = mInstalledPointerPrefs!!.edit()
 
         val pointerPackList: RecyclerView = activity!!.pointerPackList
@@ -91,12 +69,18 @@ class InstallPointerFragment : Fragment() {
     }
 
     class PointerListAdapter(context: Activity, list: ArrayList<String>) : RecyclerView.Adapter<PointerPackViewHolder>() {
-        private val TAG = "PointerListAdapter"
-        val pointerList = list
+        private val _tag = "PointerListAdapter"
+        private val pointerList = list
         private val mContext = context
         private var installedState: AppCompatTextView? = null
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PointerPackViewHolder {
-            return PointerPackViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.manage_pointer_list_item, parent, false))
+            return PointerPackViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.repo_pointer_item,
+                    parent,
+                    false
+                )
+            )
         }
 
         override fun getItemCount(): Int {
@@ -114,7 +98,7 @@ class InstallPointerFragment : Fragment() {
             try {
                 files = am.list(DIR_NAME_POINTERS)
             } catch (e: IOException) {
-                Log.e(TAG, "copySpecificPointer: ${e.message}")
+                Log.e(_tag, "copySpecificPointer: ${e.message}")
             }
 
             assert(files != null)
@@ -137,7 +121,7 @@ class InstallPointerFragment : Fragment() {
                         out.close()
                         notifyDataSetChanged()
                     } catch (e: Exception) {
-                        Log.e(TAG, "copySpecificPointer: ${e.message}")
+                        Log.e(_tag, "copySpecificPointer: ${e.message}")
                     }
 
                 }
@@ -182,7 +166,7 @@ class InstallPointerFragment : Fragment() {
             try {
                 files = am.list(DIR_NAME_POINTERS)
             } catch (e: IOException) {
-                Log.e(TAG, "showSpecificPointerDialog: ${e.message}")
+                Log.e(_tag, "showSpecificPointerDialog: ${e.message}")
             }
 
             val pointerAdapter = PointerAdapter(mContext)
@@ -207,13 +191,13 @@ class InstallPointerFragment : Fragment() {
                         out.close()
                         notifyDataSetChanged()
                     } catch (e: Exception) {
-                        Log.e(TAG, "showSpecificPointerDialog: ${e.message}")
+                        Log.e(_tag, "showSpecificPointerDialog: ${e.message}")
                     }
 
                 }
             }
             arrayList.filter { it.name.startsWith(pointerPackName) }
-                    .forEach { PointerAdapter.itemList.add(it.path) }
+                .forEach { PointerAdapter.itemList.add(it.path) }
             val materialDialog = MaterialDialog(mContext).show {
                 title(text = dialogTitle)
                 customView(viewRes = R.layout.layout_grid_bottomsheet)
@@ -228,9 +212,11 @@ class InstallPointerFragment : Fragment() {
                     if (!targetFile.exists()) {
                         try {
                             copyFile(source, targetFile)
-                            Toast.makeText(mContext,
-                                    String.format("%s %s", source.name, mContext.getString(R.string.text_installed)),
-                                    Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                mContext,
+                                String.format("%s %s", source.name, mContext.getString(R.string.text_installed)),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
@@ -249,13 +235,20 @@ class InstallPointerFragment : Fragment() {
                 message(text = "Pokemon Pointers is not installed. Do you want to download it now?")
                 positiveButton(text = "Install") {
                     try {
-                        startActivity(mContext,
-                                Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
-                                null)
+                        startActivity(
+                            mContext,
+                            Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
+                            null
+                        )
                     } catch (exception: ActivityNotFoundException) {
-                        startActivity(mContext,
-                                Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$POKEMON_POINTERS_PACKAGE_NAME")),
-                                null)
+                        startActivity(
+                            mContext,
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=$POKEMON_POINTERS_PACKAGE_NAME")
+                            ),
+                            null
+                        )
                     }
                 }
                 negativeButton(text = "No")
@@ -265,9 +258,9 @@ class InstallPointerFragment : Fragment() {
 
     class PointerPackViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
         val buttonDelete = itemView!!.button_list_delete
-        val buttonInstall = itemView!!.button_list_install
+        val buttonInstall = itemView!!.action_pack
         val packName = itemView!!.item_pointer_pack_name
-        val packState = itemView!!.text_installed_state
+        val packState = itemView!!.item_pack_state
     }
 
     companion object {
@@ -306,4 +299,4 @@ class InstallPointerFragment : Fragment() {
         private var mUtils: Helper? = null
         private var mTag: String? = null
     }
-}
+}*/

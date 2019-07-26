@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.preference.PreferenceManager
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
@@ -109,3 +110,9 @@ fun openFile(context: Context, filename: String, uri: Uri) {
     intent.setDataAndType(uri, getMimeType(filename))
     context.startActivity(intent)
 }
+
+/**
+ * Extension Function for Inflating Layout to ViewGroup
+ */
+fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View =
+    LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)

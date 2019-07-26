@@ -63,6 +63,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Apply Pointer</string>
     <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
+    <string name="pref_title_source_code">Source Code</string>
+    <string name="pref_title_visit_ar">Visit AfterROOT</string>
+    <string name="pref_title_xda_thread">XDA Thread</string>
+    <string name="pref_title_xposed_repo">Module Info</string>
     <string name="prompt_button_enable">ENABLE</string>
     <string name="reboot">Reboot</string>
     <string name="reset_pointer_color">Reset Pointer Color</string>
@@ -83,7 +87,6 @@
     <string name="text_installed">Installed</string>
     <string name="text_max_padding_size">Max Padding Size</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
-    <string name="text_module_info">Module Info</string>
     <string name="text_no">No</string>
     <string name="text_not_installed">Not Installed</string>
     <string name="text_padding">Padding</string>
@@ -93,7 +96,6 @@
     <string name="text_selected_pointer">Selected</string>
     <string name="text_size">Size</string>
     <string name="text_soft_reboot">Soft Reboot</string>
-    <string name="text_source_code">Source Code</string>
     <string name="text_will_change_to">New Pointer</string>
     <string name="text_yes">Yes</string>
     <string name="title_activity_about">About</string>
@@ -103,8 +105,6 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_home">Home</string>
     <string name="title_install_ext_dialog">Install Extension</string>
-    <string name="title_visit_ar">Visit AfterROOT</string>
-    <string name="title_xda_thread">XDA Thread</string>
 
     <!-- urls -->
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
