@@ -15,7 +15,7 @@
 
 package com.afterroot.allusive.model
 
-interface iPointer {
+interface IPointer {
 
     fun getType(): Int
 

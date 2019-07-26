@@ -13,22 +13,9 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.model
+package com.afterroot.allusive.viewmodel
 
-import java.io.Serializable
-import java.util.*
-
-//Collection 'pointers'
-data class Pointer(
-    var name: String,
-    var filename: String,
-    var description: String,
-    var uploadedBy: String,
-    var time: Date?
-) : Serializable, IPointer {
-    override fun getType(): Int {
-        return IPointer.TYPE_POINTER
-    }
-
-    constructor() : this("", "", "", "", null)
+sealed class ViewModelState {
+    object Loading : ViewModelState()
+    data class Loaded<T>(val data: T) : ViewModelState()
 }

@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
             createdView.findNavController().navigate(R.id.edit_profile)
             return
         }*/
-            val userRef = Database.getDb().collection(DatabaseFields.USERS).document(curUser!!.uid)
+            val userRef = Database.getInstance().collection(DatabaseFields.USERS).document(curUser!!.uid)
             userRef.get().addOnCompleteListener { getUserTask ->
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {

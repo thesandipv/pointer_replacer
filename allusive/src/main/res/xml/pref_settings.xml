@@ -49,21 +49,21 @@
             android:title="Licenses" />
         <Preference
             app:summary="tap to visit official XDA thread"
-            app:title="@string/title_xda_thread">
+            app:title="@string/pref_title_xda_thread">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_xda_thread" />
         </Preference>
         <Preference
             app:summary="tap to visit GitHub Repository"
-            app:title="@string/text_source_code">
+            app:title="@string/pref_title_source_code">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_source_code" />
         </Preference>
         <Preference
             app:summary="tap to open Xposed Module Repo"
-            app:title="@string/text_module_info">
+            app:title="@string/pref_title_xposed_repo">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_prx" />
