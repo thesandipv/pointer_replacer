@@ -38,6 +38,10 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="enable_touches_prompt">Show touches disabled. Would you like to enable</string>
     <string name="help">Help</string>
+    <string name="helper_text_desc">Provide short info about pointer. You can also use hashtags</string>
+    <string name="helper_text_name">Provide name of pointer. Visible to all users.</string>
+    <string name="hint_desc">Description</string>
+    <string name="hint_name">Name</string>
     <string name="import_pointer">Import Pointer</string>
     <string name="install_manage_pointers">Install Pointers</string>
     <string name="key_app_info" translatable="false">key_app_info</string>
@@ -73,6 +77,10 @@
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
+    <string name="text_action_browse">Browse</string>
+    <string name="text_action_post">Post</string>
+    <string name="text_action_save">Save</string>
+    <string name="text_action_upload">Upload</string>
     <string name="text_alpha">Alpha</string>
     <string name="text_apply_pointer_confirm">Do you want to apply this pointer?</string>
     <string name="text_change_color">Change Pointer Color</string>
@@ -105,11 +113,14 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_home">Home</string>
     <string name="title_install_ext_dialog">Install Extension</string>
-
-    <!-- urls -->
-    <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
-    <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
+    <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
+    <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
+    <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="text_browse_pointer_image">Browse Pointer Image</string>
+    <string name="text_progress_uploading">Uploading</string>
+    <string name="text_progress_finising_up">Finishing Up</string>
+    <string name="text_progrss_init">Initializing</string>
+    <string name="msg_no_pointers_installed">No Pointers Installed</string>
 
 </resources>
