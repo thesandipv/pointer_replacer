@@ -13,13 +13,9 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.utils
+package com.afterroot.allusive.database
 
-interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?, docId: String)
-    fun onListItemLongClick(item: T?, docId: String)
-}
-
-interface OnSaveButtonClick {
-    fun onSaveButtonClicked()
+interface DeleteListener {
+    fun onDeleteSuccess()
+    fun onDeleteFailed()
 }

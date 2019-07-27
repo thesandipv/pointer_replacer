@@ -13,23 +13,11 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.model
+package com.afterroot.allusive.adapter.callback
 
-import com.google.firebase.firestore.ServerTimestamp
-import java.io.Serializable
-import java.util.*
+import android.view.View
 
-//Collection 'pointers'
-data class Pointer(
-    var name: String,
-    var filename: String,
-    var description: String,
-    var uploadedBy: String,
-    @ServerTimestamp var time: Date?
-) : Serializable, IPointer {
-    override fun getType(): Int {
-        return IPointer.TYPE_POINTER
-    }
-
-    constructor() : this("", "", "", "", null)
+interface ItemSelectedCallback {
+    fun onClick(position: Int, view: View? = null)
+    fun onLongClick(position: Int)
 }

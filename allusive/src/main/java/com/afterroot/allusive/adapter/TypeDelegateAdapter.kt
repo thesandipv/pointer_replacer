@@ -13,23 +13,13 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.model
+package com.afterroot.allusive.adapter
 
-import com.google.firebase.firestore.ServerTimestamp
-import java.io.Serializable
-import java.util.*
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.afterroot.allusive.model.IPointer
 
-//Collection 'pointers'
-data class Pointer(
-    var name: String,
-    var filename: String,
-    var description: String,
-    var uploadedBy: String,
-    @ServerTimestamp var time: Date?
-) : Serializable, IPointer {
-    override fun getType(): Int {
-        return IPointer.TYPE_POINTER
-    }
-
-    constructor() : this("", "", "", "", null)
+interface TypeDelegateAdapter {
+    fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder
+    fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: IPointer)
 }
