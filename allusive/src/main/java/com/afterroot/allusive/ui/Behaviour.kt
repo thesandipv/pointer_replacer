@@ -27,16 +27,16 @@ import java.lang.Math.min
 
 
 class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) :
-        CoordinatorLayout.Behavior<V>(context, attrs) {
+    CoordinatorLayout.Behavior<V>(context, attrs) {
 
     override fun onStartNestedScroll(
-            coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int
+        coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int
     ): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
     }
 
     override fun onNestedPreScroll(
-            coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int
+        coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
         child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
@@ -63,7 +63,8 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
     }
 }
 
-class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) : CoordinatorLayout.Behavior<View>(context, attrs) {
+class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
+    CoordinatorLayout.Behavior<View>(context, attrs) {
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
         return dependency is Snackbar.SnackbarLayout
