@@ -16,13 +16,10 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,22 +31,23 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
+import com.afterroot.allusive.Constants.RC_LOGIN
+import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.Database
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.model.User
-import com.afterroot.allusive.ui.SplashActivity.Companion.RC_LOGIN
+import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.isNetworkAvailable
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 
 class MainActivity : AppCompatActivity() {
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity() {
     private val _tag = this.javaClass.simpleName
     private val manifestPermissions =
         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
-    private val showTouches = "show_touches"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                 .setMessage("No Network Available")
                 .setTitle("No Network")
                 .setPositiveButton("RETRY") { _, _ -> onStart() }
-                .setNegativeButton("Cancel") { _, _ -> finish() }
+                .setNegativeButton("Cancel") { _, _ -> }
                 .setCancelable(false)
                 .show()
         } else initialize()
@@ -96,14 +93,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initialize() {
-        if (sharedPreferences.getBoolean("first_install", true)) {
+        if (sharedPreferences.getBoolean(PREF_KEY_FIRST_INSTALL, true)) {
             Bundle().apply {
                 putString("Device_Name", Build.DEVICE)
                 putString("Manufacturer", Build.MANUFACTURER)
                 putString("AndroidVersion", Build.VERSION.RELEASE)
                 FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo", this)
             }
-            sharedPreferences.edit(true) { putBoolean("first_install", false) }
+            sharedPreferences.edit(true) { putBoolean(PREF_KEY_FIRST_INSTALL, false) }
         }
 
         //Initialize Interstitial Ad
@@ -112,17 +109,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions()
         } else {
-            Log.d(_tag, "onStart: Loading fragments..")
             loadFragments()
-
-            if (Settings.System.getInt(contentResolver, showTouches) == 0) {
-                container.longSnackbar(
-                    getString(R.string.enable_touches_prompt),
-                    getString(R.string.prompt_button_enable)
-                ) {
-                    Settings.System.putInt(contentResolver, showTouches, 1)
-                }
-            }
         }
 
         //Add user in db if not available
@@ -131,33 +118,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun addUserInfoInDB() {
         try {
-            val auth = FirebaseAuth.getInstance()
-            val curUser = auth.currentUser
-            /*if (curUser?.displayName == null || curUser.email == null || curUser.phoneNumber == null) {
-            createdView.findNavController().navigate(R.id.edit_profile)
-            return
-        }*/
+            val curUser = FirebaseUtils.auth!!.currentUser
             val userRef = Database.getInstance().collection(DatabaseFields.USERS).document(curUser!!.uid)
             userRef.get().addOnCompleteListener { getUserTask ->
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
                         container.snackbar("User not available. Creating User..")
-                        val user = User(
-                            curUser.displayName!!,
-                            curUser.email!!,
-                            curUser.uid
-                        )
-                        Log.d(_tag, "addUserInfoInDB: $user")
+                        val user = User(curUser.displayName, curUser.email, curUser.uid)
                         //TODO add dialog to add phone number
                         userRef.set(user).addOnCompleteListener { setUserTask ->
                             when {
                                 setUserTask.isSuccessful -> {
                                 }
-                                else -> Log.e(
-                                    _tag,
-                                    "Can't create firebaseUser",
-                                    setUserTask.exception
-                                )
+                                else -> Log.e(_tag, "Can't create firebaseUser", setUserTask.exception)
                             }
                         }
                     }
@@ -171,60 +144,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        Log.d(_tag, "checkPermissions: Checking Permissions..")
         val permissionChecker = PermissionChecker(this)
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
-            Log.d(_tag, "checkPermissions: Requesting Permissions..")
             ActivityCompat.requestPermissions(this, manifestPermissions, RC_PERMISSION)
         } else {
-            Log.d(_tag, "checkPermissions: Permissions Granted..")
             loadFragments()
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                when (Settings.System.canWrite(this)) {
-                    true -> {
-                        if (Settings.System.getInt(contentResolver, "show_touches") == 0) {
-                            container.indefiniteSnackbar(
-                                getString(R.string.enable_touches_prompt),
-                                getString(R.string.prompt_button_enable)
-                            ) {
-                                Settings.System.putInt(
-                                    contentResolver,
-                                    "show_touches", 1
-                                )
-                            }
-                        }
-                    }
-                    false -> {
-                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                        intent.data = Uri.parse("package:$packageName")
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                    }
-                }
-            }
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             RC_PERMISSION -> {
-                val isPermissionGranted =
-                    grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
-                    Log.d(_tag, "onRequestPermissionsResult: Permissions not Granted..")
-                    Snackbar.make(
-                        this.container,
-                        "Please Grant Permissions",
-                        Snackbar.LENGTH_INDEFINITE
-                    )
-                        .setAction("GRANT") {
-                            checkPermissions()
-                        }
+                    container.indefiniteSnackbar("Please Grant Permissions", "Grant") {
+                        checkPermissions()
+                    }.anchorView = navigation
                 } else {
                     loadFragments()
                 }
@@ -234,10 +169,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragments() {
         val host: NavHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
-                ?: return
+            supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment? ?: return
         val navController = host.navController
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             fab_apply.hide()
             when (destination.id) {
                 R.id.mainFragment -> {
@@ -249,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.repoFragment -> {
                     fab_apply.apply {
                         show()
-                        text = "POST"
+                        text = getString(R.string.text_action_post)
                     }
                 }
                 R.id.settingsFragment -> {
@@ -257,44 +191,25 @@ class MainActivity : AppCompatActivity() {
                 R.id.editProfileFragment -> {
                     fab_apply.apply {
                         show()
-                        text = "Save"
+                        text = getString(R.string.text_action_save)
+                    }
+                }
+                R.id.newPostFragment -> {
+                    fab_apply.apply {
+                        show()
+                        text = getString(R.string.text_action_upload)
                     }
                 }
             }
-
         }
 
-        appBarConfiguration =
-            AppBarConfiguration(setOf(R.id.mainFragment, R.id.repoFragment, R.id.settingsFragment))
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.mainFragment, R.id.repoFragment, R.id.settingsFragment))
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navigation.setupWithNavController(navController)
     }
 
-    /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.profile_logout -> {
-                AuthUI.getInstance().signOut(this).addOnCompleteListener { task ->
-
-                }
-            }
-            else -> {
-                return item.onNavDestinationSelected(findNavController(R.id.fragment_repo_nav)) || super.onOptionsItemSelected(item)
-            }
-        }
-        return true
-    }*/
-
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
-    }
-
-    companion object {
-        const val RC_PERMISSION = 256
     }
 }

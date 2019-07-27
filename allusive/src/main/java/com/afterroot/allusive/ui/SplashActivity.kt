@@ -20,6 +20,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.afterroot.allusive.Constants.RC_LOGIN
 import com.afterroot.allusive.R
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
@@ -63,9 +64,5 @@ class SplashActivity : AppCompatActivity() {
     private fun launchDashboard() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
-    }
-
-    companion object {
-        const val RC_LOGIN = 42
     }
 }

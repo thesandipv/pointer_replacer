@@ -16,6 +16,7 @@
 package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -35,6 +36,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afterroot.allusive.BuildConfig
+import com.afterroot.allusive.Constants.ACTION_OPEN_TEL
 import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.isAppInstalled
@@ -160,41 +162,34 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
             .setNegativeButton(getString(R.string.dialog_button_cancel)) { _, _ ->
-                activity!!.finish()
+
             }
             .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
-                when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
-                    true -> {
-                        val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
-                        val tmpFile = File(context!!.cacheDir, "app.apk")
-                        activity!!.container.longSnackbar(getString(R.string.msg_downloading_ext))
-                        reference.getFile(tmpFile).addOnSuccessListener {
-                            activity!!.container.snackbar(getString(R.string.msg_ext_downloaded))
-                            Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                val uri = FileProvider.getUriForFile(
-                                    context!!.applicationContext,
-                                    BuildConfig.APPLICATION_ID + ".provider", tmpFile
-                                )
-                                val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                                    .setDataAndType(uri, "application/vnd.android.package-archive")
-                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                startActivity(installIntent)
-                            } else {
-                                val installIntent = Intent(Intent.ACTION_VIEW)
-                                    .setDataAndType(
-                                        Uri.fromFile(tmpFile),
-                                        "application/vnd.android.package-archive"
-                                    )
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(installIntent)
-                            }
+                val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
+                val tmpFile = File(context!!.cacheDir, "app.apk")
+                activity!!.container.longSnackbar(getString(R.string.msg_downloading_ext)).anchorView = activity!!.navigation
+                reference.getFile(tmpFile).addOnSuccessListener {
+                    activity!!.container.snackbar(getString(R.string.msg_ext_downloaded)).anchorView = activity!!.navigation
+                    Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val uri = FileProvider.getUriForFile(
+                            context!!.applicationContext,
+                            BuildConfig.APPLICATION_ID + ".provider", tmpFile
+                        )
+                        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                            .setDataAndType(uri, "application/vnd.android.package-archive")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(installIntent)
+                    } else {
+                        val installIntent = Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(
+                                Uri.fromFile(tmpFile),
+                                "application/vnd.android.package-archive"
+                            )
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(installIntent)
+                    }
 
-                        }
-                    }
-                    false -> {
-                        activity!!.browse("https://m8rg7.app.goo.gl/touchel")
-                    }
                 }
             }.setNeutralButton("Learn More") { _, _ ->
                 activity!!.browse("https://pointerreplacer.page.link/ext_learn_more")
@@ -217,7 +212,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = showTouchesCurr
         } catch (e: Settings.SettingNotFoundException) {
-            activity!!.container.snackbar(getString(R.string.msg_error))
+            activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
         }
     }
 
@@ -232,7 +227,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
-                        activity!!.container.snackbar("Done")
+                        activity!!.container.snackbar("Done").anchorView = activity!!.navigation
                         /* if (interstitialAd.isLoaded) {
                              interstitialAd.show()
                          }*/
@@ -246,9 +241,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                                     startActivity(intent)
                                 }
 
-                            }
+                            }.anchorView = activity!!.navigation
                     }
-                    3 -> activity!!.container.snackbar(getString(R.string.msg_error)) //Other error
+                    3 -> activity!!.container.snackbar(getString(R.string.msg_error)).anchorView =
+                        activity!!.navigation //Other error
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -276,14 +272,54 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun updateCCSummary(preference: Preference) {
         preference.summary =
             if (preferences!!.getBoolean(getString(R.string.key_use_material_cc), true)) {
-            "Material Color Picker"
-        } else {
-            "HSV Color Picker"
-        }
+                "Material Color Picker"
+            } else {
+                "HSV Color Picker"
+            }
     }
 
     companion object {
-        const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
         const val RC_OPEN_TEL = 245
+
+        private var dialog: AlertDialog? = null
+        fun installExtensionDialog(context: Context): AlertDialog {
+            dialog = AlertDialog.Builder(context).setTitle(context.getString(R.string.title_install_ext_dialog))
+                .setMessage(context.getString(R.string.msg_install_ext_dialog))
+                .setCancelable(false)
+                .setNegativeButton(context.getString(R.string.dialog_button_cancel)) { _, _ ->
+
+                }
+                .setPositiveButton(context.getString(R.string.dialog_button_install)) { _, _ ->
+                    val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
+                    val tmpFile = File(context.cacheDir, "app.apk")
+                    Toast.makeText(context, context.getString(R.string.msg_downloading_ext), Toast.LENGTH_SHORT).show()
+                    reference.getFile(tmpFile).addOnSuccessListener {
+                        Toast.makeText(context, context.getString(R.string.msg_ext_downloaded), Toast.LENGTH_SHORT).show()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val uri = FileProvider.getUriForFile(
+                                context.applicationContext,
+                                BuildConfig.APPLICATION_ID + ".provider", tmpFile
+                            )
+                            val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                                .setDataAndType(uri, "application/vnd.android.package-archive")
+                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            context.startActivity(installIntent)
+                        } else {
+                            val installIntent = Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(
+                                    Uri.fromFile(tmpFile),
+                                    "application/vnd.android.package-archive"
+                                )
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(installIntent)
+                        }
+
+                    }
+                }.setNeutralButton("Learn More") { _, _ ->
+                    context.browse("https://pointerreplacer.page.link/ext_learn_more")
+                }.create()
+            return dialog as AlertDialog
+        }
+
     }
 }
