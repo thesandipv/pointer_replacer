@@ -40,6 +40,7 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="54dp"
         app:defaultNavHost="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph" />
@@ -64,8 +65,7 @@
         android:layout_gravity="top"
         android:orientation="vertical"
         app:layout_anchor="@id/navigation"
-        app:layout_anchorGravity="top|end"
-        app:layout_behavior=".ui.BottomNavigationBehavior" />
+        app:layout_anchorGravity="top|end" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
@@ -75,7 +75,6 @@
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         app:labelVisibilityMode="selected"
-        app:layout_behavior=".ui.BottomNavigationBehavior"
         app:menu="@menu/navigation" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
