@@ -21,25 +21,23 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.navigation.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
-import com.afterroot.allusive.utils.getDpi
+import com.afterroot.allusive.utils.visible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
-import org.jetbrains.anko.design.snackbar
 import java.io.File
 
 
 class PointerBottomSheetFragment : BottomSheetDialogFragment() {
-    var arrow: DrawerArrowDrawable? = null
     private var mBehavior: BottomSheetBehavior<*>? = null
-    var mTitle: String? = null
+    private var mTitle: String? = null
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
@@ -75,16 +73,10 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
 
         val pointerAdapter = PointerAdapter(activity!!)
 
-        if (context!!.getDpi() <= 240) {
-            pointerAdapter.setLayoutParams(49)
-        } else if (context!!.getDpi() >= 240) {
-            pointerAdapter.setLayoutParams(66)
-        }
-
         contentView.grid_pointers.apply {
             adapter = pointerAdapter
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                mPointerSelectCallback!!.onPointerSelected(pointerAdapter.getPath(position))
+                mPointerSelectCallback!!.onPointerSelected(pointerAdapter.getItem(position))
                 dialog.dismiss()
             }
         }
@@ -103,15 +95,15 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
 
                 contentView.grid_pointers.onItemLongClickListener =
                     AdapterView.OnItemLongClickListener { _, _, i, _ ->
-                        val file = File(pointerAdapter.getPath(i))
+                        val file = File(pointerAdapter.getItem(i))
                         MaterialDialog(activity!!).show {
                             title(text = getString(R.string.text_delete) + file.name)
                             message(res = R.string.text_delete_confirm)
                             positiveButton(res = R.string.text_yes) {
                                 if (file.delete()) {
-                                    activity!!.container.snackbar("Pointer deleted.")
+                                    Toast.makeText(context, "Pointer deleted.", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    activity!!.container.snackbar("Error deleting pointer.")
+                                    Toast.makeText(context, "Error deleting pointer.", Toast.LENGTH_SHORT).show()
                                 }
                             }
                             negativeButton(res = R.string.text_no)
@@ -120,7 +112,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                     }
             } else {
                 contentView.apply {
-                    info_no_pointer_installed.visibility = View.VISIBLE
+                    info_no_pointer_installed.visible(true)
                     bs_button_install_pointers.setOnClickListener {
                         dialog.dismiss()
                         activity!!.findNavController(R.id.fragment_repo_nav)

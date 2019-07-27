@@ -32,9 +32,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.visible
 import com.firebase.ui.auth.AuthUI
@@ -122,7 +124,10 @@ class MainFragment : Fragment() {
             e.printStackTrace()
             return
         }
-        activity!!.container.longSnackbar(getString(R.string.text_pointer_applied), getString(R.string.reboot)) {
+        activity!!.container.longSnackbar(
+            message = getString(R.string.text_pointer_applied),
+            actionText = getString(R.string.reboot)
+        ) {
             MaterialDialog(activity!!).show {
                 title(res = R.string.reboot)
                 message(res = R.string.text_reboot_confirm)
@@ -143,7 +148,7 @@ class MainFragment : Fragment() {
                     }
                 }
             }
-        }
+        }.anchorView = activity!!.navigation
     }
 
     private fun loadBitmapFromView(view: View): Bitmap {
@@ -165,7 +170,7 @@ class MainFragment : Fragment() {
                 sharedPreferences!!.edit(true) {
                     putString(getString(R.string.key_selectedPointerPath), pointerPath)
                 }
-                activity!!.selected_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
+                GlideApp.with(context!!).load(File(pointerPath)).into(activity!!.selected_pointer)
                 Log.d(_tag, "onPointerSelected: Selected Pointer Path: $pointerPath")
             }
 
@@ -177,7 +182,10 @@ class MainFragment : Fragment() {
             val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
             val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
             if (pointerPath != null) {
-                current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
+                GlideApp.with(context!!)
+                    .load(File(pointerPath))
+                    .override(context!!.getMinPointerSize())
+                    .into(current_pointer)
                 text_no_pointer_applied.visible(false)
             } else {
                 text_no_pointer_applied.visible(true)
@@ -185,7 +193,10 @@ class MainFragment : Fragment() {
             }
 
             if (selectedPointerPath != null) {
-                selected_pointer.setImageDrawable(Drawable.createFromPath(selectedPointerPath))
+                GlideApp.with(context!!)
+                    .load(File(selectedPointerPath))
+                    .override(context!!.getMinPointerSize())
+                    .into(selected_pointer)
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()

@@ -15,18 +15,193 @@
 
 package com.afterroot.allusive.fragment
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
+import com.afterroot.allusive.database.Database
+import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.model.Pointer
+import com.afterroot.allusive.utils.FirebaseUtils
+import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.allusive.utils.loadBitmapFromView
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
+import kotlinx.android.synthetic.main.layout_progress.view.*
+import org.jetbrains.anko.design.snackbar
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.*
 
 class NewPointerPost : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+    private lateinit var db: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
+    private val _tag = "NewPointerPost"
+    private var isPointerImported = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        storage = FirebaseStorage.getInstance()
+        db = Database.getInstance()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_new_pointer_post, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        action_upload.setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+            startActivityForResult(intent, RC_PICK_IMAGE)
+        }
+
+        activity!!.fab_apply.apply {
+            setOnClickListener {
+                if (verifyData()) {
+                    upload(saveTmpPointer())
+                }
+            }
+            icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+        }
+    }
+
+    //Handle retrieved image uri
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
+            isPointerImported = true
+            data?.data?.also { uri ->
+                Glide.with(this).load(uri).override(128).into(pointer_thumb)
+            }
+        }
+    }
+
+    private fun upload(file: File) {
+        val dialog = MaterialDialog(context!!).show {
+            customView(R.layout.layout_progress)
+            cornerRadius(16f)
+            cancelable(false)
+        }
+        val customView = dialog.getCustomView()
+
+        customView.text_progress.text = getString(R.string.text_progrss_init)
+
+        val storageRef = storage.reference
+        val fileUri = Uri.fromFile(file)
+        val fileRef = storageRef.child("pointers/${fileUri.lastPathSegment!!}")
+        val uploadTask = fileRef.putFile(fileUri)
+
+        uploadTask.addOnProgressListener {
+            val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
+            customView.text_progress.text = String.format("%s..%s", getString(R.string.text_progress_uploading), progress)
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                customView.text_progress.text = getString(R.string.text_progress_finising_up)
+                val downloadUri = task.result
+                Log.d(_tag, "upload: $downloadUri")
+                val pointer = Pointer(
+                    edit_name.text.toString().trim(), fileUri.lastPathSegment!!,
+                    edit_desc.text.toString().trim(), FirebaseUtils.auth!!.uid!!, Date()
+                )
+                db.collection(DatabaseFields.POINTERS).add(pointer).addOnSuccessListener {
+                    activity!!.apply {
+                        container.snackbar("Pointer Uploaded").anchorView = activity!!.navigation
+                        dialog.dismiss()
+                        fragment_repo_nav.findNavController().navigateUp()
+                    }
+                }
+            } else {
+                container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+            }
+        }
+    }
+
+    /**
+     * @throws IOException exception
+     */
+    @Throws(IOException::class)
+    private fun saveTmpPointer(): File {
+        val bitmap = loadBitmapFromView(pointer_thumb)
+        val file = File.createTempFile("pointer", ".png", context!!.cacheDir)
+        val out: FileOutputStream
+        try {
+            out = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return file
+    }
+
+    private fun verifyData(): Boolean {
+        return when {
+            edit_name.text!!.isEmpty() -> {
+                edit_name.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        input_name.isErrorEnabled = false
+                    }
+
+                })
+                input_name.error = "Pointer name can not be empty"
+                false
+            }
+            edit_desc.text!!.isEmpty() -> {
+                edit_desc.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        input_desc.isErrorEnabled = false
+                    }
+
+                })
+                input_desc.error = "Description can not be empty"
+                false
+            }
+            !isPointerImported -> {
+                activity!!.container.snackbar("Please import pointer image first.").anchorView = activity!!.navigation
+                false
+            }
+            else -> true
+        }
+    }
+
+    companion object {
+        private const val RC_PICK_IMAGE: Int = 478
     }
 }
