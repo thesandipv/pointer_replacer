@@ -20,10 +20,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.FrameLayout
 import android.widget.ImageView
+import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
-import com.bumptech.glide.Glide
+import com.afterroot.allusive.utils.getMinPointerSize
 import java.util.*
 
 /**GridView Image Adapter. */
@@ -40,16 +40,12 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
         itemList.clear()
     }
 
-    fun getPath(index: Int): String {
-        return itemList[index]
-    }
-
     override fun getCount(): Int {
         return itemList.size
     }
 
-    override fun getItem(arg0: Int): Any? {
-        return null
+    override fun getItem(position: Int): String {
+        return itemList[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -68,13 +64,16 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
             view = inflater.inflate(R.layout.gridview_item, parent, false)
             holder = ViewHolder()
             holder.imageView = view.findViewById(R.id.grid_item_image)
-            holder.imageView!!.layoutParams = FrameLayout.LayoutParams(gridImageWidth, gridImageWidth)
+            //holder.imageView!!.layoutParams = FrameLayout.LayoutParams(gridImageWidth, gridImageWidth)
             view.tag = holder
         } else {
             holder = view.tag as ViewHolder
         }
 
-        Glide.with(mContext).load(itemList[position]).into(holder.imageView!!)
+        GlideApp.with(mContext)
+            .load(itemList[position])
+            .override(mContext.getMinPointerSize())
+            .into(holder.imageView!!)
 
         return view
     }

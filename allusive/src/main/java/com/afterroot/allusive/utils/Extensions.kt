@@ -20,6 +20,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -30,10 +32,15 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.transition.Fade
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 
-fun View.visible(value: Boolean, transition: Transition? = null, view: ViewGroup = parent as ViewGroup) {
+fun View.visible(
+    value: Boolean,
+    transition: Transition? = Fade(if (value) Fade.MODE_IN else Fade.MODE_OUT),
+    view: ViewGroup = parent as ViewGroup
+) {
     if (transition != null) {
         TransitionManager.beginDelayedTransition(view, transition)
     }
@@ -82,11 +89,18 @@ fun Context.getDpi(): Int {
     return this.resources.displayMetrics.densityDpi
 }
 
+fun Context.getMinPointerSize(): Int =
+    if (this.getDpi() <= 240) {
+        49
+    } else {
+        66
+    }
+
 /**
  * @fileName fileName name of file
  * @return extension of fileName
  */
-private fun getFileExt(fileName: String): String {
+fun getFileExt(fileName: String): String {
     return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length)
 }
 
@@ -94,7 +108,7 @@ private fun getFileExt(fileName: String): String {
  * @fileName fileName name of file
  * @return mime type of fileName
  */
-private fun getMimeType(fileName: String): String? {
+fun getMimeType(fileName: String): String? {
     var type: String? = null
     try {
         val extension = getFileExt(fileName)
@@ -116,3 +130,13 @@ fun openFile(context: Context, filename: String, uri: Uri) {
  */
 fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View =
     LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)
+
+fun loadBitmapFromView(view: View): Bitmap {
+    val b = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+    val c = Canvas(b)
+    view.run {
+        layout(view.left, view.top, view.right, view.bottom)
+        draw(c)
+    }
+    return b
+}
