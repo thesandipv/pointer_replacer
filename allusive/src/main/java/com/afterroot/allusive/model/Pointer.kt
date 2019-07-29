@@ -24,12 +24,12 @@ data class Pointer(
     var name: String,
     var filename: String,
     var description: String,
-    var uploadedBy: String,
+    var uploadedBy: HashMap<String, String>?,
     @ServerTimestamp var time: Date?
 ) : Serializable, IPointer {
     override fun getType(): Int {
         return IPointer.TYPE_POINTER
     }
 
-    constructor() : this("", "", "", "", null)
+    constructor() : this("", "", "", null, null)
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MyTheme.Main" parent="Base.MyTheme"></style>
+    <style name="MyTheme.Main" parent="Base.MyTheme" />
 
     <style name="MyTheme.Main.Launch">
         <item name="android:windowBackground">@drawable/launch_screen</item>
@@ -24,6 +24,9 @@
         <item name="colorOnBackground">@color/color_on_background</item>
         <item name="colorOnSurface">@color/color_on_surface</item>
         <item name="colorOnError">@color/color_on_error</item>
+
+        <item name="md_corner_radius">16dp</item>
+        <item name="md_color_button_text">@color/color_primary</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>

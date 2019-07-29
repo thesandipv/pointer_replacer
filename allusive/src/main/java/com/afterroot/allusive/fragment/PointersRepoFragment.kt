@@ -28,14 +28,22 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afollestad.materialdialogs.LayoutMode
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive.database.Database
+import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.viewmodel.PointerViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -45,14 +53,16 @@ import java.io.File
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
-    private var pointerAdapter: PointerAdapterDelegate? = null
+    private lateinit var db: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
     private val pointerViewModel: PointerViewModel by lazy { ViewModelProviders.of(this).get(PointerViewModel::class.java) }
+    private var pointerAdapter: PointerAdapterDelegate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         storage = FirebaseStorage.getInstance()
+        db = Database.getInstance()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,33 +78,43 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             }
             icon = context!!.getDrawableExt(R.drawable.ic_add)
         }
+
+        repo_swipe_refresh.setOnRefreshListener {
+            loadPointers()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
-            loadPointers()
+            setUpList()
         }
     }
 
-
     lateinit var pointersList: List<Pointer>
-    private fun loadPointers() {
+    lateinit var pointersSnapshot: QuerySnapshot
+    private fun setUpList() {
         pointerAdapter = PointerAdapterDelegate(this)
         list.apply {
+            setHasFixedSize(true)
             val lm = LinearLayoutManager(context!!)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             this.adapter = pointerAdapter
         }
+        loadPointers()
+    }
 
+    private fun loadPointers() {
         pointerViewModel.getPointerSnapshot().observe(this, Observer<ViewModelState> {
             when (it) {
                 is ViewModelState.Loading -> {
-
+                    repo_swipe_refresh.isRefreshing = true
                 }
                 is ViewModelState.Loaded<*> -> {
-                    pointersList = (it.data as QuerySnapshot).toObjects(Pointer::class.java)
+                    repo_swipe_refresh.isRefreshing = false
+                    pointersSnapshot = it.data as QuerySnapshot
+                    pointersList = pointersSnapshot.toObjects(Pointer::class.java)
                     pointerAdapter!!.add(pointersList)
                 }
             }
@@ -118,10 +138,49 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     activity!!.container.snackbar("Pointer Installed").anchorView = activity!!.navigation
                 }
             }
+            else -> {
+                pointersSnapshot.documents[position].id
+            }
         }
     }
 
     override fun onLongClick(position: Int) {
+        val isIdMatch = pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
+        val list = arrayListOf(getString(R.string.text_edit), getString(R.string.text_delete))
+        if (!isIdMatch) list.remove(getString(R.string.text_edit))
+        MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+            cornerRadius(16f)
+            listItems(items = list) { dialog, index, text ->
+                when (text) {
+                    getString(R.string.text_edit) -> {
+
+                    }
+                    getString(R.string.text_delete) -> {
+                        MaterialDialog(context).show {
+                            title(text = "Are you sure?")
+                            positiveButton(text = "Yes") {
+                                val filename = pointersList[position].filename
+                                db.collection(DatabaseFields.POINTERS)
+                                    .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
+                                    .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
+                                        querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
+                                            docSnapshot!!.reference.delete().addOnSuccessListener {
+                                                val ref = storage.reference.child("pointers").child(filename)
+                                                ref.delete().addOnSuccessListener {
+
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
+                            negativeButton(text = "No") {
+                                it.dismiss()
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

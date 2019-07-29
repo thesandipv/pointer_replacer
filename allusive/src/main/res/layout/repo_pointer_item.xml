@@ -27,43 +27,39 @@
         android:id="@+id/item_pointer_thumb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         tools:src="@drawable/pointer" />
 
-    <LinearLayout
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_pointer_pack_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/item_action_pack"
         app:layout_constraintStart_toEndOf="@+id/item_pointer_thumb"
-        app:layout_constraintTop_toTopOf="@+id/item_action_pack">
+        app:layout_constraintTop_toTopOf="@+id/item_pointer_thumb"
+        tools:text="Default Pointer" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/item_pointer_pack_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="16dp"
-            tools:text="pack name" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/item_pack_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="38dp"
-            tools:text="@string/text_installed" />
-    </LinearLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_pack_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:maxLines="3"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:autoLink="web|email"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_action_pack"
+        app:layout_constraintStart_toStartOf="@+id/item_pointer_pack_name"
+        app:layout_constraintTop_toBottomOf="@+id/item_username"
+        tools:text="@string/text_multiline_sample" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/item_action_pack"
@@ -71,13 +67,24 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:tint="@color/color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_file_download" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="@+id/item_pointer_pack_name"
+        app:layout_constraintTop_toBottomOf="@+id/item_pointer_pack_name"
+        tools:text="sandipv22" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

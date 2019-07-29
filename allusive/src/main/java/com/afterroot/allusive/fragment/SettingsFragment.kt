@@ -16,7 +16,6 @@
 package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -37,7 +36,11 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.ACTION_OPEN_TEL
+import com.afterroot.allusive.Constants.EXTRA_TOUCH_VAL
+import com.afterroot.allusive.Constants.RC_OPEN_TEL
+import com.afterroot.allusive.Constants.TEL_P_NAME
 import com.afterroot.allusive.R
+import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.isAppInstalled
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -94,13 +97,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
 
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
-            summary = preferences!!.getString(getString(R.string.key_maxPointerSize), "100")
+            summary =
+                preferences!!.getString(getString(R.string.key_maxPointerSize), context!!.getMinPointerSize().toString())
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(activity!!).show {
                     title(res = R.string.text_max_pointer_size)
                     input(
-                        hint = "Enter Max Pointer Size",
-                        prefill = preferences!!.getString(getString(R.string.key_maxPointerSize), "100"),
+                        hintRes = R.string.text_max_pointer_size,
+                        prefill = preferences!!.getString(
+                            getString(R.string.key_maxPointerSize),
+                            context.getMinPointerSize().toString()
+                        ),
                         inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
                     ) { _, input ->
                         preferences!!.edit(true) { putString(getString(R.string.key_maxPointerSize), input.toString()) }
@@ -112,13 +119,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
-            summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25")
+            summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "0")
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(activity!!).show {
                     title(res = R.string.key_maxPaddingSize)
                     input(
                         hint = "Enter Max Padding Size",
-                        prefill = preferences!!.getString(getString(R.string.key_maxPaddingSize), "25"),
+                        prefill = preferences!!.getString(getString(R.string.key_maxPaddingSize), "0"),
                         allowEmpty = false, maxLength = 3,
                         inputType = InputType.TYPE_CLASS_NUMBER
                     ) { _, input ->
@@ -134,7 +141,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             val i = Intent().apply {
                 action = ACTION_OPEN_TEL
-                putExtra("com.afterroot.toucherlegacy.EXTRA_TOUCH_VAL", if (newValue == true) 1 else 0)
+                putExtra(EXTRA_TOUCH_VAL, if (newValue == true) 1 else 0)
             }
             if (i.resolveActivity(activity!!.packageManager) != null) {
                 startActivityForResult(i, RC_OPEN_TEL)
@@ -201,7 +208,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
 
-        if (!activity!!.isAppInstalled("com.afterroot.toucherlegacy")) {
+        if (!activity!!.isAppInstalled(TEL_P_NAME)) {
             installExtensionDialog().show()
         }
         try {
@@ -237,7 +244,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             .setAction("GRANT") {
                                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                                     val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                                    intent.data = Uri.parse("package:com.afterroot.toucherlegacy")
+                                    intent.data = Uri.parse("package:$TEL_P_NAME")
                                     startActivity(intent)
                                 }
 
@@ -276,50 +283,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
             } else {
                 "HSV Color Picker"
             }
-    }
-
-    companion object {
-        const val RC_OPEN_TEL = 245
-
-        private var dialog: AlertDialog? = null
-        fun installExtensionDialog(context: Context): AlertDialog {
-            dialog = AlertDialog.Builder(context).setTitle(context.getString(R.string.title_install_ext_dialog))
-                .setMessage(context.getString(R.string.msg_install_ext_dialog))
-                .setCancelable(false)
-                .setNegativeButton(context.getString(R.string.dialog_button_cancel)) { _, _ ->
-
-                }
-                .setPositiveButton(context.getString(R.string.dialog_button_install)) { _, _ ->
-                    val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
-                    val tmpFile = File(context.cacheDir, "app.apk")
-                    Toast.makeText(context, context.getString(R.string.msg_downloading_ext), Toast.LENGTH_SHORT).show()
-                    reference.getFile(tmpFile).addOnSuccessListener {
-                        Toast.makeText(context, context.getString(R.string.msg_ext_downloaded), Toast.LENGTH_SHORT).show()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            val uri = FileProvider.getUriForFile(
-                                context.applicationContext,
-                                BuildConfig.APPLICATION_ID + ".provider", tmpFile
-                            )
-                            val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                                .setDataAndType(uri, "application/vnd.android.package-archive")
-                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            context.startActivity(installIntent)
-                        } else {
-                            val installIntent = Intent(Intent.ACTION_VIEW)
-                                .setDataAndType(
-                                    Uri.fromFile(tmpFile),
-                                    "application/vnd.android.package-archive"
-                                )
-                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            context.startActivity(installIntent)
-                        }
-
-                    }
-                }.setNeutralButton("Learn More") { _, _ ->
-                    context.browse("https://pointerreplacer.page.link/ext_learn_more")
-                }.create()
-            return dialog as AlertDialog
-        }
-
     }
 }

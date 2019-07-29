@@ -108,7 +108,7 @@ class NewPointerPost : Fragment() {
         }
         val customView = dialog.getCustomView()
 
-        customView.text_progress.text = getString(R.string.text_progrss_init)
+        customView.text_progress.text = getString(R.string.text_progress_init)
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
@@ -119,13 +119,18 @@ class NewPointerPost : Fragment() {
             val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
             customView.text_progress.text = String.format("%s..%s", getString(R.string.text_progress_uploading), progress)
         }.addOnCompleteListener { task ->
+            val map = hashMapOf<String, String>()
+            map[FirebaseUtils.auth!!.uid!!] = FirebaseUtils.firebaseUser!!.displayName.toString()
             if (task.isSuccessful) {
-                customView.text_progress.text = getString(R.string.text_progress_finising_up)
+                customView.text_progress.text = getString(R.string.text_progress_finishing_up)
                 val downloadUri = task.result
                 Log.d(_tag, "upload: $downloadUri")
                 val pointer = Pointer(
-                    edit_name.text.toString().trim(), fileUri.lastPathSegment!!,
-                    edit_desc.text.toString().trim(), FirebaseUtils.auth!!.uid!!, Date()
+                    edit_name.text.toString().trim(),
+                    fileUri.lastPathSegment!!,
+                    edit_desc.text.toString().trim(),
+                    map,
+                    Date()
                 )
                 db.collection(DatabaseFields.POINTERS).add(pointer).addOnSuccessListener {
                     activity!!.apply {

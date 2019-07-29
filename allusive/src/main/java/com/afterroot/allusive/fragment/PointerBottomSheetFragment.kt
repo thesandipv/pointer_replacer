@@ -97,7 +97,7 @@ class PointerBottomSheetFragment : BottomSheetDialogFragment() {
                     AdapterView.OnItemLongClickListener { _, _, i, _ ->
                         val file = File(pointerAdapter.getItem(i))
                         MaterialDialog(activity!!).show {
-                            title(text = getString(R.string.text_delete) + file.name)
+                            title(text = getString(R.string.text_delete) + " " + file.name)
                             message(res = R.string.text_delete_confirm)
                             positiveButton(res = R.string.text_yes) {
                                 if (file.delete()) {
