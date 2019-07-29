@@ -34,8 +34,6 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
         var itemList = ArrayList<String>()
     }
 
-    var gridImageWidth = 49
-
     fun clear() {
         itemList.clear()
     }
@@ -52,10 +50,6 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
         return 0
     }
 
-    fun setLayoutParams(i: Int) {
-        gridImageWidth = i
-    }
-
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
         val holder: ViewHolder
         var view: View? = convertView
@@ -64,7 +58,6 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
             view = inflater.inflate(R.layout.gridview_item, parent, false)
             holder = ViewHolder()
             holder.imageView = view.findViewById(R.id.grid_item_image)
-            //holder.imageView!!.layoutParams = FrameLayout.LayoutParams(gridImageWidth, gridImageWidth)
             view.tag = holder
         } else {
             holder = view.tag as ViewHolder

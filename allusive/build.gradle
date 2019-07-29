@@ -138,13 +138,13 @@ dependencies {
     implementation 'com.github.yukuku:ambilwarna:2.0.1'
 
     implementation 'com.google.android.material:material:1.1.0-alpha08'
-    implementation 'com.google.firebase:firebase-ads:18.1.0'
+    implementation 'com.google.firebase:firebase-ads:18.1.1'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
     implementation 'com.google.firebase:firebase-config:18.0.0'
     implementation 'com.google.firebase:firebase-core:17.0.1'
-    implementation 'com.google.firebase:firebase-firestore:20.1.0'
+    implementation 'com.google.firebase:firebase-firestore:20.2.0'
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
-    implementation 'com.google.firebase:firebase-storage:18.1.0'
+    implementation 'com.google.firebase:firebase-storage:18.1.1'
 
     implementation 'com.firebaseui:firebase-ui-storage:4.3.1'
 

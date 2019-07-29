@@ -42,15 +42,19 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
     inner class PointerVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.repo_pointer_item)) {
         val context: Context = parent.context
         private val itemName: AppCompatTextView = itemView.item_pointer_pack_name
-        private val itemDesc: AppCompatTextView = itemView.item_pack_state
+        private val itemDesc: AppCompatTextView = itemView.item_pack_desc
         private val itemThumb: AppCompatImageView = itemView.item_pointer_thumb
         private val actionDl: AppCompatImageButton = itemView.item_action_pack
+        private val itemUploader: AppCompatTextView = itemView.item_username
 
 
         fun bind(pointer: Pointer) {
             val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
             itemName.text = pointer.name
             itemDesc.text = pointer.description
+            pointer.uploadedBy!!.forEach {
+                itemUploader.text = String.format(context.getString(R.string.formar_uploaded_by), it.value)
+            }
             GlideApp.with(context).load(storageReference).override(context.getMinPointerSize()).into(itemThumb)
             actionDl.setOnClickListener {
                 callbacks.onClick(adapterPosition, it)

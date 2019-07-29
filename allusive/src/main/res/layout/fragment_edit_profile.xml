@@ -17,14 +17,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="8dp"
-    android:fitsSystemWindows="true">
+    android:layout_margin="8dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ti_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Name"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="@string/hint_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -42,7 +42,8 @@
         android:id="@+id/ti_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="@string/hint_email"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
