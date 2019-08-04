@@ -108,7 +108,7 @@ class MainFragment : Fragment() {
             val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
             adView.loadAd(adRequest)
 
-            getPointer()
+            loadCurrentPointers()
 
             action_customize.setOnClickListener {
                 val bundle = Bundle().apply {
@@ -128,24 +128,62 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun createFileFromView(view: View, exportPath: String) {
-        val file = File(exportPath)
-        Runtime.getRuntime().exec("chmod 666 $exportPath")
-        val out: FileOutputStream
+    private fun loadCurrentPointers() {
+        val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
+        val mousePath = sharedPreferences!!.getString(getString(R.string.key_mousePath), null)
+        val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
+        val selectedMousePath = sharedPreferences!!.getString(getString(R.string.key_selectedMousePath), null)
+        var size = sharedPreferences!!.getInt(getString(R.string.key_pointerSize), context!!.getMinPointerSize())
+        var mouseSize = sharedPreferences!!.getInt(getString(R.string.key_mouseSize), context!!.getMinPointerSize())
+        val padding = sharedPreferences!!.getInt(getString(R.string.key_pointerPadding), 0)
+        val mousePadding = sharedPreferences!!.getInt(getString(R.string.key_mousePadding), 0)
+
         try {
-            out = FileOutputStream(file)
-            loadBitmapFromView(view).compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return
+            if (size <= 0) {
+                size = context!!.getMinPointerSize()
+            }
+            if (mouseSize <= 0) {
+                mouseSize = context!!.getMinPointerSize()
+            }
+            if (pointerPath != null) {
+                current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
+                text_no_pointer_applied.visible(false)
+            } else {
+                text_no_pointer_applied.visible(true)
+                current_pointer.visible(false)
+            }
+
+            if (mousePath != null) {
+                current_mouse.setImageDrawable(Drawable.createFromPath(mousePath))
+                text_no_mouse_applied.visible(false)
+            } else {
+                text_no_mouse_applied.visible(true)
+                current_mouse.visible(false)
+            }
+
+            if (selectedPointerPath != null) {
+                selected_pointer.apply {
+                    layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
+                    setPadding(padding, padding, padding, padding)
+                }
+                GlideApp.with(context!!)
+                    .load(File(selectedPointerPath))
+                    .into(selected_pointer)
+            }
+            if (selectedMousePath != null) {
+                selected_mouse.apply {
+                    layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
+                    setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
+                }
+                GlideApp.with(context!!)
+                    .load(File(selectedMousePath))
+                    .into(selected_mouse)
+            }
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
         }
     }
 
-    /**
-     * @throws IOException exception
-     */
     @Throws(IOException::class)
     private fun applyPointer() {
         val filesDir = activity!!.filesDir.path
@@ -194,6 +232,21 @@ class MainFragment : Fragment() {
                 }
             }
         }.anchorView = activity!!.navigation
+    }
+
+    private fun createFileFromView(view: View, exportPath: String) {
+        val file = File(exportPath)
+        Runtime.getRuntime().exec("chmod 666 $exportPath")
+        val out: FileOutputStream
+        try {
+            out = FileOutputStream(file)
+            loadBitmapFromView(view).compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return
+        }
     }
 
     private fun loadBitmapFromView(view: View): Bitmap {
@@ -294,52 +347,6 @@ class MainFragment : Fragment() {
             }
         } catch (npe: NullPointerException) {
             npe.printStackTrace()
-        }
-    }
-
-    private fun getPointer() {
-        try {
-            val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
-            val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
-            val selectedMousePath = sharedPreferences!!.getString(getString(R.string.key_selectedMousePath), null)
-            var size = sharedPreferences!!.getInt(getString(R.string.key_pointerSize), context!!.getMinPointerSize())
-            var mouseSize = sharedPreferences!!.getInt(getString(R.string.key_mouseSize), context!!.getMinPointerSize())
-            val padding = sharedPreferences!!.getInt(getString(R.string.key_pointerPadding), 0)
-            val mousePadding = sharedPreferences!!.getInt(getString(R.string.key_mousePadding), 0)
-            if (size <= 0) {
-                size = context!!.getMinPointerSize()
-            }
-            if (mouseSize <= 0) {
-                mouseSize = context!!.getMinPointerSize()
-            }
-            if (pointerPath != null) {
-                current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                text_no_pointer_applied.visible(false)
-            } else {
-                text_no_pointer_applied.visible(true)
-                current_pointer.visible(false)
-            }
-
-            if (selectedPointerPath != null) {
-                selected_pointer.apply {
-                    layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
-                    setPadding(padding, padding, padding, padding)
-                }
-                GlideApp.with(context!!)
-                    .load(File(selectedPointerPath))
-                    .into(selected_pointer)
-            }
-            if (selectedMousePath != null) {
-                selected_mouse.apply {
-                    layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
-                    setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
-                }
-                GlideApp.with(context!!)
-                    .load(File(selectedMousePath))
-                    .into(selected_mouse)
-            }
-        } catch (throwable: Throwable) {
-            throwable.printStackTrace()
         }
     }
 
