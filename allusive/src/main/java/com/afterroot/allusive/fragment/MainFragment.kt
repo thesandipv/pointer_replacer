@@ -15,7 +15,6 @@
 
 package com.afterroot.allusive.fragment
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -23,7 +22,6 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.FrameLayout
@@ -71,13 +69,11 @@ class MainFragment : Fragment() {
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(_tag, "adding view..")
         setHasOptionsMenu(true)
         fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
         return fragmentView
     }
 
-    @SuppressLint("CommitPrefEdits")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -213,6 +209,7 @@ class MainFragment : Fragment() {
     private fun showPointerChooser(title: String = "Select Pointers", pointerType: Int) {
         val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_grid_bottomsheet)
+            title(text = title)
         }
 
         val dialogView = dialog.getCustomView()
@@ -265,7 +262,6 @@ class MainFragment : Fragment() {
             PointerAdapter.itemList.clear()
             if (pointerFiles.isNotEmpty()) {
                 dialogView.info_no_pointer_installed.visible(false)
-                dialogView.text_bottomsheet_header.text = title
                 pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
                 pointerAdapter.notifyDataSetChanged()
 
