@@ -29,6 +29,7 @@ import java.util.*
 /**GridView Image Adapter. */
 class PointerAdapter(private val mContext: Context) : BaseAdapter() {
     private val inflater: LayoutInflater = LayoutInflater.from(mContext)
+    val _tag = "PointerAdapter"
 
     companion object {
         var itemList = ArrayList<String>()
@@ -63,9 +64,14 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
             holder = view.tag as ViewHolder
         }
 
+        var size = mContext.getMinPointerSize()
+        if (size <= 0) {
+            size = 66
+        }
+
         GlideApp.with(mContext)
             .load(itemList[position])
-            .override(mContext.getMinPointerSize())
+            .override(size)
             .into(holder.imageView!!)
 
         return view

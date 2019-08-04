@@ -200,6 +200,12 @@ class MainActivity : AppCompatActivity() {
                         text = getString(R.string.text_action_upload)
                     }
                 }
+                R.id.customizeFragment -> {
+                    fab_apply.apply {
+                        show()
+                        text = getString(R.string.text_action_apply)
+                    }
+                }
             }
         }
 

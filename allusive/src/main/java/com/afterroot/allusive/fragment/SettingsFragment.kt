@@ -97,21 +97,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
 
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
-            summary =
-                preferences!!.getString(getString(R.string.key_maxPointerSize), context!!.getMinPointerSize().toString())
+            summary = preferences!!.getInt(getString(R.string.key_maxPointerSize), context!!.getMinPointerSize()).toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(activity!!).show {
                     title(res = R.string.text_max_pointer_size)
                     input(
                         hintRes = R.string.text_max_pointer_size,
-                        prefill = preferences!!.getString(
+                        prefill = preferences!!.getInt(
                             getString(R.string.key_maxPointerSize),
-                            context.getMinPointerSize().toString()
-                        ),
+                            context.getMinPointerSize()
+                        ).toString(),
                         inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
                     ) { _, input ->
-                        preferences!!.edit(true) { putString(getString(R.string.key_maxPointerSize), input.toString()) }
-                        this@apply.summary = input
+                        if (input.toString().toInt() > context.getMinPointerSize()) {
+                            preferences!!.edit(true) {
+                                putInt(
+                                    getString(R.string.key_maxPointerSize),
+                                    input.toString().toInt()
+                                )
+                            }
+                            this@apply.summary = input
+                        } else {
+                            activity!!.container.snackbar("Value must be greater than ${context.getMinPointerSize()}")
+                                .anchorView = navigation
+                        }
+
                     }
                 }
                 false
@@ -119,18 +129,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
-            summary = preferences!!.getString(getString(R.string.key_maxPaddingSize), "0")
+            summary = preferences!!.getInt(getString(R.string.key_maxPaddingSize), 25).toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(activity!!).show {
                     title(res = R.string.key_maxPaddingSize)
                     input(
                         hint = "Enter Max Padding Size",
-                        prefill = preferences!!.getString(getString(R.string.key_maxPaddingSize), "0"),
+                        prefill = preferences!!.getInt(getString(R.string.key_maxPaddingSize), 25).toString(),
                         allowEmpty = false, maxLength = 3,
                         inputType = InputType.TYPE_CLASS_NUMBER
                     ) { _, input ->
-                        preferences!!.edit(true) { putString(getString(R.string.key_maxPaddingSize), input.toString()) }
-                        this@apply.summary = input
+                        if (input.toString().toInt() > 0) {
+                            preferences!!.edit(true) {
+                                putInt(
+                                    getString(R.string.key_maxPaddingSize), input.toString().toInt()
+                                )
+                            }
+                            this@apply.summary = input
+                        } else {
+                            activity!!.container.snackbar("Value must be greater than 0").anchorView = navigation
+                        }
+
                     }.show()
                 }
                 false

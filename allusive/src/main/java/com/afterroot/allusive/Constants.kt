@@ -23,4 +23,6 @@ object Constants {
     const val RC_LOGIN = 42
     const val RC_OPEN_TEL = 245
     const val RC_PERMISSION = 256
+    const val POINTER_TOUCH = 1
+    const val POINTER_MOUSE = 2
 }
