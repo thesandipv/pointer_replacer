@@ -50,12 +50,17 @@
     <string name="key_maxPointerSize" translatable="false">maxPointerSize</string>
     <string name="key_oldColor" translatable="false">OLD_COLOR</string>
     <string name="key_pointerPadding" translatable="false">pointer_padding</string>
+    <string name="key_mousePadding" translatable="false">MOUSE_PADDING</string>
     <string name="key_pointerPath" translatable="false">POINTER_PATH</string>
+    <string name="key_mousePath" translatable="false">MOUSE_PATH</string>
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
+    <string name="key_mouseSize" translatable="false">MOUSE_SIZE</string>
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
+    <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
-    <string name="main_fragment_transition">main_fragment_transition</string>
+    <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
+    <string name="transition_mouse" translatable="false">mouse_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="mouse_pointer">Mouse Pointer</string>
     <string name="msg_downloading_ext">Downloading Extension</string>
@@ -92,6 +97,7 @@
     <string name="text_color_changed_default">Color changed to Default</string>
     <string name="text_color_not_changed">Pointer color not changed.</string>
     <string name="text_cur_pointer">Current Pointer</string>
+    <string name="text_cur_mouse">Current Mouse Pointer</string>
     <string name="text_delete">Delete</string>
     <string name="text_delete_confirm">Are you sure you want to delete this pointer??</string>
     <string name="text_edit">Edit</string>
@@ -124,6 +130,7 @@
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
     <string name="hint_email">Email</string>
-    <string name="formar_uploaded_by">by %s</string>
+    <string name="str_format_uploaded_by">by %s</string>
+    <string name="text_action_customize">Customize</string>
 
 </resources>

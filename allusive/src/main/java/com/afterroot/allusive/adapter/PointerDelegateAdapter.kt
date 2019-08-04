@@ -53,7 +53,7 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
             itemName.text = pointer.name
             itemDesc.text = pointer.description
             pointer.uploadedBy!!.forEach {
-                itemUploader.text = String.format(context.getString(R.string.formar_uploaded_by), it.value)
+                itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
             GlideApp.with(context).load(storageReference).override(context.getMinPointerSize()).into(itemThumb)
             actionDl.setOnClickListener {

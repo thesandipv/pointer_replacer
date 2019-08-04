@@ -25,15 +25,25 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.ui.onNavDestinationSelected
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
+import com.afterroot.allusive.Constants.POINTER_MOUSE
+import com.afterroot.allusive.Constants.POINTER_TOUCH
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
+import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.getMinPointerSize
@@ -44,6 +54,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import org.jetbrains.anko.design.longSnackbar
 import java.io.File
 import java.io.FileNotFoundException
@@ -81,21 +92,58 @@ class MainFragment : Fragment() {
         targetPath = extSdDir!! + pointersFolder
         pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
 
-        activity!!.card_new_pointer.setOnClickListener { showPointerChooser() }
-
-        MobileAds.initialize(activity!!, getString(R.string.ad_banner_unit_id))
-
-        val adView = activity!!.banner_ad_main
-        val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
-        adView.loadAd(adRequest)
-
-        getPointer()
-
-        activity!!.fab_apply.apply {
-            setOnClickListener {
-                applyPointer()
+        activity!!.apply {
+            card_new_pointer.setOnClickListener { showPointerChooser(pointerType = POINTER_TOUCH) }
+            card_new_mouse.setOnClickListener {
+                showPointerChooser(
+                    pointerType = POINTER_MOUSE,
+                    title = "Select Mouse Pointer"
+                )
             }
-            icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+            fab_apply.apply {
+                setOnClickListener {
+                    applyPointer()
+                }
+                icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+            }
+            MobileAds.initialize(this, getString(R.string.ad_banner_unit_id))
+
+            val adView = banner_ad_main
+            val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
+            adView.loadAd(adRequest)
+
+            getPointer()
+
+            action_customize.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putInt("TYPE", POINTER_TOUCH)
+                }
+                val extras = FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
+                findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
+            }
+
+            action_customize_mouse.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putInt("TYPE", POINTER_MOUSE)
+                }
+                val extras = FragmentNavigatorExtras(selected_mouse to getString(R.string.transition_mouse))
+                findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
+            }
+        }
+    }
+
+    private fun createFileFromView(view: View, exportPath: String) {
+        val file = File(exportPath)
+        Runtime.getRuntime().exec("chmod 666 $exportPath")
+        val out: FileOutputStream
+        try {
+            out = FileOutputStream(file)
+            loadBitmapFromView(view).compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return
         }
     }
 
@@ -104,26 +152,27 @@ class MainFragment : Fragment() {
      */
     @Throws(IOException::class)
     private fun applyPointer() {
-        val pointerPath = activity!!.filesDir.path + "/pointer.png"
+        val filesDir = activity!!.filesDir.path
+        val pointerPath = "$filesDir/pointer.png"
+        val mousePath = "$filesDir/mouse.png"
         sharedPreferences!!.edit(true) {
             putString(getString(R.string.key_pointerPath), pointerPath)
+            putString(getString(R.string.key_mousePath), mousePath)
         }
-        val bitmap = loadBitmapFromView(selected_pointer)
-        val file = File(pointerPath)
-        Runtime.getRuntime().exec("chmod 666 $pointerPath")
-        val out: FileOutputStream
-        try {
-            out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-            current_pointer.visible(true)
-            text_no_pointer_applied.visible(false)
-            current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return
+        createFileFromView(selected_pointer, pointerPath)
+        createFileFromView(selected_mouse, mousePath)
+
+        text_no_pointer_applied.visible(false)
+        text_no_mouse_applied.visible(false)
+        current_pointer.apply {
+            visible(true)
+            setImageDrawable(Drawable.createFromPath(pointerPath))
         }
+        current_mouse.apply {
+            visible(true)
+            setImageDrawable(Drawable.createFromPath(mousePath))
+        }
+
         activity!!.container.longSnackbar(
             message = getString(R.string.text_pointer_applied),
             actionText = getString(R.string.reboot)
@@ -161,31 +210,114 @@ class MainFragment : Fragment() {
         return b
     }
 
-    private fun showPointerChooser() {
-        val pointerFragment = PointerBottomSheetFragment()
-        pointerFragment.show(activity!!.supportFragmentManager, "POINTERS")
-        pointerFragment.setTitle("Select Pointers")
-        pointerFragment.setPointerSelectCallback(object : PointerBottomSheetFragment.PointerSelectCallback {
-            override fun onPointerSelected(pointerPath: String) {
-                sharedPreferences!!.edit(true) {
-                    putString(getString(R.string.key_selectedPointerPath), pointerPath)
-                }
-                GlideApp.with(context!!).load(File(pointerPath)).into(activity!!.selected_pointer)
-                Log.d(_tag, "onPointerSelected: Selected Pointer Path: $pointerPath")
-            }
+    private fun showPointerChooser(title: String = "Select Pointers", pointerType: Int) {
+        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
+            customView(R.layout.layout_grid_bottomsheet)
+        }
 
-        })
+        val dialogView = dialog.getCustomView()
+        val pointerAdapter = PointerAdapter(activity!!)
+
+        dialogView.grid_pointers.apply {
+            adapter = pointerAdapter
+            onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                sharedPreferences!!.edit(true) {
+                    putString(
+                        when (pointerType) {
+                            POINTER_TOUCH -> {
+                                getString(R.string.key_selectedPointerPath)
+                            }
+                            else -> {
+                                getString(R.string.key_selectedMousePath)
+                            }
+                        },
+                        pointerAdapter.getItem(position)
+                    )
+
+
+                }
+                GlideApp.with(context!!).load(File(pointerAdapter.getItem(position)))
+                    .into(
+                        when (pointerType) {
+                            POINTER_TOUCH -> {
+                                activity!!.selected_pointer
+                            }
+                            else -> {
+                                activity!!.selected_mouse
+                            }
+                        }
+                    )
+                dialog.dismiss()
+            }
+        }
+
+        try {
+            val pointersFolder =
+                File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
+            val dotNoMedia = File(pointersFolder.path + ".nomedia")
+            if (!pointersFolder.exists()) {
+                pointersFolder.mkdirs()
+            }
+            if (!dotNoMedia.exists()) {
+                dotNoMedia.createNewFile()
+            }
+            val pointerFiles = pointersFolder.listFiles()
+            PointerAdapter.itemList.clear()
+            if (pointerFiles.isNotEmpty()) {
+                dialogView.info_no_pointer_installed.visible(false)
+                dialogView.text_bottomsheet_header.text = title
+                pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
+                pointerAdapter.notifyDataSetChanged()
+
+                dialogView.grid_pointers.onItemLongClickListener =
+                    AdapterView.OnItemLongClickListener { _, _, i, _ ->
+                        val file = File(pointerAdapter.getItem(i))
+                        MaterialDialog(activity!!).show {
+                            title(text = getString(R.string.text_delete) + " " + file.name)
+                            message(res = R.string.text_delete_confirm)
+                            positiveButton(res = R.string.text_yes) {
+                                if (file.delete()) {
+                                    Toast.makeText(context, "Pointer deleted.", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Error deleting pointer.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            negativeButton(res = R.string.text_no)
+                        }
+                        false
+                    }
+            } else {
+                dialogView.apply {
+                    info_no_pointer_installed.visible(true)
+                    bs_button_install_pointers.setOnClickListener {
+                        dialog.dismiss()
+                        activity!!.findNavController(R.id.fragment_repo_nav)
+                            .navigate(R.id.repoFragment)
+                    }
+                }
+            }
+        } catch (npe: NullPointerException) {
+            npe.printStackTrace()
+        }
     }
 
     private fun getPointer() {
         try {
             val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
             val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
+            val selectedMousePath = sharedPreferences!!.getString(getString(R.string.key_selectedMousePath), null)
+            var size = sharedPreferences!!.getInt(getString(R.string.key_pointerSize), context!!.getMinPointerSize())
+            var mouseSize = sharedPreferences!!.getInt(getString(R.string.key_mouseSize), context!!.getMinPointerSize())
+            val padding = sharedPreferences!!.getInt(getString(R.string.key_pointerPadding), 0)
+            val mousePadding = sharedPreferences!!.getInt(getString(R.string.key_mousePadding), 0)
+            if (size <= 0) {
+                size = context!!.getMinPointerSize()
+            }
+            if (mouseSize <= 0) {
+                mouseSize = context!!.getMinPointerSize()
+            }
             if (pointerPath != null) {
-                GlideApp.with(context!!)
-                    .load(File(pointerPath))
-                    .override(context!!.getMinPointerSize())
-                    .into(current_pointer)
+                current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
                 text_no_pointer_applied.visible(false)
             } else {
                 text_no_pointer_applied.visible(true)
@@ -193,10 +325,22 @@ class MainFragment : Fragment() {
             }
 
             if (selectedPointerPath != null) {
+                selected_pointer.apply {
+                    layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
+                    setPadding(padding, padding, padding, padding)
+                }
                 GlideApp.with(context!!)
                     .load(File(selectedPointerPath))
-                    .override(context!!.getMinPointerSize())
                     .into(selected_pointer)
+            }
+            if (selectedMousePath != null) {
+                selected_mouse.apply {
+                    layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
+                    setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
+                }
+                GlideApp.with(context!!)
+                    .load(File(selectedMousePath))
+                    .into(selected_mouse)
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()

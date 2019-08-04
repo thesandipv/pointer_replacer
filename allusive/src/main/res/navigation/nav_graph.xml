@@ -59,6 +59,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/toCustomize"
+            app:destination="@id/customizeFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -74,4 +77,8 @@
         android:name="com.afterroot.allusive.fragment.NewPointerPost"
         android:label="New Pointer"
         tools:layout="@layout/fragment_new_pointer_post" />
+    <fragment
+        android:id="@+id/customizeFragment"
+        android:name="com.afterroot.allusive.fragment.CustomizeFragment"
+        android:label="Customize Pointer" />
 </navigation>
