@@ -18,7 +18,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/viewPreview"
-        android:title="@string/title_activity_pointer_preview"
+        android:title="@string/pointer_preview"
         android:icon="@drawable/ic_action_preview"
         app:showAsAction="always"/>
     <item

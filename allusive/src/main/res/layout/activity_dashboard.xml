@@ -56,8 +56,7 @@
         app:icon="@drawable/ic_action_apply"
         app:layout_anchor="@id/placeholder"
         app:layout_anchorGravity="top|end"
-        app:layout_behavior=".ui.BottomNavigationFABBehavior"
-        app:useCompatPadding="true" />
+        app:layout_behavior=".ui.BottomNavigationFABBehavior" />
 
     <LinearLayout
         android:id="@+id/placeholder"

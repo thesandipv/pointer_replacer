@@ -20,5 +20,5 @@
         android:title="@string/edit_profile" />
     <item
         android:id="@+id/profile_logout"
-        android:title="Logout" />
+        android:title="@string/text_logout" />
 </menu>
