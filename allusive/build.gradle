@@ -34,6 +34,10 @@ private String genVersionName() {
     return "${ext.major}.${ext.minor}.${ext.patch}.${buildTime()}"
 }
 
+private String genVersionNameBeta() {
+    return "${ext.major}.${ext.minor}.${ext.patch}"
+}
+
 private Integer genVersionCode() {
     return ext.major * 10000 + ext.minor * 1000 + ext.patch * 100
 }
@@ -94,6 +98,9 @@ android {
             minSdkVersion 22
             targetSdkVersion 28
             resConfigs('en', 'xhdpi')
+            versionCode = genVersionCode()
+            versionName genVersionNameBeta()
+            versionNameSuffix = '-beta'
         }
     }
 }
@@ -126,18 +133,15 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:3.1.0'
     implementation 'com.afollestad.material-dialogs:bottomsheets:3.1.0'
 
-    implementation 'com.andkulikov:transitionseverywhere:1.8.1'
-
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
+    implementation 'com.firebaseui:firebase-ui-storage:4.3.1'
 
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     kapt 'com.github.bumptech.glide:compiler:4.9.0'
 
-    implementation 'com.github.yukuku:ambilwarna:2.0.1'
-
-    implementation 'com.google.android.material:material:1.1.0-alpha08'
+    implementation 'com.google.android.material:material:1.1.0-alpha09'
     implementation 'com.google.firebase:firebase-ads:18.1.1'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
     implementation 'com.google.firebase:firebase-config:18.0.0'
@@ -145,8 +149,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:20.2.0'
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
     implementation 'com.google.firebase:firebase-storage:18.1.1'
-
-    implementation 'com.firebaseui:firebase-ui-storage:4.3.1'
 
     implementation 'de.psdev.licensesdialog:licensesdialog:2.1.0'
     implementation 'org.apache.commons:commons-io:1.3.2'

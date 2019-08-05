@@ -15,7 +15,6 @@
 
 <resources>
     <string name="app_name">Pointer Replacer</string>
-    <string name="version" translatable="false">v1.7.1 (25)</string>
 
     <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/7473207984</string>
@@ -41,6 +40,7 @@
     <string name="helper_text_desc">Provide short info about pointer.</string>
     <string name="helper_text_name">Provide name of pointer. Visible to all users.</string>
     <string name="hint_desc">Description</string>
+    <string name="hint_email">Email</string>
     <string name="hint_name">Name</string>
     <string name="import_pointer">Import Pointer</string>
     <string name="install_manage_pointers">Install Pointers</string>
@@ -48,19 +48,18 @@
     <string name="key_EnablePointerAlpha" translatable="false">keyEnablePointerAlpha</string>
     <string name="key_maxPaddingSize" translatable="false">maxPaddingSize</string>
     <string name="key_maxPointerSize" translatable="false">maxPointerSize</string>
+    <string name="key_mousePadding" translatable="false">MOUSE_PADDING</string>
+    <string name="key_mousePath" translatable="false">MOUSE_PATH</string>
+    <string name="key_mouseSize" translatable="false">MOUSE_SIZE</string>
     <string name="key_oldColor" translatable="false">OLD_COLOR</string>
     <string name="key_pointerPadding" translatable="false">pointer_padding</string>
-    <string name="key_mousePadding" translatable="false">MOUSE_PADDING</string>
     <string name="key_pointerPath" translatable="false">POINTER_PATH</string>
-    <string name="key_mousePath" translatable="false">MOUSE_PATH</string>
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
-    <string name="key_mouseSize" translatable="false">MOUSE_SIZE</string>
-    <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
+    <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
-    <string name="transition_mouse" translatable="false">mouse_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="mouse_pointer">Mouse Pointer</string>
     <string name="msg_downloading_ext">Downloading Extension</string>
@@ -81,9 +80,11 @@
     <string name="reboot">Reboot</string>
     <string name="reset_pointer_color">Reset Pointer Color</string>
     <string name="reset_size">Reset Size &amp; Padding</string>
+    <string name="str_format_uploaded_by">by %s</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
+    <string name="text_action_customize">Customize</string>
     <string name="text_action_post">Post</string>
     <string name="text_action_save">Save</string>
     <string name="text_action_upload">Upload</string>
@@ -96,22 +97,22 @@
     <string name="text_color_changed">Pointer color changed.</string>
     <string name="text_color_changed_default">Color changed to Default</string>
     <string name="text_color_not_changed">Pointer color not changed.</string>
-    <string name="text_cur_pointer">Current Pointer</string>
     <string name="text_cur_mouse">Current Mouse Pointer</string>
+    <string name="text_cur_pointer">Current Pointer</string>
     <string name="text_delete">Delete</string>
     <string name="text_delete_confirm">Are you sure you want to delete this pointer??</string>
     <string name="text_edit">Edit</string>
-    <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
     <string name="text_max_padding_size">Max Padding Size</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
+    <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
     <string name="text_no">No</string>
     <string name="text_not_installed">Not Installed</string>
     <string name="text_padding">Padding</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>
     <string name="text_progress_finishing_up">Finishing Up</string>
-    <string name="text_progress_uploading">Uploading</string>
     <string name="text_progress_init">Initializing</string>
+    <string name="text_progress_uploading">Uploading</string>
     <string name="text_reboot_confirm">Pointer Applied. Choose Reboot or Soft-Reboot. Click outside to cancel.</string>
     <string name="text_selected_pointer">Selected</string>
     <string name="text_size">Size</string>
@@ -125,12 +126,10 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_home">Home</string>
     <string name="title_install_ext_dialog">Install Extension</string>
+    <string name="transition_mouse" translatable="false">mouse_transition</string>
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
     <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="hint_email">Email</string>
-    <string name="str_format_uploaded_by">by %s</string>
-    <string name="text_action_customize">Customize</string>
 
 </resources>
