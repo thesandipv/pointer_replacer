@@ -22,6 +22,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.FrameLayout
@@ -89,8 +90,8 @@ class MainFragment : Fragment() {
         pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
 
         activity!!.apply {
-            card_new_pointer.setOnClickListener { showPointerChooser(pointerType = POINTER_TOUCH) }
-            card_new_mouse.setOnClickListener {
+            layout_new_pointer.setOnClickListener { showPointerChooser(pointerType = POINTER_TOUCH) }
+            layout_new_mouse.setOnClickListener {
                 showPointerChooser(
                     pointerType = POINTER_MOUSE,
                     title = "Select Mouse Pointer"
@@ -137,6 +138,8 @@ class MainFragment : Fragment() {
         var mouseSize = sharedPreferences!!.getInt(getString(R.string.key_mouseSize), context!!.getMinPointerSize())
         val padding = sharedPreferences!!.getInt(getString(R.string.key_pointerPadding), 0)
         val mousePadding = sharedPreferences!!.getInt(getString(R.string.key_mousePadding), 0)
+        val pointerColor = sharedPreferences!!.getInt(getString(R.string.key_pointerColor), 0)
+        val mouseColor = sharedPreferences!!.getInt(getString(R.string.key_mouseColor), 0)
 
         try {
             if (size <= 0) {
@@ -165,6 +168,7 @@ class MainFragment : Fragment() {
                 selected_pointer.apply {
                     layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
                     setPadding(padding, padding, padding, padding)
+                    setColorFilter(pointerColor)
                 }
                 GlideApp.with(context!!)
                     .load(File(selectedPointerPath))
@@ -174,6 +178,7 @@ class MainFragment : Fragment() {
                 selected_mouse.apply {
                     layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
                     setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
+                    setColorFilter(mouseColor)
                 }
                 GlideApp.with(context!!)
                     .load(File(selectedMousePath))
@@ -304,14 +309,15 @@ class MainFragment : Fragment() {
         try {
             val pointersFolder =
                 File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
-            val dotNoMedia = File(pointersFolder.path + ".nomedia")
+            val dotNoMedia = File("${pointersFolder.path}/.nomedia")
             if (!pointersFolder.exists()) {
                 pointersFolder.mkdirs()
             }
             if (!dotNoMedia.exists()) {
                 dotNoMedia.createNewFile()
             }
-            val pointerFiles = pointersFolder.listFiles()
+
+            val pointerFiles = pointersFolder.listFiles()//.filter { getMimeType(it.name)!!.startsWith("image/") }
             PointerAdapter.itemList.clear()
             if (pointerFiles.isNotEmpty()) {
                 dialogView.info_no_pointer_installed.visible(false)
@@ -345,8 +351,8 @@ class MainFragment : Fragment() {
                     }
                 }
             }
-        } catch (npe: NullPointerException) {
-            npe.printStackTrace()
+        } catch (npe: Exception) {
+            Log.e(_tag, "showPointerChooser: $npe")
         }
     }
 

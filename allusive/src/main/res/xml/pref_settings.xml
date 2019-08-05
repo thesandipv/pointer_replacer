@@ -32,11 +32,6 @@
             app:summary="Enables Slider to Change Pointer Alpha (transparency)"
             app:title="Enable Pointer Alpha" />
     </PreferenceCategory>
-    <PreferenceCategory app:title="Color Picker">
-        <Preference
-            app:key="@string/key_use_material_cc"
-            app:title="Change Color Picker" />
-    </PreferenceCategory>
     <PreferenceCategory app:title="About">
         <Preference
             app:icon="@mipmap/ic_launcher"

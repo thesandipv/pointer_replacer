@@ -33,7 +33,6 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.ACTION_OPEN_TEL
 import com.afterroot.allusive.Constants.EXTRA_TOUCH_VAL
@@ -85,16 +84,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
         }
-
-
-        findPreference<Preference>(getString(R.string.key_use_material_cc))!!.apply {
-            updateCCSummary(this)
-            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                showSingleChoice()
-                false
-            }
-        }
-
 
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
             summary = preferences!!.getInt(getString(R.string.key_maxPointerSize), context!!.getMinPointerSize()).toString()
@@ -278,29 +267,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun showSingleChoice() {
-        val selectedIndex = preferences!!.getInt("selectedIndex", 1)
-        MaterialDialog(activity!!).show {
-            title(R.string.choose_color_picker)
-            listItemsSingleChoice(res = R.array.CCItems, initialSelection = selectedIndex) { _, index, _ ->
-                preferences!!.edit(true) {
-                    putInt("selectedIndex", index)
-                    putBoolean(getString(R.string.key_use_material_cc), index != 0)
-                }
-                updateCCSummary(findPreference(getString(R.string.key_use_material_cc))!!)
-            }
-            positiveButton(R.string.changelog_ok_button)
-        }
-    }
-
-    private fun updateCCSummary(preference: Preference) {
-        preference.summary =
-            if (preferences!!.getBoolean(getString(R.string.key_use_material_cc), true)) {
-                "Material Color Picker"
-            } else {
-                "HSV Color Picker"
-            }
     }
 }

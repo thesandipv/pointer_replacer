@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         //addUserInfoInDB()
     }
 
+    //TODO Get to work addUserInfoInDB function
     private fun addUserInfoInDB() {
         try {
             val curUser = FirebaseUtils.auth!!.currentUser
@@ -123,9 +124,8 @@ class MainActivity : AppCompatActivity() {
             userRef.get().addOnCompleteListener { getUserTask ->
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
-                        container.snackbar("User not available. Creating User..")
+                        container.snackbar("User not available. Creating User..").anchorView = navigation
                         val user = User(curUser.displayName, curUser.email, curUser.uid)
-                        //TODO add dialog to add phone number
                         userRef.set(user).addOnCompleteListener { setUserTask ->
                             when {
                                 setUserTask.isSuccessful -> {
@@ -136,7 +136,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     else -> Log.e(_tag, "Unknown Error", getUserTask.exception)
                 }
-                //initFirebaseDb()
             }
         } catch (e: Exception) {
             e.printStackTrace()
