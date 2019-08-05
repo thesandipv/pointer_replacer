@@ -76,8 +76,8 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
 
         return view
     }
-}
 
-private class ViewHolder {
-    internal var imageView: ImageView? = null
+    inner class ViewHolder {
+        internal var imageView: ImageView? = null
+    }
 }
