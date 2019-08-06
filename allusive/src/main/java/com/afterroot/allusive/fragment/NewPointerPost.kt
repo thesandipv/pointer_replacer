@@ -42,8 +42,8 @@ import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.dialog_progress.view.*
 import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
-import kotlinx.android.synthetic.main.layout_progress.view.*
 import org.jetbrains.anko.design.snackbar
 import java.io.File
 import java.io.FileNotFoundException
@@ -102,7 +102,7 @@ class NewPointerPost : Fragment() {
 
     private fun upload(file: File) {
         val dialog = MaterialDialog(context!!).show {
-            customView(R.layout.layout_progress)
+            customView(R.layout.dialog_progress)
             cornerRadius(16f)
             cancelable(false)
         }
