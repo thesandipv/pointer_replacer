@@ -36,7 +36,6 @@
         <Preference
             app:icon="@mipmap/ic_launcher"
             app:key="pref_version"
-            app:summary="@string/version"
             app:title="@string/app_name" />
         <Preference
             android:key="licenses"
