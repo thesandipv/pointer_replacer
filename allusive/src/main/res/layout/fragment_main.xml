@@ -28,9 +28,9 @@
             android:id="@+id/card_current_pointer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             app:cardCornerRadius="@dimen/card_radius"
             app:cardUseCompatPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
@@ -41,8 +41,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/card_corner_radius"
-                android:paddingBottom="@dimen/card_corner_radius"
+                android:paddingTop="@dimen/padding_normal"
+                android:paddingBottom="@dimen/padding_normal"
                 android:clipToPadding="true">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -154,10 +154,9 @@
             android:id="@+id/card_current_mouse"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:clickable="false"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             app:cardCornerRadius="@dimen/card_radius"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -166,8 +165,8 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/card_corner_radius"
-                android:paddingBottom="@dimen/card_corner_radius"
+                android:paddingTop="@dimen/padding_normal"
+                android:paddingBottom="@dimen/padding_normal"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout

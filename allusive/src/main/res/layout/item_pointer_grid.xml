@@ -20,7 +20,9 @@
 
     <ImageView
         android:id="@+id/grid_item_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:ignore="ContentDescription" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_normal"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/pointer" />
 </FrameLayout>

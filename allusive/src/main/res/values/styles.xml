@@ -32,4 +32,9 @@
 
     <!--Toolbar-->
     <style name="Widget.MyTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary" />
+
+    <style name="SeekBarButtonStyle">
+        <item name="android:tint">@color/color_primary</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+    </style>
 </resources>

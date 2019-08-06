@@ -35,6 +35,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.transition.Fade
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import com.afterroot.allusive.R
 
 fun View.visible(
     value: Boolean,
@@ -85,16 +86,7 @@ fun Context.getDrawableExt(id: Int, tint: Int? = null): Drawable {
     return drawable!!
 }
 
-fun Context.getDpi(): Int {
-    return this.resources.displayMetrics.densityDpi
-}
-
-fun Context.getMinPointerSize(): Int =
-    if (this.getDpi() <= 240) {
-        49
-    } else {
-        66
-    }
+fun Context.getMinPointerSize(): Int = this.resources.getInteger(R.integer.min_pointer_size)
 
 /**
  * @fileName fileName name of file

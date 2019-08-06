@@ -57,7 +57,6 @@
         <activity
             android:name="com.afterroot.allusive.ui.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
             android:theme="@style/MyTheme.Main" />
 
         <activity

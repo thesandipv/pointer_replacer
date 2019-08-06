@@ -31,7 +31,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.listItems
+import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
@@ -47,6 +50,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
 import org.jetbrains.anko.design.snackbar
 import java.io.File
@@ -54,6 +58,9 @@ import java.io.File
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
     private lateinit var db: FirebaseFirestore
+    private lateinit var extSdDir: String
+    private lateinit var mTargetPath: String
+    private lateinit var pointersFolder: String
     private lateinit var storage: FirebaseStorage
     private val pointerViewModel: PointerViewModel by lazy { ViewModelProviders.of(this).get(PointerViewModel::class.java) }
     private var pointerAdapter: PointerAdapterDelegate? = null
@@ -79,8 +86,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             icon = context!!.getDrawableExt(R.drawable.ic_add)
         }
 
-        repo_swipe_refresh.setOnRefreshListener {
-            loadPointers()
+        repo_swipe_refresh.apply {
+            setOnRefreshListener {
+                loadPointers()
+            }
+            setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
         }
     }
 
@@ -88,6 +98,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             setUpList()
+
+            pointersFolder = getString(R.string.pointer_folder_path)
+            extSdDir = Environment.getExternalStorageDirectory().toString()
+            mTargetPath = extSdDir + pointersFolder
         }
     }
 
@@ -121,39 +135,68 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         })
     }
 
-    override fun onClick(position: Int, view: View?) {
-        when (view!!.id) {
-            R.id.item_action_pack -> {
-                Toast.makeText(context!!, pointersList[position].name, Toast.LENGTH_SHORT).show()
+    private fun showPointerInfoDialog(position: Int) {
+        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
+            customView(R.layout.fragment_pointer_info, scrollable = true)
+        }
 
-                val pointersFolder = getString(R.string.pointer_folder_path)
-                val extSdDir = Environment.getExternalStorageDirectory().toString()
-                val mTargetPath = extSdDir + pointersFolder
+        val pointer = pointersList[position]
+        var isDownloaded = false
+        val file = File("$mTargetPath${pointersList[position].filename}")
+        if (file.exists()) {
+            isDownloaded = true
+        }
 
-                val ref = storage.reference.child("pointers").child(pointersList[position].filename)
-
-                val file = File("$mTargetPath${pointersList[position].filename}")
-
-                ref.getFile(file).addOnSuccessListener {
-                    activity!!.container.snackbar("Pointer Installed").anchorView = activity!!.navigation
-                }
+        dialog.getCustomView().apply {
+            val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
+            info_pointer_pack_name.text = pointer.name
+            info_pack_desc.text = pointer.description
+            pointer.uploadedBy!!.forEach {
+                info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
-            else -> {
-                pointersSnapshot.documents[position].id
+            GlideApp.with(context).load(storageReference).override(128).into(info_pointer_image)
+            info_action_pack.apply {
+                if (isDownloaded) {
+                    text = getString(R.string.text_installed)
+                    setOnClickListener {
+
+                    }
+                } else {
+                    text = getString(R.string.text_download)
+                    setOnClickListener {
+                        downloadPointer(position)
+                    }
+                }
+
             }
         }
     }
 
+    private fun downloadPointer(position: Int) {
+        Toast.makeText(context!!, pointersList[position].name, Toast.LENGTH_SHORT).show()
+        val ref = storage.reference.child(DatabaseFields.POINTERS).child(pointersList[position].filename)
+        val file = File("$mTargetPath${pointersList[position].filename}")
+
+        ref.getFile(file).addOnSuccessListener {
+            activity!!.container.snackbar("Pointer Downloaded").anchorView = activity!!.navigation
+        }
+        pointersSnapshot.documents[position].reference.update("downloads", pointersList[position].downloads + 1)
+    }
+
+    override fun onClick(position: Int, view: View?) {
+        showPointerInfoDialog(position)
+    }
+
     override fun onLongClick(position: Int) {
         val isIdMatch = pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
+        if (!isIdMatch) return
         val list = arrayListOf(getString(R.string.text_edit), getString(R.string.text_delete))
-        if (!isIdMatch) list.remove(getString(R.string.text_edit))
         MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             cornerRadius(16f)
-            listItems(items = list) { dialog, index, text ->
+            listItems(items = list) { _, _, text ->
                 when (text) {
                     getString(R.string.text_edit) -> {
-
+                        activity!!.container.snackbar("Will arrive soon.").anchorView = activity!!.navigation
                     }
                     getString(R.string.text_delete) -> {
                         MaterialDialog(context).show {

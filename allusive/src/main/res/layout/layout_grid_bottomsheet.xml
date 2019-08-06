@@ -18,10 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:behavior_hideable="true"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    android:layout_height="match_parent">
 
     <GridView
         android:id="@+id/grid_pointers"

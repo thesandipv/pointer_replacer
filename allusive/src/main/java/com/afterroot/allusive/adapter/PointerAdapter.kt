@@ -56,7 +56,7 @@ class PointerAdapter(private val mContext: Context) : BaseAdapter() {
         var view: View? = convertView
 
         if (view == null) {
-            view = inflater.inflate(R.layout.gridview_item, parent, false)
+            view = inflater.inflate(R.layout.item_pointer_grid, parent, false)
             holder = ViewHolder()
             holder.imageView = view.findViewById(R.id.grid_item_image)
             view.tag = holder

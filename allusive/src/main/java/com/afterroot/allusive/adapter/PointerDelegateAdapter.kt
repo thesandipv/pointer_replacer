@@ -17,7 +17,6 @@ package com.afterroot.allusive.adapter
 
 import android.content.Context
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +28,7 @@ import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.inflate
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.repo_pointer_item.view.*
+import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 
 class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = PointerVH(parent)
@@ -39,26 +38,20 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
         holder.bind(item as Pointer)
     }
 
-    inner class PointerVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.repo_pointer_item)) {
+    inner class PointerVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
         val context: Context = parent.context
-        private val itemName: AppCompatTextView = itemView.item_pointer_pack_name
-        private val itemDesc: AppCompatTextView = itemView.item_pack_desc
-        private val itemThumb: AppCompatImageView = itemView.item_pointer_thumb
-        private val actionDl: AppCompatImageButton = itemView.item_action_pack
-        private val itemUploader: AppCompatTextView = itemView.item_username
+        private val itemName: AppCompatTextView = itemView.info_pointer_pack_name
+        private val itemThumb: AppCompatImageView = itemView.info_pointer_image
+        private val itemUploader: AppCompatTextView = itemView.info_username
 
 
         fun bind(pointer: Pointer) {
             val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
             itemName.text = pointer.name
-            itemDesc.text = pointer.description
             pointer.uploadedBy!!.forEach {
                 itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
             GlideApp.with(context).load(storageReference).override(context.getMinPointerSize()).into(itemThumb)
-            actionDl.setOnClickListener {
-                callbacks.onClick(adapterPosition, it)
-            }
 
             with(super.itemView) {
                 tag = pointer
