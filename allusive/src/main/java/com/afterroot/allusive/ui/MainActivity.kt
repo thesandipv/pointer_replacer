@@ -103,8 +103,8 @@ class MainActivity : AppCompatActivity() {
             sharedPreferences.edit(true) { putBoolean(PREF_KEY_FIRST_INSTALL, false) }
         }
 
-        //Initialize Interstitial Ad
-        MobileAds.initialize(this, getString(R.string.ad_interstitial_1_id))
+        //Initialize AdMob SDK
+        MobileAds.initialize(this, getString(R.string.admob_app_id))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions()
