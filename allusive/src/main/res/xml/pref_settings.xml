@@ -37,6 +37,12 @@
             app:icon="@mipmap/ic_launcher"
             app:key="pref_version"
             app:title="@string/app_name" />
+        <Preference android:title="Privacy Policy">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_privacy_policy" />
+        </Preference>
+
         <Preference
             android:key="licenses"
             android:summary="Click to view licenses of third party libraries"
