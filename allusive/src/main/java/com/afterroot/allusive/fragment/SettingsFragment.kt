@@ -42,10 +42,10 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.isAppInstalled
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
-import de.psdev.licensesdialog.LicensesDialog
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.longSnackbar
@@ -166,7 +166,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("licenses")?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                LicensesDialog.Builder(context!!).setNotices(R.raw.notices).build().show()
+                OssLicensesMenuActivity.setActivityTitle("Licences").apply { }
+                startActivity(Intent(context!!, OssLicensesMenuActivity::class.java))
                 return@OnPreferenceClickListener true
             }
         }
