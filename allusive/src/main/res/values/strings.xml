@@ -16,6 +16,7 @@
 <resources>
     <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/6191545783</string>
+    <string name="ad_pr_native_1_id" translatable="false">ca-app-pub-6628325093439880/6721706938</string>
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~2651384855</string>
     <string name="app_name">Pointer Replacer</string>
     <string name="apply_pointer">Apply Pointer</string>
@@ -126,7 +127,7 @@
     <string name="title_install_ext_dialog">Install Extension</string>
     <string name="transition_mouse" translatable="false">mouse_transition</string>
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
-    <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
-    <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
-    <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="url_prx" translatable="false">https://pointerreplacer.page.link/xposedRepo</string>
+    <string name="url_source_code" translatable="false">https://pointerreplacer.page.link/source</string>
+    <string name="url_xda_thread" translatable="false">https://pointerreplacer.page.link/xda</string>
 </resources>
