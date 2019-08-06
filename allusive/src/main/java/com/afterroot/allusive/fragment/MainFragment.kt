@@ -38,6 +38,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.POINTER_MOUSE
 import com.afterroot.allusive.Constants.POINTER_TOUCH
 import com.afterroot.allusive.GlideApp
@@ -49,7 +50,9 @@ import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.visible
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -68,6 +71,7 @@ class MainFragment : Fragment() {
     private var pointerPreviewPath: String? = null
     private var sharedPreferences: SharedPreferences? = null
     private var targetPath: String? = null
+    private lateinit var interstitialAd: InterstitialAd
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -103,11 +107,7 @@ class MainFragment : Fragment() {
                 }
                 icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
             }
-            MobileAds.initialize(this, getString(R.string.ad_banner_unit_id))
-
-            val adView = banner_ad_main
-            val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
-            adView.loadAd(adRequest)
+            setUpAd()
 
             loadCurrentPointers()
 
@@ -212,31 +212,61 @@ class MainFragment : Fragment() {
             setImageDrawable(Drawable.createFromPath(mousePath))
         }
 
-        activity!!.container.longSnackbar(
-            message = getString(R.string.text_pointer_applied),
-            actionText = getString(R.string.reboot)
-        ) {
-            MaterialDialog(activity!!).show {
-                title(res = R.string.reboot)
-                message(res = R.string.text_reboot_confirm)
-                positiveButton(res = R.string.reboot) {
-                    try {
-                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
-                        process.waitFor()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                negativeButton(res = R.string.text_soft_reboot) {
-                    try {
-                        val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
-                        process.waitFor()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+        interstitialAd.apply {
+            if (isLoaded) show()
+            adListener = object : AdListener() {
+                override fun onAdClosed() {
+                    super.onAdClosed()
+                    activity!!.container.longSnackbar(
+                        message = getString(R.string.text_pointer_applied),
+                        actionText = getString(R.string.reboot)
+                    ) {
+                        showRebootDialog()
+                    }.anchorView = activity!!.navigation
                 }
             }
-        }.anchorView = activity!!.navigation
+        }
+    }
+
+    private fun showRebootDialog() {
+        MaterialDialog(activity!!).show {
+            title(res = R.string.reboot)
+            message(res = R.string.text_reboot_confirm)
+            positiveButton(res = R.string.reboot) {
+                try {
+                    val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
+                    process.waitFor()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            negativeButton(res = R.string.text_soft_reboot) {
+                try {
+                    val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
+                    process.waitFor()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun setUpAd() {
+        MobileAds.initialize(context!!, getString(R.string.ad_banner_unit_id))
+
+        val adView = banner_ad_main
+        val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
+        adView.loadAd(adRequest)
+
+        interstitialAd = InterstitialAd(this.activity!!)
+        interstitialAd.apply {
+            adUnitId = if (BuildConfig.DEBUG) {
+                "ca-app-pub-3940256099942544/1033173712"
+            } else {
+                getString(R.string.ad_interstitial_1_id)
+            }
+            loadAd(AdRequest.Builder().build())
+        }
     }
 
     private fun createFileFromView(view: View, exportPath: String) {
