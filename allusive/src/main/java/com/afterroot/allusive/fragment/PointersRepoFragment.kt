@@ -38,8 +38,8 @@ import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
-import com.afterroot.allusive.database.Database
 import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
@@ -48,6 +48,7 @@ import com.afterroot.allusive.viewmodel.ViewModelState
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
@@ -60,16 +61,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private lateinit var db: FirebaseFirestore
     private lateinit var extSdDir: String
     private lateinit var mTargetPath: String
+    private lateinit var pointerAdapter: PointerAdapterDelegate
     private lateinit var pointersFolder: String
+    private lateinit var pointersList: List<Pointer>
+    private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var storage: FirebaseStorage
     private val pointerViewModel: PointerViewModel by lazy { ViewModelProviders.of(this).get(PointerViewModel::class.java) }
-    private var pointerAdapter: PointerAdapterDelegate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         storage = FirebaseStorage.getInstance()
-        db = Database.getInstance()
+        db = dbInstance
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -105,8 +108,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
     }
 
-    lateinit var pointersList: List<Pointer>
-    lateinit var pointersSnapshot: QuerySnapshot
     private fun setUpList() {
         pointerAdapter = PointerAdapterDelegate(this)
         list.apply {
@@ -128,8 +129,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 is ViewModelState.Loaded<*> -> {
                     repo_swipe_refresh.isRefreshing = false
                     pointersSnapshot = it.data as QuerySnapshot
-                    pointersList = pointersSnapshot.toObjects(Pointer::class.java)
-                    pointerAdapter!!.add(pointersList)
+                    pointersList = pointersSnapshot.toObjects()
+                    pointerAdapter.add(pointersList)
                 }
             }
         })
@@ -226,4 +227,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
     }
 
+    private fun showContextDialog() {
+
+    }
 }

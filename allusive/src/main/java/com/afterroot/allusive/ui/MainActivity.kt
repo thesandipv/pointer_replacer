@@ -35,8 +35,8 @@ import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_LOGIN
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
-import com.afterroot.allusive.database.Database
 import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     private fun addUserInfoInDB() {
         try {
             val curUser = FirebaseUtils.auth!!.currentUser
-            val userRef = Database.getInstance().collection(DatabaseFields.USERS).document(curUser!!.uid)
+            val userRef = dbInstance.collection(DatabaseFields.USERS).document(curUser!!.uid)
             userRef.get().addOnCompleteListener { getUserTask ->
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {

@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.model.User
+import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
 import com.google.firebase.auth.FirebaseUser
@@ -34,19 +34,18 @@ import org.jetbrains.anko.design.snackbar
 
 class EditProfileFragment : Fragment() {
 
-    //private var listener: OnSaveButtonClick? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_edit_profile, container, false)
     }
 
-    lateinit var user: FirebaseUser
-    private val db = FirebaseFirestore.getInstance()
+    private lateinit var db: FirebaseFirestore
+    private lateinit var user: FirebaseUser
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         if (FirebaseUtils.isUserSignedIn) {
+            db = dbInstance
             user = FirebaseUtils.auth!!.currentUser!!
             with(view) {
                 input_profile_name.setText(user.displayName)
@@ -54,23 +53,22 @@ class EditProfileFragment : Fragment() {
                 input_email.isEnabled = false
                 activity!!.fab_apply.apply {
                     setOnClickListener {
-                        val newName = this@with.input_profile_name.text.toString()
+                        val newName = this@with.input_profile_name.text.toString().trim()
                         if (user.displayName != newName) {
                             val request = UserProfileChangeRequest.Builder()
                                 .setDisplayName(newName)
                                 .build()
                             user.updateProfile(request).addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    activity!!.container.snackbar("Profile Updated")
+                                    activity!!.container.snackbar(getString(R.string.msg_profile_updated))
+                                        .anchorView = activity!!.navigation
                                     db.collection(DatabaseFields.USERS)
                                         .document(user.uid)
-                                        .set(
-                                            User(newName, user.email, user.uid)
-                                        )
+                                        .update(DatabaseFields.FIELD_NAME, newName)
                                 }
                             }
-                        } else activity!!.container.snackbar("No Changes to Save.")
-                        //listener!!.onSaveButtonClicked()
+                        } else activity!!.container.snackbar(getString(R.string.msg_no_changes))
+                            .anchorView = activity!!.navigation
                     }
                     icon = context!!.getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
                 }
@@ -78,9 +76,5 @@ class EditProfileFragment : Fragment() {
         } else {
             //Not Logged In
         }
-    }
-
-    companion object {
-        fun newInstance() = EditProfileFragment()
     }
 }

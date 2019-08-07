@@ -15,18 +15,12 @@
 
 package com.afterroot.allusive.database
 
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
-object Database {
-    fun getInstance() = FirebaseFirestore.getInstance().apply {
+val dbInstance: FirebaseFirestore
+    get() = Firebase.firestore.apply {
         firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
     }
-
-    fun delete(ref: DocumentReference, callbacks: DeleteListener) {
-        ref.delete().addOnSuccessListener {
-            callbacks.onDeleteSuccess()
-        }.addOnFailureListener { callbacks.onDeleteFailed() }
-    }
-}

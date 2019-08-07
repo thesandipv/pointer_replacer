@@ -255,13 +255,13 @@ class MainFragment : Fragment() {
         MobileAds.initialize(context!!, getString(R.string.ad_banner_unit_id))
 
         val adView = banner_ad_main
-        val adRequest = AdRequest.Builder().addTestDevice("C2E7A1508F5C10E8CAD48853E334BD4C").build()
+        val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
         interstitialAd = InterstitialAd(this.activity!!)
         interstitialAd.apply {
             adUnitId = if (BuildConfig.DEBUG) {
-                "ca-app-pub-3940256099942544/1033173712"
+                getString(R.string.ad_interstitial_test_id)
             } else {
                 getString(R.string.ad_interstitial_1_id)
             }
