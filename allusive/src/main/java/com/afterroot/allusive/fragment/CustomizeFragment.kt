@@ -279,6 +279,7 @@ class CustomizeFragment : Fragment() {
         action_reset_color.setOnClickListener {
             mSharedPreferences!!.edit(true) {
                 putInt(typeTmpColor, 0)
+                color = 0
             }
             this@CustomizeFragment.view!!.image_customize_pointer.setColorFilter(0)
         }

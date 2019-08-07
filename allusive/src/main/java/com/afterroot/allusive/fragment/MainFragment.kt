@@ -289,6 +289,11 @@ class MainFragment : Fragment() {
         val dialogView = dialog.getCustomView()
         val pointerAdapter = PointerAdapter(activity!!)
 
+        dialogView.banner_ad_pointer_grid.apply {
+            val adRequest = AdRequest.Builder().build()
+            this.loadAd(adRequest)
+        }
+
         dialogView.grid_pointers.apply {
             adapter = pointerAdapter
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
