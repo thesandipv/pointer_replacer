@@ -166,7 +166,6 @@ class CustomizeFragment : Fragment() {
         seekBarSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, newProgress: Int, fromUser: Boolean) {
                 currentSize = minSize + newProgress
-                //mSharedPreferences!!.edit(true) { putInt(getString(R.string.key_pointerSize), currentSize) }
                 textSize.text =
                     String.format(Locale.US, formatTextSize, getString(R.string.text_size), currentSize, currentSize)
                 setLayoutSize(currentSize)
@@ -185,7 +184,6 @@ class CustomizeFragment : Fragment() {
         seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var imagePadding: Int = 0
             override fun onProgressChanged(seekBar: SeekBar, newPadding: Int, fromUser: Boolean) {
-                //mSharedPreferences!!.edit(true) { putInt(getString(R.string.key_pointerPadding), newPadding) }
                 textPadding.text = String.format(Locale.US, formatPadding, getString(R.string.text_padding), newPadding)
                 setLayoutPadding(newPadding)
                 imagePadding = newPadding
@@ -202,7 +200,6 @@ class CustomizeFragment : Fragment() {
 
         seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                //mSharedPreferences!!.edit(true) { putInt("pointerAlpha", value) }
                 textAlpha.text = String.format(Locale.US, formatPadding, getString(R.string.text_alpha), value)
                 image_customize_pointer.imageAlpha = value
             }

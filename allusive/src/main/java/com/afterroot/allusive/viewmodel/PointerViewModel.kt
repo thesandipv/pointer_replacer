@@ -28,7 +28,7 @@ class PointerViewModel : ViewModel() {
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
-            dbInstance.collection(DatabaseFields.POINTERS)
+            dbInstance.collection(DatabaseFields.COLLECTION_POINTERS)
                 .orderBy(DatabaseFields.FIELD_TIME, Query.Direction.DESCENDING)
                 .addSnapshotListener { querySnapshot, _ ->
                     if (querySnapshot != null) {

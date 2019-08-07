@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     private fun addUserInfoInDB() {
         try {
             val curUser = FirebaseUtils.auth!!.currentUser
-            val userRef = dbInstance.collection(DatabaseFields.USERS).document(curUser!!.uid)
+            val userRef = dbInstance.collection(DatabaseFields.COLLECTION_USERS).document(curUser!!.uid)
             userRef.get().addOnCompleteListener { getUserTask ->
                 when {
                     getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {

@@ -31,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
@@ -132,9 +133,9 @@ class NewPointerPost : Fragment() {
                     map,
                     Date()
                 )
-                db.collection(DatabaseFields.POINTERS).add(pointer).addOnSuccessListener {
+                db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     activity!!.apply {
-                        container.snackbar("Pointer Uploaded").anchorView = activity!!.navigation
+                        container.snackbar(getString(R.string.msg_pointer_upload_success)).anchorView = activity!!.navigation
                         dialog.dismiss()
                         fragment_repo_nav.findNavController().navigateUp()
                     }
@@ -179,7 +180,7 @@ class NewPointerPost : Fragment() {
                     }
 
                 })
-                input_name.error = "Pointer name can not be empty"
+                input_name.error = getString(R.string.msg_input_error_name_empty)
                 false
             }
             edit_desc.text!!.isEmpty() -> {
@@ -195,18 +196,15 @@ class NewPointerPost : Fragment() {
                     }
 
                 })
-                input_desc.error = "Description can not be empty"
+                input_desc.error = getString(R.string.msg_input_error_description_empty)
                 false
             }
             !isPointerImported -> {
-                activity!!.container.snackbar("Please import pointer image first.").anchorView = activity!!.navigation
+                activity!!.container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
+                    activity!!.navigation
                 false
             }
             else -> true
         }
-    }
-
-    companion object {
-        private const val RC_PICK_IMAGE: Int = 478
     }
 }

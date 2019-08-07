@@ -23,20 +23,23 @@
     <string name="apply_pointer">Apply Pointer</string>
     <string name="change_color">Change Color</string>
     <string name="choose_color">Choose Color</string>
-    <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_install">Install</string>
     <string name="dialog_msg_sign_out">Do you want to Sign Out?</string>
     <string name="dialog_sign_out_result_success">Signed Out</string>
+    <string name="dialog_title_confirmation">Are you sure?</string>
+    <string name="dialog_title_select_mouse_pointer">Select Mouse Pointer</string>
+    <string name="dialog_title_select_pointer">Select Pointers</string>
     <string name="dialog_title_sign_out">Sign Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="enable_touches_prompt">Show touches disabled. Would you like to enable</string>
     <string name="help">Help</string>
     <string name="helper_text_desc">Provide short info about pointer.</string>
     <string name="helper_text_name">Provide name of pointer.</string>
-    <string name="hint_desc">Description</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_name">Name</string>
     <string name="import_pointer">Import Pointer</string>
+    <string name="input_hint_desc">Description</string>
+    <string name="input_hint_email">Email</string>
+    <string name="input_hint_max_padding_size">Enter Max Padding Size</string>
+    <string name="input_hint_name">Name</string>
     <string name="install_manage_pointers">Install Pointers</string>
     <string name="key_app_info" translatable="false">key_app_info</string>
     <string name="key_EnablePointerAlpha" translatable="false">keyEnablePointerAlpha</string>
@@ -60,12 +63,20 @@
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="mouse_pointer">Mouse Pointer</string>
+    <string name="msg_delete_failed">Error deleting pointer</string>
+    <string name="msg_delete_success">Pointer deleted</string>
     <string name="msg_downloading_ext">Downloading Extension</string>
     <string name="msg_error">Some Error occurred.</string>
     <string name="msg_ext_downloaded">Extension Downloaded</string>
+    <string name="msg_input_error_description_empty">Description can not be empty</string>
+    <string name="msg_input_error_name_empty">Pointer name can not be empty</string>
     <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
+    <string name="msg_install_extension">Please install Extension First</string>
     <string name="msg_no_changes">No Changes to Save.</string>
     <string name="msg_no_pointers_installed">No Pointers Installed</string>
+    <string name="msg_pointer_downloaded">Pointer Downloaded</string>
+    <string name="msg_pointer_not_imported">Please import pointer image first.</string>
+    <string name="msg_pointer_upload_success">Pointer Uploaded</string>
     <string name="msg_profile_updated">"Profile Updated"</string>
     <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -82,6 +93,8 @@
     <string name="reset_color">Reset Color</string>
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="str_format_uploaded_by">by %s</string>
+    <string name="str_format_value_error">Value must be greater than %1$d</string>
+    <string name="str_format_version">Version %1$s (%2$d)</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
@@ -124,7 +137,6 @@
     <string name="text_will_change_to">New Pointer</string>
     <string name="text_yes">Yes</string>
     <string name="title_activity_about">About</string>
-    <string name="title_activity_manage_pointer">Install Pointers</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_dashboard">Repository</string>
     <string name="title_home">Home</string>

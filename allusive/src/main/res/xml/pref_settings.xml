@@ -32,7 +32,7 @@
             app:summary="Enables Slider to Change Pointer Alpha (transparency)"
             app:title="Enable Pointer Alpha" />
     </PreferenceCategory>
-    <PreferenceCategory app:title="About">
+    <PreferenceCategory app:title="@string/title_activity_about">
         <Preference
             app:icon="@mipmap/ic_launcher"
             app:key="pref_version"

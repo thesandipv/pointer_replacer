@@ -149,7 +149,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
 
         dialog.getCustomView().apply {
-            val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
+            val storageReference =
+                FirebaseStorage.getInstance().reference.child("${DatabaseFields.FIELD_DOWNLOADS}/${pointer.filename}")
             info_pointer_pack_name.text = pointer.name
             info_pack_desc.text = pointer.description
             pointer.uploadedBy!!.forEach {
@@ -168,20 +169,22 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                         downloadPointer(position)
                     }
                 }
-
             }
         }
     }
 
     private fun downloadPointer(position: Int) {
         Toast.makeText(context!!, pointersList[position].name, Toast.LENGTH_SHORT).show()
-        val ref = storage.reference.child(DatabaseFields.POINTERS).child(pointersList[position].filename)
+        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
         val file = File("$mTargetPath${pointersList[position].filename}")
 
         ref.getFile(file).addOnSuccessListener {
-            activity!!.container.snackbar("Pointer Downloaded").anchorView = activity!!.navigation
+            activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
         }
-        pointersSnapshot.documents[position].reference.update("downloads", pointersList[position].downloads + 1)
+        pointersSnapshot.documents[position].reference.update(
+            DatabaseFields.FIELD_DOWNLOADS,
+            pointersList[position].downloads + 1
+        )
     }
 
     override fun onClick(position: Int, view: View?) {
@@ -201,15 +204,17 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     }
                     getString(R.string.text_delete) -> {
                         MaterialDialog(context).show {
-                            title(text = "Are you sure?")
-                            positiveButton(text = "Yes") {
+                            title(text = getString(R.string.dialog_title_confirmation))
+                            icon(R.drawable.ic_delete)
+                            positiveButton(android.R.string.yes) {
                                 val filename = pointersList[position].filename
-                                db.collection(DatabaseFields.POINTERS)
+                                db.collection(DatabaseFields.COLLECTION_POINTERS)
                                     .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
                                     .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
                                         querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
                                             docSnapshot!!.reference.delete().addOnSuccessListener {
-                                                val ref = storage.reference.child("pointers").child(filename)
+                                                val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
+                                                    .child(filename)
                                                 ref.delete().addOnSuccessListener {
 
                                                 }
@@ -217,7 +222,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                                         }
                                     }
                             }
-                            negativeButton(text = "No") {
+                            negativeButton(android.R.string.no) {
                                 it.dismiss()
                             }
                         }
@@ -225,9 +230,5 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 }
             }
         }
-    }
-
-    private fun showContextDialog() {
-
     }
 }

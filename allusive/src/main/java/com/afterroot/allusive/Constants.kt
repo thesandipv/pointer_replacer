@@ -19,10 +19,11 @@ object Constants {
     const val TEL_P_NAME = "com.afterroot.toucherlegacy"
     const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
     const val EXTRA_TOUCH_VAL = "$TEL_P_NAME.EXTRA_TOUCH_VAL"
+    const val POINTER_MOUSE = 2
+    const val POINTER_TOUCH = 1
     const val PREF_KEY_FIRST_INSTALL = "first_install"
     const val RC_LOGIN = 42
     const val RC_OPEN_TEL = 245
     const val RC_PERMISSION = 256
-    const val POINTER_TOUCH = 1
-    const val POINTER_MOUSE = 2
+    const val RC_PICK_IMAGE: Int = 478
 }

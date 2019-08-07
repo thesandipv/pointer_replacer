@@ -56,6 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/borderlessButtonStyle"
+            android:visibility="gone"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/outline_thumb_up"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -68,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?attr/borderlessButtonStyle"
+            android:visibility="gone"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/outline_thumb_down"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -86,12 +88,13 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/info_tv_downloads_count"
                 tools:text="500" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_download" />
+                android:text="@string/text_downloads" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
