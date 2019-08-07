@@ -107,8 +107,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             }
                             this@apply.summary = input
                         } else {
-                            activity!!.container.snackbar("Value must be greater than ${context.getMinPointerSize()}")
-                                .anchorView = navigation
+                            activity!!.container.snackbar(
+                                String.format(
+                                    getString(R.string.str_format_value_error),
+                                    context.getMinPointerSize()
+                                )
+                            ).anchorView = activity!!.navigation
                         }
 
                     }
@@ -123,7 +127,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 MaterialDialog(activity!!).show {
                     title(res = R.string.key_maxPaddingSize)
                     input(
-                        hint = "Enter Max Padding Size",
+                        hint = getString(R.string.input_hint_max_padding_size),
                         prefill = preferences!!.getInt(getString(R.string.key_maxPaddingSize), 25).toString(),
                         allowEmpty = false, maxLength = 3,
                         inputType = InputType.TYPE_CLASS_NUMBER
@@ -136,7 +140,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             }
                             this@apply.summary = input
                         } else {
-                            activity!!.container.snackbar("Value must be greater than 0").anchorView = navigation
+                            activity!!.container.snackbar(String.format(getString(R.string.str_format_value_error), 0))
+                                .anchorView = activity!!.navigation
                         }
 
                     }.show()
@@ -154,14 +159,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (i.resolveActivity(activity!!.packageManager) != null) {
                 startActivityForResult(i, RC_OPEN_TEL)
             } else {
-                Toast.makeText(activity!!, "Please install Extension First", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!, getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
                 installExtensionDialog().show()
             }
             true
         }
 
         findPreference<Preference>("pref_version")?.apply {
-            summary = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            summary =
+                String.format(getString(R.string.str_format_version), BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
         }
 
         findPreference<Preference>("licenses")?.apply {
@@ -177,7 +183,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
-            .setNegativeButton(getString(R.string.dialog_button_cancel)) { _, _ ->
+            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
 
             }
             .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->

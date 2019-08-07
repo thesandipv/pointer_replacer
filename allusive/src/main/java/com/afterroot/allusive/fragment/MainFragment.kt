@@ -98,7 +98,7 @@ class MainFragment : Fragment() {
             layout_new_mouse.setOnClickListener {
                 showPointerChooser(
                     pointerType = POINTER_MOUSE,
-                    title = "Select Mouse Pointer"
+                    title = getString(R.string.dialog_title_select_mouse_pointer)
                 )
             }
             fab_apply.apply {
@@ -294,7 +294,7 @@ class MainFragment : Fragment() {
         return b
     }
 
-    private fun showPointerChooser(title: String = "Select Pointers", pointerType: Int) {
+    private fun showPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
         val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_grid_bottomsheet)
             title(text = title)
@@ -362,9 +362,10 @@ class MainFragment : Fragment() {
                             message(res = R.string.text_delete_confirm)
                             positiveButton(res = R.string.text_yes) {
                                 if (file.delete()) {
-                                    Toast.makeText(context, "Pointer deleted.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, getString(R.string.msg_delete_success), Toast.LENGTH_SHORT)
+                                        .show()
                                 } else {
-                                    Toast.makeText(context, "Error deleting pointer.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, getString(R.string.msg_delete_failed), Toast.LENGTH_SHORT).show()
                                 }
                             }
                             negativeButton(res = R.string.text_no)
@@ -421,7 +422,7 @@ class MainFragment : Fragment() {
                     startActivity(Intent(context!!, SplashActivity::class.java))
                 }
             }
-            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
 
             }.setCancelable(true)
     }

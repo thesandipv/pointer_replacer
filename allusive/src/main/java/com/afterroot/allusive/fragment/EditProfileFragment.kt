@@ -62,7 +62,7 @@ class EditProfileFragment : Fragment() {
                                 if (task.isSuccessful) {
                                     activity!!.container.snackbar(getString(R.string.msg_profile_updated))
                                         .anchorView = activity!!.navigation
-                                    db.collection(DatabaseFields.USERS)
+                                    db.collection(DatabaseFields.COLLECTION_USERS)
                                         .document(user.uid)
                                         .update(DatabaseFields.FIELD_NAME, newName)
                                 }
