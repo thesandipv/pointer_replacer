@@ -18,8 +18,8 @@ package com.afterroot.allusive.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.afterroot.allusive.database.Database
 import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.dbInstance
 import com.google.firebase.firestore.Query
 
 class PointerViewModel : ViewModel() {
@@ -28,7 +28,7 @@ class PointerViewModel : ViewModel() {
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
-            Database.getInstance().collection(DatabaseFields.POINTERS)
+            dbInstance.collection(DatabaseFields.POINTERS)
                 .orderBy(DatabaseFields.FIELD_TIME, Query.Direction.DESCENDING)
                 .addSnapshotListener { querySnapshot, _ ->
                     if (querySnapshot != null) {

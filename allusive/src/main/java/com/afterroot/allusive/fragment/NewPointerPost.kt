@@ -32,8 +32,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
-import com.afterroot.allusive.database.Database
 import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
@@ -62,7 +62,7 @@ class NewPointerPost : Fragment() {
         super.onCreate(savedInstanceState)
 
         storage = FirebaseStorage.getInstance()
-        db = Database.getInstance()
+        db = dbInstance
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

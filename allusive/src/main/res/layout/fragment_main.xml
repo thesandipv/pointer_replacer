@@ -282,7 +282,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             app:adSize="BANNER"
-            app:adUnitId="@string/ad_banner_unit_id"
+            app:adUnitId="@string/ad_banner_test_id"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/card_current_mouse" />
