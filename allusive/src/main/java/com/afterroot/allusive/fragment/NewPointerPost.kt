@@ -167,7 +167,7 @@ class NewPointerPost : Fragment() {
 
     private fun verifyData(): Boolean {
         return when {
-            edit_name.text!!.isEmpty() -> {
+            edit_name.text!!.trim().isEmpty() -> {
                 edit_name.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
                     }
@@ -183,7 +183,7 @@ class NewPointerPost : Fragment() {
                 input_name.error = getString(R.string.msg_input_error_name_empty)
                 false
             }
-            edit_desc.text!!.isEmpty() -> {
+            edit_desc.text!!.trim().isEmpty() -> {
                 edit_desc.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
                     }
@@ -197,6 +197,10 @@ class NewPointerPost : Fragment() {
 
                 })
                 input_desc.error = getString(R.string.msg_input_error_description_empty)
+                false
+            }
+            (edit_desc.length() >= input_desc.counterMaxLength) -> {
+                input_desc.error = "Maximum Characters"
                 false
             }
             !isPointerImported -> {
