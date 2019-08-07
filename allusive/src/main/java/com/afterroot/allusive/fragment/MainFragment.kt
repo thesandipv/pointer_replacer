@@ -18,7 +18,6 @@ package com.afterroot.allusive.fragment
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
@@ -45,10 +44,7 @@ import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.ui.SplashActivity
-import com.afterroot.allusive.utils.getDrawableExt
-import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.getPrefs
-import com.afterroot.allusive.utils.visible
+import com.afterroot.allusive.utils.*
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -282,16 +278,6 @@ class MainFragment : Fragment() {
             e.printStackTrace()
             return
         }
-    }
-
-    private fun loadBitmapFromView(view: View): Bitmap {
-        val b = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-        val c = Canvas(b)
-        view.run {
-            layout(view.left, view.top, view.right, view.bottom)
-            draw(c)
-        }
-        return b
     }
 
     private fun showPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {

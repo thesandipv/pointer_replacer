@@ -28,8 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
@@ -39,6 +37,7 @@ import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.loadBitmapFromView
+import com.afterroot.allusive.utils.showStaticProgressDialog
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -102,18 +101,12 @@ class NewPointerPost : Fragment() {
     }
 
     private fun upload(file: File) {
-        val dialog = MaterialDialog(context!!).show {
-            customView(R.layout.dialog_progress)
-            cornerRadius(16f)
-            cancelable(false)
-        }
+        val dialog = context!!.showStaticProgressDialog(getString(R.string.text_progress_init))
         val customView = dialog.getCustomView()
-
-        customView.text_progress.text = getString(R.string.text_progress_init)
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
-        val fileRef = storageRef.child("pointers/${fileUri.lastPathSegment!!}")
+        val fileRef = storageRef.child("${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}")
         val uploadTask = fileRef.putFile(fileUri)
 
         uploadTask.addOnProgressListener {

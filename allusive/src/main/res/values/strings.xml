@@ -92,6 +92,7 @@
     <string name="reboot">Reboot</string>
     <string name="reset_color">Reset Color</string>
     <string name="reset_size">Reset Size &amp; Padding</string>
+    <string name="str_format_download_count">%1$d Downloads</string>
     <string name="str_format_uploaded_by">by %s</string>
     <string name="str_format_value_error">Value must be greater than %1$d</string>
     <string name="str_format_version">Version %1$s (%2$d)</string>
@@ -115,7 +116,6 @@
     <string name="text_delete">Delete</string>
     <string name="text_delete_confirm">Are you sure you want to delete this pointer??</string>
     <string name="text_download">Download</string>
-    <string name="text_downloads">Downloads</string>
     <string name="text_edit">Edit</string>
     <string name="text_installed">Installed</string>
     <string name="text_logout">Logout</string>
@@ -146,4 +146,5 @@
     <string name="url_prx" translatable="false">https://pointerreplacer.page.link/xposedRepo</string>
     <string name="url_source_code" translatable="false">https://pointerreplacer.page.link/source</string>
     <string name="url_xda_thread" translatable="false">https://pointerreplacer.page.link/xda</string>
+    <string name="text_progress_downloading">Downloading</string>
 </resources>
