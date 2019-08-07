@@ -21,7 +21,6 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -43,6 +42,7 @@ import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.allusive.utils.showStaticProgressDialog
 import com.afterroot.allusive.viewmodel.PointerViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
 import com.google.firebase.firestore.DocumentSnapshot
@@ -150,7 +150,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
         dialog.getCustomView().apply {
             val storageReference =
-                FirebaseStorage.getInstance().reference.child("${DatabaseFields.FIELD_DOWNLOADS}/${pointer.filename}")
+                FirebaseStorage.getInstance().reference.child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
             info_pointer_pack_name.text = pointer.name
             info_pack_desc.text = pointer.description
             pointer.uploadedBy!!.forEach {
@@ -160,26 +160,29 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             info_action_pack.apply {
                 if (isDownloaded) {
                     text = getString(R.string.text_installed)
-                    setOnClickListener {
-
-                    }
+                    setOnClickListener(null)
+                    isEnabled = false
                 } else {
                     text = getString(R.string.text_download)
                     setOnClickListener {
                         downloadPointer(position)
+                        dialog.dismiss()
                     }
+                    isEnabled = true
                 }
             }
+            info_tv_downloads_count.text = String.format(getString(R.string.str_format_download_count), pointer.downloads)
         }
     }
 
     private fun downloadPointer(position: Int) {
-        Toast.makeText(context!!, pointersList[position].name, Toast.LENGTH_SHORT).show()
+        val dialog = context!!.showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
         val file = File("$mTargetPath${pointersList[position].filename}")
 
         ref.getFile(file).addOnSuccessListener {
             activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+            dialog.dismiss()
         }
         pointersSnapshot.documents[position].reference.update(
             DatabaseFields.FIELD_DOWNLOADS,

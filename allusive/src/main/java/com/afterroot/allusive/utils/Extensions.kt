@@ -35,7 +35,11 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.transition.Fade
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
+import kotlinx.android.synthetic.main.dialog_progress.view.*
 
 fun View.visible(
     value: Boolean,
@@ -131,4 +135,15 @@ fun loadBitmapFromView(view: View): Bitmap {
         draw(c)
     }
     return b
+}
+
+fun Context.showStaticProgressDialog(progressText: String): MaterialDialog {
+    val dialog = MaterialDialog(this).show {
+        customView(R.layout.dialog_progress)
+        cornerRadius(16f)
+        cancelable(false)
+    }
+    val customView = dialog.getCustomView()
+    customView.text_progress.text = progressText
+    return dialog
 }
