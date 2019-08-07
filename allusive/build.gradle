@@ -28,8 +28,8 @@ static def buildTime() {
 }
 
 ext.major = 1
-ext.minor = 7
-ext.patch = 2
+ext.minor = 8
+ext.patch = 0
 
 private String genVersionName() {
     return "${ext.major}.${ext.minor}.${ext.patch}.${buildTime()}"

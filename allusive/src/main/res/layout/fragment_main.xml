@@ -28,8 +28,8 @@
             android:id="@+id/card_current_pointer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             app:cardCornerRadius="@dimen/card_radius"
             app:cardUseCompatPadding="false"
@@ -40,10 +40,10 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="true"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/padding_normal"
                 android:paddingBottom="@dimen/padding_normal"
-                android:clipToPadding="true">
+                android:paddingTop="@dimen/padding_normal">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layout_current_pointer"
@@ -54,8 +54,8 @@
                         android:id="@+id/current_pointer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -66,9 +66,9 @@
                         android:id="@+id/text_no_pointer_applied"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
                         android:text="@string/no_pointer_applied"
                         android:textAlignment="textEnd"
                         android:visibility="gone"
@@ -99,9 +99,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:text="@string/text_action_customize"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
+                        android:text="@string/text_action_customize"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/new_pointer_subtitle" />
@@ -110,10 +110,10 @@
                         android:id="@+id/text_new_pointer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/text_will_change_to"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
+                        android:text="@string/text_will_change_to"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -128,9 +128,9 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -154,8 +154,8 @@
             android:id="@+id/card_current_mouse"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             app:cardCornerRadius="@dimen/card_radius"
             app:layout_constraintEnd_toEndOf="parent"
@@ -165,9 +165,9 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/padding_normal"
+                android:orientation="vertical"
                 android:paddingBottom="@dimen/padding_normal"
-                android:orientation="vertical">
+                android:paddingTop="@dimen/padding_normal">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layout_current_mouse"
@@ -178,9 +178,9 @@
                         android:id="@+id/current_mouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -190,9 +190,9 @@
                         android:id="@+id/text_no_mouse_applied"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
                         android:text="@string/no_pointer_applied"
                         android:textAlignment="textEnd"
                         android:visibility="gone"
@@ -204,9 +204,9 @@
                         android:id="@+id/text_current_mouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
                         android:text="@string/text_cur_mouse"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -224,10 +224,10 @@
                         android:id="@+id/text_new_mouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
                         android:text="@string/mouse_pointer"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginStart="16dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -242,9 +242,9 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -262,9 +262,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:text="@string/text_action_customize"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
+                        android:text="@string/text_action_customize"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/new_mouse_subtitle" />
@@ -278,11 +278,11 @@
             android:id="@+id/banner_ad_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             app:adSize="BANNER"
-            app:adUnitId="@string/ad_banner_test_id"
+            app:adUnitId="@string/ad_banner_unit_id"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/card_current_mouse" />
