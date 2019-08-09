@@ -361,7 +361,7 @@ class MainFragment : Fragment() {
 
 
                 }
-                GlideApp.with(context!!).load(File(pointerAdapter.getItem(position)))
+                GlideApp.with(context!!).load(File(pointerAdapter.getItem(position))).override(context!!.getMinPointerSize())
                     .into(
                         when (pointerType) {
                             POINTER_TOUCH -> {
