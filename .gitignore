@@ -4,10 +4,11 @@
 ### Android ###
 # Built application files
 *.apk
+*.aab
 
 gen/
 # Gradle files
-.gradle/
+#.gradle/
 build/
 
 # Local configuration file (sdk path, etc)
@@ -25,7 +26,8 @@ captures/
 
 # Intellij
 *.iml
-.idea/
+#.idea/
+#.settings
 
 # Keystore files
 *.jks
@@ -39,4 +41,5 @@ captures/
 # End of https://www.gitignore.io/api/android,java,gradle,intellij
 
 # My List
-.vscode/
+.*
+!/.gitignore
