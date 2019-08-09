@@ -37,6 +37,7 @@
             app:icon="@mipmap/ic_launcher"
             app:key="pref_version"
             app:title="@string/app_name" />
+        <Preference app:summary="@string/made_with_love" />
         <Preference android:title="Privacy Policy">
             <intent
                 android:action="android.intent.action.VIEW"

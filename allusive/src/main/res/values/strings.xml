@@ -150,4 +150,5 @@
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="msg_pointer_not_selected">Please Select Pointer first</string>
     <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
+    <string name="made_with_love">Made with ❤ In India.</string>
 </resources>
