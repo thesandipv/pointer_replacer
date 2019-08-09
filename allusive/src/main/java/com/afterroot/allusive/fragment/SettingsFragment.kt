@@ -23,7 +23,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputType
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -184,7 +183,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
             .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
-
+                preferences!!.edit(true) {
+                    putBoolean(getString(R.string.key_ext_dialog_cancel), true)
+                }
             }
             .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
                 val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
@@ -192,7 +193,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 activity!!.container.longSnackbar(getString(R.string.msg_downloading_ext)).anchorView = activity!!.navigation
                 reference.getFile(tmpFile).addOnSuccessListener {
                     activity!!.container.snackbar(getString(R.string.msg_ext_downloaded)).anchorView = activity!!.navigation
-                    Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         val uri = FileProvider.getUriForFile(
                             context!!.applicationContext,
@@ -213,8 +213,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }
 
                 }
-            }.setNeutralButton("Learn More") { _, _ ->
-                activity!!.browse("https://pointerreplacer.page.link/ext_learn_more")
+            }.setNeutralButton(getString(R.string.button_text_learn_more)) { _, _ ->
+                activity!!.browse(getString(R.string.url_learn_more))
             }.create()
         return dialog as AlertDialog
     }
@@ -223,7 +223,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
 
-        if (!activity!!.isAppInstalled(TEL_P_NAME)) {
+        if (!activity!!.isAppInstalled(TEL_P_NAME) &&
+            !preferences!!.getBoolean(getString(R.string.key_ext_dialog_cancel), false)
+        ) {
             installExtensionDialog().show()
         }
         try {
@@ -249,14 +251,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
-                        activity!!.container.snackbar("Done").anchorView = activity!!.navigation
+                        activity!!.container.snackbar(getString(R.string.msg_done)).anchorView = activity!!.navigation
                         /* if (interstitialAd.isLoaded) {
                              interstitialAd.show()
                          }*/
                     }
                     2 -> { //Write Setting Permission not Granted
                         activity!!.container.snackbar(getString(R.string.msg_secure_settings_permission))
-                            .setAction("GRANT") {
+                            .setAction(getString(R.string.text_action_grant)) {
                                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                                     val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
                                     intent.data = Uri.parse("package:$TEL_P_NAME")

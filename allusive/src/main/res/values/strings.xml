@@ -14,6 +14,7 @@
   -->
 
 <resources>
+    <string name="text_action_grant">Grant</string>
     <string name="ad_banner_test_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/6191545783</string>
@@ -21,6 +22,7 @@
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~2651384855</string>
     <string name="app_name">Pointer Replacer</string>
     <string name="apply_pointer">Apply Pointer</string>
+    <string name="button_text_learn_more">Learn More</string>
     <string name="change_color">Change Color</string>
     <string name="choose_color">Choose Color</string>
     <string name="dialog_button_install">Install</string>
@@ -43,6 +45,7 @@
     <string name="install_manage_pointers">Install Pointers</string>
     <string name="key_app_info" translatable="false">key_app_info</string>
     <string name="key_EnablePointerAlpha" translatable="false">keyEnablePointerAlpha</string>
+    <string name="key_ext_dialog_cancel" translatable="false">ext_dialog_cancelled</string>
     <string name="key_maxPaddingSize" translatable="false">maxPaddingSize</string>
     <string name="key_maxPointerSize" translatable="false">maxPointerSize</string>
     <string name="key_mouseAlpha">MOUSE_ALPHA</string>
@@ -60,11 +63,13 @@
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
+    <string name="made_with_love">Made with ❤ In India.</string>
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="mouse_pointer">Mouse Pointer</string>
     <string name="msg_delete_failed">Error deleting pointer</string>
     <string name="msg_delete_success">Pointer deleted</string>
+    <string name="msg_done">Done</string>
     <string name="msg_downloading_ext">Downloading Extension</string>
     <string name="msg_error">Some Error occurred.</string>
     <string name="msg_ext_downloaded">Extension Downloaded</string>
@@ -72,10 +77,12 @@
     <string name="msg_input_error_name_empty">Pointer name can not be empty</string>
     <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
     <string name="msg_install_extension">Please install Extension First</string>
+    <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
     <string name="msg_no_changes">No Changes to Save.</string>
     <string name="msg_no_pointers_installed">No Pointers Installed</string>
     <string name="msg_pointer_downloaded">Pointer Downloaded</string>
     <string name="msg_pointer_not_imported">Please import pointer image first.</string>
+    <string name="msg_pointer_not_selected">Please Select Pointer first</string>
     <string name="msg_pointer_upload_success">Pointer Uploaded</string>
     <string name="msg_profile_updated">"Profile Updated"</string>
     <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
@@ -83,6 +90,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Select and Apply Pointer</string>
     <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
+    <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="pointer_preview">Pointer Preview</string>
     <string name="pref_title_source_code">Source Code</string>
     <string name="pref_title_visit_ar">Visit AfterROOT</string>
@@ -127,6 +135,7 @@
     <string name="text_padding">Padding</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>
+    <string name="text_progress_downloading">Downloading</string>
     <string name="text_progress_finishing_up">Finishing Up</string>
     <string name="text_progress_init">Initializing</string>
     <string name="text_progress_uploading">Uploading</string>
@@ -142,13 +151,13 @@
     <string name="title_home">Home</string>
     <string name="title_install_ext_dialog">Install Extension</string>
     <string name="transition_mouse" translatable="false">mouse_transition</string>
+    <string name="url_learn_more" translatable="false">https://m8rg7.app.goo.gl/whyNeedExt</string>
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
-    <string name="url_prx" translatable="false">https://pointerreplacer.page.link/xposedRepo</string>
-    <string name="url_source_code" translatable="false">https://pointerreplacer.page.link/source</string>
-    <string name="url_xda_thread" translatable="false">https://pointerreplacer.page.link/xda</string>
-    <string name="text_progress_downloading">Downloading</string>
-    <string name="pointer_grid_hint">Long press pointer for delete.</string>
-    <string name="msg_pointer_not_selected">Please Select Pointer first</string>
-    <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
-    <string name="made_with_love">Made with ❤ In India.</string>
+    <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
+    <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
+    <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="dialog_msg_no_network">No Network Available. Some features might not work.</string>
+    <string name="dialog_title_no_network">No Network</string>
+    <string name="text_action_retry">Retry</string>
+    <string name="msg_grant_app_permissions">Please Grant Permissions</string>
 </resources>

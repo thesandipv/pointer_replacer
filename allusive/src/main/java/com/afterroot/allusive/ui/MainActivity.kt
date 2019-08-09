@@ -82,10 +82,10 @@ class MainActivity : AppCompatActivity() {
             )
         } else if (!this.isNetworkAvailable()) {
             AlertDialog.Builder(this)
-                .setMessage("No Network Available")
-                .setTitle("No Network")
-                .setPositiveButton("RETRY") { _, _ -> onStart() }
-                .setNegativeButton("Cancel") { _, _ -> }
+                .setMessage(getString(R.string.dialog_msg_no_network))
+                .setTitle(getString(R.string.dialog_title_no_network))
+                .setPositiveButton(R.string.text_action_retry) { _, _ -> onStart() }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
                 .setCancelable(false)
                 .show()
         } else initialize()
@@ -156,7 +156,10 @@ class MainActivity : AppCompatActivity() {
             RC_PERMISSION -> {
                 val isPermissionGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (!isPermissionGranted) {
-                    container.indefiniteSnackbar("Please Grant Permissions", "Grant") {
+                    container.indefiniteSnackbar(
+                        getString(R.string.msg_grant_app_permissions),
+                        getString(R.string.text_action_grant)
+                    ) {
                         checkPermissions()
                     }.anchorView = navigation
                 } else {
