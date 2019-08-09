@@ -160,4 +160,5 @@
     <string name="dialog_title_no_network">No Network</string>
     <string name="text_action_retry">Retry</string>
     <string name="msg_grant_app_permissions">Please Grant Permissions</string>
+    <string name="text_action_exit">Exit</string>
 </resources>

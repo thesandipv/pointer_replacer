@@ -16,12 +16,12 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
@@ -32,7 +32,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
-import com.afterroot.allusive.Constants.RC_LOGIN
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
@@ -41,8 +40,6 @@ import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.allusive.utils.getPrefs
-import com.afterroot.allusive.utils.isNetworkAvailable
-import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
@@ -67,29 +64,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (FirebaseAuth.getInstance().currentUser == null && this.isNetworkAvailable()) {
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(
-                        arrayListOf(
-                            AuthUI.IdpConfig.EmailBuilder().build(),
-                            AuthUI.IdpConfig.GoogleBuilder().build()
-                        )
-                    )
-                    .setLogo(R.drawable.ic_launch_screen)
-                    .build(), RC_LOGIN
-            )
-        } else if (!this.isNetworkAvailable()) {
-            AlertDialog.Builder(this)
-                .setMessage(getString(R.string.dialog_msg_no_network))
-                .setTitle(getString(R.string.dialog_title_no_network))
-                .setPositiveButton(R.string.text_action_retry) { _, _ -> onStart() }
-                .setNegativeButton(android.R.string.cancel) { _, _ -> }
-                .setCancelable(false)
-                .show()
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
-
     }
 
     private fun initialize() {
