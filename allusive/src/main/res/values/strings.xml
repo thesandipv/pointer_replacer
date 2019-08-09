@@ -148,4 +148,6 @@
     <string name="url_xda_thread" translatable="false">https://pointerreplacer.page.link/xda</string>
     <string name="text_progress_downloading">Downloading</string>
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
+    <string name="msg_pointer_not_selected">Please Select Pointer first</string>
+    <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
 </resources>

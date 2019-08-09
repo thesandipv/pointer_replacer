@@ -127,7 +127,10 @@ fun openFile(context: Context, filename: String, uri: Uri) {
 fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View =
     LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)
 
-fun loadBitmapFromView(view: View): Bitmap {
+fun loadBitmapFromView(view: View): Bitmap? {
+    if (view.width == 0 || view.height == 0) {
+        return null
+    }
     val b = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
     val c = Canvas(b)
     view.run {

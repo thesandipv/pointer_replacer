@@ -54,6 +54,7 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.design.snackbar
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -108,21 +109,47 @@ class MainFragment : Fragment() {
             loadCurrentPointers()
 
             action_customize.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putInt("TYPE", POINTER_TOUCH)
+                if (!isPointerSelected()) {
+                    activity!!.container.snackbar(
+                        message = getString(R.string.msg_pointer_not_selected)
+                    ).anchorView = activity!!.navigation
+                } else {
+                    val bundle = Bundle().apply {
+                        putInt("TYPE", POINTER_TOUCH)
+                    }
+                    val extras = FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
+                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
-                val extras = FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
-                findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
             }
 
             action_customize_mouse.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putInt("TYPE", POINTER_MOUSE)
+                if (!isMouseSelected()) {
+                    activity!!.container.snackbar(
+                        message = getString(R.string.msg_mouse_not_selected)
+                    ).anchorView = activity!!.navigation
+                } else {
+                    val bundle = Bundle().apply {
+                        putInt("TYPE", POINTER_MOUSE)
+                    }
+                    val extras = FragmentNavigatorExtras(selected_mouse to getString(R.string.transition_mouse))
+                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
-                val extras = FragmentNavigatorExtras(selected_mouse to getString(R.string.transition_mouse))
-                findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
             }
         }
+    }
+
+    private fun isPointerSelected(): Boolean {
+        if (selected_pointer.width == 0 || selected_pointer.height == 0) {
+            return false
+        }
+        return true
+    }
+
+    private fun isMouseSelected(): Boolean {
+        if (selected_mouse.width == 0 || selected_mouse.height == 0) {
+            return false
+        }
+        return true
     }
 
     private fun loadCurrentPointers() {
@@ -187,6 +214,18 @@ class MainFragment : Fragment() {
 
     @Throws(IOException::class)
     private fun applyPointer() {
+        if (!isPointerSelected()) {
+            activity!!.container.snackbar(
+                message = getString(R.string.msg_pointer_not_selected)
+            ).anchorView = activity!!.navigation
+            return
+        }
+        if (!isMouseSelected()) {
+            activity!!.container.snackbar(
+                message = getString(R.string.msg_mouse_not_selected)
+            ).anchorView = activity!!.navigation
+            return
+        }
         val filesDir = activity!!.filesDir.path
         val pointerPath = "$filesDir/pointer.png"
         val mousePath = "$filesDir/mouse.png"
@@ -209,10 +248,18 @@ class MainFragment : Fragment() {
         }
 
         interstitialAd.apply {
-            if (isLoaded) show()
+            if (isLoaded) show() else {
+                activity!!.container.longSnackbar(
+                    message = getString(R.string.text_pointer_applied),
+                    actionText = getString(R.string.reboot)
+                ) {
+                    showRebootDialog()
+                }.anchorView = activity!!.navigation
+            }
             adListener = object : AdListener() {
                 override fun onAdClosed() {
                     super.onAdClosed()
+                    interstitialAd.loadAd(AdRequest.Builder().build())
                     activity!!.container.longSnackbar(
                         message = getString(R.string.text_pointer_applied),
                         actionText = getString(R.string.reboot)
@@ -250,9 +297,11 @@ class MainFragment : Fragment() {
     private fun setUpAd() {
         MobileAds.initialize(context!!, getString(R.string.ad_banner_unit_id))
 
-        val adView = banner_ad_main
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        if (!BuildConfig.DEBUG) {
+            val adView = banner_ad_main
+            val adRequest = AdRequest.Builder().build()
+            adView.loadAd(adRequest)
+        }
 
         interstitialAd = InterstitialAd(this.activity!!)
         interstitialAd.apply {
@@ -271,7 +320,7 @@ class MainFragment : Fragment() {
         val out: FileOutputStream
         try {
             out = FileOutputStream(file)
-            loadBitmapFromView(view).compress(Bitmap.CompressFormat.PNG, 100, out)
+            loadBitmapFromView(view)?.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
         } catch (e: FileNotFoundException) {
