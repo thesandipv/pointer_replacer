@@ -40,9 +40,7 @@ import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
-import com.afterroot.allusive.utils.FirebaseUtils
-import com.afterroot.allusive.utils.getDrawableExt
-import com.afterroot.allusive.utils.showStaticProgressDialog
+import com.afterroot.allusive.utils.*
 import com.afterroot.allusive.viewmodel.PointerViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
 import com.google.firebase.firestore.DocumentSnapshot
@@ -54,6 +52,7 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.toast
 import java.io.File
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
@@ -82,18 +81,34 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     override fun onResume() {
         super.onResume()
 
-        activity!!.fab_apply.apply {
-            setOnClickListener {
-                activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
+        if (!context!!.isNetworkAvailable()) {
+            repo_swipe_refresh.visible(false)
+            layout_no_network.visible(true)
+            button_retry.setOnClickListener {
+                onResume()
             }
-            icon = context!!.getDrawableExt(R.drawable.ic_add)
-        }
+            activity!!.fab_apply.hide()
+        } else {
+            activity!!.fab_apply.apply {
+                show()
+                setOnClickListener {
+                    if (!context!!.isNetworkAvailable()) {
+                        context!!.toast(getString(R.string.dialog_title_no_network))
+                        return@setOnClickListener
+                    }
+                    activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
+                }
+                icon = context!!.getDrawableExt(R.drawable.ic_add)
+            }
 
-        repo_swipe_refresh.apply {
-            setOnRefreshListener {
-                loadPointers()
+            repo_swipe_refresh.visible(true)
+            layout_no_network.visible(false)
+            repo_swipe_refresh.apply {
+                setOnRefreshListener {
+                    loadPointers()
+                }
+                setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
             }
-            setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
         }
     }
 
