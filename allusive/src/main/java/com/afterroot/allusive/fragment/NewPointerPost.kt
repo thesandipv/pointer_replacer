@@ -149,11 +149,13 @@ class NewPointerPost : Fragment() {
         val out: FileOutputStream
         try {
             out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
+        } catch (iae: IllegalArgumentException) {
+            iae.printStackTrace()
         }
         return file
     }
