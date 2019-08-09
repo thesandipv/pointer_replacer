@@ -20,8 +20,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.Constants.RC_LOGIN
 import com.afterroot.allusive.R
+import com.afterroot.allusive.utils.isNetworkAvailable
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 
@@ -31,8 +33,17 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser == null) {
+        if (auth.currentUser == null && this.isNetworkAvailable()) {
             tryLogin()
+        } else if (auth.currentUser == null && !this.isNetworkAvailable()) {
+            MaterialDialog(this).show {
+                title(R.string.dialog_title_no_network)
+                message(R.string.dialog_msg_no_network)
+                positiveButton(R.string.text_action_exit) {
+                    finish()
+                }
+                cancelable(false)
+            }
         } else {
             launchDashboard()
         }
