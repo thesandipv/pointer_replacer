@@ -32,21 +32,25 @@ class SplashActivity : AppCompatActivity() {
 
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser == null) {
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setLogo(R.drawable.ic_launch_screen)
-                    .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
-                    .setAvailableProviders(
-                        listOf(
-                            AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
-                            AuthUI.IdpConfig.GoogleBuilder().build()
-                        )
-                    ).build(), RC_LOGIN
-            )
+            tryLogin()
         } else {
             launchDashboard()
         }
+    }
+
+    private fun tryLogin() {
+        startActivityForResult(
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setLogo(R.drawable.ic_launch_screen)
+                .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
+                .setAvailableProviders(
+                    listOf(
+                        AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
+                        AuthUI.IdpConfig.GoogleBuilder().build()
+                    )
+                ).build(), RC_LOGIN
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -55,6 +59,7 @@ class SplashActivity : AppCompatActivity() {
                 launchDashboard()
             } else {
                 Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
+                tryLogin()
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
