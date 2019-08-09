@@ -39,8 +39,8 @@ class SplashActivity : AppCompatActivity() {
                     .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
                     .setAvailableProviders(
                         listOf(
-                            AuthUI.IdpConfig.GoogleBuilder().build(),
-                            AuthUI.IdpConfig.PhoneBuilder().build()
+                            AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
+                            AuthUI.IdpConfig.GoogleBuilder().build()
                         )
                     ).build(), RC_LOGIN
             )
