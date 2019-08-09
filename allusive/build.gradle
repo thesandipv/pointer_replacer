@@ -12,9 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import java.text.SimpleDateFormat
-
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -22,32 +19,24 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
-static def buildTime() {
-    def df = new SimpleDateFormat("yyMMdd")
-    return df.format(new Date())
-}
-
 ext.major = 1
 ext.minor = 8
-ext.patch = 0
+ext.patch = 1
+ext.minimumSdkVersion = 16
 
 private String genVersionName() {
-    return "${ext.major}.${ext.minor}.${ext.patch}.${buildTime()}"
-}
-
-private String genVersionNameBeta() {
     return "${ext.major}.${ext.minor}.${ext.patch}"
 }
 
 private Integer genVersionCode() {
-    return ext.major * 10000 + ext.minor * 1000 + ext.patch * 100
+    return ext.minimumSdkVersion * 10000000 + ext.major * 10000 + ext.minor * 100 + ext.patch
 }
 
 android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.afterroot.allusive"
-        minSdkVersion 16
+        minSdkVersion project.ext.minimumSdkVersion
         targetSdkVersion 28
         versionCode genVersionCode()
         versionName genVersionName()
@@ -99,7 +88,7 @@ android {
             targetSdkVersion 28
             resConfigs('en', 'xhdpi')
             versionCode = genVersionCode()
-            versionName genVersionNameBeta()
+            versionName genVersionName()
             versionNameSuffix = '-beta'
         }
 
