@@ -16,4 +16,5 @@
 <resources>
     <integer name="fragment_anim_time">200</integer>
     <integer name="min_pointer_size">66</integer>
+    <integer name="checkered_grid_alpha">50</integer>
 </resources>

@@ -171,7 +171,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             pointer.uploadedBy!!.forEach {
                 info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
-            GlideApp.with(context).load(storageReference).override(128).into(info_pointer_image)
+            info_pointer_image.apply {
+                background =
+                    CheckeredDrawable().apply { alpha = context.resources.getInteger(R.integer.checkered_grid_alpha) }
+                GlideApp.with(context).load(storageReference).override(128, 128).into(this)
+            }
             info_action_pack.apply {
                 if (isDownloaded) {
                     text = getString(R.string.text_installed)
