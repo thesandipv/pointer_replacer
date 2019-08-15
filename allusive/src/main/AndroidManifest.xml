@@ -57,8 +57,8 @@
         <activity
             android:name="com.afterroot.allusive.ui.MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/MyTheme.Main" />
+            android:theme="@style/MyTheme.Main"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.SplashActivity"
