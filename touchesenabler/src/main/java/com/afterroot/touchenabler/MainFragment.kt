@@ -57,8 +57,10 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var showTouchPref: SwitchPreferenceCompat
     private val _tag: String = "TouchEnabler"
+    private val isDisableAds: Boolean by lazy { sharedPreferences.getBoolean(getString(R.string.key_disable_ads), false) }
     private var billingProcessor: BillingProcessor? = null
     private var dialog: AlertDialog? = null
+    private var isPurchased: Boolean? = false
     private var isReadyToPurchase: Boolean = false
 
     @SuppressLint("CommitPrefEdits")
@@ -79,7 +81,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             if (i.resolveActivity(activity!!.packageManager) != null) {
                 startActivityForResult(i, RC_OPEN_TEL)
             } else {
-                Toast.makeText(activity!!, "Please install Extension First", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!, getString(R.string.msg_install_extension_first), Toast.LENGTH_SHORT).show()
                 installExtensionDialog().show()
             }
             true
@@ -116,17 +118,16 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 true
             }
 
-        setUpAds()
-
-        val isFirstInstall = sharedPreferences.getBoolean("first_install", true)
+        val isFirstInstall = sharedPreferences.getBoolean("first_install_2", true)
         if (isFirstInstall) {
             Bundle().apply {
                 putString("Device_Name", Build.DEVICE)
                 putString("Manufacturer", Build.MANUFACTURER)
                 putString("AndroidVersion", Build.VERSION.RELEASE)
-                firebaseAnalytics.logEvent("DeviceInfo", this)
+                putString("AppVersion", BuildConfig.VERSION_CODE.toString())
+                firebaseAnalytics.logEvent("DeviceInfo2", this)
             }
-            editor.putBoolean("first_install", false)
+            editor.putBoolean("first_install_2", false).apply()
         }
     }
 
@@ -155,32 +156,35 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                     )
                     billingProcessor?.initialize()
 
-                    val purchased = billingProcessor?.isPurchased(
+                    isPurchased = billingProcessor?.isPurchased(
                         firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1)
                     )
                     //Donate Preference
                     donatePreference.apply {
-                        isEnabled = !purchased!!
+                        isEnabled = !isPurchased!!
                         summary =
-                            if (purchased) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
+                            if (isPurchased!!) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
                     }
 
                     //Version Preference
-                    preferenceScreen.findPreference<Preference>(getString(R.string.key_version))
-                        ?.apply {
-                            title =
-                                "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-                            if (firebaseRemoteConfig.getLong("touch_enabler_latest_build") > BuildConfig.VERSION_CODE) {
-                                summary = getString(R.string.msg_update_available)
-                                onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                                    val intent = Intent(Intent.ACTION_VIEW)
-                                    intent.data =
-                                        Uri.parse(getString(R.string.url_play_store_app_page))
-                                    startActivity(intent)
-                                    true
-                                }
+                    preferenceScreen.findPreference<Preference>(getString(R.string.key_version))?.apply {
+                        title = String.format(
+                            getString(R.string.format_version),
+                            BuildConfig.VERSION_NAME,
+                            BuildConfig.VERSION_CODE
+                        )
+                        if (firebaseRemoteConfig.getLong(REMOTE_CONFIG_LATEST_BUILD) > BuildConfig.VERSION_CODE) {
+                            summary = getString(R.string.msg_update_available)
+                            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.data =
+                                    Uri.parse(getString(R.string.url_play_store_app_page))
+                                startActivity(intent)
+                                true
                             }
                         }
+                    }
+                    setUpAds()
                 } else {
                     Log.d(_tag, "onCreate: Error getting RemoteConfig")
                 }
@@ -197,49 +201,42 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     }
 
     private fun installExtensionDialog(): AlertDialog {
-        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
+        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.dialog_title_install_ext))
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
-            .setNegativeButton(getString(R.string.text_button_cancel)) { _, _ ->
+            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
                 activity!!.finish()
             }
-            .setPositiveButton(getString(R.string.text_button_install)) { _, _ ->
-                when (firebaseRemoteConfig.getBoolean("enable_ext_dl_storage")) {
-                    true -> {
-                        val reference = FirebaseStorage.getInstance()
-                            .reference.child("updates/tapslegacy-release.apk")
-                        val tmpFile = File(context!!.cacheDir, "app.apk")
-                        activity!!.root_layout.longSnackbar(getString(R.string.msg_downloading_ext))
-                        reference.getFile(tmpFile).addOnSuccessListener {
-                            activity!!.root_layout.snackbar(getString(R.string.msg_ext_downloaded))
-                            Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                val uri = FileProvider.getUriForFile(
-                                    context!!.applicationContext,
-                                    BuildConfig.APPLICATION_ID + ".provider", tmpFile
-                                )
-                                val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                                    .setDataAndType(uri, "application/vnd.android.package-archive")
-                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                startActivity(installIntent)
-                            } else {
-                                val installIntent = Intent(Intent.ACTION_VIEW)
-                                    .setDataAndType(
-                                        Uri.fromFile(tmpFile),
-                                        "application/vnd.android.package-archive"
-                                    )
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(installIntent)
-                            }
+            .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
+                val reference = FirebaseStorage.getInstance()
+                    .reference.child("updates/tapslegacy-release.apk")
+                val tmpFile = File(context!!.cacheDir, "app.apk")
+                activity!!.root_layout.longSnackbar(getString(R.string.msg_downloading_ext))
+                reference.getFile(tmpFile).addOnSuccessListener {
+                    activity!!.root_layout.snackbar(getString(R.string.msg_ext_downloaded))
+                    Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val uri = FileProvider.getUriForFile(
+                            context!!.applicationContext,
+                            BuildConfig.APPLICATION_ID + ".provider", tmpFile
+                        )
+                        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                            .setDataAndType(uri, "application/vnd.android.package-archive")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(installIntent)
+                    } else {
+                        val installIntent = Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(
+                                Uri.fromFile(tmpFile),
+                                "application/vnd.android.package-archive"
+                            )
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(installIntent)
+                    }
 
-                        }
-                    }
-                    false -> {
-                        activity!!.browse("https://m8rg7.app.goo.gl/touchel")
-                    }
                 }
-            }.setNeutralButton("Learn More") { _, _ ->
-                activity!!.browse("https://pointerreplacer.page.link/ext_learn_more")
+            }.setNeutralButton(getString(R.string.dialog_button_learn_more)) { _, _ ->
+                activity!!.browse(getString(R.string.url_learn_more))
             }.create()
         return dialog as AlertDialog
     }
@@ -279,15 +276,15 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
-                        activity!!.root_layout.snackbar("Done")
-                        if (interstitialAd.isLoaded) {
+                        activity!!.root_layout.snackbar(getString(R.string.msg_done))
+                        if (interstitialAd.isLoaded && !isDisableAds) {
                             interstitialAd.show()
                         }
                     }
                     2 -> { //Write Setting Permission not Granted
                         activity!!.root_layout.snackbar(getString(R.string.msg_secure_settings_permission))
-                            .setAction("GRANT") {
-                                if (isMUp()) {
+                            .setAction(getString(R.string.action_grant)) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                     val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
                                     intent.data = Uri.parse("package:com.afterroot.toucherlegacy")
                                     startActivity(intent)
@@ -368,7 +365,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 }
                 true
             }
-            summary = "Ad Loading"
+            summary = getString(R.string.msg_ad_loading)
             isEnabled = false
         }
 
@@ -393,16 +390,13 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         }
     }
 
-    private fun isMUp(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-    }
-
     companion object {
         const val INAPP_LICENCE_KEY = "inapp_licence_key"
         const val PRODUCT_ID_KEY_1 = "product_id_1"
         const val PRODUCT_ID_KEY_2 = "product_id_2"
         const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
         const val RC_OPEN_TEL = 245
+        const val REMOTE_CONFIG_LATEST_BUILD = "touch_enabler_latest_build"
     }
 
 }

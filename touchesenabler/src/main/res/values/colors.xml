@@ -15,12 +15,29 @@
   -->
 
 <resources>
-    <color name="primaryColor">#e0e0e0</color>
-    <color name="primaryLightColor">#ffffff</color>
-    <color name="primaryDarkColor">#aeaeae</color>
-    <color name="secondaryColor">#2962ff</color>
-    <color name="secondaryLightColor">#768fff</color>
-    <color name="secondaryDarkColor">#0039cb</color>
-    <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#ffffff</color>
+    <color name="color_primary">#1E88E5</color>
+    <color name="primaryLightColor">#6ab7ff</color>
+    <color name="color_primary_variant">#005cb2</color>
+
+    <color name="color_secondary">#dd2c00</color>
+    <color name="secondaryLightColor">#ff6434</color>
+    <color name="color_secondary_variant">#a30000</color>
+
+    <!--colorBackground appears behind scrollable content and is used for the default window-->
+    <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
+    <!--and menus. colorError is used to indicate an error state for components such as-->
+    <!--text fields.-->
+    <color name="color_background">#ffffff</color>
+    <color name="color_surface">#ffffff</color>
+    <color name="color_error">#b00020</color>
+
+    <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+    <!--on which they appear.-->
+    <color name="color_on_background">#000000</color>
+    <color name="color_on_surface">#000000</color>
+    <color name="color_on_primary">#ffffff</color>
+    <color name="color_on_secondary">#ffffff</color>
+    <color name="color_on_error">#ffffff</color>
+
+    <color name="grey">#424242</color>
 </resources>
