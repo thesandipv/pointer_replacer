@@ -30,15 +30,15 @@ class FireMessagingService : FirebaseMessagingService() {
     private val TAG = "FireMessagingService"
     private val keyUrl = "FCM_URL"
 
-    override fun onNewToken(token: String?) {
+    override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.e(TAG, "NEW_TOKEN $token")
 
     }
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage?) {
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage!!.from)
+        Log.d(TAG, "From: " + remoteMessage.from)
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {

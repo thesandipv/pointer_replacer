@@ -20,33 +20,36 @@
         app:key="@string/key_show_touches"
         app:summaryOff="@string/msg_touch_disabled"
         app:summaryOn="@string/msg_touch_enabled"
-        app:title="Show Touches" />
-    <PreferenceCategory app:title="Support Development">
+        app:title="@string/pref_title_show_touches" />
+    <PreferenceCategory app:title="@string/pref_category_support">
         <Preference
             app:key="@string/key_pref_donate"
             app:summary="@string/pref_summary_donation"
-            app:title="@string/pref_key_donate_dev" />
+            app:title="@string/pref_title_donate_dev" />
         <Preference
             app:key="@string/key_watch_ads"
             app:summary="@string/pref_summary_watch_ad"
             app:title="@string/pref_title_watch_ad" />
+        <SwitchPreferenceCompat
+            app:key="@string/key_disable_ads"
+            app:title="@string/pref_title_disable_ads" />
     </PreferenceCategory>
-    <PreferenceCategory app:title="About">
+    <PreferenceCategory app:title="@string/pref_category_about">
+        <Preference app:key="@string/key_version" />
         <Preference
             app:key="@string/key_other_apps"
-            app:summary="Check out my other apps!"
-            app:title="Other Apps">
+            app:summary="@string/pref_summary_other_apps"
+            app:title="@string/pref_title_other_apps">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_play_store_developer" />
         </Preference>
         <Preference
             app:key="@string/key_rate_on_g_play"
-            app:title="Rate on Google Play">
+            app:title="@string/pref_title_rate_g_play">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_play_store_app_page" />
         </Preference>
-        <Preference app:key="@string/key_version" />
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
