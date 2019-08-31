@@ -41,6 +41,10 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.R
 import kotlinx.android.synthetic.main.dialog_progress.view.*
 
+/**
+ * sets visibility of view with optional transition
+ * last updated - 17-08-2019
+ */
 fun View.visible(
     value: Boolean,
     transition: Transition? = Fade(if (value) Fade.MODE_IN else Fade.MODE_OUT),
