@@ -25,7 +25,7 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.model.IPointer
 import com.afterroot.allusive.model.Pointer
-import com.afterroot.allusive.utils.CheckeredDrawable
+import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.inflate
 import com.google.firebase.storage.FirebaseStorage
@@ -54,8 +54,7 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
             }
             GlideApp.with(context).load(storageReference).override(context.getMinPointerSize(), context.getMinPointerSize())
                 .into(itemThumb)
-            itemThumb.background =
-                CheckeredDrawable().apply { alpha = context.resources.getInteger(R.integer.checkered_grid_alpha) }
+            itemThumb.background = context.getDrawableExt(R.drawable.transparent_grid)
             with(super.itemView) {
                 tag = pointer
                 setOnClickListener {
