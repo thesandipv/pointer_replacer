@@ -15,7 +15,6 @@
 
 package com.afterroot.allusive.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -30,6 +29,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.transition.Fade
@@ -78,15 +79,11 @@ fun Context.getPrefs(): SharedPreferences {
     return PreferenceManager.getDefaultSharedPreferences(this)
 }
 
-fun Activity.getDrawableExt(id: Int, tint: Int? = null): Drawable {
-    val drawable = ContextCompat.getDrawable(this, id)
-    if (tint != null) {
-        DrawableCompat.setTint(drawable!!, ContextCompat.getColor(this, tint))
-    }
-    return drawable!!
-}
-
-fun Context.getDrawableExt(id: Int, tint: Int? = null): Drawable {
+/**
+ * returns drawable with optional tint
+ * last updated - 31-08-2019
+ */
+fun Context.getDrawableExt(@DrawableRes id: Int, @ColorRes tint: Int? = null): Drawable {
     val drawable = ContextCompat.getDrawable(this, id)
     if (tint != null) {
         DrawableCompat.setTint(drawable!!, ContextCompat.getColor(this, tint))

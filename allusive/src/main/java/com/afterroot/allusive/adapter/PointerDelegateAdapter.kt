@@ -52,9 +52,21 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
             pointer.uploadedBy!!.forEach {
                 itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
-            GlideApp.with(context).load(storageReference).override(context.getMinPointerSize(), context.getMinPointerSize())
-                .into(itemThumb)
-            itemThumb.background = context.getDrawableExt(R.drawable.transparent_grid)
+            itemThumb.apply {
+                if (pointer.reasonCode <= 0) {
+                    GlideApp.with(context).load(storageReference)
+                        .override(context.getMinPointerSize(), context.getMinPointerSize())
+                        .into(this)
+                    background = context.getDrawableExt(R.drawable.transparent_grid)
+                } else {
+                    background = null
+                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                }
+
+            }
+
+            itemView.info_meta.text = String.format(context.getString(R.string.str_format_download_count), pointer.downloads)
+
             with(super.itemView) {
                 tag = pointer
                 setOnClickListener {

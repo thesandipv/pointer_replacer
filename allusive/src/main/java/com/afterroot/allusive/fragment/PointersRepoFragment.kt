@@ -159,9 +159,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         val pointer = pointersList[position]
         var isDownloaded = false
         val file = File("$mTargetPath${pointersList[position].filename}")
-        if (file.exists()) {
-            isDownloaded = true
-        }
+        if (file.exists()) isDownloaded = true
 
         dialog.getCustomView().apply {
             val storageReference =
@@ -172,9 +170,17 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
             info_pointer_image.apply {
-                background =
-                    CheckeredDrawable().apply { alpha = context.resources.getInteger(R.integer.checkered_grid_alpha) }
-                GlideApp.with(context).load(storageReference).override(128, 128).into(this)
+                context!!.toast("isAvailable: ${pointer.reasonCode}")
+                if (pointer.reasonCode <= 0) {
+                    background = context.getDrawableExt(R.drawable.transparent_grid)
+                    GlideApp.with(context)
+                        .load(storageReference)
+                        .override(128, 128).into(this)
+                } else {
+                    background = null
+                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                }
+
             }
             info_action_pack.apply {
                 if (isDownloaded) {
@@ -201,6 +207,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
         ref.getFile(file).addOnSuccessListener {
             activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+            dialog.dismiss()
+        }.addOnFailureListener {
+            activity!!.container.snackbar("Pointer not Available").anchorView = activity!!.navigation
             dialog.dismiss()
         }
         pointersSnapshot.documents[position].reference.update(
