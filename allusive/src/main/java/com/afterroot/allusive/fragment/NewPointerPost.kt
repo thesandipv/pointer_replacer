@@ -125,11 +125,11 @@ class NewPointerPost : Fragment() {
                 val downloadUri = task.result
                 Log.d(_tag, "upload: $downloadUri")
                 val pointer = Pointer(
-                    pointerName,
-                    fileUri.lastPathSegment!!,
-                    pointerDescription,
-                    map,
-                    Timestamp.now().toDate()
+                    name = pointerName,
+                    filename = fileUri.lastPathSegment!!,
+                    description = pointerDescription,
+                    uploadedBy = map,
+                    time = Timestamp.now().toDate()
                 )
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     activity!!.apply {

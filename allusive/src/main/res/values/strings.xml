@@ -161,4 +161,5 @@
     <string name="text_action_retry">Retry</string>
     <string name="msg_grant_app_permissions">Please Grant Permissions</string>
     <string name="text_action_exit">Exit</string>
+    <string name="format_text_empty_error">%1$s can not be empty</string>
 </resources>
