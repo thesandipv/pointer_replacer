@@ -39,6 +39,9 @@ import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.loadBitmapFromView
 import com.afterroot.allusive.utils.showStaticProgressDialog
 import com.bumptech.glide.Glide
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -49,7 +52,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.*
 
 class NewPointerPost : Fragment() {
 
@@ -57,6 +59,8 @@ class NewPointerPost : Fragment() {
     private lateinit var storage: FirebaseStorage
     private val _tag = "NewPointerPost"
     private var isPointerImported = false
+    private val pointerName: String get() = edit_name.text.toString().trim()
+    private val pointerDescription: String get() = edit_desc.text.toString().trim()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,11 +125,11 @@ class NewPointerPost : Fragment() {
                 val downloadUri = task.result
                 Log.d(_tag, "upload: $downloadUri")
                 val pointer = Pointer(
-                    edit_name.text.toString().trim(),
+                    pointerName,
                     fileUri.lastPathSegment!!,
-                    edit_desc.text.toString().trim(),
+                    pointerDescription,
                     map,
-                    Date()
+                    Timestamp.now().toDate()
                 )
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     activity!!.apply {
@@ -134,9 +138,9 @@ class NewPointerPost : Fragment() {
                         fragment_repo_nav.findNavController().navigateUp()
                     }
                 }
-            } else {
-                container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
             }
+        }.addOnFailureListener {
+            container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
         }
     }
 
@@ -162,49 +166,53 @@ class NewPointerPost : Fragment() {
     }
 
     private fun verifyData(): Boolean {
-        return when {
-            edit_name.text!!.trim().isEmpty() -> {
-                edit_name.addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                    }
+        var isOK = true
 
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                    }
-
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                        input_name.isErrorEnabled = false
-                    }
-
-                })
-                input_name.error = getString(R.string.msg_input_error_name_empty)
-                false
-            }
-            edit_desc.text!!.trim().isEmpty() -> {
-                edit_desc.addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                    }
-
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                        input_desc.isErrorEnabled = false
-                    }
-
-                })
-                input_desc.error = getString(R.string.msg_input_error_description_empty)
-                false
-            }
-            (edit_desc.length() >= input_desc.counterMaxLength) -> {
-                input_desc.error = "Maximum Characters"
-                false
-            }
-            !isPointerImported -> {
-                activity!!.container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
-                    activity!!.navigation
-                false
-            }
-            else -> true
+        if (pointerName.isEmpty()) {
+            setListener(edit_name, input_name)
+            setError(input_name)
+            isOK = false
         }
+
+        if (pointerDescription.isEmpty()) {
+            setListener(edit_desc, input_desc)
+            setError(input_desc)
+            isOK = false
+        }
+
+        if (pointerDescription.length >= input_desc.counterMaxLength) {
+            input_desc.error = "Maximum Characters"
+            isOK = false
+        }
+
+        if (!isPointerImported) {
+            activity!!.container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
+                activity!!.navigation
+            isOK = false
+        }
+
+        return isOK
+    }
+
+    private fun setError(inputLayoutView: TextInputLayout) {
+        inputLayoutView.apply {
+            isErrorEnabled = true
+            error = String.format(getString(R.string.format_text_empty_error), inputLayoutView.hint)
+        }
+    }
+
+    private fun setListener(editTextView: TextInputEditText, inputLayoutView: TextInputLayout) {
+        editTextView.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                inputLayoutView.isErrorEnabled = false
+            }
+        })
     }
 }
