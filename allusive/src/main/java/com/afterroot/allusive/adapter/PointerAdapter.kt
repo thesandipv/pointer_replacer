@@ -29,7 +29,7 @@ import java.util.*
 /**GridView Image Adapter. */
 class PointerAdapter(private val mContext: Context) : BaseAdapter() {
     private val inflater: LayoutInflater = LayoutInflater.from(mContext)
-    val _tag = "PointerAdapter"
+    private val _tag = "PointerAdapter"
 
     companion object {
         var itemList = ArrayList<String>()
