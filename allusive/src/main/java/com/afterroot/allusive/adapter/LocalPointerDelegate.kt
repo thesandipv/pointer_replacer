@@ -16,56 +16,43 @@
 package com.afterroot.allusive.adapter
 
 import android.content.Context
+import android.os.Environment
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.model.IPointer
-import com.afterroot.allusive.model.Pointer
+import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.getMinPointerSize
 import com.afterroot.allusive.utils.inflate
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 
-class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
+class LocalPointerDelegate(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = PointerVH(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: IPointer) {
         holder as PointerVH
-        holder.bind(item as Pointer)
+        holder.bind(item as RoomPointer)
     }
+
 
     inner class PointerVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
         val context: Context = parent.context
-        private val itemName: AppCompatTextView = itemView.info_pointer_pack_name
-        private val itemThumb: AppCompatImageView = itemView.info_pointer_image
-        private val itemUploader: AppCompatTextView = itemView.info_username
 
-
-        fun bind(pointer: Pointer) {
-            val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
-            itemName.text = pointer.name
-            pointer.uploadedBy!!.forEach {
-                itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
+        fun bind(pointer: RoomPointer) {
+            val path =
+                "${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}"
+            itemView.info_pointer_pack_name.text = pointer.pointer_name
+            itemView.info_username.text =
+                String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
+            itemView.info_pointer_image.apply {
+                GlideApp.with(context).load(path)
+                    .override(context.getMinPointerSize(), context.getMinPointerSize())
+                    .into(this)
+                background = context.getDrawableExt(R.drawable.transparent_grid)
             }
-            itemThumb.apply {
-                if (pointer.reasonCode <= 0) {
-                    GlideApp.with(context).load(storageReference)
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .into(this)
-                    background = context.getDrawableExt(R.drawable.transparent_grid)
-                } else {
-                    background = null
-                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
-                }
-
-            }
-
-            itemView.info_meta.text = String.format(context.getString(R.string.str_format_download_count), pointer.downloads)
 
             with(super.itemView) {
                 tag = pointer
@@ -79,5 +66,5 @@ class PointerDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegate
             }
         }
     }
-}
 
+}

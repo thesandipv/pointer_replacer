@@ -16,6 +16,7 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -31,10 +32,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.Room
 import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
@@ -196,5 +199,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
+    }
+
+    companion object {
+        private var myDatabase: MyDatabase? = null
+
+        fun getDatabase(context: Context): MyDatabase {
+            return myDatabase ?: Room.databaseBuilder(context, MyDatabase::class.java, "installed-pointers").build()
+        }
+
     }
 }

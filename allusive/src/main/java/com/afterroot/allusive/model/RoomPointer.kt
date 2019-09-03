@@ -15,12 +15,24 @@
 
 package com.afterroot.allusive.model
 
-interface IPointer {
+import android.provider.BaseColumns
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-    fun getType(): Int
+@Entity(tableName = RoomPointer.TABLE_NAME)
+data class RoomPointer(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(index = true, name = BaseColumns._ID)
+    val id: Int = 0,
+    @ColumnInfo val pointer_name: String,
+    @ColumnInfo val file_name: String,
+    @ColumnInfo val pointer_desc: String,
+    @ColumnInfo val uploader_id: String,
+    @ColumnInfo val uploader_name: String
+) : IPointer {
+    override fun getType(): Int = IPointer.TYPE_LOCAL_P
 
     companion object {
-        const val TYPE_POINTER = 1
-        const val TYPE_LOCAL_P = 2
+        const val TABLE_NAME = "pointers"
     }
 }

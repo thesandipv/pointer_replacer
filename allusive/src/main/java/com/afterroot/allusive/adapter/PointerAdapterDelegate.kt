@@ -22,13 +22,14 @@ import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.model.IPointer
 import java.util.*
 
-class PointerAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PointerAdapterDelegate(val callbacks: ItemSelectedCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mList = ArrayList<IPointer>()
     private var delegateAdapters = SparseArrayCompat<TypeDelegateAdapter>()
 
     init {
         with(delegateAdapters) {
-            put(IPointer.TYPE_POINTER, PointerDelegateAdapter(callbacks))
+            put(IPointer.TYPE_POINTER, PointerDelegate(callbacks))
+            put(IPointer.TYPE_LOCAL_P, LocalPointerDelegate(callbacks))
         }
     }
 
@@ -47,6 +48,10 @@ class PointerAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
         mList.addAll(value)
         notifyItemRangeInserted(0, mList.size)
     }
+
+    fun getItem(position: Int) = mList[position]
+
+    fun getList(): List<IPointer> = mList
 
     private fun removeAll() {
         val size = mList.size
