@@ -22,8 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +34,7 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.listItems
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
@@ -40,8 +42,10 @@ import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
+import com.afterroot.allusive.model.RoomPointer
+import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.utils.*
-import com.afterroot.allusive.viewmodel.PointerViewModel
+import com.afterroot.allusive.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -51,6 +55,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
 import java.io.File
@@ -65,7 +70,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var storage: FirebaseStorage
-    private val pointerViewModel: PointerViewModel by lazy { ViewModelProvider(this).get(PointerViewModel::class.java) }
+    private val pointerViewModel: PointerRepoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,9 +162,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
 
         val pointer = pointersList[position]
-        var isDownloaded = false
-        val file = File("$mTargetPath${pointersList[position].filename}")
-        if (file.exists()) isDownloaded = true
+        val db = MainActivity.getDatabase(context!!.applicationContext)
 
         dialog.getCustomView().apply {
             val storageReference =
@@ -170,7 +173,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
             info_pointer_image.apply {
-                context!!.toast("isAvailable: ${pointer.reasonCode}")
                 if (pointer.reasonCode <= 0) {
                     background = context.getDrawableExt(R.drawable.transparent_grid)
                     GlideApp.with(context)
@@ -183,17 +185,19 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
             }
             info_action_pack.apply {
-                if (isDownloaded) {
-                    text = getString(R.string.text_installed)
-                    setOnClickListener(null)
-                    isEnabled = false
-                } else {
-                    text = getString(R.string.text_download)
-                    setOnClickListener {
-                        downloadPointer(position)
-                        dialog.dismiss()
+                lifecycleScope.launch {
+                    if (db.pointerDao().exists(pointer.filename).isNotEmpty()) {
+                        text = getString(R.string.text_installed)
+                        setOnClickListener(null)
+                        isEnabled = false
+                    } else {
+                        text = getString(R.string.text_download)
+                        setOnClickListener {
+                            downloadPointer(position)
+                            dialog.dismiss()
+                        }
+                        isEnabled = true
                     }
-                    isEnabled = true
                 }
             }
             info_tv_downloads_count.text = String.format(getString(R.string.str_format_download_count), pointer.downloads)
@@ -207,15 +211,36 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
         ref.getFile(file).addOnSuccessListener {
             activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+            if (!BuildConfig.DEBUG) {
+                pointersSnapshot.documents[position].reference.update(
+                    DatabaseFields.FIELD_DOWNLOADS,
+                    pointersList[position].downloads + 1
+                )
+            }
+            val p = pointersList[position]
+            var id = ""
+            var name = ""
+            p.uploadedBy!!.forEach {
+                id = it.key
+                name = it.value
+            }
+            val pointer = RoomPointer(
+                file_name = p.filename,
+                pointer_desc = p.description,
+                pointer_name = p.name,
+                uploader_id = id,
+                uploader_name = name
+            )
+            val db = MainActivity.getDatabase(activity!!.applicationContext)
+            lifecycleScope.launch {
+                db.pointerDao().add(pointer)
+            }
+
             dialog.dismiss()
         }.addOnFailureListener {
             activity!!.container.snackbar("Pointer not Available").anchorView = activity!!.navigation
             dialog.dismiss()
         }
-        pointersSnapshot.documents[position].reference.update(
-            DatabaseFields.FIELD_DOWNLOADS,
-            pointersList[position].downloads + 1
-        )
     }
 
     override fun onClick(position: Int, view: View?) {

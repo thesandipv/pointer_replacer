@@ -22,8 +22,8 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.google.firebase.firestore.Query
 
-class PointerViewModel : ViewModel() {
-    var pointerSnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
+class PointerRepoViewModel : ViewModel() {
+    private var pointerSnapshot = MutableLiveData<ViewModelState>()
 
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {

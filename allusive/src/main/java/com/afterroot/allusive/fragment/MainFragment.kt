@@ -29,9 +29,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.ui.onNavDestinationSelected
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -43,6 +47,14 @@ import com.afterroot.allusive.Constants.POINTER_TOUCH
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapter
+import com.afterroot.allusive.adapter.PointerAdapterDelegate
+import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.MyDatabase
+import com.afterroot.allusive.database.dbInstance
+import com.afterroot.allusive.model.Pointer
+import com.afterroot.allusive.model.RoomPointer
+import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.*
 import com.firebase.ui.auth.AuthUI
@@ -53,6 +65,10 @@ import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
+import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.bs_button_install_pointers
+import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.info_no_pointer_installed
+import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 import java.io.File
@@ -69,6 +85,7 @@ class MainFragment : Fragment() {
     private var sharedPreferences: SharedPreferences? = null
     private var targetPath: String? = null
     private lateinit var interstitialAd: InterstitialAd
+    private lateinit var myDatabase: MyDatabase
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -89,11 +106,12 @@ class MainFragment : Fragment() {
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
         pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
+        myDatabase = MainActivity.getDatabase(activity!!.applicationContext)
 
         activity!!.apply {
-            layout_new_pointer.setOnClickListener { showPointerChooser(pointerType = POINTER_TOUCH) }
+            layout_new_pointer.setOnClickListener { showListPointerChooser(pointerType = POINTER_TOUCH) }
             layout_new_mouse.setOnClickListener {
-                showPointerChooser(
+                showListPointerChooser(
                     pointerType = POINTER_MOUSE,
                     title = getString(R.string.dialog_title_select_mouse_pointer)
                 )
@@ -329,6 +347,152 @@ class MainFragment : Fragment() {
         }
     }
 
+    private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
+        val roomPointers = arrayListOf<RoomPointer>()
+        fileNames.forEach { filename ->
+            dbInstance.collection(DatabaseFields.COLLECTION_POINTERS)
+                .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get().addOnSuccessListener { snapshot ->
+                    if (!snapshot.isEmpty) { //Pointer available in repository
+                        val p = snapshot.documents[0].toObject(Pointer::class.java)!!
+                        var id = ""
+                        var name = ""
+                        p.uploadedBy!!.forEach {
+                            id = it.key
+                            name = it.value
+                        }
+                        val pointer = RoomPointer(
+                            file_name = p.filename,
+                            pointer_desc = p.description,
+                            pointer_name = p.name,
+                            uploader_id = id,
+                            uploader_name = name
+                        )
+
+                        roomPointers.add(pointer)
+                        lifecycleScope.launch {
+                            if (myDatabase.pointerDao().exists(filename).isEmpty()) {
+                                myDatabase.pointerDao().add(pointer)
+                            }
+                        }
+                    } else { //Pointer not available in repository
+                        val pointer = RoomPointer(
+                            file_name = filename,
+                            uploader_name = "You (Local)",
+                            uploader_id = "N/A",
+                            pointer_name = filename,
+                            pointer_desc = "N/A"
+                        )
+                        lifecycleScope.launch {
+                            if (myDatabase.pointerDao().exists(filename).isEmpty()) {
+                                myDatabase.pointerDao().add(pointer)
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun import() {
+        val fileNames = arrayListOf<String>()
+        File(targetPath).listFiles().forEach {
+            if (it.name != ".nomedia") {
+                fileNames.add(it.name)
+            }
+
+        }
+        lifecycleScope.launch {
+            generateRoomPointerFromFileName(fileNames)
+        }
+    }
+
+    lateinit var pointerAdapter: PointerAdapterDelegate
+    private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
+        val pointersFolder = File(targetPath)
+        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
+            customView(R.layout.layout_list_bottomsheet)
+            title(text = title)
+            noAutoDismiss()
+            positiveButton(text = "Import Your Pointers") {
+                import()
+            }
+        }
+
+        val dialogView = dialog.getCustomView()
+
+        pointerAdapter = PointerAdapterDelegate(object : ItemSelectedCallback {
+            override fun onClick(position: Int, view: View?) {
+                val selectedItem = pointerAdapter.getItem(position) as RoomPointer
+                sharedPreferences!!.edit(true) {
+                    putString(
+                        if (pointerType == POINTER_TOUCH) getString(R.string.key_selectedPointerPath) else getString(R.string.key_selectedMousePath),
+                        targetPath + selectedItem.file_name
+                    )
+                }
+                GlideApp.with(context!!)
+                    .load(File(targetPath + selectedItem.file_name))
+                    .override(context!!.getMinPointerSize())
+                    .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                dialog.dismiss()
+            }
+
+            override fun onLongClick(position: Int) {
+                val selectedItem = pointerAdapter.getItem(position) as RoomPointer
+                val file = File(targetPath + selectedItem.file_name)
+                MaterialDialog(activity!!).show {
+                    title(text = "${getString(R.string.text_delete)} ${file.name}")
+                    message(res = R.string.text_delete_confirm)
+                    positiveButton(res = R.string.text_yes) {
+                        if (file.delete()) {
+                            lifecycleScope.launch {
+                                myDatabase.pointerDao().delete(selectedItem)
+                            }
+                            Toast.makeText(context, getString(R.string.msg_delete_success), Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(context, getString(R.string.msg_delete_failed), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    negativeButton(res = R.string.text_no)
+                }
+            }
+
+        })
+        dialogView.list_pointers.apply {
+            val lm = LinearLayoutManager(context!!)
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            this.adapter = pointerAdapter
+        }
+
+        lifecycleScope.launch {
+            //Observe Db on CoroutineScope
+            myDatabase.pointerDao().getAll().observe(this@MainFragment, Observer {
+                pointerAdapter.add(it)
+                //Show install msg if no pointer installed
+                dialogView.apply {
+                    info_no_pointer_installed.visible(pointerAdapter.getList().isEmpty())
+                    text_dialog_hint.visible(pointerAdapter.getList().isNotEmpty())
+                    bs_button_install_pointers.setOnClickListener {
+                        dialog.dismiss()
+                        activity!!.findNavController(R.id.fragment_repo_nav)
+                            .navigate(R.id.repoFragment)
+                    }
+                    bs_button_import_pointers.setOnClickListener {
+                        import()
+                    }
+                }
+            })
+        }
+
+        val dotNoMedia = File("${targetPath}/.nomedia")
+        if (!pointersFolder.exists()) {
+            pointersFolder.mkdirs()
+        }
+        if (!dotNoMedia.exists()) {
+            dotNoMedia.createNewFile()
+        }
+    }
+
     private fun showPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
         val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_grid_bottomsheet)
@@ -348,38 +512,19 @@ class MainFragment : Fragment() {
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                 sharedPreferences!!.edit(true) {
                     putString(
-                        when (pointerType) {
-                            POINTER_TOUCH -> {
-                                getString(R.string.key_selectedPointerPath)
-                            }
-                            else -> {
-                                getString(R.string.key_selectedMousePath)
-                            }
-                        },
+                        if (pointerType == POINTER_TOUCH) getString(R.string.key_selectedPointerPath) else getString(R.string.key_selectedMousePath),
                         pointerAdapter.getItem(position)
                     )
-
-
                 }
                 GlideApp.with(context!!).load(File(pointerAdapter.getItem(position))).override(context!!.getMinPointerSize())
-                    .into(
-                        when (pointerType) {
-                            POINTER_TOUCH -> {
-                                activity!!.selected_pointer
-                            }
-                            else -> {
-                                activity!!.selected_mouse
-                            }
-                        }
-                    )
+                    .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
                 dialog.dismiss()
             }
         }
 
         try {
-            val pointersFolder =
-                File(Environment.getExternalStorageDirectory().toString() + getString(R.string.pointer_folder_path))
-            val dotNoMedia = File("${pointersFolder.path}/.nomedia")
+            val pointersFolder = File(targetPath)
+            val dotNoMedia = File("${targetPath}/.nomedia")
             if (!pointersFolder.exists()) {
                 pointersFolder.mkdirs()
             }

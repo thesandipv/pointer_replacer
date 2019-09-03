@@ -44,7 +44,7 @@ import kotlinx.android.synthetic.main.dialog_progress.view.*
 
 /**
  * sets visibility of view with optional transition
- * last updated - 17-08-2019
+ * last updated - 03-09-2019
  */
 fun View.visible(
     value: Boolean,
@@ -54,10 +54,7 @@ fun View.visible(
     if (transition != null) {
         TransitionManager.beginDelayedTransition(view, transition)
     }
-    visibility = when {
-        value -> View.VISIBLE
-        else -> View.GONE
-    }
+    visibility = if (value) View.VISIBLE else View.GONE
 }
 
 fun Context.isAppInstalled(pName: String): Boolean {
