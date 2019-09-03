@@ -44,3 +44,4 @@ captures/
 .*
 !/.gitignore
 /others
+gradle.properties
