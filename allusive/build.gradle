@@ -41,11 +41,11 @@ android {
             storePassword RELEASE_STORE_PASSWORD
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.afterroot.allusive"
         minSdkVersion project.ext.minimumSdkVersion
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode genVersionCode()
         versionName genVersionName()
         vectorDrawables.useSupportLibrary = true
@@ -167,7 +167,7 @@ dependencies {
     api 'com.google.dagger:dagger-android-support:2.24'
     kapt 'com.google.dagger:dagger-android-processor:2.24'
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
 }
 apply plugin: 'com.google.gms.google-services'
