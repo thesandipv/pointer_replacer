@@ -17,6 +17,7 @@ package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -67,10 +68,8 @@ class CustomizeFragment : Fragment() {
         return view
     }
 
-    @SuppressLint("CommitPrefEdits")
-    override fun onStart() {
-        super.onStart()
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         mSharedPreferences = context!!.getPrefs()
 
         if (pointerType == POINTER_TOUCH) {
@@ -79,31 +78,19 @@ class CustomizeFragment : Fragment() {
             typePadding = getString(R.string.key_pointerPadding)
             typeAlpha = getString(R.string.key_pointerAlpha)
             typePath = getString(R.string.key_selectedPointerPath)
-            view!!.image_customize_pointer.transitionName = getString(R.string.main_fragment_transition)
         } else {
             typeColor = getString(R.string.key_mouseColor)
             typeSize = getString(R.string.key_mouseSize)
             typePadding = getString(R.string.key_mousePadding)
             typeAlpha = getString(R.string.key_mouseAlpha)
             typePath = getString(R.string.key_selectedMousePath)
-            view!!.image_customize_pointer.transitionName = getString(R.string.transition_mouse)
         }
 
-        TransitionSet()
-            .addTransition(ChangeBounds())
-            .addTransition(ChangeTransform())
-            .apply {
-                ordering = TransitionSet.ORDERING_TOGETHER
-                duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-                interpolator = FastOutSlowInInterpolator()
-                sharedElementEnterTransition = this
-            }
-
         color = mSharedPreferences!!.getInt(typeColor, 0)
-        view!!.image_customize_pointer.setColorFilter(color)
+        view.image_customize_pointer.setColorFilter(color)
 
         GlideApp.with(context!!)
-            .load(File(mSharedPreferences!!.getString(typePath, "")))
+            .load(File(mSharedPreferences!!.getString(typePath, "")!!))
             .into(image_customize_pointer)
 
         activity!!.fab_apply.apply {
@@ -121,6 +108,29 @@ class CustomizeFragment : Fragment() {
 
         setSeekBars()
         setClickListeners()
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    override fun onStart() {
+        super.onStart()
+
+        mSharedPreferences = context!!.getPrefs()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (pointerType == POINTER_TOUCH) {
+                view!!.image_customize_pointer.transitionName = getString(R.string.main_fragment_transition)
+            } else {
+                view!!.image_customize_pointer.transitionName = getString(R.string.transition_mouse)
+            }
+        }
+        TransitionSet()
+            .addTransition(ChangeBounds())
+            .addTransition(ChangeTransform())
+            .apply {
+                ordering = TransitionSet.ORDERING_TOGETHER
+                duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+                interpolator = FastOutSlowInInterpolator()
+                sharedElementEnterTransition = this
+            }
     }
 
     private val minSize: Int
