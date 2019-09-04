@@ -56,6 +56,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -66,8 +67,10 @@
                         android:id="@+id/text_no_pointer_applied"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="end"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/no_pointer_applied"
                         android:textAlignment="textEnd"
@@ -80,6 +83,7 @@
                         android:id="@+id/text_current_pointer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:text="@string/text_cur_pointer"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -99,6 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/text_action_customize"
@@ -110,6 +115,7 @@
                         android:id="@+id/text_new_pointer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/text_will_change_to"
@@ -130,6 +136,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -140,7 +147,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:transitionName="@string/main_fragment_transition"
-                            tools:src="@drawable/pointer" />
+                            tools:src="@drawable/pointer"
+                            tools:targetApi="lollipop" />
                     </FrameLayout>
 
 
@@ -180,6 +188,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -190,8 +199,10 @@
                         android:id="@+id/text_no_mouse_applied"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="end"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/no_pointer_applied"
                         android:textAlignment="textEnd"
@@ -205,6 +216,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/text_cur_mouse"
@@ -224,6 +236,7 @@
                         android:id="@+id/text_new_mouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/mouse_pointer"
@@ -244,6 +257,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -254,7 +268,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:transitionName="@string/transition_mouse"
-                            tools:src="@drawable/pointer" />
+                            tools:src="@drawable/pointer"
+                            tools:targetApi="lollipop" />
                     </FrameLayout>
 
                     <androidx.appcompat.widget.AppCompatButton
@@ -262,6 +277,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/text_action_customize"
