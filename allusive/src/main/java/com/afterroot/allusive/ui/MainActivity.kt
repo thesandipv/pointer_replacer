@@ -16,6 +16,7 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -23,9 +24,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
+import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -43,6 +46,7 @@ import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.allusive.utils.getPrefs
+import com.afterroot.allusive.utils.visible
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
@@ -149,44 +153,71 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun hideNavigation() {
+        if (navigation.isVisible) {
+            ObjectAnimator.ofFloat(navigation, "translationY", 0f, navigation.height.toFloat()).apply {
+                interpolator = AccelerateDecelerateInterpolator()
+                duration = 400
+                start()
+            }
+            navigation.visible(false)
+        }
+    }
+
+    private fun showNavigation() {
+        if (!navigation.isVisible) {
+            ObjectAnimator.ofFloat(navigation, "translationY", navigation.height.toFloat(), 0f).apply {
+                interpolator = AccelerateDecelerateInterpolator()
+                duration = 400
+                start()
+            }
+            navigation.visible(true)
+        }
+    }
+
     private fun loadFragments() {
         val host: NavHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment? ?: return
         val navController = host.navController
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            fab_apply.hide()
+            //fab_apply.hide()
+            showNavigation()
             when (destination.id) {
                 R.id.mainFragment -> {
                     fab_apply.apply {
-                        show()
+                        if (!isShown) show()
                         text = getString(R.string.text_action_apply)
                     }
                 }
                 R.id.repoFragment -> {
                     fab_apply.apply {
-                        show()
+                        if (!isShown) show()
                         text = getString(R.string.text_action_post)
                     }
                 }
                 R.id.settingsFragment -> {
+                    fab_apply.hide()
                 }
                 R.id.editProfileFragment -> {
                     fab_apply.apply {
-                        show()
+                        if (!isShown) show()
                         text = getString(R.string.text_action_save)
                     }
+                    hideNavigation()
                 }
                 R.id.newPostFragment -> {
                     fab_apply.apply {
-                        show()
+                        if (!isShown) show()
                         text = getString(R.string.text_action_upload)
                     }
+                    hideNavigation()
                 }
                 R.id.customizeFragment -> {
                     fab_apply.apply {
-                        show()
+                        if (!isShown) show()
                         text = getString(R.string.text_action_apply)
                     }
+                    hideNavigation()
                 }
             }
         }
