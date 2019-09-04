@@ -15,6 +15,7 @@
 
 package com.afterroot.allusive.utils
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -24,15 +25,17 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.Interpolator
 import android.webkit.MimeTypeMap
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.preference.PreferenceManager
 import androidx.transition.Fade
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
@@ -57,6 +60,24 @@ fun View.visible(
     visibility = if (value) View.VISIBLE else View.GONE
 }
 
+/**
+ * animate property of view
+ * last updated - 04-09-2019
+ */
+fun View.animateProperty(
+    property: String,
+    from: Float,
+    to: Float,
+    duration: Long = 400,
+    interpolator: Interpolator = AccelerateDecelerateInterpolator()
+) {
+    ObjectAnimator.ofFloat(this, property, from, to).apply {
+        this.interpolator = interpolator
+        this.duration = duration
+        start()
+    }
+}
+
 fun Context.isAppInstalled(pName: String): Boolean {
     return try {
         this.packageManager.getApplicationInfo(pName, 0)
@@ -69,7 +90,7 @@ fun Context.isAppInstalled(pName: String): Boolean {
 fun Context.isNetworkAvailable(): Boolean {
     val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val networkInfo = cm.activeNetworkInfo
-    return networkInfo != null && networkInfo.isConnected
+    return networkInfo?.isConnectedOrConnecting == true
 }
 
 fun Context.getPrefs(): SharedPreferences {
