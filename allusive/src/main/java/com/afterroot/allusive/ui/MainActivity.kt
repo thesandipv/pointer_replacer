@@ -16,7 +16,6 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -24,7 +23,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
@@ -43,10 +41,7 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.User
-import com.afterroot.allusive.utils.FirebaseUtils
-import com.afterroot.allusive.utils.PermissionChecker
-import com.afterroot.allusive.utils.getPrefs
-import com.afterroot.allusive.utils.visible
+import com.afterroot.allusive.utils.*
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
@@ -155,23 +150,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideNavigation() {
         if (navigation.isVisible) {
-            ObjectAnimator.ofFloat(navigation, "translationY", 0f, navigation.height.toFloat()).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                duration = 400
-                start()
+            navigation.run {
+                animateProperty("translationY", 0f, navigation.height.toFloat(), 200)
+                visible(false)
             }
-            navigation.visible(false)
         }
     }
 
     private fun showNavigation() {
         if (!navigation.isVisible) {
-            ObjectAnimator.ofFloat(navigation, "translationY", navigation.height.toFloat(), 0f).apply {
-                interpolator = AccelerateDecelerateInterpolator()
-                duration = 400
-                start()
+            navigation.run {
+                animateProperty("translationY", navigation.height.toFloat(), 0f, 200)
+                visible(true)
             }
-            navigation.visible(true)
         }
     }
 
