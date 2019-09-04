@@ -29,4 +29,6 @@ object DatabaseFields {
     const val FIELD_TIME = "time"
     const val FIELD_UPLOAD_BY = "uploadedBy"
     const val FIELD_DOWNLOADS = "downloads"
+    const val FIELD_UPVOTES = "upvotes"
+    const val FIELD_DOWNVOTES = "downvotes"
 }
