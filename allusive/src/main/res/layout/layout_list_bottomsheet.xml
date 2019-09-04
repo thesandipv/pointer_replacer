@@ -77,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="OR"
+            android:text="@string/text_or"
             android:textSize="18sp" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -88,7 +88,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:text="Import Old Pointers" />
+            android:text="@string/action_import_old_pointers" />
 
     </LinearLayout>
 
