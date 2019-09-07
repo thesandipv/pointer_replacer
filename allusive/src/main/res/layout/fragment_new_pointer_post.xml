@@ -126,5 +126,18 @@
                 android:layout_height="wrap_content"
                 android:inputType="textLongMessage|textMultiLine|textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/banner_ad_repo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:adSize="BANNER"
+            app:adUnitId="@string/ad_banner_unit_id"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_desc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -22,13 +22,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
@@ -39,6 +39,7 @@ import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.loadBitmapFromView
 import com.afterroot.allusive.utils.showStaticProgressDialog
 import com.bumptech.glide.Glide
+import com.google.android.gms.ads.AdRequest
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
@@ -91,6 +92,12 @@ class NewPointerPost : Fragment() {
             }
             icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
         }
+
+        val adRequest = AdRequest.Builder()
+        if (BuildConfig.DEBUG) {
+            adRequest.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID)
+        }
+        banner_ad_repo.loadAd(adRequest.build())
     }
 
     //Handle retrieved image uri
@@ -122,8 +129,6 @@ class NewPointerPost : Fragment() {
             map[FirebaseUtils.auth!!.uid!!] = FirebaseUtils.firebaseUser!!.displayName.toString()
             if (task.isSuccessful) {
                 customView.text_progress.text = getString(R.string.text_progress_finishing_up)
-                val downloadUri = task.result
-                Log.d(_tag, "upload: $downloadUri")
                 val pointer = Pointer(
                     name = pointerName,
                     filename = fileUri.lastPathSegment!!,
@@ -174,13 +179,8 @@ class NewPointerPost : Fragment() {
             isOK = false
         }
 
-        if (pointerDescription.isEmpty()) {
-            setListener(edit_desc, input_desc)
-            setError(input_desc)
-            isOK = false
-        }
-
         if (pointerDescription.length >= input_desc.counterMaxLength) {
+            setListener(edit_desc, input_desc)
             input_desc.error = "Maximum Characters"
             isOK = false
         }

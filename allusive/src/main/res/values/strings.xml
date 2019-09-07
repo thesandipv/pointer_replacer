@@ -38,7 +38,7 @@
     <string name="helper_text_desc">Provide short info about pointer.</string>
     <string name="helper_text_name">Provide name of pointer.</string>
     <string name="import_pointer">Import Pointer</string>
-    <string name="input_hint_desc">Description</string>
+    <string name="input_hint_desc">Description (optional)</string>
     <string name="input_hint_email">Email</string>
     <string name="input_hint_max_padding_size">Enter Max Padding Size</string>
     <string name="input_hint_name">Name</string>
