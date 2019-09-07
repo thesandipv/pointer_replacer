@@ -29,7 +29,7 @@ data class Pointer(
     var downloads: Int = 0,
     var reasonCode: Int = 0
 ) : Serializable, IPointer {
-    override fun getType(): Int {
+    override fun type(): Int {
         return IPointer.TYPE_POINTER
     }
 

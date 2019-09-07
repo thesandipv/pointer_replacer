@@ -30,7 +30,7 @@ data class RoomPointer(
     @ColumnInfo val uploader_id: String,
     @ColumnInfo val uploader_name: String
 ) : IPointer {
-    override fun getType(): Int = IPointer.TYPE_LOCAL_P
+    override fun type(): Int = IPointer.TYPE_LOCAL_P
 
     companion object {
         const val TABLE_NAME = "pointers"

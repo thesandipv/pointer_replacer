@@ -17,7 +17,7 @@ package com.afterroot.allusive.model
 
 interface IPointer {
 
-    fun getType(): Int
+    fun type(): Int
 
     companion object {
         const val TYPE_POINTER = 1
