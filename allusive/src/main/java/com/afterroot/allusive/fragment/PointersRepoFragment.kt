@@ -131,11 +131,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private fun setUpList() {
         pointerAdapter = PointerAdapterDelegate(this)
         list.apply {
-            setHasFixedSize(true)
             val lm = LinearLayoutManager(context!!)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            this.adapter = pointerAdapter
         }
         loadPointers()
     }
@@ -151,6 +149,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     pointersSnapshot = it.data as QuerySnapshot
                     pointersList = pointersSnapshot.toObjects()
                     pointerAdapter.add(pointersList)
+                    list.adapter = pointerAdapter
                 }
             }
         })
@@ -196,7 +195,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                             downloadPointer(position)
                             dialog.dismiss()
                         }
-                        isEnabled = true
+                        isEnabled = pointer.reasonCode == 0
                     }
                 }
             }
@@ -269,20 +268,20 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     }
                     getString(R.string.text_delete) -> {
                         MaterialDialog(context).show {
-                            title(text = getString(R.string.dialog_title_confirmation))
-                            icon(R.drawable.ic_delete)
-                            positiveButton(android.R.string.yes) {
+                            message(text = getString(R.string.dialog_delete_confirm))
+                            positiveButton(R.string.text_delete) {
                                 val filename = pointersList[position].filename
                                 db.collection(DatabaseFields.COLLECTION_POINTERS)
                                     .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
                                     .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
                                         querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
                                             docSnapshot!!.reference.delete().addOnSuccessListener {
-                                                val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
-                                                    .child(filename)
-                                                ref.delete().addOnSuccessListener {
-
-                                                }
+                                                //go to last position after deleting pointer
+                                                this@PointersRepoFragment.list.scrollToPosition(position)
+                                                //delete pointer from storage bucket
+                                                storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(filename)
+                                                    .delete()
+                                                context.toast(R.string.msg_delete_success)
                                             }
                                         }
                                     }

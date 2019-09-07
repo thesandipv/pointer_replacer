@@ -113,7 +113,7 @@
     <string name="text_action_upload">Upload</string>
     <string name="text_alpha">Alpha</string>
     <string name="text_apply_pointer_confirm">Do you want to apply this pointer?</string>
-    <string name="text_browse_pointer_image">Browse Pointer Image</string>
+    <string name="text_browse_pointer_image">Browse Pointer Image\nRecommended min Pointer Size is 150*150.</string>
     <string name="text_click_to_change_pointer">Click to Change Pointer</string>
     <string name="text_click_to_mouse">Click to change mouse pointer</string>
     <string name="text_color_changed">Pointer color changed.</string>
@@ -164,4 +164,5 @@
     <string name="format_text_empty_error">%1$s can not be empty</string>
     <string name="text_or">OR</string>
     <string name="action_import_old_pointers">Import Old Pointers</string>
+    <string name="dialog_delete_confirm">Delete this Pointer?</string>
 </resources>
