@@ -41,7 +41,7 @@ class PointerAdapterDelegate(val callbacks: ItemSelectedCallback) : RecyclerView
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         delegateAdapters.get(getItemViewType(position))!!.onBindViewHolder(holder, mList[position])
 
-    override fun getItemViewType(position: Int): Int = mList[position].getType()
+    override fun getItemViewType(position: Int): Int = mList[position].type()
 
     fun add(value: List<IPointer>) {
         removeAll()
