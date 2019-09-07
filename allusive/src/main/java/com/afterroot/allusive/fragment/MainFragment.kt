@@ -315,11 +315,11 @@ class MainFragment : Fragment() {
     private fun setUpAd() {
         MobileAds.initialize(context!!, getString(R.string.ad_banner_unit_id))
 
-        if (!BuildConfig.DEBUG) {
-            val adView = banner_ad_main
-            val adRequest = AdRequest.Builder().build()
-            adView.loadAd(adRequest)
+        val adRequest = AdRequest.Builder()
+        if (BuildConfig.DEBUG) {
+            adRequest.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID)
         }
+        banner_ad_main.loadAd(adRequest.build())
 
         interstitialAd = InterstitialAd(this.activity!!)
         interstitialAd.apply {
@@ -394,7 +394,7 @@ class MainFragment : Fragment() {
 
     private fun import() {
         val fileNames = arrayListOf<String>()
-        File(targetPath).listFiles().forEach {
+        File(targetPath!!).listFiles()?.forEach {
             if (it.name != ".nomedia") {
                 fileNames.add(it.name)
             }
@@ -407,7 +407,7 @@ class MainFragment : Fragment() {
 
     lateinit var pointerAdapter: PointerAdapterDelegate
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
-        val pointersFolder = File(targetPath)
+        val pointersFolder = File(targetPath!!)
         val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_list_bottomsheet)
             title(text = title)
@@ -523,7 +523,7 @@ class MainFragment : Fragment() {
         }
 
         try {
-            val pointersFolder = File(targetPath)
+            val pointersFolder = File(targetPath!!)
             val dotNoMedia = File("${targetPath}/.nomedia")
             if (!pointersFolder.exists()) {
                 pointersFolder.mkdirs()
@@ -534,7 +534,7 @@ class MainFragment : Fragment() {
 
             val pointerFiles = pointersFolder.listFiles()//.filter { getMimeType(it.name)!!.startsWith("image/") }
             PointerAdapter.itemList.clear()
-            if (pointerFiles.isNotEmpty()) {
+            if (pointerFiles!!.isNotEmpty()) {
                 dialogView.info_no_pointer_installed.visible(false)
                 pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
                 pointerAdapter.notifyDataSetChanged()

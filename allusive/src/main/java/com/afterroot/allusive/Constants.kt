@@ -27,3 +27,9 @@ object Constants {
     const val RC_PERMISSION = 256
     const val RC_PICK_IMAGE: Int = 478
 }
+
+object Reason {
+    const val DUPLICATE = 1
+    const val NOT_A_POINTER = 2
+    const val OTHER = 3
+}
