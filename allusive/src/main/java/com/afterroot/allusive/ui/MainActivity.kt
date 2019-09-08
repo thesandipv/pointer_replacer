@@ -34,6 +34,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
@@ -43,11 +44,14 @@ import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.*
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -89,6 +93,25 @@ class MainActivity : AppCompatActivity() {
             checkPermissions()
         } else {
             loadFragments()
+        }
+
+        if (BuildConfig.DEBUG) {
+            val tag = "FCMToken"
+            FirebaseInstanceId.getInstance().instanceId
+                .addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w(tag, "getInstanceId failed", task.exception)
+                        return@OnCompleteListener
+                    }
+
+                    // Get new Instance ID token
+                    val token = task.result?.token
+
+                    // Log and toast
+                    val msg = "InstanceID Token: $token"
+                    Log.d(tag, msg)
+                    baseContext.toast(msg)
+                })
         }
 
         //Add user in db if not available

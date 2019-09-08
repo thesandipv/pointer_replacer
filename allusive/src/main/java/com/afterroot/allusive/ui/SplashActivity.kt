@@ -18,6 +18,7 @@ package com.afterroot.allusive.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
@@ -26,11 +27,15 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.utils.isNetworkAvailable
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import org.jetbrains.anko.browse
 
 class SplashActivity : AppCompatActivity() {
 
+    private val _tag = javaClass.simpleName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser == null && this.isNetworkAvailable()) {
@@ -43,6 +48,12 @@ class SplashActivity : AppCompatActivity() {
                     finish()
                 }
                 cancelable(false)
+            }
+        } else if (intent.extras != null) {
+            Log.d(_tag, "FCM-Extra: ${intent.extras}")
+            intent.extras?.let {
+                browse(it.get("link") as String)
+                finish()
             }
         } else {
             launchDashboard()
