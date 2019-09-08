@@ -21,6 +21,7 @@ object DatabaseFields {
     const val FIELD_NAME = "name"
     const val FIELD_EMAIL = "email"
     const val FIELD_UID = "uid"
+    const val FIELD_FCM_ID = "fcmId"
 
     //table 'pointers'
     const val COLLECTION_POINTERS = "pointers"

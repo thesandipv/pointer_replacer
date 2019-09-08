@@ -26,18 +26,32 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.afterroot.allusive.database.DatabaseFields
+import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.ui.MainActivity
+import com.afterroot.allusive.utils.FirebaseUtils
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class FireMessagingService : FirebaseMessagingService() {
 
-    private val TAG = "FireMessagingService"
+    private val _tag = "FireMessagingService"
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.e(TAG, "NEW_TOKEN $token")
+        Log.e(_tag, "NEW_TOKEN $token")
+        updateToken(token)
+    }
 
+    private fun updateToken(token: String) {
+        try {
+            if (FirebaseUtils.isUserSignedIn) {
+                dbInstance.collection(DatabaseFields.COLLECTION_USERS).document(FirebaseUtils.firebaseUser!!.uid)
+                    .update(DatabaseFields.FIELD_FCM_ID, token)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
