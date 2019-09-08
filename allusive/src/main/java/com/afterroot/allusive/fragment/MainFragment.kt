@@ -61,7 +61,6 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
@@ -313,8 +312,6 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpAd() {
-        MobileAds.initialize(context!!, getString(R.string.ad_banner_unit_id))
-
         val adRequest = AdRequest.Builder()
         if (BuildConfig.DEBUG) {
             adRequest.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID)

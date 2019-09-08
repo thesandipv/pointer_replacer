@@ -165,4 +165,6 @@
     <string name="text_or">OR</string>
     <string name="action_import_old_pointers">Import Old Pointers</string>
     <string name="dialog_delete_confirm">Delete this Pointer?</string>
+    <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="fcm_channel_default">Updates</string>
 </resources>
