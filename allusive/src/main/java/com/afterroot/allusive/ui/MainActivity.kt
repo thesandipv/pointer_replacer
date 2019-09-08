@@ -34,7 +34,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
-import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
@@ -51,7 +50,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -95,52 +93,40 @@ class MainActivity : AppCompatActivity() {
             loadFragments()
         }
 
-        if (BuildConfig.DEBUG) {
-            val tag = "FCMToken"
-            FirebaseInstanceId.getInstance().instanceId
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.w(tag, "getInstanceId failed", task.exception)
-                        return@OnCompleteListener
-                    }
-
-                    // Get new Instance ID token
-                    val token = task.result?.token
-
-                    // Log and toast
-                    val msg = "InstanceID Token: $token"
-                    Log.d(tag, msg)
-                    baseContext.toast(msg)
-                })
-        }
-
         //Add user in db if not available
-        //addUserInfoInDB()
+        addUserInfoInDB()
     }
 
-    //TODO Get to work addUserInfoInDB function
     private fun addUserInfoInDB() {
         try {
             val curUser = FirebaseUtils.auth!!.currentUser
             val userRef = dbInstance.collection(DatabaseFields.COLLECTION_USERS).document(curUser!!.uid)
-            userRef.get().addOnCompleteListener { getUserTask ->
-                when {
-                    getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
-                        container.snackbar("User not available. Creating User..").anchorView = navigation
-                        val user = User(curUser.displayName, curUser.email, curUser.uid)
-                        userRef.set(user).addOnCompleteListener { setUserTask ->
-                            when {
-                                setUserTask.isSuccessful -> {
-                                }
-                                else -> Log.e(_tag, "Can't create firebaseUser", setUserTask.exception)
-                            }
-                        }
+            FirebaseInstanceId.getInstance().instanceId
+                .addOnCompleteListener(OnCompleteListener { tokenTask ->
+                    if (!tokenTask.isSuccessful) {
+                        return@OnCompleteListener
                     }
-                    else -> Log.e(_tag, "Unknown Error", getUserTask.exception)
-                }
-            }
+                    userRef.get().addOnCompleteListener { getUserTask ->
+                        if (getUserTask.isSuccessful) {
+                            if (!getUserTask.result!!.exists()) {
+                                container.snackbar("User not available. Creating User..").anchorView = navigation
+                                val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result?.token!!)
+                                userRef.set(user).addOnCompleteListener { setUserTask ->
+                                    if (!setUserTask.isSuccessful) Log.e(
+                                        _tag,
+                                        "Can't create firebaseUser",
+                                        setUserTask.exception
+                                    )
+                                }
+                            } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result?.token!!) {
+                                userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result?.token!!)
+                            }
+
+                        } else Log.e(_tag, "Unknown Error", getUserTask.exception)
+                    }
+                })
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(_tag, "addUserInfoInDB: $e")
         }
     }
 
