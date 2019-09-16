@@ -18,23 +18,31 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.fabric'
 
+ext {
+    major = 1
+    minor = 2
+    patch = 1
+    minimumSdkVersion = 16
+}
+
 android {
     signingConfigs {
         config {
-            keyAlias 'allusive'
-            keyPassword 'allusive@afterroot'
-            storeFile file('G:/AS_SDK/Development References/Keystore/afterroot_current.jks')
-            storePassword 'afterroot'
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+            storeFile file("config/release.jks")
+            storePassword RELEASE_STORE_PASSWORD
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.afterroot.touchenabler"
-        minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 6
-        versionName "1.2.1"
+        minSdkVersion project.ext.minimumSdkVersion
+        targetSdkVersion 29
+        versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
+        versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
         multiDexEnabled true
+        buildConfigField("String", "AD_TEST_DEVICE_ID", ADMOB_TEST_DEVICE_ID)
     }
     buildTypes {
         release {
@@ -43,13 +51,21 @@ android {
             signingConfig signingConfigs.config
         }
         debug {
-            versionNameSuffix '-debug'
+            ext.alwaysUpdateBuildId = false
+            splits.abi.enable = false
+            splits.density.enable = false
+            crunchPngs false
+            versionNameSuffix '-beta'
         }
     }
-}
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 
-repositories {
-    mavenCentral()
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -57,15 +73,15 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-core:17.2.0'
     implementation 'com.google.firebase:firebase-ads:18.2.0'
-    implementation 'com.google.firebase:firebase-config:19.0.0'
+    implementation 'com.google.firebase:firebase-config:19.0.1'
     implementation 'com.google.firebase:firebase-messaging:20.0.0'
-    implementation 'com.google.firebase:firebase-storage:19.0.0'
+    implementation 'com.google.firebase:firebase-storage:19.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
-    implementation 'androidx.preference:preference:1.1.0-rc01'
-    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
 
     implementation 'com.anjlab.android.iab.v3:library:1.1.0'
