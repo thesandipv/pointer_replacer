@@ -65,4 +65,7 @@
     <string name="format_version">Version %1$s (%2$d)</string>
     <string name="msg_install_extension_first">Please install Extension First</string>
     <string name="action_grant">Grant</string>
+    <string name="test">test</string>
+    <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="fcm_channel_default">Updates</string>
 </resources>
