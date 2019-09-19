@@ -68,4 +68,6 @@
     <string name="test">test</string>
     <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
     <string name="fcm_channel_default">Updates</string>
+    <string name="made_with_love">Made with ❤ In India.</string>
+    <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
 </resources>
