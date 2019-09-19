@@ -52,6 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
         android:text="@string/text_action_apply"
         app:icon="@drawable/ic_action_apply"
         app:layout_anchor="@id/placeholder"
