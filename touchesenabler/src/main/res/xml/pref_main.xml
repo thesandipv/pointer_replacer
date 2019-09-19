@@ -21,6 +21,13 @@
         app:summaryOff="@string/msg_touch_disabled"
         app:summaryOn="@string/msg_touch_enabled"
         app:title="@string/pref_title_show_touches" />
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        app:isPreferenceVisible="false"
+        app:key="@string/key_disable_ads"
+        app:summaryOff="will only disable Full Screen Ads shown when toggling 'Show Touches'"
+        app:summaryOn="BTW, Ads help me to support development"
+        app:title="@string/pref_title_disable_ads" />
     <PreferenceCategory app:title="@string/pref_category_support">
         <Preference
             app:key="@string/key_pref_donate"
@@ -30,9 +37,6 @@
             app:key="@string/key_watch_ads"
             app:summary="@string/pref_summary_watch_ad"
             app:title="@string/pref_title_watch_ad" />
-        <SwitchPreferenceCompat
-            app:key="@string/key_disable_ads"
-            app:title="@string/pref_title_disable_ads" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/pref_category_about">
         <Preference app:key="@string/key_version" />

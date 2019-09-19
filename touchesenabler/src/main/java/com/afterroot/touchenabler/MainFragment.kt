@@ -45,23 +45,31 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.toast
 import java.io.File
 
 class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandler {
 
+    private lateinit var config: FirebaseRemoteConfig
     private lateinit var donatePreference: Preference
     private lateinit var editor: SharedPreferences.Editor
     private lateinit var firebaseAnalytics: FirebaseAnalytics
-    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private lateinit var interstitialAd: InterstitialAd
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var showTouchPref: SwitchPreferenceCompat
     private val _tag: String = "TouchEnabler"
-    private val isDisableAds: Boolean by lazy { sharedPreferences.getBoolean(getString(R.string.key_disable_ads), false) }
+    private val isDisableAds: Boolean get() = sharedPreferences.getBoolean(getString(R.string.key_disable_ads), false)
     private var billingProcessor: BillingProcessor? = null
     private var dialog: AlertDialog? = null
     private var isPurchased: Boolean? = false
     private var isReadyToPurchase: Boolean = false
+
+    private val currentSetting
+        get() = Settings.System.getInt(
+            activity!!.contentResolver,
+            getString(R.string.key_show_touches)
+        )
+
 
     @SuppressLint("CommitPrefEdits")
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -69,9 +77,105 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         editor = sharedPreferences.edit()
-
         firebaseAnalytics = FirebaseAnalytics.getInstance(this.activity!!)
 
+        prefShowTouches()
+        prefOthers()
+
+        val isFirstInstall = sharedPreferences.getBoolean("first_install_2", true)
+        if (isFirstInstall) {
+            Bundle().apply {
+                putString("Device_Name", Build.DEVICE)
+                putString("Device_Model", Build.MODEL)
+                putString("Manufacturer", Build.MANUFACTURER)
+                putString("AndroidVersion", Build.VERSION.RELEASE)
+                putString("AppVersion", BuildConfig.VERSION_CODE.toString())
+                putString("Package", BuildConfig.APPLICATION_ID)
+                firebaseAnalytics.logEvent("DeviceInfo2", this)
+            }
+            editor.putBoolean("first_install_2", false).apply()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        config = FirebaseRemoteConfig.getInstance()
+        FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
+            .build().apply {
+                config.setConfigSettingsAsync(this)
+            }
+
+        config.fetch(config.info.fetchTimeMillis)
+            .addOnCompleteListener(this.activity!!) { task ->
+                if (task.isSuccessful) {
+                    config.activate()
+                    setUpBilling()
+                    prefVersion()
+                    setUpAds()
+                } else {
+                    Log.d(_tag, "onCreate: Error getting RemoteConfig")
+                }
+            }
+    }
+
+    private fun setUpBilling() {
+        if (!BillingProcessor.isIabServiceAvailable(this.activity!!)) {
+            activity!!.root_layout.snackbar(getString(R.string.msg_info_iab_na))
+        }
+
+        billingProcessor = BillingProcessor.newBillingProcessor(
+            this.activity!!,
+            config.getString(INAPP_LICENCE_KEY),
+            this
+        )
+        billingProcessor?.initialize()
+
+        isPurchased = billingProcessor?.isPurchased(config.getString(PRODUCT_ID_KEY_1))
+
+        prefDonate()
+    }
+
+    //Donate Preference
+    private fun prefDonate() {
+        //Donate Preference
+        donatePreference = findPreference(getString(R.string.key_pref_donate))!!
+        donatePreference.apply {
+            isEnabled = !isPurchased!!
+            summary =
+                if (isPurchased!!) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                if (BuildConfig.DEBUG) {
+                    Toast.makeText(activity!!, config.getString(PRODUCT_ID_KEY_1), Toast.LENGTH_SHORT).show()
+                }
+                billingProcessor!!.purchase(activity, config.getString(PRODUCT_ID_KEY_1))
+            }
+        }
+    }
+
+    //Version Preference
+    private fun prefVersion() {
+        preferenceScreen.findPreference<Preference>(getString(R.string.key_version))?.apply {
+            title = String.format(
+                getString(R.string.format_version),
+                BuildConfig.VERSION_NAME,
+                BuildConfig.VERSION_CODE
+            )
+            if (config.getLong(REMOTE_CONFIG_LATEST_BUILD) > BuildConfig.VERSION_CODE) {
+                summary = getString(R.string.msg_update_available)
+                onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data =
+                        Uri.parse(getString(R.string.url_play_store_app_page))
+                    startActivity(intent)
+                    true
+                }
+            }
+        }
+    }
+
+    //Main Show touches Preference
+    private fun prefShowTouches() {
         showTouchPref = preferenceScreen.findPreference(getString(R.string.key_show_touches))!!
         showTouchPref.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             val i = Intent().apply {
@@ -86,7 +190,10 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             }
             true
         }
+    }
 
+    //Other Preferences
+    private fun prefOthers() {
         //Open Other Apps on Play Store
         preferenceScreen.findPreference<Preference>(getString(R.string.key_other_apps))!!.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
@@ -117,128 +224,6 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 }
                 true
             }
-
-        val isFirstInstall = sharedPreferences.getBoolean("first_install_2", true)
-        if (isFirstInstall) {
-            Bundle().apply {
-                putString("Device_Name", Build.DEVICE)
-                putString("Manufacturer", Build.MANUFACTURER)
-                putString("AndroidVersion", Build.VERSION.RELEASE)
-                putString("AppVersion", BuildConfig.VERSION_CODE.toString())
-                firebaseAnalytics.logEvent("DeviceInfo2", this)
-            }
-            editor.putBoolean("first_install_2", false).apply()
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
-            .build().apply {
-                firebaseRemoteConfig.setConfigSettingsAsync(this)
-            }
-
-        firebaseRemoteConfig.fetch(firebaseRemoteConfig.info.fetchTimeMillis)
-            .addOnCompleteListener(this.activity!!) { task ->
-                if (task.isSuccessful) {
-                    firebaseRemoteConfig.activate()
-
-                    if (!BillingProcessor.isIabServiceAvailable(this.activity!!)) {
-                        activity!!.root_layout.snackbar(getString(R.string.msg_info_iab_na))
-                    }
-
-                    billingProcessor = BillingProcessor.newBillingProcessor(
-                        this.activity!!,
-                        firebaseRemoteConfig.getString(INAPP_LICENCE_KEY),
-                        this
-                    )
-                    billingProcessor?.initialize()
-
-                    isPurchased = billingProcessor?.isPurchased(
-                        firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1)
-                    )
-                    //Donate Preference
-                    donatePreference.apply {
-                        isEnabled = !isPurchased!!
-                        summary =
-                            if (isPurchased!!) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
-                    }
-
-                    //Version Preference
-                    preferenceScreen.findPreference<Preference>(getString(R.string.key_version))?.apply {
-                        title = String.format(
-                            getString(R.string.format_version),
-                            BuildConfig.VERSION_NAME,
-                            BuildConfig.VERSION_CODE
-                        )
-                        if (firebaseRemoteConfig.getLong(REMOTE_CONFIG_LATEST_BUILD) > BuildConfig.VERSION_CODE) {
-                            summary = getString(R.string.msg_update_available)
-                            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data =
-                                    Uri.parse(getString(R.string.url_play_store_app_page))
-                                startActivity(intent)
-                                true
-                            }
-                        }
-                    }
-                    setUpAds()
-                } else {
-                    Log.d(_tag, "onCreate: Error getting RemoteConfig")
-                }
-
-            }
-
-        donatePreference = findPreference(getString(R.string.key_pref_donate))!!
-        donatePreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!, firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1), Toast.LENGTH_SHORT).show()
-            }
-            billingProcessor!!.purchase(this.activity, firebaseRemoteConfig.getString(PRODUCT_ID_KEY_1))
-        }
-    }
-
-    private fun installExtensionDialog(): AlertDialog {
-        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.dialog_title_install_ext))
-            .setMessage(getString(R.string.msg_install_ext_dialog))
-            .setCancelable(false)
-            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
-                activity!!.finish()
-            }
-            .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
-                val reference = FirebaseStorage.getInstance()
-                    .reference.child("updates/tapslegacy-release.apk")
-                val tmpFile = File(context!!.cacheDir, "app.apk")
-                activity!!.root_layout.longSnackbar(getString(R.string.msg_downloading_ext))
-                reference.getFile(tmpFile).addOnSuccessListener {
-                    activity!!.root_layout.snackbar(getString(R.string.msg_ext_downloaded))
-                    Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val uri = FileProvider.getUriForFile(
-                            context!!.applicationContext,
-                            BuildConfig.APPLICATION_ID + ".provider", tmpFile
-                        )
-                        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                            .setDataAndType(uri, "application/vnd.android.package-archive")
-                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(installIntent)
-                    } else {
-                        val installIntent = Intent(Intent.ACTION_VIEW)
-                            .setDataAndType(
-                                Uri.fromFile(tmpFile),
-                                "application/vnd.android.package-archive"
-                            )
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(installIntent)
-                    }
-
-                }
-            }.setNeutralButton(getString(R.string.dialog_button_learn_more)) { _, _ ->
-                activity!!.browse(getString(R.string.url_learn_more))
-            }.create()
-        return dialog as AlertDialog
     }
 
     override fun onResume() {
@@ -248,11 +233,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
             installExtensionDialog().show()
         }
         try {
-            val showTouchesCurr =
-                Settings.System.getInt(
-                    activity!!.contentResolver,
-                    getString(R.string.key_show_touches)
-                ) == 1
+            val showTouchesCurr = currentSetting == 1
             editor.putBoolean(getString(R.string.key_show_touches), showTouchesCurr).apply()
             showTouchPref.isChecked = showTouchesCurr
         } catch (e: Settings.SettingNotFoundException) {
@@ -267,7 +248,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
     override fun onDestroy() {
         super.onDestroy()
-        billingProcessor?.release()
+        if (!BuildConfig.DEBUG) billingProcessor?.release()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -318,23 +299,30 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         }
         isReadyToPurchase = true
         billingProcessor?.loadOwnedPurchasesFromGoogle()
-        if (billingProcessor!!.isPurchased(PRODUCT_ID_KEY_1)) {
-            donatePreference.apply {
-                isEnabled = false
-                summary = getString(R.string.msg_donation_done)
+        if (billingProcessor!!.isPurchased(config.getString(PRODUCT_ID_KEY_1))) {
+            if (!BuildConfig.DEBUG) {
+                findPreference<Preference>(getString(R.string.key_pref_donate))?.apply {
+                    isEnabled = false
+                    summary = getString(R.string.msg_donation_done)
+                }
+            }
+            findPreference<Preference>(getString(R.string.key_disable_ads))?.apply {
+                isVisible = true
             }
         }
     }
 
     override fun onPurchaseHistoryRestored() {
-
+        context?.toast("History Restored")
     }
 
     override fun onProductPurchased(productId: String, details: TransactionDetails?) {
         activity!!.root_layout.snackbar(getString(R.string.msg_donation_thanks))
-        donatePreference.apply {
-            isEnabled = false
-            summary = getString(R.string.msg_donation_done)
+        when (productId) {
+            config.getString(PRODUCT_ID_KEY_1) -> donatePreference.apply {
+                isEnabled = false
+                summary = getString(R.string.msg_donation_done)
+            }
         }
     }
 
@@ -386,8 +374,48 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                     isEnabled = true
                 }
             }
-
         }
+    }
+
+    private fun installExtensionDialog(): AlertDialog {
+        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.dialog_title_install_ext))
+            .setMessage(getString(R.string.msg_install_ext_dialog))
+            .setCancelable(false)
+            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
+                activity!!.finish()
+            }
+            .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
+                val reference = FirebaseStorage.getInstance()
+                    .reference.child("updates/tapslegacy-release.apk")
+                val tmpFile = File(context!!.cacheDir, "app.apk")
+                activity!!.root_layout.longSnackbar(getString(R.string.msg_downloading_ext))
+                reference.getFile(tmpFile).addOnSuccessListener {
+                    activity!!.root_layout.snackbar(getString(R.string.msg_ext_downloaded))
+                    Log.d(_tag, "installExtensionDialog: ${Uri.fromFile(tmpFile)}")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val uri = FileProvider.getUriForFile(
+                            context!!.applicationContext,
+                            BuildConfig.APPLICATION_ID + ".provider", tmpFile
+                        )
+                        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                            .setDataAndType(uri, "application/vnd.android.package-archive")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(installIntent)
+                    } else {
+                        val installIntent = Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(
+                                Uri.fromFile(tmpFile),
+                                "application/vnd.android.package-archive"
+                            )
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(installIntent)
+                    }
+
+                }
+            }.setNeutralButton(getString(R.string.dialog_button_learn_more)) { _, _ ->
+                activity!!.browse(getString(R.string.url_learn_more))
+            }.create()
+        return dialog as AlertDialog
     }
 
     companion object {
