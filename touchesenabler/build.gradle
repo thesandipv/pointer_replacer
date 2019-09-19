@@ -20,8 +20,8 @@ apply plugin: 'io.fabric'
 
 ext {
     major = 1
-    minor = 2
-    patch = 2
+    minor = 3
+    patch = 0
     minimumSdkVersion = 16
 }
 
