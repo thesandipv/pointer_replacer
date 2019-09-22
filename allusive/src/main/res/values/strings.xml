@@ -52,6 +52,7 @@
     <string name="key_app_info" translatable="false">key_app_info</string>
     <string name="key_EnablePointerAlpha" translatable="false">keyEnablePointerAlpha</string>
     <string name="key_ext_dialog_cancel" translatable="false">ext_dialog_cancelled</string>
+    <string name="key_licences" translatable="false">licenses</string>
     <string name="key_maxPaddingSize" translatable="false">maxPaddingSize</string>
     <string name="key_maxPointerSize" translatable="false">maxPointerSize</string>
     <string name="key_mouseAlpha">MOUSE_ALPHA</string>
@@ -69,6 +70,7 @@
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
+    <string name="key_version" translatable="false">pref_version</string>
     <string name="made_with_love">Made with ❤ In India.</string>
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
@@ -99,7 +101,18 @@
     <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="pointer_preview">Pointer Preview</string>
+    <string name="pref_summary_enable_alpha">Enables Slider to Change Pointer Alpha (transparency)</string>
+    <string name="pref_summary_licences">Click to view licenses of third party libraries</string>
+    <string name="pref_summary_source_code">tap to visit GitHub Repository</string>
+    <string name="pref_summary_xda">tap to visit official XDA thread</string>
+    <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
+    <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
+    <string name="pref_title_licences">Licenses</string>
+    <string name="pref_title_pointer_settings">Pointer Settings</string>
+    <string name="pref_title_privacy_policy">Privacy Policy</string>
+    <string name="pref_title_show_touches">Show Touches</string>
     <string name="pref_title_source_code">Source Code</string>
+    <string name="pref_title_telegram_group">Join Telegram Group</string>
     <string name="pref_title_visit_ar">Visit AfterROOT</string>
     <string name="pref_title_xda_thread">XDA Thread</string>
     <string name="pref_title_xposed_repo">Module Info</string>
@@ -146,6 +159,7 @@
     <string name="text_padding">Padding</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>
+    <string name="text_pointer_upload_notes">The recommended minimum Pointer Size is 128*128 and the recommended aspect ratio is 1:1. If the pointer image does not follow the above conditions then it will be downsized and center cropped.</string>
     <string name="text_progress_downloading">Downloading</string>
     <string name="text_progress_finishing_up">Finishing Up</string>
     <string name="text_progress_init">Initializing</string>
@@ -166,6 +180,6 @@
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
     <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
+    <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="text_pointer_upload_notes">The recommended minimum Pointer Size is 128*128 and the recommended aspect ratio is 1:1. If the pointer image does not follow the above conditions then it will be downsized and center cropped.</string>
 </resources>

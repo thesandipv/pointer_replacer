@@ -15,11 +15,12 @@
 
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory app:title="Pointer Settings">
+    <PreferenceCategory app:title="@string/pref_title_pointer_settings">
         <SwitchPreferenceCompat
             app:defaultValue="false"
-            app:key="show_touches"
-            app:title="Show Touches" />
+            app:icon="@drawable/ic_touch"
+            app:key="@string/key_show_touches"
+            app:title="@string/pref_title_show_touches" />
         <Preference
             app:key="@string/key_maxPointerSize"
             app:title="@string/text_max_pointer_size" />
@@ -29,45 +30,50 @@
         <SwitchPreference
             app:defaultValue="false"
             app:key="@string/key_EnablePointerAlpha"
-            app:summary="Enables Slider to Change Pointer Alpha (transparency)"
-            app:title="Enable Pointer Alpha" />
+            app:summary="@string/pref_summary_enable_alpha"
+            app:title="@string/pref_title_enable_alpha" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/title_activity_about">
         <Preference
             app:icon="@mipmap/ic_launcher"
-            app:key="pref_version"
+            app:key="@string/key_version"
             app:title="@string/app_name" />
         <Preference app:summary="@string/made_with_love" />
-        <Preference android:title="Privacy Policy">
+        <Preference android:title="@string/pref_title_privacy_policy">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_privacy_policy" />
         </Preference>
 
         <Preference
-            android:key="licenses"
-            android:summary="Click to view licenses of third party libraries"
-            android:title="Licenses" />
+            android:key="@string/key_licences"
+            android:summary="@string/pref_summary_licences"
+            android:title="@string/pref_title_licences" />
         <Preference
-            app:summary="tap to visit official XDA thread"
+            app:summary="@string/pref_summary_xda"
             app:title="@string/pref_title_xda_thread">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_xda_thread" />
         </Preference>
         <Preference
-            app:summary="tap to visit GitHub Repository"
+            app:summary="@string/pref_summary_source_code"
             app:title="@string/pref_title_source_code">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_source_code" />
         </Preference>
         <Preference
-            app:summary="tap to open Xposed Module Repo"
+            app:summary="@string/pref_summary_xposed_repo"
             app:title="@string/pref_title_xposed_repo">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_prx" />
+        </Preference>
+        <Preference app:title="@string/pref_title_telegram_group">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_telegram" />
         </Preference>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
