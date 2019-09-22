@@ -77,11 +77,17 @@ class NewPointerPost : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         action_upload.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "image/*"
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/png"
             }
-            startActivityForResult(intent, RC_PICK_IMAGE)
+            val pickIntent =
+                Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+                    type = "image/png"
+                }
+            val chooserIntent = Intent.createChooser(intent, "Choose Pointer Image").apply {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
+            }
+            startActivityForResult(chooserIntent, RC_PICK_IMAGE)
         }
 
         activity!!.fab_apply.apply {
