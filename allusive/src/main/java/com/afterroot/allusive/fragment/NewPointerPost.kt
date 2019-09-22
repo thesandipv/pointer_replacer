@@ -106,7 +106,7 @@ class NewPointerPost : Fragment() {
         if (requestCode == RC_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             isPointerImported = true
             data?.data?.also { uri ->
-                Glide.with(this).load(uri).override(128, 128).into(pointer_thumb)
+                Glide.with(this).load(uri).override(128, 128).centerCrop().into(pointer_thumb)
                 pointer_thumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
             }
         }
@@ -145,7 +145,7 @@ class NewPointerPost : Fragment() {
                 }
             }
         }.addOnFailureListener {
-            container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+            activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
         }
     }
 
