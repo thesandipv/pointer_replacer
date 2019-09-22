@@ -151,6 +151,7 @@ class NewPointerPost : Fragment() {
                 }
             }
         }.addOnFailureListener {
+            pointer_thumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
             activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
         }
     }
@@ -160,6 +161,7 @@ class NewPointerPost : Fragment() {
      */
     @Throws(IOException::class)
     private fun saveTmpPointer(): File {
+        pointer_thumb.background = null
         val bitmap = loadBitmapFromView(pointer_thumb)
         val file = File.createTempFile("pointer", ".png", context!!.cacheDir)
         val out: FileOutputStream
