@@ -15,8 +15,6 @@
 
 package com.afterroot.allusive.fragment
 
-import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -25,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.fragment.findNavController
@@ -38,9 +35,9 @@ import com.afollestad.materialdialogs.color.colorChooser
 import com.afterroot.allusive.Constants.POINTER_TOUCH
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.utils.getDrawableExt
 import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.getPrefs
 import com.afterroot.allusive.utils.visible
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_customize_pointer.*
@@ -53,14 +50,14 @@ import java.util.*
  * Created by Sandip on 04-10-2017.
  */
 class CustomizeFragment : Fragment() {
-    private lateinit var typeAlpha: String
-    private lateinit var typeColor: String
-    private lateinit var typePadding: String
+    private lateinit var settings: Settings
     private lateinit var typePath: String
-    private lateinit var typeSize: String
-    private var mSharedPreferences: SharedPreferences? = null
     private var pointerType: Int = 0
-    var color: Int = 0
+    private var selectedColor: Int = 0
+    private var typeAlpha: Int = 255
+    private var typeColor: Int = 0
+    private var typePadding: Int = 0
+    private var typeSize: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_customize_pointer, container, false)
@@ -70,36 +67,45 @@ class CustomizeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mSharedPreferences = context!!.getPrefs()
-
-        if (pointerType == POINTER_TOUCH) {
-            typeColor = getString(R.string.key_pointerColor)
-            typeSize = getString(R.string.key_pointerSize)
-            typePadding = getString(R.string.key_pointerPadding)
-            typeAlpha = getString(R.string.key_pointerAlpha)
-            typePath = getString(R.string.key_selectedPointerPath)
-        } else {
-            typeColor = getString(R.string.key_mouseColor)
-            typeSize = getString(R.string.key_mouseSize)
-            typePadding = getString(R.string.key_mousePadding)
-            typeAlpha = getString(R.string.key_mouseAlpha)
-            typePath = getString(R.string.key_selectedMousePath)
+        settings = Settings(context!!)
+        settings.apply {
+            if (pointerType == POINTER_TOUCH) {
+                typeColor = pointerColor
+                typeSize = pointerSize
+                typePadding = pointerPadding
+                typeAlpha = pointerAlpha
+                typePath = selectedPointerPath!!
+            } else {
+                typeColor = mouseColor
+                typeSize = mouseSize
+                typePadding = mousePadding
+                typeAlpha = mouseAlpha
+                typePath = selectedMousePath!!
+            }
         }
 
-        color = mSharedPreferences!!.getInt(typeColor, 0)
-        view.image_customize_pointer.setColorFilter(color)
+        view.image_customize_pointer.setColorFilter(typeColor)
 
         GlideApp.with(context!!)
-            .load(File(mSharedPreferences!!.getString(typePath, "")!!))
+            .load(File(typePath))
             .into(image_customize_pointer)
 
         activity!!.fab_apply.apply {
             setOnClickListener {
-                mSharedPreferences!!.edit(true) {
-                    putInt(typeSize, minSize + getView()!!.seekBarSize.progress)
-                    putInt(typePadding, getView()!!.seekBarPadding.progress)
-                    putInt(typeAlpha, getView()!!.seekBarAlpha.progress)
-                    putInt(typeColor, color)
+                if (pointerType == POINTER_TOUCH) {
+                    settings.apply {
+                        pointerSize = minSize + getView()!!.seekBarSize.progress
+                        pointerPadding = getView()!!.seekBarPadding.progress
+                        pointerAlpha = getView()!!.seekBarAlpha.progress
+                        pointerColor = selectedColor
+                    }
+                } else {
+                    settings.apply {
+                        mouseSize = minSize + getView()!!.seekBarSize.progress
+                        mousePadding = getView()!!.seekBarPadding.progress
+                        mouseAlpha = getView()!!.seekBarAlpha.progress
+                        mouseColor = selectedColor
+                    }
                 }
                 activity!!.fragment_repo_nav.findNavController().navigateUp()
             }
@@ -110,11 +116,9 @@ class CustomizeFragment : Fragment() {
         setClickListeners()
     }
 
-    @SuppressLint("CommitPrefEdits")
     override fun onStart() {
         super.onStart()
 
-        mSharedPreferences = context!!.getPrefs()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (pointerType == POINTER_TOUCH) {
                 view!!.image_customize_pointer.transitionName = getString(R.string.main_fragment_transition)
@@ -141,15 +145,15 @@ class CustomizeFragment : Fragment() {
      * Set initial values to SeekBar
      */
     private fun setSeekBars() {
-        val maxSize = mSharedPreferences!!.getInt(getString(R.string.key_maxPointerSize), 100)
-        val maxPadding = mSharedPreferences!!.getInt(getString(R.string.key_maxPaddingSize), 25)
-        val alpha = mSharedPreferences!!.getInt(typeAlpha, 255)
-        val pointerSize = mSharedPreferences!!.getInt(typeSize, minSize)
-        val padding = mSharedPreferences!!.getInt(typePadding, 0)
+        val maxSize = settings.maxPointerSize
+        val maxPadding = settings.maxPointerPadding
+        val alpha = typeAlpha
+        val pointerSize = typeSize
+        val padding = typePadding
         val formatTextSize = "%s: %d*%d "
         val formatPadding = "| %s: %d "
 
-        with(mSharedPreferences!!.getBoolean(getString(R.string.key_EnablePointerAlpha), false)) {
+        with(settings.isEnableAlpha) {
             alphaBarLayout?.visible(this)
             textAlpha?.visible(this)
         }
@@ -265,9 +269,8 @@ class CustomizeFragment : Fragment() {
             seekBarAlpha.progress = seekBarAlpha.progress + 1
         }
 
-        val typeTmpColor = if (pointerType == POINTER_TOUCH) "POINTER_TMP_COLOR" else "MOUSE_TMP_COLOR"
         action_change_color.setOnClickListener {
-            val tmpColor = mSharedPreferences!!.getInt(typeTmpColor, 0)
+            val tmpColor = if (pointerType == POINTER_TOUCH) settings.pointerTmpColor else settings.mouseTmpColor
 
             MaterialDialog(context!!).show {
                 title(R.string.choose_color)
@@ -276,10 +279,10 @@ class CustomizeFragment : Fragment() {
                     ColorPalette.PrimarySub, allowCustomArgb = true, showAlphaSelector = true, initialSelection = tmpColor
                 ) { _, selectedColor ->
                     this@CustomizeFragment.view!!.image_customize_pointer.setColorFilter(selectedColor)
-                    color = selectedColor
-                    mSharedPreferences!!.edit(true) {
-                        putInt(typeTmpColor, selectedColor)
-                    }
+                    this@CustomizeFragment.selectedColor = selectedColor
+                    if (pointerType == POINTER_TOUCH) {
+                        settings.pointerTmpColor = selectedColor
+                    } else settings.mouseTmpColor = selectedColor
                 }
                 positiveButton(android.R.string.ok)
                 negativeButton(android.R.string.cancel)
@@ -287,10 +290,10 @@ class CustomizeFragment : Fragment() {
         }
 
         action_reset_color.setOnClickListener {
-            mSharedPreferences!!.edit(true) {
-                putInt(typeTmpColor, 0)
-                color = 0
-            }
+            if (pointerType == POINTER_TOUCH) {
+                settings.pointerTmpColor = 0
+            } else settings.mouseTmpColor = 0
+            selectedColor = 0
             this@CustomizeFragment.view!!.image_customize_pointer.setColorFilter(0)
         }
     }

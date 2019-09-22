@@ -16,7 +16,6 @@
 package com.afterroot.allusive.fragment
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -27,7 +26,6 @@ import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +44,7 @@ import com.afterroot.allusive.Constants.POINTER_MOUSE
 import com.afterroot.allusive.Constants.POINTER_TOUCH
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
@@ -56,7 +55,10 @@ import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
-import com.afterroot.allusive.utils.*
+import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.allusive.utils.getMinPointerSize
+import com.afterroot.allusive.utils.loadBitmapFromView
+import com.afterroot.allusive.utils.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -81,10 +83,10 @@ class MainFragment : Fragment() {
     private var extSdDir: String? = null
     private var fragmentView: View? = null
     private var pointerPreviewPath: String? = null
-    private var sharedPreferences: SharedPreferences? = null
     private var targetPath: String? = null
     private lateinit var interstitialAd: InterstitialAd
     private lateinit var myDatabase: MyDatabase
+    private lateinit var settings: Settings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -95,7 +97,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPreferences = context!!.getPrefs()
+        settings = Settings(this.context!!)
 
         init()
     }
@@ -170,16 +172,16 @@ class MainFragment : Fragment() {
     }
 
     private fun loadCurrentPointers() {
-        val pointerPath = sharedPreferences!!.getString(getString(R.string.key_pointerPath), null)
-        val mousePath = sharedPreferences!!.getString(getString(R.string.key_mousePath), null)
-        val selectedPointerPath = sharedPreferences!!.getString(getString(R.string.key_selectedPointerPath), null)
-        val selectedMousePath = sharedPreferences!!.getString(getString(R.string.key_selectedMousePath), null)
-        var size = sharedPreferences!!.getInt(getString(R.string.key_pointerSize), context!!.getMinPointerSize())
-        var mouseSize = sharedPreferences!!.getInt(getString(R.string.key_mouseSize), context!!.getMinPointerSize())
-        val padding = sharedPreferences!!.getInt(getString(R.string.key_pointerPadding), 0)
-        val mousePadding = sharedPreferences!!.getInt(getString(R.string.key_mousePadding), 0)
-        val pointerColor = sharedPreferences!!.getInt(getString(R.string.key_pointerColor), 0)
-        val mouseColor = sharedPreferences!!.getInt(getString(R.string.key_mouseColor), 0)
+        val pointerPath = settings.pointerPath
+        val mousePath = settings.mousePath
+        val selectedPointerPath = settings.selectedPointerPath
+        val selectedMousePath = settings.selectedMousePath
+        var size = settings.pointerSize
+        var mouseSize = settings.mouseSize
+        val padding = settings.pointerPadding
+        val mousePadding = settings.mousePadding
+        val pointerColor = settings.pointerColor
+        val mouseColor = settings.mouseColor
 
         try {
             if (size <= 0) {
@@ -209,6 +211,7 @@ class MainFragment : Fragment() {
                     layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
                     setPadding(padding, padding, padding, padding)
                     setColorFilter(pointerColor)
+                    imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
                 GlideApp.with(context!!)
                     .load(File(selectedPointerPath))
@@ -219,6 +222,7 @@ class MainFragment : Fragment() {
                     layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
                     setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
                     setColorFilter(mouseColor)
+                    imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
                 GlideApp.with(context!!)
                     .load(File(selectedMousePath))
@@ -246,10 +250,8 @@ class MainFragment : Fragment() {
         val filesDir = activity!!.filesDir.path
         val pointerPath = "$filesDir/pointer.png"
         val mousePath = "$filesDir/mouse.png"
-        sharedPreferences!!.edit(true) {
-            putString(getString(R.string.key_pointerPath), pointerPath)
-            putString(getString(R.string.key_mousePath), mousePath)
-        }
+        settings.pointerPath = pointerPath
+        settings.mousePath = mousePath
         createFileFromView(selected_pointer, pointerPath)
         createFileFromView(selected_mouse, mousePath)
 
@@ -419,11 +421,10 @@ class MainFragment : Fragment() {
         pointerAdapter = PointerAdapterDelegate(object : ItemSelectedCallback {
             override fun onClick(position: Int, view: View?) {
                 val selectedItem = pointerAdapter.getItem(position) as RoomPointer
-                sharedPreferences!!.edit(true) {
-                    putString(
-                        if (pointerType == POINTER_TOUCH) getString(R.string.key_selectedPointerPath) else getString(R.string.key_selectedMousePath),
-                        targetPath + selectedItem.file_name
-                    )
+                if (pointerType == POINTER_TOUCH) {
+                    settings.selectedPointerPath = targetPath + selectedItem.file_name
+                } else {
+                    settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
                 GlideApp.with(context!!)
                     .load(File(targetPath + selectedItem.file_name))
@@ -507,11 +508,10 @@ class MainFragment : Fragment() {
         dialogView.grid_pointers.apply {
             adapter = pointerAdapter
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                sharedPreferences!!.edit(true) {
-                    putString(
-                        if (pointerType == POINTER_TOUCH) getString(R.string.key_selectedPointerPath) else getString(R.string.key_selectedMousePath),
-                        pointerAdapter.getItem(position)
-                    )
+                if (pointerType == POINTER_TOUCH) {
+                    settings.selectedPointerPath = pointerAdapter.getItem(position)
+                } else {
+                    settings.selectedMousePath = pointerAdapter.getItem(position)
                 }
                 GlideApp.with(context!!).load(File(pointerAdapter.getItem(position))).override(context!!.getMinPointerSize())
                     .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
