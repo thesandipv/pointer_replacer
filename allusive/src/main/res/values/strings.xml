@@ -14,7 +14,7 @@
   -->
 
 <resources>
-    <string name="text_action_grant">Grant</string>
+    <string name="action_import_old_pointers">Import Old Pointers</string>
     <string name="ad_banner_test_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/6191545783</string>
@@ -26,14 +26,20 @@
     <string name="change_color">Change Color</string>
     <string name="choose_color">Choose Color</string>
     <string name="dialog_button_install">Install</string>
+    <string name="dialog_delete_confirm">Delete this Pointer?</string>
+    <string name="dialog_msg_no_network">No Network Available. Some features might not work.</string>
     <string name="dialog_msg_sign_out">Do you want to Sign Out?</string>
     <string name="dialog_sign_out_result_success">Signed Out</string>
     <string name="dialog_title_confirmation">Are you sure?</string>
+    <string name="dialog_title_no_network">No Network</string>
     <string name="dialog_title_select_mouse_pointer">Select Mouse Pointer</string>
     <string name="dialog_title_select_pointer">Select Pointers</string>
     <string name="dialog_title_sign_out">Sign Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="enable_touches_prompt">Show touches disabled. Would you like to enable</string>
+    <string name="fcm_channel_default">Updates</string>
+    <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="format_text_empty_error">%1$s can not be empty</string>
     <string name="help">Help</string>
     <string name="helper_text_desc">Provide short info about pointer.</string>
     <string name="helper_text_name">Provide name of pointer.</string>
@@ -73,6 +79,7 @@
     <string name="msg_downloading_ext">Downloading Extension</string>
     <string name="msg_error">Some Error occurred.</string>
     <string name="msg_ext_downloaded">Extension Downloaded</string>
+    <string name="msg_grant_app_permissions">Please Grant Permissions</string>
     <string name="msg_input_error_description_empty">Description can not be empty</string>
     <string name="msg_input_error_name_empty">Pointer name can not be empty</string>
     <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
@@ -108,12 +115,15 @@
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
     <string name="text_action_customize">Customize</string>
+    <string name="text_action_exit">Exit</string>
+    <string name="text_action_grant">Grant</string>
     <string name="text_action_post">Post</string>
+    <string name="text_action_retry">Retry</string>
     <string name="text_action_save">Save</string>
     <string name="text_action_upload">Upload</string>
     <string name="text_alpha">Alpha</string>
     <string name="text_apply_pointer_confirm">Do you want to apply this pointer?</string>
-    <string name="text_browse_pointer_image">Browse Pointer Image\nRecommended min Pointer Size is 150*150.</string>
+    <string name="text_browse_pointer_image">Browse Pointer Image</string>
     <string name="text_click_to_change_pointer">Click to Change Pointer</string>
     <string name="text_click_to_mouse">Click to change mouse pointer</string>
     <string name="text_color_changed">Pointer color changed.</string>
@@ -132,6 +142,7 @@
     <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
     <string name="text_no">No</string>
     <string name="text_not_installed">Not Installed</string>
+    <string name="text_or">OR</string>
     <string name="text_padding">Padding</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>
@@ -156,15 +167,5 @@
     <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="dialog_msg_no_network">No Network Available. Some features might not work.</string>
-    <string name="dialog_title_no_network">No Network</string>
-    <string name="text_action_retry">Retry</string>
-    <string name="msg_grant_app_permissions">Please Grant Permissions</string>
-    <string name="text_action_exit">Exit</string>
-    <string name="format_text_empty_error">%1$s can not be empty</string>
-    <string name="text_or">OR</string>
-    <string name="action_import_old_pointers">Import Old Pointers</string>
-    <string name="dialog_delete_confirm">Delete this Pointer?</string>
-    <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
-    <string name="fcm_channel_default">Updates</string>
+    <string name="text_pointer_upload_notes">The recommended minimum Pointer Size is 128*128 and the recommended aspect ratio is 1:1. If the pointer image does not follow the above conditions then it will be downsized and center cropped.</string>
 </resources>
