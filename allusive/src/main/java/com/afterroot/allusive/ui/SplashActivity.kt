@@ -18,7 +18,6 @@ package com.afterroot.allusive.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
@@ -31,7 +30,7 @@ import org.jetbrains.anko.browse
 
 class SplashActivity : AppCompatActivity() {
 
-    private val _tag = javaClass.simpleName
+    private val _tag = "SplashActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +48,16 @@ class SplashActivity : AppCompatActivity() {
                 }
                 cancelable(false)
             }
-        } else if (intent.extras != null) {
-            Log.d(_tag, "FCM-Extra: ${intent.extras}")
-            intent.extras?.let {
-                browse(it.get("link") as String)
-                finish()
-            }
+        } else if (intent != null) {
+            if (intent.action == Intent.ACTION_VIEW) {
+                intent.extras?.let {
+                    val link = it.getString("link")
+                    if (link != null) {
+                        browse(link)
+                    }
+                    finish()
+                }
+            } else launchDashboard()
         } else {
             launchDashboard()
         }
