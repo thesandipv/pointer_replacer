@@ -54,7 +54,6 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:text="@string/text_action_apply"
-        app:icon="@drawable/ic_action_apply"
         app:layout_anchor="@id/placeholder"
         app:layout_anchorGravity="top|end"
         app:layout_behavior=".ui.BottomNavigationFABBehavior" />
