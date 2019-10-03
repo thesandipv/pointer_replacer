@@ -1,4 +1,29 @@
+###1.8.4 [25/09/2019]
+fix crash on custom launchers
+
+###1.8.3 [23/09/2019]
+fix issue #3 https://github.com/sandipv22/pointer_replacer/issues/3
+Internal Code Changes
+pointer image will be center cropped
+
+###1.8.2 [07/09/2019]
+Pointer Picker is now detailed list. [1st time you should click 'Import Old Pointers']
+More detail in Pointer Repo List
+Transparent grid behind pointers for better Handling of Transparent Pointers
+Description is now optional while uploading new pointer
+
+###1.8.1 [09/08/2019]
+Fixed Crashes
+
 ###v1.8 [27/07/2019]
+Major Update after release. It has been almost 2 years.
+
+Changes include
+NEW: Can change mouse pointer also. (Report me if not working)
+NEW: Brand new Pointer Repository - Download and Install pointer by others or you can now share your pointer with the world.
+NEW: Complete rewrite of User Interface.
+NEW: Toggle 'Show Touches' from Settings (Extension Needed)
+Many under-the-hood changes
 
 ###v1.7 [16/09/2017]
 
