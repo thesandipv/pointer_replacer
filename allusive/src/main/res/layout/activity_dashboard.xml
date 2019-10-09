@@ -28,10 +28,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            android:background="?attr/colorPrimarySurface"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
             app:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -56,7 +54,8 @@
         android:text="@string/text_action_apply"
         app:layout_anchor="@id/placeholder"
         app:layout_anchorGravity="top|end"
-        app:layout_behavior=".ui.BottomNavigationFABBehavior" />
+        app:layout_behavior=".ui.BottomNavigationFABBehavior"
+        tools:icon="@drawable/ic_action_apply" />
 
     <LinearLayout
         android:id="@+id/placeholder"
@@ -71,7 +70,6 @@
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
         android:layout_gravity="bottom"
         app:labelVisibilityMode="selected"
         app:menu="@menu/navigation" />

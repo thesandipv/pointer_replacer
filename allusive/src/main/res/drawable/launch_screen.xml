@@ -16,7 +16,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@android:color/white" />
+            <solid android:color="@color/color_surface" />
         </shape>
     </item>
     <item android:gravity="center">
@@ -24,7 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:src="@drawable/ic_launch_screen" />
+            android:src="@drawable/ic_launch_screen"
+            android:tint="@color/color_on_surface" />
     </item>
     <item
         android:bottom="80dp"
@@ -32,6 +33,7 @@
         <bitmap
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ar_logo" />
+            android:src="@drawable/ar_logo"
+            android:tint="@color/color_on_surface" />
     </item>
 </layer-list>
