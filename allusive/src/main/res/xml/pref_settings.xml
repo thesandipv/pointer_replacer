@@ -27,11 +27,20 @@
         <Preference
             app:key="@string/key_maxPaddingSize"
             app:title="@string/text_max_padding_size" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="@string/key_EnablePointerAlpha"
             app:summary="@string/pref_summary_enable_alpha"
             app:title="@string/pref_title_enable_alpha" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="App Settings">
+        <androidx.preference.ListPreference
+            app:defaultValue="@string/theme_device_default"
+            app:entries="@array/theme_mode"
+            app:entryValues="@array/theme_mode"
+            app:key="key_app_theme"
+            app:title="App Theme"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/title_activity_about">
         <Preference

@@ -27,7 +27,7 @@
     <string name="choose_color">Choose Color</string>
     <string name="dialog_button_install">Install</string>
     <string name="dialog_delete_confirm">Delete this Pointer?</string>
-    <string name="dialog_msg_no_network">No Network Available. Some features might not work.</string>
+    <string name="dialog_msg_no_network">No Network Available. Please check connection and try again.</string>
     <string name="dialog_msg_sign_out">Do you want to Sign Out?</string>
     <string name="dialog_sign_out_result_success">Signed Out</string>
     <string name="dialog_title_confirmation">Are you sure?</string>
@@ -182,4 +182,8 @@
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="theme_device_default">Device Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_battery">Set by Battery Saver</string>
 </resources>

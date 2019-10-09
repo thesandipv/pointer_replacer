@@ -25,8 +25,10 @@ import android.provider.Settings
 import android.text.InputType
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -174,6 +176,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 OssLicensesMenuActivity.setActivityTitle("Licences").apply { }
                 startActivity(Intent(context!!, OssLicensesMenuActivity::class.java))
                 return@OnPreferenceClickListener true
+            }
+        }
+
+        findPreference<ListPreference>("key_app_theme")?.apply {
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                when (newValue) {
+                    getString(R.string.theme_device_default) -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                    getString(R.string.theme_light) -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+                    getString(R.string.theme_dark) -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    }
+                    getString(R.string.theme_battery) -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+                    }
+                }
+
+                return@OnPreferenceChangeListener true
             }
         }
     }

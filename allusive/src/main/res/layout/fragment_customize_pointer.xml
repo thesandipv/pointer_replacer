@@ -293,7 +293,7 @@
             android:id="@+id/action_reset_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="?attr/borderlessButtonStyle"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/reset_color"

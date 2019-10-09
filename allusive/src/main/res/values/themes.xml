@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2019 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -32,8 +31,6 @@
         <item name="colorSecondary">@color/color_secondary</item>
         <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
 
-        <item name="android:colorBackground">@color/color_background</item>
-        <item name="colorSurface">@color/color_surface</item>
         <item name="colorError">@color/color_error</item>
 
         <item name="colorOnPrimary">@color/color_on_primary</item>
@@ -50,7 +47,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
-    <style name="Base.AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:statusBarColor" tools:targetApi="lollipop">?colorPrimaryVariant</item>
         <!-- <item name="android:navigationBarColor">?android:colorBackground</item>
          <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>-->
