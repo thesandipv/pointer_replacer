@@ -120,12 +120,12 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     }
 
     private fun setUpBilling() {
-        if (!BillingProcessor.isIabServiceAvailable(this.activity!!)) {
-            activity!!.root_layout.snackbar(getString(R.string.msg_info_iab_na))
+        if (!BillingProcessor.isIabServiceAvailable(context)) {
+            activity?.root_layout?.snackbar(getString(R.string.msg_info_iab_na))
         }
 
         billingProcessor = BillingProcessor.newBillingProcessor(
-            this.activity!!,
+            context,
             config.getString(INAPP_LICENCE_KEY),
             this
         )
