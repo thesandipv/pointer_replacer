@@ -180,7 +180,9 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment? ?: return
         val navController = host.navController
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            //fab_apply.hide()
+            if (!fab_apply.isExtended) {
+                fab_apply.extend()
+            }
             showNavigation()
             when (destination.id) {
                 R.id.mainFragment -> {
