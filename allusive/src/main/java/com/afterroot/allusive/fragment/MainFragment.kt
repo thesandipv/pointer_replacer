@@ -39,12 +39,9 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afterroot.allusive.BuildConfig
+import com.afterroot.allusive.*
 import com.afterroot.allusive.Constants.POINTER_MOUSE
 import com.afterroot.allusive.Constants.POINTER_TOUCH
-import com.afterroot.allusive.GlideApp
-import com.afterroot.allusive.R
-import com.afterroot.allusive.Settings
 import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
@@ -55,10 +52,9 @@ import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
-import com.afterroot.allusive.utils.getDrawableExt
-import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.loadBitmapFromView
-import com.afterroot.allusive.utils.visible
+import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.loadBitmapFromView
+import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest

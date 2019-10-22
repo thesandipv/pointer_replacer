@@ -18,8 +18,7 @@ package com.afterroot.allusive
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.getPrefs
+import com.afterroot.core.extensions.getPrefs
 
 class Settings(context: Context) {
 

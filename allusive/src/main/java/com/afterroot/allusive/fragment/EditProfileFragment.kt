@@ -24,7 +24,7 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.utils.FirebaseUtils
-import com.afterroot.allusive.utils.getDrawableExt
+import com.afterroot.core.extensions.getDrawableExt
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore

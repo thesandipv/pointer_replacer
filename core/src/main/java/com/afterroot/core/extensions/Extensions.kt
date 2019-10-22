@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive.utils
+package com.afterroot.core.extensions
 
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -42,7 +42,7 @@ import androidx.transition.TransitionManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afterroot.allusive.R
+import com.afterroot.core.R
 import kotlinx.android.synthetic.main.dialog_progress.view.*
 
 /**
@@ -89,8 +89,7 @@ fun Context.isAppInstalled(pName: String): Boolean {
 
 fun Context.isNetworkAvailable(): Boolean {
     val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val networkInfo = cm.activeNetworkInfo
-    return networkInfo?.isConnectedOrConnecting == true
+    return cm.activeNetworkInfo?.isConnectedOrConnecting == true
 }
 
 fun Context.getPrefs(): SharedPreferences {
@@ -108,8 +107,6 @@ fun Context.getDrawableExt(@DrawableRes id: Int, @ColorRes tint: Int? = null): D
     }
     return drawable!!
 }
-
-fun Context.getMinPointerSize(): Int = this.resources.getInteger(R.integer.min_pointer_size)
 
 /**
  * @fileName fileName name of file

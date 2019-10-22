@@ -15,6 +15,8 @@
 
 package com.afterroot.allusive
 
+import android.content.Context
+
 object Constants {
     const val TEL_P_NAME = "com.afterroot.toucherlegacy"
     const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
@@ -33,3 +35,5 @@ object Reason {
     const val NOT_A_POINTER = 2
     const val OTHER = 3
 }
+
+fun Context.getMinPointerSize(): Int = this.resources.getInteger(R.integer.min_pointer_size)

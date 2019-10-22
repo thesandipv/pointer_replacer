@@ -44,9 +44,13 @@ import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.allusive.ui.MainActivity
-import com.afterroot.allusive.utils.*
+import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
+import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.isNetworkAvailable
+import com.afterroot.core.extensions.showStaticProgressDialog
+import com.afterroot.core.extensions.visible
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -256,7 +260,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     override fun onLongClick(position: Int) {
-        val isIdMatch = pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
+        val isIdMatch = if (BuildConfig.DEBUG) true
+        else pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
         if (!isIdMatch) return
         val list = arrayListOf(getString(R.string.text_edit), getString(R.string.text_delete))
         MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
