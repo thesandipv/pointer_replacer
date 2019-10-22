@@ -40,9 +40,9 @@ import com.afterroot.allusive.Constants.EXTRA_TOUCH_VAL
 import com.afterroot.allusive.Constants.RC_OPEN_TEL
 import com.afterroot.allusive.Constants.TEL_P_NAME
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.getPrefs
-import com.afterroot.allusive.utils.isAppInstalled
+import com.afterroot.allusive.getMinPointerSize
+import com.afterroot.core.extensions.getPrefs
+import com.afterroot.core.extensions.isAppInstalled
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings

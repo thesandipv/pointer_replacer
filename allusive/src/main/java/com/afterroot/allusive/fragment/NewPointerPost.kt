@@ -35,9 +35,9 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
-import com.afterroot.allusive.utils.getDrawableExt
-import com.afterroot.allusive.utils.loadBitmapFromView
-import com.afterroot.allusive.utils.showStaticProgressDialog
+import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.loadBitmapFromView
+import com.afterroot.core.extensions.showStaticProgressDialog
 import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.textfield.TextInputEditText

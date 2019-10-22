@@ -23,7 +23,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.getMinPointerSize
+import com.afterroot.allusive.getMinPointerSize
 import java.util.*
 
 /**GridView Image Adapter. */
