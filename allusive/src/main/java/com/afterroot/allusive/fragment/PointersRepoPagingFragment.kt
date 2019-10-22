@@ -40,7 +40,11 @@ import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
-import com.afterroot.allusive.utils.*
+import com.afterroot.allusive.utils.FirebaseUtils
+import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.isNetworkAvailable
+import com.afterroot.core.extensions.showStaticProgressDialog
+import com.afterroot.core.extensions.visible
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore

@@ -23,7 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.Constants.RC_LOGIN
 import com.afterroot.allusive.R
-import com.afterroot.allusive.utils.isNetworkAvailable
+import com.afterroot.core.extensions.isNetworkAvailable
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import org.jetbrains.anko.browse
