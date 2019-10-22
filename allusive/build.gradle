@@ -45,6 +45,12 @@ android {
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
         buildConfigField("String", "AD_TEST_DEVICE_ID", ADMOB_TEST_DEVICE_ID)
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas".toString())
+            }
+        }
     }
     buildTypes {
         release {
