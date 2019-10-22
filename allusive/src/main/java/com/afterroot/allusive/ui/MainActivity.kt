@@ -41,7 +41,11 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.User
-import com.afterroot.allusive.utils.*
+import com.afterroot.allusive.utils.FirebaseUtils
+import com.afterroot.allusive.utils.PermissionChecker
+import com.afterroot.core.extensions.animateProperty
+import com.afterroot.core.extensions.getPrefs
+import com.afterroot.core.extensions.visible
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics

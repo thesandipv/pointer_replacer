@@ -13,4 +13,25 @@
  * limitations under the License.
  */
 
-include ':allusive', ':touchesenabler', ':tapslegacy', ':core'
+package com.afterroot.allusive
+
+import androidx.multidex.MultiDexApplication
+import com.afterroot.allusive.di.roomModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+
+class MyApplication : MultiDexApplication() {
+    override fun onCreate() {
+        super.onCreate()
+        init()
+    }
+
+    private fun init() {
+        startKoin {
+            androidLogger()
+            androidContext(this@MyApplication)
+            modules(roomModule)
+        }
+    }
+}

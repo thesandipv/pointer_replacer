@@ -13,4 +13,21 @@
  * limitations under the License.
  */
 
-include ':allusive', ':touchesenabler', ':tapslegacy', ':core'
+package com.afterroot.allusive.di
+
+import androidx.room.Room
+import com.afterroot.allusive.database.MyDatabase
+import org.koin.android.ext.koin.androidApplication
+import org.koin.dsl.module
+
+val roomModule = module {
+    single {
+        Room.databaseBuilder(
+            androidApplication(),
+            MyDatabase::class.java,
+            "installed-pointers"
+        ).build()
+    }
+
+    single { get<MyDatabase>().pointerDao() }
+}

@@ -22,11 +22,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive.getMinPointerSize
 import com.afterroot.allusive.model.IPointer
 import com.afterroot.allusive.model.RoomPointer
-import com.afterroot.allusive.utils.getDrawableExt
-import com.afterroot.allusive.utils.getMinPointerSize
-import com.afterroot.allusive.utils.inflate
+import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.inflate
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 
 class LocalPointerDelegate(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
