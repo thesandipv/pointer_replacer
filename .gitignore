@@ -45,3 +45,5 @@ captures/
 !/.gitignore
 /others
 gradle.properties
+/dev/
+/prod/
