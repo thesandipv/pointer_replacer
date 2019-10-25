@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.core.extensions.getDrawableExt
@@ -33,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.*
 import org.jetbrains.anko.design.snackbar
+import org.koin.android.ext.android.inject
 
 class EditProfileFragment : Fragment() {
 
@@ -40,14 +40,13 @@ class EditProfileFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_edit_profile, container, false)
     }
 
-    private lateinit var db: FirebaseFirestore
+    private val db: FirebaseFirestore by inject()
     private lateinit var user: FirebaseUser
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         if (FirebaseUtils.isUserSignedIn) {
-            db = dbInstance
             user = FirebaseUtils.auth!!.currentUser!!
             with(view) {
                 input_profile_name.setText(user.displayName)

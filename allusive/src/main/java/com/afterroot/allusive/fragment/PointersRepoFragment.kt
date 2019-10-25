@@ -40,10 +40,9 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.database.dbInstance
+import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
-import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
@@ -62,26 +61,21 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
+import org.koin.android.ext.android.inject
 import java.io.File
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
-    private lateinit var db: FirebaseFirestore
     private lateinit var extSdDir: String
     private lateinit var mTargetPath: String
     private lateinit var pointerAdapter: PointerAdapterDelegate
     private lateinit var pointersFolder: String
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
-    private lateinit var storage: FirebaseStorage
+    private val db: FirebaseFirestore by inject()
+    private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        storage = FirebaseStorage.getInstance()
-        db = dbInstance
-    }
+    private val storage: FirebaseStorage by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -165,7 +159,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
 
         val pointer = pointersList[position]
-        val db = MainActivity.getDatabase(context!!.applicationContext)
 
         dialog.getCustomView().apply {
             val storageReference =
@@ -189,7 +182,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             }
             info_action_pack.apply {
                 lifecycleScope.launch {
-                    if (db.pointerDao().exists(pointer.filename).isNotEmpty()) {
+                    if (myDatabase.pointerDao().exists(pointer.filename).isNotEmpty()) {
                         text = getString(R.string.text_installed)
                         setOnClickListener(null)
                         isEnabled = false
@@ -243,9 +236,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 uploader_id = id,
                 uploader_name = name
             )
-            val db = MainActivity.getDatabase(activity!!.applicationContext)
             lifecycleScope.launch {
-                db.pointerDao().add(pointer)
+                myDatabase.pointerDao().add(pointer)
             }
 
             dialog.dismiss()
