@@ -29,8 +29,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/pointer_grid_hint" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -40,19 +40,20 @@
             android:layoutAnimation="@anim/layout_anim_fall_down"
             android:nestedScrollingEnabled="true"
             tools:itemCount="5"
-            tools:listitem="@layout/item_pointer_repo" />
+            tools:listitem="@layout/item_pointer_repo"
+            tools:targetApi="lollipop" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/info_no_pointer_installed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_gravity="center"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -65,12 +66,12 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bs_button_install_pointers"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button"
             android:layout_gravity="center_horizontal"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/install_manage_pointers" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -82,12 +83,12 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bs_button_import_pointers"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button"
             android:layout_gravity="center_horizontal"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/action_import_old_pointers" />
 
     </LinearLayout>

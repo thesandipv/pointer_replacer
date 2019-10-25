@@ -15,6 +15,7 @@
 
 package com.afterroot.allusive.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.dbInstance
+import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.core.extensions.getDrawableExt
 import com.google.firebase.auth.FirebaseUser
@@ -74,7 +76,7 @@ class EditProfileFragment : Fragment() {
                 }
             }
         } else {
-            //Not Logged In
+            startActivity(Intent(this.context, SplashActivity::class.java))
         }
     }
 }
