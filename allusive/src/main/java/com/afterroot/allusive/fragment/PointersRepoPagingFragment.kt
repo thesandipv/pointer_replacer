@@ -38,7 +38,6 @@ import com.afterroot.allusive.R
 import com.afterroot.allusive.adapter.MyFirestorePagingAdapter
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.core.extensions.getDrawableExt
@@ -56,24 +55,18 @@ import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
+import org.koin.android.ext.android.inject
 import java.io.File
 
 class PointersRepoPagingFragment : Fragment(), ItemSelectedCallback {
 
-    private lateinit var db: FirebaseFirestore
     private lateinit var extSdDir: String
     private lateinit var mTargetPath: String
     private lateinit var myFirestorePagingAdapter: MyFirestorePagingAdapter
     private lateinit var pointersFolder: String
-    private lateinit var storage: FirebaseStorage
     private val _tag = "PointersRepoFragment"
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        storage = FirebaseStorage.getInstance()
-        db = dbInstance
-    }
+    private val db: FirebaseFirestore by inject()
+    private val storage: FirebaseStorage by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -126,7 +119,7 @@ class PointersRepoPagingFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun setUpList() {
-        val baseQuery = dbInstance.collection(DatabaseFields.COLLECTION_POINTERS)
+        val baseQuery = db.collection(DatabaseFields.COLLECTION_POINTERS)
             .orderBy(DatabaseFields.FIELD_TIME, Query.Direction.DESCENDING)
 
         val config =

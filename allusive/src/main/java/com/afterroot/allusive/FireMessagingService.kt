@@ -27,11 +27,12 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.utils.FirebaseUtils
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.koin.android.ext.android.get
 
 class FireMessagingService : FirebaseMessagingService() {
 
@@ -46,7 +47,8 @@ class FireMessagingService : FirebaseMessagingService() {
     private fun updateToken(token: String) {
         try {
             if (FirebaseUtils.isUserSignedIn) {
-                dbInstance.collection(DatabaseFields.COLLECTION_USERS).document(FirebaseUtils.firebaseUser!!.uid)
+                get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS)
+                    .document(FirebaseUtils.firebaseUser!!.uid)
                     .update(DatabaseFields.FIELD_FCM_ID, token)
             }
         } catch (e: Exception) {

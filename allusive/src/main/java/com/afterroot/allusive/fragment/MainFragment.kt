@@ -47,10 +47,8 @@ import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
-import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
-import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.loadBitmapFromView
@@ -59,6 +57,7 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
@@ -68,6 +67,8 @@ import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -81,7 +82,7 @@ class MainFragment : Fragment() {
     private var pointerPreviewPath: String? = null
     private var targetPath: String? = null
     private lateinit var interstitialAd: InterstitialAd
-    private lateinit var myDatabase: MyDatabase
+    private val myDatabase: MyDatabase by inject()
     private lateinit var settings: Settings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -103,7 +104,6 @@ class MainFragment : Fragment() {
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
         pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
-        myDatabase = MainActivity.getDatabase(activity!!.applicationContext)
 
         activity!!.apply {
             layout_new_pointer.setOnClickListener { showListPointerChooser(pointerType = POINTER_TOUCH) }
@@ -345,7 +345,7 @@ class MainFragment : Fragment() {
     private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
         val roomPointers = arrayListOf<RoomPointer>()
         fileNames.forEach { filename ->
-            dbInstance.collection(DatabaseFields.COLLECTION_POINTERS)
+            get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_POINTERS)
                 .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get().addOnSuccessListener { snapshot ->
                     if (!snapshot.isEmpty) { //Pointer available in repository
                         val p = snapshot.documents[0].toObject(Pointer::class.java)!!

@@ -32,7 +32,6 @@ import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
-import com.afterroot.allusive.database.dbInstance
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.core.extensions.getDrawableExt
@@ -49,6 +48,7 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.dialog_progress.view.*
 import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
 import org.jetbrains.anko.design.snackbar
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -56,19 +56,12 @@ import java.io.IOException
 
 class NewPointerPost : Fragment() {
 
-    private lateinit var db: FirebaseFirestore
-    private lateinit var storage: FirebaseStorage
     private val _tag = "NewPointerPost"
-    private var isPointerImported = false
-    private val pointerName: String get() = edit_name.text.toString().trim()
+    private val db: FirebaseFirestore by inject()
     private val pointerDescription: String get() = edit_desc.text.toString().trim()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        storage = FirebaseStorage.getInstance()
-        db = dbInstance
-    }
+    private val pointerName: String get() = edit_name.text.toString().trim()
+    private val storage: FirebaseStorage by inject()
+    private var isPointerImported = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_new_pointer_post, container, false)
