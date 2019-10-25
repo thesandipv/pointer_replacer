@@ -25,6 +25,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,12 +101,17 @@ fun Context.getPrefs(): SharedPreferences {
  * returns drawable with optional tint
  * last updated - 31-08-2019
  */
-fun Context.getDrawableExt(@DrawableRes id: Int, @ColorRes tint: Int? = null): Drawable {
-    val drawable = ContextCompat.getDrawable(this, id)
-    if (tint != null) {
-        DrawableCompat.setTint(drawable!!, ContextCompat.getColor(this, tint))
+fun Context.getDrawableExt(@DrawableRes id: Int, @ColorRes tint: Int? = null): Drawable? {
+    var drawable: Drawable? = null
+    try {
+        drawable = ContextCompat.getDrawable(this, id)!!
+        if (tint != null) {
+            DrawableCompat.setTint(drawable, ContextCompat.getColor(this, tint))
+        }
+    } catch (e: Exception) {
+        Log.e("Extensions", "getDrawableExt: ${e.stackTrace}")
     }
-    return drawable!!
+    return drawable
 }
 
 /**
