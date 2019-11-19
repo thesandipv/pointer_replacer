@@ -42,12 +42,23 @@
             app:title="App Theme"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
+    <PreferenceCategory app:title="@string/pref_category_support">
+        <Preference
+            app:key="@string/key_pref_donate"
+            app:summary="@string/pref_summary_donation"
+            app:title="@string/pref_title_donate_dev" />
+        <Preference
+            app:key="@string/key_watch_ads"
+            app:summary="@string/pref_summary_watch_ad"
+            app:title="@string/pref_title_watch_ad" />
+    </PreferenceCategory>
     <PreferenceCategory app:title="@string/title_activity_about">
         <Preference
             app:icon="@mipmap/ic_launcher"
             app:key="@string/key_version"
             app:title="@string/app_name" />
         <Preference app:summary="@string/made_with_love" />
+        <Preference android:title="Rate on Play Store" />
         <Preference android:title="@string/pref_title_privacy_policy">
             <intent
                 android:action="android.intent.action.VIEW"

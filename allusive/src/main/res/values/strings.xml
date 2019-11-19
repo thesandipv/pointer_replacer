@@ -66,11 +66,14 @@
     <string name="key_pointerPadding" translatable="false">pointer_padding</string>
     <string name="key_pointerPath" translatable="false">POINTER_PATH</string>
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
+    <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
+    <string name="key_rate_on_g_play" translatable="false">pref_rate_on_g_play</string>
     <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="key_version" translatable="false">pref_version</string>
+    <string name="key_watch_ads" translatable="false">pref_watch_ads</string>
     <string name="made_with_love">Made with ❤ In India.</string>
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
@@ -101,19 +104,25 @@
     <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="pointer_preview">Pointer Preview</string>
+    <string name="pref_category_support">Support Development</string>
+    <string name="pref_summary_donation">to support development</string>
     <string name="pref_summary_enable_alpha">Enables Slider to Change Pointer Alpha (transparency)</string>
     <string name="pref_summary_licences">Click to view licenses of third party libraries</string>
     <string name="pref_summary_source_code">tap to visit GitHub Repository</string>
+    <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
     <string name="pref_summary_xda">tap to visit official XDA thread</string>
     <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
+    <string name="pref_title_donate_dev">Donate Developer</string>
     <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
     <string name="pref_title_licences">Licenses</string>
     <string name="pref_title_pointer_settings">Pointer Settings</string>
     <string name="pref_title_privacy_policy">Privacy Policy</string>
+    <string name="pref_title_rate_g_play">Rate on Google Play</string>
     <string name="pref_title_show_touches">Show Touches</string>
     <string name="pref_title_source_code">Source Code</string>
     <string name="pref_title_telegram_group">Join Telegram Group</string>
     <string name="pref_title_visit_ar">Visit AfterROOT</string>
+    <string name="pref_title_watch_ad">Watch Ads to Support Development</string>
     <string name="pref_title_xda_thread">XDA Thread</string>
     <string name="pref_title_xposed_repo">Module Info</string>
     <string name="prompt_button_enable">ENABLE</string>
@@ -170,6 +179,10 @@
     <string name="text_soft_reboot">Soft Reboot</string>
     <string name="text_will_change_to">New Pointer</string>
     <string name="text_yes">Yes</string>
+    <string name="theme_battery">Set by Battery Saver</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_device_default">Device Default</string>
+    <string name="theme_light">Light</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_dashboard">Repository</string>
@@ -182,8 +195,4 @@
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="theme_device_default">Device Default</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_battery">Set by Battery Saver</string>
 </resources>
