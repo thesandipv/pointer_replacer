@@ -98,7 +98,7 @@ class Settings(context: Context) {
         }
 
     var maxPointerSize
-        get() = preferences.getInt(mContext.getString(R.string.key_maxPointerSize), 100)
+        get() = preferences.getInt(mContext.getString(R.string.key_maxPointerSize), mContext.getMinPointerSize())
         set(value) = preferences.edit(true) {
             putInt(mContext.getString(R.string.key_maxPointerSize), value)
         }
@@ -126,4 +126,16 @@ class Settings(context: Context) {
         set(value) = preferences.edit(true) {
             putInt("MOUSE_TMP_COLOR", value)
         }
+
+    var isExtDialogCancelled
+        get() = preferences.getBoolean(mContext.getString(R.string.key_ext_dialog_cancel), false)
+        set(value) = preferences.edit(true) {
+            putBoolean(mContext.getString(R.string.key_ext_dialog_cancel), value)
+        }
+    var isShowTouches
+        get() = preferences.getBoolean(mContext.getString(R.string.key_show_touches), false)
+        set(value) = preferences.edit(true) {
+            putBoolean(mContext.getString(R.string.key_show_touches), value)
+        }
+
 }

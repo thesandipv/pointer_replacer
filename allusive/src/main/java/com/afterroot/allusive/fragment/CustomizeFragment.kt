@@ -25,7 +25,7 @@ import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeTransform
 import androidx.transition.TransitionSet
