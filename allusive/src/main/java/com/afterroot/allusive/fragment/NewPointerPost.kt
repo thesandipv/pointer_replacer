@@ -26,7 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE

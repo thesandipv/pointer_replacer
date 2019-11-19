@@ -20,9 +20,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.*
-import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -42,7 +40,6 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive.*
 import com.afterroot.allusive.Constants.POINTER_MOUSE
 import com.afterroot.allusive.Constants.POINTER_TOUCH
-import com.afterroot.allusive.adapter.PointerAdapter
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
@@ -60,7 +57,6 @@ import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.*
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.bs_button_install_pointers
 import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.info_no_pointer_installed
 import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
@@ -484,84 +480,6 @@ class MainFragment : Fragment() {
         }
         if (!dotNoMedia.exists()) {
             dotNoMedia.createNewFile()
-        }
-    }
-
-    private fun showPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
-        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
-            customView(R.layout.layout_grid_bottomsheet)
-            title(text = title)
-        }
-
-        val dialogView = dialog.getCustomView()
-        val pointerAdapter = PointerAdapter(activity!!)
-
-        /*dialogView.banner_ad_pointer_grid.apply {
-            val adRequest = AdRequest.Builder().build()
-            this.loadAd(adRequest)
-        }*/
-
-        dialogView.grid_pointers.apply {
-            adapter = pointerAdapter
-            onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                if (pointerType == POINTER_TOUCH) {
-                    settings.selectedPointerPath = pointerAdapter.getItem(position)
-                } else {
-                    settings.selectedMousePath = pointerAdapter.getItem(position)
-                }
-                GlideApp.with(context!!).load(File(pointerAdapter.getItem(position))).override(context!!.getMinPointerSize())
-                    .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
-                dialog.dismiss()
-            }
-        }
-
-        try {
-            val pointersFolder = File(targetPath!!)
-            val dotNoMedia = File("${targetPath}/.nomedia")
-            if (!pointersFolder.exists()) {
-                pointersFolder.mkdirs()
-            }
-            if (!dotNoMedia.exists()) {
-                dotNoMedia.createNewFile()
-            }
-
-            val pointerFiles = pointersFolder.listFiles()//.filter { getMimeType(it.name)!!.startsWith("image/") }
-            PointerAdapter.itemList.clear()
-            if (pointerFiles!!.isNotEmpty()) {
-                dialogView.info_no_pointer_installed.visible(false)
-                pointerFiles.mapTo(PointerAdapter.itemList) { it.absolutePath }
-                pointerAdapter.notifyDataSetChanged()
-
-                dialogView.grid_pointers.onItemLongClickListener =
-                    AdapterView.OnItemLongClickListener { _, _, i, _ ->
-                        val file = File(pointerAdapter.getItem(i))
-                        MaterialDialog(activity!!).show {
-                            title(text = getString(R.string.text_delete) + " " + file.name)
-                            message(res = R.string.text_delete_confirm)
-                            positiveButton(res = R.string.text_yes) {
-                                if (file.delete()) {
-                                    Toast.makeText(context, getString(R.string.msg_delete_success), Toast.LENGTH_SHORT)
-                                        .show()
-                                } else {
-                                    Toast.makeText(context, getString(R.string.msg_delete_failed), Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            negativeButton(res = R.string.text_no)
-                        }
-                        false
-                    }
-            } else {
-                dialogView.apply {
-                    info_no_pointer_installed.visible(true)
-                    bs_button_install_pointers.setOnClickListener {
-                        dialog.dismiss()
-                        activity!!.findNavController(R.id.fragment_repo_nav)
-                            .navigate(R.id.repoFragment)
-                    }
-                }
-            }
-        } catch (npe: Exception) {
-            Log.e(_tag, "showPointerChooser: $npe")
         }
     }
 
