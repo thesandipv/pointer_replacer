@@ -103,9 +103,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .addOnCompleteListener(activity!!) { result ->
                     if (result.isSuccessful) {
                         firebaseRemoteConfig.activate()
-                        setUpBilling()
+                        setDonatePref(true)
+                    } else {
+                        setDonatePref(false)
                     }
                 }
+        }
+    }
+
+    private fun setDonatePref(isEnable: Boolean) {
+        findPreference<Preference>("key_pref_donate")?.apply {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                setUpBilling()
+                return@OnPreferenceClickListener true
+            }
+            isEnabled = isEnable
         }
     }
 
