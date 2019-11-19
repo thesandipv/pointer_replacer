@@ -17,49 +17,53 @@ package com.afterroot.allusive.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.text.InputType
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.FileProvider
-import androidx.core.content.edit
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.ACTION_OPEN_TEL
 import com.afterroot.allusive.Constants.EXTRA_TOUCH_VAL
 import com.afterroot.allusive.Constants.RC_OPEN_TEL
 import com.afterroot.allusive.Constants.TEL_P_NAME
 import com.afterroot.allusive.R
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.getMinPointerSize
-import com.afterroot.core.extensions.getPrefs
 import com.afterroot.core.extensions.isAppInstalled
+import com.android.billingclient.api.*
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.koin.android.ext.android.inject
 import java.io.File
 
 @SuppressLint("ValidFragment")
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    private lateinit var billingClient: BillingClient
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
-    private val _tag = "SettingsFragment"
+    private val settings: Settings by inject()
     private var dialog: AlertDialog? = null
-    private var preferences: SharedPreferences? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -69,8 +73,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        preferences = context!!.getPrefs()
+        initFirebaseConfig()
+        setAppThemePref()
+        setMaxPointerPaddingPref()
+        setMaxPointerSizePref()
+        setOpenSourceLicPref()
+        setShowTouchPref()
+        setVersionPref()
+        initBilling()
+    }
 
+    private fun initBilling() {
+        billingClient =
+            BillingClient.newBuilder(context!!).enablePendingPurchases().setListener { billingResult, purchases ->
+                //TODO implement
+            }.build()
+    }
+
+    private fun initFirebaseConfig() {
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
         firebaseRemoteConfig.let { config ->
             FirebaseRemoteConfigSettings.Builder()
@@ -79,98 +99,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     config.setConfigSettingsAsync(this)
                 }
 
-            config.fetch(config.info.fetchTimeMillis).addOnCompleteListener(activity!!) { result ->
-                if (result.isSuccessful) {
-                    firebaseRemoteConfig.activate()
-                }
-            }
-        }
-
-        findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
-            summary = preferences!!.getInt(getString(R.string.key_maxPointerSize), context!!.getMinPointerSize()).toString()
-            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(activity!!).show {
-                    title(res = R.string.text_max_pointer_size)
-                    input(
-                        hintRes = R.string.text_max_pointer_size,
-                        prefill = preferences!!.getInt(
-                            getString(R.string.key_maxPointerSize),
-                            context.getMinPointerSize()
-                        ).toString(),
-                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
-                    ) { _, input ->
-                        if (input.toString().toInt() > context.getMinPointerSize()) {
-                            preferences!!.edit(true) {
-                                putInt(
-                                    getString(R.string.key_maxPointerSize),
-                                    input.toString().toInt()
-                                )
-                            }
-                            this@apply.summary = input
-                        } else {
-                            activity!!.container.snackbar(
-                                String.format(
-                                    getString(R.string.str_format_value_error),
-                                    context.getMinPointerSize()
-                                )
-                            ).anchorView = activity!!.navigation
-                        }
-
+            config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
+                .addOnCompleteListener(activity!!) { result ->
+                    if (result.isSuccessful) {
+                        firebaseRemoteConfig.activate()
+                        setUpBilling()
                     }
                 }
-                false
-            }
         }
+    }
 
-        findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
-            summary = preferences!!.getInt(getString(R.string.key_maxPaddingSize), 25).toString()
-            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(activity!!).show {
-                    title(res = R.string.key_maxPaddingSize)
-                    input(
-                        hint = getString(R.string.input_hint_max_padding_size),
-                        prefill = preferences!!.getInt(getString(R.string.key_maxPaddingSize), 25).toString(),
-                        allowEmpty = false, maxLength = 3,
-                        inputType = InputType.TYPE_CLASS_NUMBER
-                    ) { _, input ->
-                        if (input.toString().toInt() > 0) {
-                            preferences!!.edit(true) {
-                                putInt(
-                                    getString(R.string.key_maxPaddingSize), input.toString().toInt()
-                                )
-                            }
-                            this@apply.summary = input
-                        } else {
-                            activity!!.container.snackbar(String.format(getString(R.string.str_format_value_error), 0))
-                                .anchorView = activity!!.navigation
-                        }
-
-                    }.show()
-                }
-                false
-            }
-        }
-
-        findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!
-            .onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            val i = Intent().apply {
-                action = ACTION_OPEN_TEL
-                putExtra(EXTRA_TOUCH_VAL, if (newValue == true) 1 else 0)
-            }
-            if (i.resolveActivity(activity!!.packageManager) != null) {
-                startActivityForResult(i, RC_OPEN_TEL)
-            } else {
-                Toast.makeText(activity!!, getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
-                installExtensionDialog().show()
-            }
-            true
-        }
-
+    private fun setVersionPref() {
         findPreference<Preference>("pref_version")?.apply {
             summary =
                 String.format(getString(R.string.str_format_version), BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
         }
+    }
 
+    private fun setOpenSourceLicPref() {
         findPreference<Preference>("licenses")?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 OssLicensesMenuActivity.setActivityTitle("Licences").apply { }
@@ -178,7 +124,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 return@OnPreferenceClickListener true
             }
         }
+    }
 
+    private fun setAppThemePref() {
         findPreference<ListPreference>("key_app_theme")?.apply {
             onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                 when (newValue) {
@@ -201,14 +149,86 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun setShowTouchPref() {
+        findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!
+            .onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            val i = Intent().apply {
+                action = ACTION_OPEN_TEL
+                putExtra(EXTRA_TOUCH_VAL, if (newValue == true) 1 else 0)
+            }
+            if (i.resolveActivity(activity!!.packageManager) != null) {
+                startActivityForResult(i, RC_OPEN_TEL)
+            } else {
+                Toast.makeText(activity!!, getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
+                installExtensionDialog().show()
+            }
+            true
+        }
+    }
+
+    private fun setMaxPointerPaddingPref() {
+        findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
+            summary = settings.maxPointerPadding.toString()
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                MaterialDialog(activity!!).show {
+                    title(res = R.string.key_maxPaddingSize)
+                    input(
+                        hint = getString(R.string.input_hint_max_padding_size),
+                        prefill = settings.maxPointerPadding.toString(),
+                        allowEmpty = false, maxLength = 3,
+                        inputType = InputType.TYPE_CLASS_NUMBER
+                    ) { _, input ->
+                        if (input.toString().toInt() > 0) {
+                            settings.maxPointerPadding = input.toString().toInt()
+                            this@apply.summary = input
+                        } else {
+                            activity!!.container.snackbar(String.format(getString(R.string.str_format_value_error), 0))
+                                .anchorView = activity!!.navigation
+                        }
+
+                    }.show()
+                }
+                false
+            }
+        }
+    }
+
+    private fun setMaxPointerSizePref() {
+        findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
+            summary = settings.maxPointerSize.toString()
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                MaterialDialog(activity!!).show {
+                    title(res = R.string.text_max_pointer_size)
+                    input(
+                        hintRes = R.string.text_max_pointer_size,
+                        prefill = settings.maxPointerSize.toString(),
+                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
+                    ) { _, input ->
+                        if (input.toString().toInt() > context.getMinPointerSize()) {
+                            settings.maxPointerSize = input.toString().toInt()
+                            this@apply.summary = input
+                        } else {
+                            activity!!.container.snackbar(
+                                String.format(
+                                    getString(R.string.str_format_value_error),
+                                    context.getMinPointerSize()
+                                )
+                            ).anchorView = activity!!.navigation
+                        }
+
+                    }
+                }
+                false
+            }
+        }
+    }
+
     private fun installExtensionDialog(): AlertDialog {
         dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
             .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
-                preferences!!.edit(true) {
-                    putBoolean(getString(R.string.key_ext_dialog_cancel), true)
-                }
+                settings.isExtDialogCancelled = true
             }
             .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
                 val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
@@ -242,23 +262,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         return dialog as AlertDialog
     }
 
-
     override fun onResume() {
         super.onResume()
 
-        if (!activity!!.isAppInstalled(TEL_P_NAME) &&
-            !preferences!!.getBoolean(getString(R.string.key_ext_dialog_cancel), false)
-        ) {
+        if (!activity!!.isAppInstalled(TEL_P_NAME) && settings.isExtDialogCancelled) {
             installExtensionDialog().show()
         }
         try {
-            val showTouchesCurr =
-                Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches)) == 1
-            preferences!!.edit(true) {
-                putBoolean(getString(R.string.key_show_touches), showTouchesCurr)
-            }
-            findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = showTouchesCurr
-        } catch (e: Settings.SettingNotFoundException) {
+            settings.isShowTouches =
+                android.provider.Settings.System.getInt(
+                    activity!!.contentResolver,
+                    getString(R.string.key_show_touches)
+                ) == 1
+            findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = settings.isShowTouches
+        } catch (e: android.provider.Settings.SettingNotFoundException) {
             activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
         }
     }
@@ -270,7 +287,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
-            if (requestCode == RC_OPEN_TEL) {
+            if (requestCode == RC_OPEN_TEL) { //Open TouchEnablerLegacy
                 super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
@@ -283,7 +300,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         activity!!.container.snackbar(getString(R.string.msg_secure_settings_permission))
                             .setAction(getString(R.string.text_action_grant)) {
                                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
                                     intent.data = Uri.parse("package:$TEL_P_NAME")
                                     startActivity(intent)
                                 }
@@ -298,6 +315,62 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    private fun setUpBilling() {
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingServiceDisconnected() {
+
+            }
+
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    loadAllSku()
+                }
+            }
+
+        })
+    }
+
+    private fun loadAllSku() {
+        val skuModel = Gson().fromJson(firebaseRemoteConfig.getString("pr_sku_list"), SkuModel::class.java)
+        if (billingClient.isReady) {
+            val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
+            billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
+                    val list = ArrayList<String>()
+                    for (skuDetails in skuDetailsList) {
+                        list.add("${skuDetails.title} - ${skuDetails.price}")
+                    }
+                    MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                        listItems(items = list) { _, index, _ ->
+                            val billingFlowParams =
+                                BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[index]).build()
+                            billingClient.launchBillingFlow(activity!!, billingFlowParams)
+                        }
+                        title(R.string.pref_title_donate_dev)
+                        negativeButton(android.R.string.cancel) {
+
+                        }
+                    }
+                }
+            }
+        } else Log.d(TAG, "loadAllSku: Billing not ready")
+    }
+
+    companion object {
+        private const val TAG = "SettingsFragment"
+    }
+
+    /**
+     * Data class for Sku List Json response
+     */
+    data class SkuModel(val sku: List<String>)
+
+    class PurchaseUpdatedImpl : PurchasesUpdatedListener {
+        override fun onPurchasesUpdated(billingResult: BillingResult?, purchases: MutableList<Purchase>?) {
+
         }
     }
 }

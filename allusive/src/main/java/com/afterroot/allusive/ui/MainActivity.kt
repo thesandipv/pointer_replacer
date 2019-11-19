@@ -235,4 +235,8 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
     }
+
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 }

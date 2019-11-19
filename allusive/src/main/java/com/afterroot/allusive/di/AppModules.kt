@@ -16,12 +16,14 @@
 package com.afterroot.allusive.di
 
 import androidx.room.Room
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.database.MyDatabase
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val roomModule = module {
@@ -45,5 +47,11 @@ val firebaseModule = module {
 
     single {
         FirebaseStorage.getInstance()
+    }
+}
+
+val appModule = module {
+    single {
+        Settings(androidContext())
     }
 }
