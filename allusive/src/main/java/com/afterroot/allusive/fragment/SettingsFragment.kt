@@ -43,9 +43,14 @@ import com.afterroot.allusive.Constants.TEL_P_NAME
 import com.afterroot.allusive.R
 import com.afterroot.allusive.Settings
 import com.afterroot.allusive.getMinPointerSize
+import com.afterroot.allusive.model.SkuModel
 import com.afterroot.core.extensions.isAppInstalled
 import com.android.billingclient.api.*
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
@@ -62,6 +67,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var billingClient: BillingClient
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+    private lateinit var interstitialAd: InterstitialAd
     private val settings: Settings by inject()
     private var dialog: AlertDialog? = null
 
@@ -80,13 +86,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setOpenSourceLicPref()
         setShowTouchPref()
         setVersionPref()
+        setDonatePref(false)
         initBilling()
+        setUpAds()
+        setRateOnGPlay()
     }
 
     private fun initBilling() {
         billingClient =
-            BillingClient.newBuilder(context!!).enablePendingPurchases().setListener { billingResult, purchases ->
-                //TODO implement
+            BillingClient.newBuilder(context!!).enablePendingPurchases().setListener { _, purchases ->
+                val purchase = purchases?.first()
+                if (purchase != null) { //Consume every time after successful purchase
+                    val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
+                    billingClient.consumeAsync(params) { result, purchaseToken ->
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK && purchaseToken != null) {
+                            Log.d(TAG, "initBilling: Purchase Done and Consumed")
+                        } else Log.d(TAG, "initBilling: Purchase Done but not Consumed.")
+                    }
+                }
             }.build()
     }
 
@@ -112,7 +129,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setDonatePref(isEnable: Boolean) {
-        findPreference<Preference>("key_pref_donate")?.apply {
+        findPreference<Preference>(getString(R.string.key_pref_donate))?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 setUpBilling()
                 return@OnPreferenceClickListener true
@@ -235,6 +252,71 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun setUpAds() {
+        interstitialAd = InterstitialAd(this.activity!!)
+        interstitialAd.apply {
+            adUnitId = if (BuildConfig.DEBUG) {
+                "ca-app-pub-3940256099942544/1033173712"
+            } else {
+                getString(R.string.ad_interstitial_1_id)
+            }
+            loadAd(AdRequest.Builder().build())
+        }
+
+        val watchAds =
+            preferenceScreen.findPreference<Preference>(getString(R.string.key_watch_ads))!!
+        watchAds.apply {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                if (interstitialAd.isLoaded) {
+                    interstitialAd.show()
+                } else {
+                    activity!!.container.snackbar(getString(R.string.msg_ad_not_loaded))
+                }
+                true
+            }
+            summary = getString(R.string.msg_ad_loading)
+            isEnabled = false
+        }
+
+        interstitialAd.adListener = object : AdListener() {
+            override fun onAdClosed() {
+                super.onAdClosed()
+                watchAds.apply {
+                    summary = getString(R.string.msg_ad_loading)
+                    isEnabled = false
+                }
+                interstitialAd.loadAd(AdRequest.Builder().build())
+            }
+
+            override fun onAdLoaded() {
+                super.onAdLoaded()
+                watchAds.apply {
+                    summary = getString(R.string.msg_ad_loaded)
+                    isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun setRateOnGPlay() {
+        preferenceScreen.findPreference<Preference>(getString(R.string.key_rate_on_g_play))!!.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                Bundle().apply {
+                    putString(
+                        FirebaseAnalytics.Param.ITEM_NAME,
+                        getString(R.string.key_rate_on_g_play)
+                    )
+                    FirebaseAnalytics.getInstance(context!!).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
+                }
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse(getString(R.string.url_play_store_app_page))
+                    startActivity(this)
+                }
+                true
+            }
+
+    }
+
     private fun installExtensionDialog(): AlertDialog {
         dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
             .setMessage(getString(R.string.msg_install_ext_dialog))
@@ -333,7 +415,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun setUpBilling() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
-
+                activity!!.container.snackbar("Something went wrong.").anchorView = activity!!.navigation
             }
 
             override fun onBillingSetupFinished(billingResult: BillingResult) {
@@ -341,7 +423,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     loadAllSku()
                 }
             }
-
         })
     }
 
@@ -353,7 +434,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
                     val list = ArrayList<String>()
                     for (skuDetails in skuDetailsList) {
-                        list.add("${skuDetails.title} - ${skuDetails.price}")
+                        list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
                     }
                     MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                         listItems(items = list) { _, index, _ ->
@@ -362,9 +443,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             billingClient.launchBillingFlow(activity!!, billingFlowParams)
                         }
                         title(R.string.pref_title_donate_dev)
-                        negativeButton(android.R.string.cancel) {
-
-                        }
+                        negativeButton(android.R.string.cancel)
                     }
                 }
             }
@@ -373,16 +452,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     companion object {
         private const val TAG = "SettingsFragment"
-    }
-
-    /**
-     * Data class for Sku List Json response
-     */
-    data class SkuModel(val sku: List<String>)
-
-    class PurchaseUpdatedImpl : PurchasesUpdatedListener {
-        override fun onPurchasesUpdated(billingResult: BillingResult?, purchases: MutableList<Purchase>?) {
-
-        }
     }
 }
