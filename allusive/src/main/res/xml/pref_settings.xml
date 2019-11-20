@@ -58,7 +58,9 @@
             app:key="@string/key_version"
             app:title="@string/app_name" />
         <Preference app:summary="@string/made_with_love" />
-        <Preference android:title="Rate on Play Store" />
+        <Preference
+            app:key="@string/key_rate_on_g_play"
+            app:title="Rate on Play Store" />
         <Preference android:title="@string/pref_title_privacy_policy">
             <intent
                 android:action="android.intent.action.VIEW"
@@ -66,9 +68,9 @@
         </Preference>
 
         <Preference
-            android:key="@string/key_licences"
-            android:summary="@string/pref_summary_licences"
-            android:title="@string/pref_title_licences" />
+            app:key="@string/key_licences"
+            app:summary="@string/pref_summary_licences"
+            app:title="@string/pref_title_licences" />
         <Preference
             app:summary="@string/pref_summary_xda"
             app:title="@string/pref_title_xda_thread">

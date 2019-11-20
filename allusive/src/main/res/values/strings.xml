@@ -78,6 +78,9 @@
     <string name="main_fragment_transition" translatable="false">main_fragment_transition</string>
     <string name="module_description">Simple Module To Replace Touch Pointer. by sandipv22@xda.</string>
     <string name="mouse_pointer">Mouse Pointer</string>
+    <string name="msg_ad_loaded">Ad Loaded</string>
+    <string name="msg_ad_loading">Ad Loading</string>
+    <string name="msg_ad_not_loaded">Ad Not Loaded yet</string>
     <string name="msg_delete_failed">Error deleting pointer</string>
     <string name="msg_delete_success">Pointer deleted</string>
     <string name="msg_done">Done</string>
@@ -195,4 +198,6 @@
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="url_play_store_app_page" translatable="false">https://play.google.com/store/apps/details?id=com.afterroot.allusive</string>
+    <string name="url_play_store_developer" translatable="false">https://play.google.com/store/apps/dev?id=5302118761742285445</string>
 </resources>
