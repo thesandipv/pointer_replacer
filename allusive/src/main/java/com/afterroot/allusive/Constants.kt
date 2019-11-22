@@ -23,7 +23,7 @@ object Constants {
     const val EXTRA_TOUCH_VAL = "$TEL_P_NAME.EXTRA_TOUCH_VAL"
     const val POINTER_MOUSE = 2
     const val POINTER_TOUCH = 1
-    const val PREF_KEY_FIRST_INSTALL = "first_install"
+    const val PREF_KEY_FIRST_INSTALL = "first_install_2"
     const val RC_LOGIN = 42
     const val RC_OPEN_TEL = 245
     const val RC_PERMISSION = 256

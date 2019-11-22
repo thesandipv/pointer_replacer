@@ -32,6 +32,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.R
@@ -79,9 +80,12 @@ class MainActivity : AppCompatActivity() {
         if (sharedPreferences.getBoolean(PREF_KEY_FIRST_INSTALL, true)) {
             Bundle().apply {
                 putString("Device_Name", Build.DEVICE)
+                putString("Device_Model", Build.MODEL)
                 putString("Manufacturer", Build.MANUFACTURER)
                 putString("AndroidVersion", Build.VERSION.RELEASE)
-                FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo", this)
+                putString("AppVersion", BuildConfig.VERSION_CODE.toString())
+                putString("Package", BuildConfig.APPLICATION_ID)
+                FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo2", this)
             }
             sharedPreferences.edit(true) { putBoolean(PREF_KEY_FIRST_INSTALL, false) }
         }
