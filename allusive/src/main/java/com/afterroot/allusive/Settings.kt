@@ -98,7 +98,7 @@ class Settings(context: Context) {
         }
 
     var maxPointerSize
-        get() = preferences.getInt(mContext.getString(R.string.key_maxPointerSize), mContext.getMinPointerSize())
+        get() = preferences.getInt(mContext.getString(R.string.key_maxPointerSize), 100)
         set(value) = preferences.edit(true) {
             putInt(mContext.getString(R.string.key_maxPointerSize), value)
         }
