@@ -172,6 +172,7 @@
     <string name="text_not_installed">Not Installed</string>
     <string name="text_or">OR</string>
     <string name="text_padding">Padding</string>
+    <string name="text_please_wait">Please Wait..</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>
     <string name="text_pointer_upload_notes">The recommended minimum Pointer Size is 128*128 and the recommended aspect ratio is 1:1. If the pointer image does not follow the above conditions then it will be downsized and center cropped.</string>
