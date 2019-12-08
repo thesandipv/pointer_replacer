@@ -20,6 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.text.InputType
 import android.util.Log
 import android.widget.Toast
@@ -45,6 +46,7 @@ import com.afterroot.allusive.Settings
 import com.afterroot.allusive.getMinPointerSize
 import com.afterroot.allusive.model.SkuModel
 import com.afterroot.core.extensions.isAppInstalled
+import com.afterroot.core.extensions.showStaticProgressDialog
 import com.android.billingclient.api.*
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -412,7 +414,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private lateinit var loadingDialog: MaterialDialog
     private fun setUpBilling() {
+        loadingDialog = context!!.showStaticProgressDialog(getString(R.string.text_please_wait))
+        loadingDialog.show()
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
                 activity!!.container.snackbar("Something went wrong.").anchorView = activity!!.navigation
@@ -432,6 +437,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
             billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
+                    Handler().postDelayed({
+                        loadingDialog.dismiss()
+                    }, 100)
+
                     val list = ArrayList<String>()
                     for (skuDetails in skuDetailsList) {
                         list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
