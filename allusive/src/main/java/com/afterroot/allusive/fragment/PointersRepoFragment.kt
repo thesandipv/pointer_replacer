@@ -152,6 +152,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     pointersList = pointersSnapshot.toObjects()
                     pointerAdapter.add(pointersList)
                     list.adapter = pointerAdapter
+                    list.scheduleLayoutAnimation()
                 }
             }
         })

@@ -452,11 +452,12 @@ class MainFragment : Fragment() {
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             this.adapter = pointerAdapter
+            scheduleLayoutAnimation()
         }
 
         lifecycleScope.launch {
             //Observe Db on CoroutineScope
-            myDatabase.pointerDao().getAll().observe(this@MainFragment, Observer {
+            myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, Observer {
                 pointerAdapter.add(it)
                 //Show install msg if no pointer installed
                 dialogView.apply {
