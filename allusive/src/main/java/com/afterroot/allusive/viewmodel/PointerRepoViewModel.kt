@@ -24,12 +24,14 @@ import com.google.firebase.firestore.Query
 
 class PointerRepoViewModel : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
+    private lateinit var order: String
 
-    fun getPointerSnapshot(): LiveData<ViewModelState> {
-        if (pointerSnapshot.value == null) {
+    fun getPointerSnapshot(orderBy: String = DatabaseFields.FIELD_TIME): LiveData<ViewModelState> {
+        if (pointerSnapshot.value == null || orderBy != order) {
             pointerSnapshot.postValue(ViewModelState.Loading)
+            order = orderBy
             FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
-                .orderBy(DatabaseFields.FIELD_TIME, Query.Direction.DESCENDING)
+                .orderBy(orderBy, Query.Direction.DESCENDING)
                 .addSnapshotListener { querySnapshot, _ ->
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
