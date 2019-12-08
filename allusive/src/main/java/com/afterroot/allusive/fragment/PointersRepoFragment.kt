@@ -37,6 +37,7 @@ import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.adapter.PointerAdapterDelegate
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.database.DatabaseFields
@@ -58,6 +59,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
+import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
@@ -72,6 +74,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private lateinit var pointersFolder: String
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
+    private lateinit var settings: Settings
     private val db: FirebaseFirestore by inject()
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
@@ -118,11 +121,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
-            setUpList()
-
             pointersFolder = getString(R.string.pointer_folder_path)
             extSdDir = Environment.getExternalStorageDirectory().toString()
             mTargetPath = extSdDir + pointersFolder
+            settings = Settings(context!!)
+            setUpList()
         }
     }
 
@@ -134,10 +137,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
         }
         loadPointers()
+        setUpFilter()
     }
 
-    private fun loadPointers() {
-        pointerViewModel.getPointerSnapshot().observe(this, Observer<ViewModelState> {
+    private fun loadPointers(orderBy: String = settings.orderBy!!) {
+        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, Observer<ViewModelState> {
             when (it) {
                 is ViewModelState.Loading -> {
                     repo_swipe_refresh.isRefreshing = true
@@ -151,6 +155,32 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 }
             }
         })
+    }
+
+    private fun setUpFilter() {
+        view!!.repo_filter_chip_group.apply {
+            clearCheck()
+            when (settings.orderBy) {
+                DatabaseFields.FIELD_TIME -> this.check(R.id.filter_chip_sort_by_date)
+                DatabaseFields.FIELD_DOWNLOADS -> this.check(R.id.filter_chip_sort_by_download)
+            }
+        }
+        view!!.filter_chip_sort_by_date.setOnClickListener {
+            loadPointers(DatabaseFields.FIELD_TIME)
+            view!!.repo_filter_chip_group.apply {
+                clearCheck()
+                check(R.id.filter_chip_sort_by_date)
+                settings.orderBy = DatabaseFields.FIELD_TIME
+            }
+        }
+        view!!.filter_chip_sort_by_download.setOnClickListener {
+            loadPointers(DatabaseFields.FIELD_DOWNLOADS)
+            view!!.repo_filter_chip_group.apply {
+                clearCheck()
+                check(R.id.filter_chip_sort_by_download)
+                settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
+            }
+        }
     }
 
     private fun showPointerInfoDialog(position: Int) {

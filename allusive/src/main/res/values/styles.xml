@@ -22,4 +22,6 @@
         <item name="android:tint">@color/color_primary</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
     </style>
+
+    <style name="MyStyle.FilterChip" parent="Widget.MaterialComponents.Chip.Choice"></style>
 </resources>

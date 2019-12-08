@@ -18,6 +18,7 @@ package com.afterroot.allusive
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.core.extensions.getPrefs
 
 class Settings(context: Context) {
@@ -136,6 +137,11 @@ class Settings(context: Context) {
         get() = preferences.getBoolean(mContext.getString(R.string.key_show_touches), false)
         set(value) = preferences.edit(true) {
             putBoolean(mContext.getString(R.string.key_show_touches), value)
+        }
+    var orderBy
+        get() = preferences.getString(mContext.getString(R.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
+        set(value) = preferences.edit(true) {
+            putString(mContext.getString(R.string.key_repo_order_by), value)
         }
 
 }

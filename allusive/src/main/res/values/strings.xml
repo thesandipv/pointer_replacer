@@ -68,6 +68,7 @@
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
     <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
     <string name="key_rate_on_g_play" translatable="false">pref_rate_on_g_play</string>
+    <string name="key_repo_order_by">repo_order_by</string>
     <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
@@ -149,6 +150,8 @@
     <string name="text_alpha">Alpha</string>
     <string name="text_apply_pointer_confirm">Do you want to apply this pointer?</string>
     <string name="text_browse_pointer_image">Browse Pointer Image</string>
+    <string name="text_chip_sort_by_date">Sort by Date</string>
+    <string name="text_chip_sort_by_downloads">Sort by Downloads</string>
     <string name="text_click_to_change_pointer">Click to Change Pointer</string>
     <string name="text_click_to_mouse">Click to change mouse pointer</string>
     <string name="text_color_changed">Pointer color changed.</string>
@@ -193,11 +196,11 @@
     <string name="title_install_ext_dialog">Install Extension</string>
     <string name="transition_mouse" translatable="false">mouse_transition</string>
     <string name="url_learn_more" translatable="false">https://m8rg7.app.goo.gl/whyNeedExt</string>
+    <string name="url_play_store_app_page" translatable="false">https://play.google.com/store/apps/details?id=com.afterroot.allusive</string>
+    <string name="url_play_store_developer" translatable="false">https://play.google.com/store/apps/dev?id=5302118761742285445</string>
     <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
     <string name="url_prx" translatable="false">https://m8rg7.app.goo.gl/xposedRepo</string>
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
-    <string name="url_play_store_app_page" translatable="false">https://play.google.com/store/apps/details?id=com.afterroot.allusive</string>
-    <string name="url_play_store_developer" translatable="false">https://play.google.com/store/apps/dev?id=5302118761742285445</string>
 </resources>
