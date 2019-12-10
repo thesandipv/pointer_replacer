@@ -16,3 +16,4 @@
 #   public *;
 #}
 -keep class com.afterroot.** { *; }
+-keep class androidx.navigation.fragment.NavHostFragment

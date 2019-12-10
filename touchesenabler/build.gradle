@@ -58,6 +58,18 @@ android {
             versionNameSuffix '-beta'
         }
     }
+    flavorDimensions 'ar'
+    productFlavors {
+        dev {
+            dimension = 'ar'
+            resConfigs('en', 'xhdpi')
+            versionNameSuffix = '-beta'
+        }
+
+        prod {
+            dimension = 'ar'
+        }
+    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
