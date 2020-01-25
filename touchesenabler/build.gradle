@@ -55,7 +55,6 @@ android {
             splits.abi.enable = false
             splits.density.enable = false
             crunchPngs false
-            versionNameSuffix '-beta'
         }
     }
     flavorDimensions 'ar'
@@ -64,10 +63,12 @@ android {
             dimension = 'ar'
             resConfigs('en', 'xhdpi')
             versionNameSuffix = '-beta'
+            signingConfig signingConfigs.config
         }
 
         prod {
             dimension = 'ar'
+            signingConfig signingConfigs.config
         }
     }
     compileOptions {
@@ -85,20 +86,19 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.firebase:firebase-ads:18.3.0'
-    implementation 'com.google.firebase:firebase-config:19.0.3'
-    implementation 'com.google.firebase:firebase-core:17.2.1'
-    implementation 'com.google.firebase:firebase-messaging:20.0.1'
+    implementation 'com.google.firebase:firebase-config:19.1.0'
+    implementation 'com.google.firebase:firebase-core:17.2.2'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.google.firebase:firebase-storage:19.1.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.2.0-alpha02'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
+    implementation 'com.google.android.material:material:1.2.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
 
-    implementation 'com.anjlab.android.iab.v3:library:1.1.0'
-    implementation 'com.android.billingclient:billing:2.0.3'
+    implementation 'com.android.billingclient:billing:2.1.0'
 
     implementation 'org.jetbrains.anko:anko-commons:0.10.8'
     implementation project(path: ':core')
