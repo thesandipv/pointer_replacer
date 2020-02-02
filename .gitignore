@@ -47,3 +47,4 @@ captures/
 gradle.properties
 /dev/
 /prod/
+!/.travis.yml
