@@ -23,10 +23,6 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
-script: gradle build connectedCheck
 before_install:
-  - wget http://services.gradle.org/distributions/gradle-6.1-rc-1-bin.zip
-  - unzip -qq gradle-6.1-rc-1-bin.zip
-  - export GRADLE_HOME=$PWD/gradle-6.1
-  - export PATH=$GRADLE_HOME/bin:$PATH
-  - gradle -v
+  - chmod +x gradlew
+script: gradle build connectedCheck
