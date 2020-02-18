@@ -24,5 +24,6 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
 before_install:
+  - ./gradlew wrapper --gradle-version=6.2
   - chmod +x gradlew
 script: gradle build connectedCheck
