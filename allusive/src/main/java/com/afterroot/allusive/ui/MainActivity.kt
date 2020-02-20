@@ -16,16 +16,19 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -33,16 +36,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive.BuildConfig
-import com.afterroot.allusive.Constants.PREF_KEY_FIRST_INSTALL
 import com.afterroot.allusive.Constants.RC_PERMISSION
+import com.afterroot.allusive.Constants.RC_STORAGE_ACCESS
 import com.afterroot.allusive.R
+import com.afterroot.allusive.Settings
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.model.User
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.core.extensions.animateProperty
-import com.afterroot.core.extensions.getPrefs
 import com.afterroot.core.extensions.visible
+import com.afterroot.core.onVersionGreaterThanEqualTo
+import com.afterroot.core.onVersionLessThan
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -53,11 +58,13 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var sharedPreferences: SharedPreferences
+    private val settings: Settings by inject()
     private val _tag = this.javaClass.simpleName
     private val manifestPermissions =
         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
@@ -66,18 +73,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
         setSupportActionBar(toolbar)
-        sharedPreferences = this.getPrefs()
     }
 
     override fun onStart() {
         super.onStart()
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        if (FirebaseAuth.getInstance().currentUser == null) { //If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
     }
 
     private fun initialize() {
-        if (sharedPreferences.getBoolean(PREF_KEY_FIRST_INSTALL, true)) {
+        if (settings.isFirstInstalled) {
             Bundle().apply {
                 putString("Device_Name", Build.DEVICE)
                 putString("Device_Model", Build.MODEL)
@@ -87,20 +93,86 @@ class MainActivity : AppCompatActivity() {
                 putString("Package", BuildConfig.APPLICATION_ID)
                 FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo2", this)
             }
-            sharedPreferences.edit(true) { putBoolean(PREF_KEY_FIRST_INSTALL, false) }
+            settings.isFirstInstalled = false
         }
 
         //Initialize AdMob SDK
         MobileAds.initialize(this, getString(R.string.admob_app_id))
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermissions()
-        } else {
-            loadFragments()
-        }
+        onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
+            //Greater than Lollipop
+            when {
+                settings.safUri == null -> { //SAF not Accessed
+                    openStorageAccess()
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    checkPermissions()
+                }
+                else -> {
+                    createPointerFolder()
+                }
+            }
+        }, {
+            loadFragments() //Less than Lollipop, direct load fragments
+        })
 
         //Add user in db if not available
         addUserInfoInDB()
+    }
+
+    private fun createPointerFolder() {
+        onVersionLessThan(Build.VERSION_CODES.LOLLIPOP, {
+            val targetPath = "${Environment.getExternalStorageDirectory()}${getString(R.string.pointer_folder_path)}"
+            val pointersFolder = File(targetPath)
+            val dotNoMedia = File("${targetPath}/.nomedia")
+            if (!pointersFolder.exists()) {
+                pointersFolder.mkdirs()
+            }
+            if (!dotNoMedia.exists()) {
+                dotNoMedia.createNewFile()
+            }
+        }, {
+            val pointerFolderName = "Pointer Replacer"
+            val documentTree = DocumentFile.fromTreeUri(
+                this,
+                settings.safUri?.toUri()!!
+            ) ?: return@onVersionLessThan
+            if (documentTree.findFile(pointerFolderName) == null) {
+                documentTree.createDirectory(pointerFolderName)
+                    ?.createDirectory("Pointers")
+                    ?.createFile("", ".nomedia")
+            }
+        })
+        loadFragments()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun openStorageAccess() {
+        val myIntent =
+            Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+            }
+        startActivityForResult(myIntent, RC_STORAGE_ACCESS)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_STORAGE_ACCESS && resultCode == Activity.RESULT_OK) {
+            data?.data?.also {
+                val uri = data.data ?: return
+                settings.safUri = uri.toString()
+                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                onVersionGreaterThanEqualTo(Build.VERSION_CODES.KITKAT, {
+                    this.applicationContext.contentResolver.takePersistableUriPermission(uri, flags)
+                })
+                onVersionGreaterThanEqualTo(Build.VERSION_CODES.M, {
+                    checkPermissions() //Check for permissions after Storage access if Android M up
+                }, {
+                    createPointerFolder() //Else direct create folder if not exists if Lollipop
+                })
+
+            }
+        }
     }
 
     private fun addUserInfoInDB() {
@@ -141,7 +213,7 @@ class MainActivity : AppCompatActivity() {
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
             ActivityCompat.requestPermissions(this, manifestPermissions, RC_PERMISSION)
         } else {
-            loadFragments()
+            createPointerFolder()
         }
     }
 
