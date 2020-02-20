@@ -18,12 +18,14 @@ package com.afterroot.allusive.fragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -64,6 +66,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
@@ -72,26 +75,22 @@ import java.io.IOException
 
 class MainFragment : Fragment() {
 
+    private lateinit var interstitialAd: InterstitialAd
     private val _tag = "MainFragment"
+    private val myDatabase: MyDatabase by inject()
+    private val pointersDocument: DocumentFile by inject()
+    private val settings: Settings by inject()
     private var extSdDir: String? = null
-    private var fragmentView: View? = null
     private var pointerPreviewPath: String? = null
     private var targetPath: String? = null
-    private lateinit var interstitialAd: InterstitialAd
-    private val myDatabase: MyDatabase by inject()
-    private lateinit var settings: Settings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
-        fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
-        return fragmentView
+        return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        settings = Settings(this.context!!)
-
         init()
     }
 
@@ -385,11 +384,19 @@ class MainFragment : Fragment() {
 
     private fun import() {
         val fileNames = arrayListOf<String>()
-        File(targetPath!!).listFiles()?.forEach {
-            if (it.name != ".nomedia") {
-                fileNames.add(it.name)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            pointersDocument.listFiles().forEach {
+                if (it.name != ".nomedia") {
+                    fileNames.add(it.name.toString())
+                }
             }
+        } else {
+            File(targetPath!!).listFiles()?.forEach {
+                if (it.name != ".nomedia") {
+                    fileNames.add(it.name)
+                }
 
+            }
         }
         lifecycleScope.launch {
             generateRoomPointerFromFileName(fileNames)
@@ -398,7 +405,6 @@ class MainFragment : Fragment() {
 
     lateinit var pointerAdapter: PointerAdapterDelegate
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
-        val pointersFolder = File(targetPath!!)
         val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_list_bottomsheet)
             title(text = title)
@@ -418,10 +424,17 @@ class MainFragment : Fragment() {
                 } else {
                     settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
-                GlideApp.with(context!!)
-                    .load(File(targetPath + selectedItem.file_name))
-                    .override(context!!.getMinPointerSize())
-                    .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    GlideApp.with(context!!)
+                        .load(pointersDocument.findFile(selectedItem.file_name)?.uri)
+                        .override(context!!.getMinPointerSize())
+                        .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                } else {
+                    GlideApp.with(context!!)
+                        .load(File(targetPath + selectedItem.file_name))
+                        .override(context!!.getMinPointerSize())
+                        .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                }
                 dialog.dismiss()
             }
 
@@ -446,7 +459,7 @@ class MainFragment : Fragment() {
                 }
             }
 
-        })
+        }, getKoin())
         dialogView.list_pointers.apply {
             val lm = LinearLayoutManager(context!!)
             layoutManager = lm
@@ -473,14 +486,6 @@ class MainFragment : Fragment() {
                     }
                 }
             })
-        }
-
-        val dotNoMedia = File("${targetPath}/.nomedia")
-        if (!pointersFolder.exists()) {
-            pointersFolder.mkdirs()
-        }
-        if (!dotNoMedia.exists()) {
-            dotNoMedia.createNewFile()
         }
     }
 

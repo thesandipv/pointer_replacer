@@ -28,6 +28,7 @@ object Constants {
     const val RC_OPEN_TEL = 245
     const val RC_PERMISSION = 256
     const val RC_PICK_IMAGE: Int = 478
+    const val RC_STORAGE_ACCESS = 12
 }
 
 object Reason {

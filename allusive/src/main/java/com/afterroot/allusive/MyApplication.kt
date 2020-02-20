@@ -17,6 +17,7 @@ package com.afterroot.allusive
 
 import androidx.multidex.MultiDexApplication
 import com.afterroot.allusive.di.appModule
+import com.afterroot.allusive.di.documentModule
 import com.afterroot.allusive.di.firebaseModule
 import com.afterroot.allusive.di.roomModule
 import org.koin.android.ext.koin.androidContext
@@ -33,7 +34,7 @@ class MyApplication : MultiDexApplication() {
         startKoin {
             androidLogger()
             androidContext(this@MyApplication)
-            modules(listOf(roomModule, firebaseModule, appModule))
+            modules(listOf(roomModule, firebaseModule, appModule, documentModule))
         }
     }
 }
