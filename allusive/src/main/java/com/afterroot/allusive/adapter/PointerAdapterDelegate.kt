@@ -20,16 +20,18 @@ import androidx.collection.SparseArrayCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive.model.IPointer
+import org.koin.core.Koin
 import java.util.*
 
-class PointerAdapterDelegate(val callbacks: ItemSelectedCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PointerAdapterDelegate(private val callbacks: ItemSelectedCallback, koin: Koin) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mList = ArrayList<IPointer>()
     private var delegateAdapters = SparseArrayCompat<TypeDelegateAdapter>()
 
     init {
         with(delegateAdapters) {
             put(IPointer.TYPE_POINTER, PointerDelegate(callbacks))
-            put(IPointer.TYPE_LOCAL_P, LocalPointerDelegate(callbacks))
+            put(IPointer.TYPE_LOCAL_P, LocalPointerDelegate(callbacks, koin))
         }
     }
 

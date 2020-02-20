@@ -16,11 +16,13 @@
 package com.afterroot.allusive.fragment
 
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -51,6 +53,7 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.isNetworkAvailable
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.afterroot.core.onVersionGreaterThanEqualTo
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -63,8 +66,12 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
@@ -79,6 +86,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
     private val storage: FirebaseStorage by inject()
+    private val pointersDocument: DocumentFile by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -130,7 +138,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun setUpList() {
-        pointerAdapter = PointerAdapterDelegate(this)
+        pointerAdapter = PointerAdapterDelegate(this, getKoin())
         list.apply {
             val lm = LinearLayoutManager(context!!)
             layoutManager = lm
@@ -244,38 +252,84 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         val dialog = context!!.showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
         val file = File("$mTargetPath${pointersList[position].filename}")
-
-        ref.getFile(file).addOnSuccessListener {
-            activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
-            if (!BuildConfig.DEBUG) {
-                pointersSnapshot.documents[position].reference.update(
-                    DatabaseFields.FIELD_DOWNLOADS,
-                    pointersList[position].downloads + 1
+        onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
+            ref.getBytes(1024 * 1024).addOnSuccessListener { bytes ->
+                activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+                val p = pointersList[position]
+                var id = ""
+                var name = ""
+                p.uploadedBy!!.forEach {
+                    id = it.key
+                    name = it.value
+                }
+                val pointer = RoomPointer(
+                    file_name = p.filename,
+                    pointer_desc = p.description,
+                    pointer_name = p.name,
+                    uploader_id = id,
+                    uploader_name = name
                 )
-            }
-            val p = pointersList[position]
-            var id = ""
-            var name = ""
-            p.uploadedBy!!.forEach {
-                id = it.key
-                name = it.value
-            }
-            val pointer = RoomPointer(
-                file_name = p.filename,
-                pointer_desc = p.description,
-                pointer_name = p.name,
-                uploader_id = id,
-                uploader_name = name
-            )
-            lifecycleScope.launch {
-                myDatabase.pointerDao().add(pointer)
-            }
+                try {
+                    this.activity!!.contentResolver
+                        .openFileDescriptor(pointersDocument.createFile("", p.filename)?.uri!!, "w").use { pfd ->
+                            FileOutputStream(pfd!!.fileDescriptor).use {
+                                it.write(bytes)
+                            }
+                        }
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                } finally {
+                    lifecycleScope.launch {
+                        myDatabase.pointerDao().add(pointer)
+                    }
+                    if (!BuildConfig.DEBUG) {
+                        pointersSnapshot.documents[position].reference.update(
+                            DatabaseFields.FIELD_DOWNLOADS,
+                            pointersList[position].downloads + 1
+                        )
+                    }
+                    dialog.dismiss()
+                }
 
-            dialog.dismiss()
-        }.addOnFailureListener {
-            activity!!.container.snackbar("Pointer not Available").anchorView = activity!!.navigation
-            dialog.dismiss()
-        }
+            }.addOnFailureListener {
+                activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+                dialog.dismiss()
+            }
+        }, {
+            ref.getFile(file).addOnSuccessListener {
+                activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+                if (!BuildConfig.DEBUG) {
+                    pointersSnapshot.documents[position].reference.update(
+                        DatabaseFields.FIELD_DOWNLOADS,
+                        pointersList[position].downloads + 1
+                    )
+                }
+                val p = pointersList[position]
+                var id = ""
+                var name = ""
+                p.uploadedBy!!.forEach {
+                    id = it.key
+                    name = it.value
+                }
+                val pointer = RoomPointer(
+                    file_name = p.filename,
+                    pointer_desc = p.description,
+                    pointer_name = p.name,
+                    uploader_id = id,
+                    uploader_name = name
+                )
+                lifecycleScope.launch {
+                    myDatabase.pointerDao().add(pointer)
+                }
+
+                dialog.dismiss()
+            }.addOnFailureListener {
+                activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+                dialog.dismiss()
+            }
+        })
     }
 
     override fun onClick(position: Int, view: View?) {

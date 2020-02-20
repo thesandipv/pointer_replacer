@@ -144,4 +144,15 @@ class Settings(context: Context) {
             putString(mContext.getString(R.string.key_repo_order_by), value)
         }
 
+    var safUri
+        get() = preferences.getString(mContext.getString(R.string.key_saf_uri), null)
+        set(value) = preferences.edit(true) {
+            putString(mContext.getString(R.string.key_saf_uri), value)
+        }
+
+    var isFirstInstalled
+        get() = preferences.getBoolean(Constants.PREF_KEY_FIRST_INSTALL, true)
+        set(value) = preferences.edit(true) {
+            putBoolean(Constants.PREF_KEY_FIRST_INSTALL, value)
+        }
 }
