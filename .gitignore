@@ -44,7 +44,6 @@ captures/
 .*
 !/.gitignore
 /others
-gradle.properties
 /dev/
 /prod/
 !/.travis.yml

@@ -26,14 +26,6 @@ ext {
 }
 
 android {
-    signingConfigs {
-        config {
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-            storeFile file("config/release.jks")
-            storePassword RELEASE_STORE_PASSWORD
-        }
-    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.afterroot.touchenabler"
@@ -48,7 +40,6 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
         }
         debug {
             ext.alwaysUpdateBuildId = false
@@ -63,12 +54,10 @@ android {
             dimension = 'ar'
             resConfigs('en', 'xhdpi')
             versionNameSuffix = '-beta'
-            signingConfig signingConfigs.config
         }
 
         prod {
             dimension = 'ar'
-            signingConfig signingConfigs.config
         }
     }
     compileOptions {

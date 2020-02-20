@@ -27,14 +27,6 @@ ext {
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file("config/release.jks")
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-            storePassword RELEASE_STORE_PASSWORD
-        }
-    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.afterroot.allusive"
@@ -42,7 +34,9 @@ android {
         targetSdkVersion 29
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
         versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
-        vectorDrawables.useSupportLibrary = true
+        vectorDrawables {
+            useSupportLibrary = true
+        }
         multiDexEnabled true
         buildConfigField("String", "AD_TEST_DEVICE_ID", ADMOB_TEST_DEVICE_ID)
 
@@ -80,11 +74,9 @@ android {
             dimension = 'ar'
             resConfigs('en', 'xhdpi')
             versionNameSuffix = '-beta'
-            signingConfig signingConfigs.release
         }
 
         prod {
-            signingConfig signingConfigs.release
         }
     }
     compileOptions {
