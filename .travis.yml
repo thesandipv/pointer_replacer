@@ -6,8 +6,8 @@ android:
     - platform-tools
     - build-tools-29.0.3
     - android-29
-    licenses:
-      - 'android-sdk-license-.+'
+  licenses:
+    - 'android-sdk-license-.+'
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
