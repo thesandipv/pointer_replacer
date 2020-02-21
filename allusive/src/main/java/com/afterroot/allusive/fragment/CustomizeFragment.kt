@@ -15,6 +15,7 @@
 
 package com.afterroot.allusive.fragment
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -23,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.findNavController
@@ -42,6 +44,7 @@ import com.afterroot.core.extensions.visible
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_customize_pointer.*
 import kotlinx.android.synthetic.main.fragment_customize_pointer.view.*
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.*
 
@@ -50,8 +53,9 @@ import java.util.*
  * Created by Sandip on 04-10-2017.
  */
 class CustomizeFragment : Fragment() {
-    private lateinit var settings: Settings
     private lateinit var typePath: String
+    private val pointersDocument: DocumentFile by inject()
+    private val settings: Settings by inject()
     private var pointerType: Int = 0
     private var selectedColor: Int = 0
     private var typeAlpha: Int = 255
@@ -67,7 +71,6 @@ class CustomizeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        settings = Settings(context!!)
         settings.apply {
             if (pointerType == POINTER_TOUCH) {
                 typeColor = pointerColor
@@ -87,7 +90,17 @@ class CustomizeFragment : Fragment() {
         view.image_customize_pointer.setColorFilter(typeColor)
 
         GlideApp.with(context!!)
-            .load(File(typePath))
+            .load(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    pointersDocument.findFile(
+                        if (pointerType == POINTER_TOUCH) settings.selectedPointerName!!
+                        else settings.selectedMouseName!!
+                    )
+                        ?.uri
+                } else {
+                    Uri.fromFile(File(typePath))
+                }
+            )
             .into(image_customize_pointer)
 
         activity!!.fab_apply.apply {
