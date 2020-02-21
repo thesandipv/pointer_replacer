@@ -72,6 +72,8 @@
     <string name="key_saf_uri">saf_uri</string>
     <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
+    <string name="key_selectedMouseName" translatable="false">SELECTED_MOUSE_NAME</string>
+    <string name="key_selectedPointerName" translatable="false">SELECTED_POINTER_NAME</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="key_version" translatable="false">pref_version</string>

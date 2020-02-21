@@ -18,6 +18,7 @@ package com.afterroot.allusive.fragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -98,7 +99,6 @@ class MainFragment : Fragment() {
         val pointersFolder = getString(R.string.pointer_folder_path)
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
-        pointerPreviewPath = activity!!.filesDir.path + "/pointerPreview.png"
 
         activity!!.apply {
             layout_new_pointer.setOnClickListener { showListPointerChooser(pointerType = POINTER_TOUCH) }
@@ -204,8 +204,13 @@ class MainFragment : Fragment() {
                     setColorFilter(pointerColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
+                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    pointersDocument.findFile(settings.selectedPointerName!!)?.uri
+                } else {
+                    Uri.fromFile(File(selectedPointerPath))
+                }
                 GlideApp.with(context!!)
-                    .load(File(selectedPointerPath))
+                    .load(uri)
                     .into(selected_pointer)
             }
             if (selectedMousePath != null) {
@@ -215,8 +220,13 @@ class MainFragment : Fragment() {
                     setColorFilter(mouseColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
+                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    pointersDocument.findFile(settings.selectedMouseName!!)?.uri
+                } else {
+                    Uri.fromFile(File(selectedMousePath))
+                }
                 GlideApp.with(context!!)
-                    .load(File(selectedMousePath))
+                    .load(uri)
                     .into(selected_mouse)
             }
         } catch (throwable: Throwable) {
@@ -420,8 +430,10 @@ class MainFragment : Fragment() {
             override fun onClick(position: Int, view: View?) {
                 val selectedItem = pointerAdapter.getItem(position) as RoomPointer
                 if (pointerType == POINTER_TOUCH) {
+                    settings.selectedPointerName = selectedItem.file_name
                     settings.selectedPointerPath = targetPath + selectedItem.file_name
                 } else {
+                    settings.selectedMouseName = selectedItem.file_name
                     settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
