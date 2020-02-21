@@ -25,134 +25,111 @@ class Settings(context: Context) {
 
     private val preferences: SharedPreferences = context.getPrefs()
     private val mContext = context
+    private fun putString(key: String, value: String?) = preferences.edit(true) {
+        putString(key, value)
+    }
+
+    private fun putInt(key: String, value: Int) = preferences.edit(true) {
+        putInt(key, value)
+    }
+
+    private fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
+        putBoolean(key, value)
+    }
 
     var pointerPath
         get() = preferences.getString(mContext.getString(R.string.key_pointerPath), null)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_pointerPath), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_pointerPath), value)
 
     var mousePath
         get() = preferences.getString(mContext.getString(R.string.key_mousePath), null)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_mousePath), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_mousePath), value)
 
     var selectedPointerPath
         get() = preferences.getString(mContext.getString(R.string.key_selectedPointerPath), null)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_selectedPointerPath), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_selectedPointerPath), value)
 
     var selectedMousePath
         get() = preferences.getString(mContext.getString(R.string.key_selectedMousePath), null)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_selectedMousePath), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_selectedMousePath), value)
+
+    var selectedPointerName
+        get() = preferences.getString(mContext.getString(R.string.key_selectedPointerName), null)
+        set(value) = putString(mContext.getString(R.string.key_selectedPointerName), value)
+
+    var selectedMouseName
+        get() = preferences.getString(mContext.getString(R.string.key_selectedMouseName), null)
+        set(value) = putString(mContext.getString(R.string.key_selectedMouseName), value)
 
     var pointerSize
         get() = preferences.getInt(mContext.getString(R.string.key_pointerSize), mContext.getMinPointerSize())
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_pointerSize), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_pointerSize), value)
 
     var mouseSize
         get() = preferences.getInt(mContext.getString(R.string.key_mouseSize), mContext.getMinPointerSize())
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_mouseSize), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_mouseSize), value)
 
     var pointerPadding
         get() = preferences.getInt(mContext.getString(R.string.key_pointerPadding), 0)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_pointerPadding), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_pointerPadding), value)
 
     var mousePadding
         get() = preferences.getInt(mContext.getString(R.string.key_mousePadding), 0)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_mousePadding), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_mousePadding), value)
 
     var pointerColor
         get() = preferences.getInt(mContext.getString(R.string.key_pointerColor), 0)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_pointerColor), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_pointerColor), value)
 
     var mouseColor
         get() = preferences.getInt(mContext.getString(R.string.key_mouseColor), 0)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_mouseColor), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_mouseColor), value)
 
     var pointerAlpha
         get() = preferences.getInt(mContext.getString(R.string.key_pointerAlpha), 255)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_pointerAlpha), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_pointerAlpha), value)
 
     var mouseAlpha
         get() = preferences.getInt(mContext.getString(R.string.key_mouseAlpha), 255)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_mouseAlpha), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_mouseAlpha), value)
 
     var maxPointerSize
         get() = preferences.getInt(mContext.getString(R.string.key_maxPointerSize), 100)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_maxPointerSize), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_maxPointerSize), value)
 
     var maxPointerPadding
         get() = preferences.getInt(mContext.getString(R.string.key_maxPaddingSize), 100)
-        set(value) = preferences.edit(true) {
-            putInt(mContext.getString(R.string.key_maxPaddingSize), value)
-        }
+        set(value) = putInt(mContext.getString(R.string.key_maxPaddingSize), value)
 
     var isEnableAlpha
         get() = preferences.getBoolean(mContext.getString(R.string.key_EnablePointerAlpha), false)
-        set(value) = preferences.edit(true) {
-            putBoolean(mContext.getString(R.string.key_EnablePointerAlpha), value)
-        }
+        set(value) = putBoolean(mContext.getString(R.string.key_EnablePointerAlpha), value)
 
     var pointerTmpColor
         get() = preferences.getInt("POINTER_TMP_COLOR", 0)
-        set(value) = preferences.edit(true) {
-            putInt("POINTER_TMP_COLOR", value)
-        }
+        set(value) = putInt("POINTER_TMP_COLOR", value)
 
     var mouseTmpColor
         get() = preferences.getInt("MOUSE_TMP_COLOR", 0)
-        set(value) = preferences.edit(true) {
-            putInt("MOUSE_TMP_COLOR", value)
-        }
+        set(value) = putInt("MOUSE_TMP_COLOR", value)
 
     var isExtDialogCancelled
         get() = preferences.getBoolean(mContext.getString(R.string.key_ext_dialog_cancel), false)
-        set(value) = preferences.edit(true) {
-            putBoolean(mContext.getString(R.string.key_ext_dialog_cancel), value)
-        }
+        set(value) = putBoolean(mContext.getString(R.string.key_ext_dialog_cancel), value)
+
     var isShowTouches
         get() = preferences.getBoolean(mContext.getString(R.string.key_show_touches), false)
-        set(value) = preferences.edit(true) {
-            putBoolean(mContext.getString(R.string.key_show_touches), value)
-        }
+        set(value) = putBoolean(mContext.getString(R.string.key_show_touches), value)
+
     var orderBy
         get() = preferences.getString(mContext.getString(R.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_repo_order_by), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_repo_order_by), value)
 
     var safUri
         get() = preferences.getString(mContext.getString(R.string.key_saf_uri), null)
-        set(value) = preferences.edit(true) {
-            putString(mContext.getString(R.string.key_saf_uri), value)
-        }
+        set(value) = putString(mContext.getString(R.string.key_saf_uri), value)
 
     var isFirstInstalled
         get() = preferences.getBoolean(Constants.PREF_KEY_FIRST_INSTALL, true)
-        set(value) = preferences.edit(true) {
-            putBoolean(Constants.PREF_KEY_FIRST_INSTALL, value)
-        }
+        set(value) = putBoolean(Constants.PREF_KEY_FIRST_INSTALL, value)
 }
