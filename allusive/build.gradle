@@ -46,6 +46,9 @@ android {
             }
         }
     }
+    signingConfigs {
+        release
+    }
     buildTypes {
         release {
             shrinkResources true
@@ -53,6 +56,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexKeepProguard file('proguard-rules.pro')
             multiDexKeepFile file('main_dex.txt')
+            signingConfig signingConfigs.release
         }
         debug {
             ext.alwaysUpdateBuildId = false
@@ -77,6 +81,7 @@ android {
         }
 
         prod {
+
         }
     }
     compileOptions {
@@ -90,6 +95,18 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+
+    if (System.getenv("CI") == "true") {
+        signingConfigs {
+            release {
+                storeFile = file("../keystore.jks")
+                storePassword = System.getenv("keystore_pass")
+                keyAlias = System.getenv("key_alias")
+                keyPassword = System.getenv("key_pass")
+            }
+        }
+
     }
 }
 
