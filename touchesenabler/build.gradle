@@ -82,19 +82,23 @@ dependencies {
     implementation "com.google.firebase:firebase-storage:${firebaseStorageVersion}"
     implementation "com.crashlytics.sdk.android:crashlytics:${crashlyticsVersion}"
 
-    implementation "androidx.preference:preference:${preferenceVersion}"
     implementation "androidx.appcompat:appcompat:${appcompatVersion}"
-    implementation "androidx.multidex:multidex:${multidexVersion}"
-    implementation "com.google.android.material:material:${googleMaterialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${constraintlayoutVersion}"
+    implementation "androidx.multidex:multidex:${multidexVersion}"
+    implementation "androidx.preference:preference:${preferenceVersion}"
+    implementation "com.google.android.material:material:${googleMaterialVersion}"
 
     implementation "com.android.billingclient:billing:${billingVersion}"
+    implementation "com.android.billingclient:billing-ktx:${billingVersion}"
 
     implementation "org.jetbrains.anko:anko-commons:${ankoCommonsVersion}"
     implementation project(path: ':core')
 
     implementation "com.afollestad.material-dialogs:core:${materialDialogsVersion}"
     implementation "com.afollestad.material-dialogs:bottomsheets:${materialDialogsVersion}"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinxCoroutinesVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinxCoroutinesVersion}"
 }
 
 apply plugin: 'com.google.gms.google-services'

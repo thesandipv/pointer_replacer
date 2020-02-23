@@ -32,8 +32,12 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
-import com.anjlab.android.iab.v3.BillingProcessor
-import com.anjlab.android.iab.v3.TransactionDetails
+import com.afollestad.materialdialogs.LayoutMode
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.list.listItems
+import com.afterroot.core.extensions.showStaticProgressDialog
+import com.android.billingclient.api.*
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
@@ -41,15 +45,17 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.*
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.toast
 import java.io.File
 
-class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandler {
+class MainFragment : PreferenceFragmentCompat() {
 
+    private lateinit var billingClient: BillingClient
     private lateinit var config: FirebaseRemoteConfig
     private lateinit var donatePreference: Preference
     private lateinit var editor: SharedPreferences.Editor
@@ -59,16 +65,10 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     private lateinit var showTouchPref: SwitchPreferenceCompat
     private val _tag: String = "TouchEnabler"
     private val isDisableAds: Boolean get() = sharedPreferences.getBoolean(getString(R.string.key_disable_ads), false)
-    private var billingProcessor: BillingProcessor? = null
     private var dialog: AlertDialog? = null
-    private var isPurchased: Boolean? = false
-    private var isReadyToPurchase: Boolean = false
 
     private val currentSetting
-        get() = Settings.System.getInt(
-            activity!!.contentResolver,
-            getString(R.string.key_show_touches)
-        )
+        get() = Settings.System.getInt(activity!!.contentResolver, getString(R.string.key_show_touches))
 
 
     @SuppressLint("CommitPrefEdits")
@@ -81,6 +81,7 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
 
         prefShowTouches()
         prefOthers()
+        initBilling()
 
         val isFirstInstall = sharedPreferences.getBoolean("first_install_2", true)
         if (isFirstInstall) {
@@ -106,52 +107,157 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                 config.setConfigSettingsAsync(this)
             }
 
-        config.fetch(config.info.fetchTimeMillis)
+        config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
             .addOnCompleteListener(this.activity!!) { task ->
                 if (task.isSuccessful) {
                     config.activate()
-                    setUpBilling()
                     prefVersion()
                     setUpAds()
+                    prefDonate(true)
                 } else {
+                    prefDonate(false)
                     Log.d(_tag, "onCreate: Error getting RemoteConfig")
                 }
             }
     }
 
-    private fun setUpBilling() {
-        if (!BillingProcessor.isIabServiceAvailable(context)) {
-            activity?.root_layout?.snackbar(getString(R.string.msg_info_iab_na))
-        }
-
-        billingProcessor = BillingProcessor.newBillingProcessor(
-            context,
-            config.getString(INAPP_LICENCE_KEY),
-            this
-        )
-        billingProcessor?.initialize()
-
-        isPurchased = billingProcessor?.isPurchased(config.getString(PRODUCT_ID_KEY_1))
-
-        prefDonate()
+    //[Billing Start]
+    private fun initBilling() {
+        billingClient =
+            BillingClient.newBuilder(context!!).enablePendingPurchases().setListener { _, purchases ->
+                val purchase = purchases?.first()
+                if (purchase != null) { //Consume every time after successful purchase
+                    val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
+                    billingClient.consumeAsync(params) { result, purchaseToken ->
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK && purchaseToken != null) {
+                            Log.d(TAG, "initBilling: Purchase Done and Consumed")
+                        } else Log.d(TAG, "initBilling: Purchase Done but not Consumed.")
+                    }
+                }
+            }.build()
     }
 
-    //Donate Preference
-    private fun prefDonate() {
-        //Donate Preference
-        donatePreference = findPreference(getString(R.string.key_pref_donate))!!
-        donatePreference.apply {
-            isEnabled = !isPurchased!!
-            summary =
-                if (isPurchased!!) getString(R.string.msg_donation_done) else getString(R.string.pref_summary_donation)
-            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                if (BuildConfig.DEBUG) {
-                    Toast.makeText(activity!!, config.getString(PRODUCT_ID_KEY_1), Toast.LENGTH_SHORT).show()
+    suspend fun queryPurchaseHistory() {
+        val purchaseHistoryResult = withContext(Dispatchers.IO) {
+            billingClient.queryPurchaseHistory(BillingClient.SkuType.INAPP)
+        }
+        if (purchaseHistoryResult.billingResult.responseCode == BillingClient.BillingResponseCode.OK &&
+            purchaseHistoryResult.purchaseHistoryRecordList!!.isNotEmpty()
+        ) {
+            purchaseHistoryResult.purchaseHistoryRecordList!!.forEach { purchaseHistoryRecord: PurchaseHistoryRecord ->
+                val params = ConsumeParams.newBuilder().setPurchaseToken(purchaseHistoryRecord.purchaseToken).build()
+                billingClient.consumeAsync(params) { result, purchaseToken ->
+                    if (result.responseCode == BillingClient.BillingResponseCode.OK && purchaseToken != null) {
+                        Log.d(TAG, "queryPurchaseHistory: Purchase Consumed")
+                    } else Log.d(TAG, "queryPurchaseHistory: Purchase not Consumed.")
                 }
-                billingProcessor!!.purchase(activity, config.getString(PRODUCT_ID_KEY_1))
             }
         }
     }
+
+    private lateinit var loadingDialog: MaterialDialog
+    private fun setUpBilling() {
+        loadingDialog = context!!.showStaticProgressDialog(getString(R.string.text_please_wait))
+        loadingDialog.show()
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingServiceDisconnected() {
+                activity!!.container.snackbar("Something went wrong.")
+            }
+
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    GlobalScope.launch {
+                        loadAllSku()
+                        queryPurchaseHistory()
+                    }
+                }
+            }
+        })
+    }
+
+    suspend fun loadAllSku() {
+        if (billingClient.isReady) {
+            val skuModel = Gson().fromJson(config.getString("touches_sku_list"), SkuModel::class.java)
+            val params = SkuDetailsParams.newBuilder()
+            params.setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP)
+            val skuDetailsResult = withContext(Dispatchers.IO) {
+                billingClient.querySkuDetails(params.build())
+            }
+            if (skuDetailsResult.billingResult.responseCode == BillingClient.BillingResponseCode.OK &&
+                skuDetailsResult.skuDetailsList!!.isNotEmpty()
+            ) {
+                withContext(Dispatchers.Default) {
+                    delay(100)
+                    loadingDialog.dismiss()
+                }
+
+                val list = ArrayList<String>()
+                for (skuDetails in skuDetailsResult.skuDetailsList!!) {
+                    list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
+                }
+                withContext(Dispatchers.Main) {
+                    MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                        listItems(items = list) { _, index, _ ->
+                            val billingFlowParams =
+                                BillingFlowParams.newBuilder().setSkuDetails(skuDetailsResult.skuDetailsList!![index])
+                                    .build()
+                            billingClient.launchBillingFlow(activity!!, billingFlowParams)
+                        }
+                        title(R.string.pref_title_donate_dev)
+                        negativeButton(android.R.string.cancel)
+                    }
+
+                }
+            }
+        } else Log.d(TAG, "loadAllSku: Billing not ready")
+
+    }
+
+/*
+    private fun loadAllSku() {
+        val skuModel = Gson().fromJson(config.getString("touches_sku_list"), SkuModel::class.java)
+        if (billingClient.isReady) {
+            val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
+            billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
+                    Handler().postDelayed({
+                        loadingDialog.dismiss()
+                    }, 100)
+
+                    val list = ArrayList<String>()
+                    for (skuDetails in skuDetailsList) {
+                        list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
+                    }
+                    MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                        listItems(items = list) { _, index, _ ->
+                            val billingFlowParams =
+                                BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[index]).build()
+                            billingClient.launchBillingFlow(activity!!, billingFlowParams)
+                        }
+                        title(R.string.pref_title_donate_dev)
+                        negativeButton(android.R.string.cancel)
+                    }
+                }
+            }
+        } else Log.d(TAG, "loadAllSku: Billing not ready")
+    }
+*/
+
+    data class SkuModel(val sku: List<String>)
+
+    //Donate Preference
+    private fun prefDonate(isEnable: Boolean) {
+        //Donate Preference
+        donatePreference = findPreference(getString(R.string.key_pref_donate))!!
+        donatePreference.apply {
+            isEnabled = isEnable
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                setUpBilling()
+                return@OnPreferenceClickListener true
+            }
+        }
+    }
+    //[/Billing End]
 
     //Version Preference
     private fun prefVersion() {
@@ -246,11 +352,6 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         dialog?.dismiss()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (!BuildConfig.DEBUG) billingProcessor?.release()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             if (requestCode == RC_OPEN_TEL) {
@@ -276,9 +377,6 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
                     3 -> activity!!.root_layout.snackbar(getString(R.string.msg_error)) //Other error
                 }
             }
-            if (!billingProcessor?.handleActivityResult(requestCode, resultCode, data)!!) {
-                super.onActivityResult(requestCode, resultCode, data)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -291,44 +389,6 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
         } catch (e: PackageManager.NameNotFoundException) {
             false
         }
-    }
-
-    override fun onBillingInitialized() {
-        if (BuildConfig.DEBUG) {
-            activity!!.root_layout.snackbar("Billing Initialized")
-        }
-        isReadyToPurchase = true
-        billingProcessor?.loadOwnedPurchasesFromGoogle()
-        if (billingProcessor!!.isPurchased(config.getString(PRODUCT_ID_KEY_1))) {
-            if (!BuildConfig.DEBUG) {
-                findPreference<Preference>(getString(R.string.key_pref_donate))?.apply {
-                    isEnabled = false
-                    summary = getString(R.string.msg_donation_done)
-                }
-            }
-            findPreference<Preference>(getString(R.string.key_disable_ads))?.apply {
-                isVisible = true
-            }
-        }
-    }
-
-    override fun onPurchaseHistoryRestored() {
-        context?.toast("History Restored")
-    }
-
-    override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-        activity!!.root_layout.snackbar(getString(R.string.msg_donation_thanks))
-        when (productId) {
-            config.getString(PRODUCT_ID_KEY_1) -> donatePreference.apply {
-                isEnabled = false
-                summary = getString(R.string.msg_donation_done)
-            }
-        }
-    }
-
-    override fun onBillingError(errorCode: Int, error: Throwable?) {
-        activity!!.root_layout.snackbar("${getString(R.string.msg_billing_error)} $errorCode")
-        donatePreference.summary = "${getString(R.string.msg_billing_error)} $errorCode"
     }
 
     private fun setUpAds() {
@@ -419,12 +479,13 @@ class MainFragment : PreferenceFragmentCompat(), BillingProcessor.IBillingHandle
     }
 
     companion object {
+        const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
         const val INAPP_LICENCE_KEY = "inapp_licence_key"
         const val PRODUCT_ID_KEY_1 = "product_id_1"
         const val PRODUCT_ID_KEY_2 = "product_id_2"
-        const val ACTION_OPEN_TEL = "com.afterroot.action.OPEN_TPL"
         const val RC_OPEN_TEL = 245
         const val REMOTE_CONFIG_LATEST_BUILD = "touch_enabler_latest_build"
+        private const val TAG = "MainFragment"
     }
 
 }
