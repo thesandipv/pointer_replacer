@@ -25,7 +25,7 @@ deploy:
   provider: releases
   api_key:
     secure: nuDtXHrckr7+cvmJMgVlsnnVmCr/5dhcNwMLHKunb3qbMbocdyBrGM9hnosgPf2TYdu7GFNzXdzpg9W+a1tOKAWiPANRnQhEyUhb/MQ9K7i/ePb6tbQMO53A206Th0Z5ySY+SJAC0/GqOzdfyNeF/2H3qIVI2qXse8mv7h9ziQ9yq0e1ATzKNcAOY8XGVtdBdxXkc/rYUd7GnR6Hvarep/kvYUJKMbJo7zFEel+CjwSMWwF6GptmFvAatvqs5pz5hvnkyUgn+C3wnoVmpfILXvrSnm7WmyDXGVzOkkYqwFVNxNIXUwffH5rs7s5++PCc12GUYGlUz6tzB0/L5nl8INpYHTVNuX/ogXE+sfnSMxEzLW3iEHi13PPBSHbjbk0uhmWdTwbf/m+Y8LEKTeMiX9rj3YwaVc8HvH7Sqzle6JYAQ4c/oIj/IUkX31nM9K9P4rzqwYUjFStlNUpPt80aPb1b9tUzTjeD5quzY5+lOcBHWP916jKiq8EtsqGEU7010RBkjRmurajHpKPtyz4+nM4uY98dNu3qRLl/VcCn0V+MTqM+Nnf23JWCYsJlCleW303f/U/81iDbpPP5mZAHu+KVx1dSSA582DLPywL6kcKey5EnGcnJK0qIp312RnpFLuSwpMyyWZmbdQmmACW8493/wxXjIhF3ZMBYqVHY+YI=
-  file: /home/travis/build/sandipv22/pointer_replacer/allusive/build/outputs/apk/release/*
+  file: /home/travis/build/sandipv22/pointer_replacer/dev/release/*
   skip_cleanup: true
   overwrite: true
   on:
