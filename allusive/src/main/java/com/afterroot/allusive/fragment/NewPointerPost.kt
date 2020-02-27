@@ -56,7 +56,6 @@ import java.io.IOException
 
 class NewPointerPost : Fragment() {
 
-    private val _tag = "NewPointerPost"
     private val db: FirebaseFirestore by inject()
     private val pointerDescription: String get() = edit_desc.text.toString().trim()
     private val pointerName: String get() = edit_name.text.toString().trim()
@@ -83,13 +82,13 @@ class NewPointerPost : Fragment() {
             startActivityForResult(chooserIntent, RC_PICK_IMAGE)
         }
 
-        activity!!.fab_apply.apply {
+        requireActivity().fab_apply.apply {
             setOnClickListener {
                 if (verifyData()) {
                     upload(saveTmpPointer())
                 }
             }
-            icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
         }
 
         val adRequest = AdRequest.Builder()
@@ -112,7 +111,7 @@ class NewPointerPost : Fragment() {
     }
 
     private fun upload(file: File) {
-        val dialog = context!!.showStaticProgressDialog(getString(R.string.text_progress_init))
+        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_init))
         val customView = dialog.getCustomView()
 
         val storageRef = storage.reference
@@ -136,8 +135,9 @@ class NewPointerPost : Fragment() {
                     time = Timestamp.now().toDate()
                 )
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
-                    activity!!.apply {
-                        container.snackbar(getString(R.string.msg_pointer_upload_success)).anchorView = activity!!.navigation
+                    requireActivity().apply {
+                        container.snackbar(getString(R.string.msg_pointer_upload_success)).anchorView =
+                            requireActivity().navigation
                         dialog.dismiss()
                         fragment_repo_nav.findNavController().navigateUp()
                     }
@@ -145,7 +145,7 @@ class NewPointerPost : Fragment() {
             }
         }.addOnFailureListener {
             pointer_thumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
-            activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+            requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
         }
     }
 
@@ -156,7 +156,7 @@ class NewPointerPost : Fragment() {
     private fun saveTmpPointer(): File {
         pointer_thumb.background = null
         val bitmap = loadBitmapFromView(pointer_thumb)
-        val file = File.createTempFile("pointer", ".png", context!!.cacheDir)
+        val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
         val out: FileOutputStream
         try {
             out = FileOutputStream(file)
@@ -187,8 +187,8 @@ class NewPointerPost : Fragment() {
         }
 
         if (!isPointerImported) {
-            activity!!.container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
-                activity!!.navigation
+            requireActivity().container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
+                requireActivity().navigation
             isOK = false
         }
 

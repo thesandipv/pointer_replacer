@@ -95,24 +95,24 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     override fun onResume() {
         super.onResume()
 
-        if (!context!!.isNetworkAvailable()) {
+        if (!requireContext().isNetworkAvailable()) {
             repo_swipe_refresh.visible(false)
             layout_no_network.visible(true)
             button_retry.setOnClickListener {
                 onResume()
             }
-            activity!!.fab_apply.hide()
+            requireActivity().fab_apply.hide()
         } else {
-            activity!!.fab_apply.apply {
+            requireActivity().fab_apply.apply {
                 show()
                 setOnClickListener {
-                    if (!context!!.isNetworkAvailable()) {
-                        context!!.toast(getString(R.string.dialog_title_no_network))
+                    if (!requireContext().isNetworkAvailable()) {
+                        requireContext().toast(getString(R.string.dialog_title_no_network))
                         return@setOnClickListener
                     }
-                    activity!!.findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
+                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
                 }
-                icon = context!!.getDrawableExt(R.drawable.ic_add)
+                icon = requireContext().getDrawableExt(R.drawable.ic_add)
             }
 
             repo_swipe_refresh.visible(true)
@@ -132,7 +132,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             pointersFolder = getString(R.string.pointer_folder_path)
             extSdDir = Environment.getExternalStorageDirectory().toString()
             mTargetPath = extSdDir + pointersFolder
-            settings = Settings(context!!)
+            settings = Settings(requireContext())
             setUpList()
         }
     }
@@ -140,7 +140,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private fun setUpList() {
         pointerAdapter = PointerAdapterDelegate(this, getKoin())
         list.apply {
-            val lm = LinearLayoutManager(context!!)
+            val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
         }
@@ -193,7 +193,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun showPointerInfoDialog(position: Int) {
-        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
+        val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.fragment_pointer_info, scrollable = true)
         }
 
@@ -249,12 +249,13 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun downloadPointer(position: Int) {
-        val dialog = context!!.showStaticProgressDialog(getString(R.string.text_progress_downloading))
+        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
         val file = File("$mTargetPath${pointersList[position].filename}")
         onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
             ref.getBytes(1024 * 1024).addOnSuccessListener { bytes ->
-                activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+                requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
+                    requireActivity().navigation
                 val p = pointersList[position]
                 var id = ""
                 var name = ""
@@ -270,7 +271,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     uploader_name = name
                 )
                 try {
-                    this.activity!!.contentResolver
+                    this.requireActivity().contentResolver
                         .openFileDescriptor(pointersDocument.createFile("", p.filename)?.uri!!, "w").use { pfd ->
                             FileOutputStream(pfd!!.fileDescriptor).use {
                                 it.write(bytes)
@@ -294,12 +295,13 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 }
 
             }.addOnFailureListener {
-                activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
                 dialog.dismiss()
             }
         }, {
             ref.getFile(file).addOnSuccessListener {
-                activity!!.container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView = activity!!.navigation
+                requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
+                    requireActivity().navigation
                 if (!BuildConfig.DEBUG) {
                     pointersSnapshot.documents[position].reference.update(
                         DatabaseFields.FIELD_DOWNLOADS,
@@ -326,7 +328,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
                 dialog.dismiss()
             }.addOnFailureListener {
-                activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
                 dialog.dismiss()
             }
         })
@@ -341,12 +343,12 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         else pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
         if (!isIdMatch) return
         val list = arrayListOf(getString(R.string.text_edit), getString(R.string.text_delete))
-        MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+        MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             cornerRadius(16f)
             listItems(items = list) { _, _, text ->
                 when (text) {
                     getString(R.string.text_edit) -> {
-                        activity!!.container.snackbar("Will arrive soon.").anchorView = activity!!.navigation
+                        requireActivity().container.snackbar("Will arrive soon.").anchorView = requireActivity().navigation
                     }
                     getString(R.string.text_delete) -> {
                         MaterialDialog(context).show {

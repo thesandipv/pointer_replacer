@@ -52,7 +52,7 @@ class EditProfileFragment : Fragment() {
                 input_profile_name.setText(user.displayName)
                 input_email.setText(user.email)
                 input_email.isEnabled = false
-                activity!!.fab_apply.apply {
+                requireActivity().fab_apply.apply {
                     setOnClickListener {
                         val newName = this@with.input_profile_name.text.toString().trim()
                         if (user.displayName != newName) {
@@ -61,17 +61,17 @@ class EditProfileFragment : Fragment() {
                                 .build()
                             user.updateProfile(request).addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    activity!!.container.snackbar(getString(R.string.msg_profile_updated))
-                                        .anchorView = activity!!.navigation
+                                    requireActivity().container.snackbar(getString(R.string.msg_profile_updated))
+                                        .anchorView = requireActivity().navigation
                                     db.collection(DatabaseFields.COLLECTION_USERS)
                                         .document(user.uid)
                                         .update(DatabaseFields.FIELD_NAME, newName)
                                 }
                             }
-                        } else activity!!.container.snackbar(getString(R.string.msg_no_changes))
-                            .anchorView = activity!!.navigation
+                        } else requireActivity().container.snackbar(getString(R.string.msg_no_changes))
+                            .anchorView = requireActivity().navigation
                     }
-                    icon = context!!.getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
+                    icon = requireContext().getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
                 }
             }
         } else {

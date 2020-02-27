@@ -77,12 +77,10 @@ import java.io.IOException
 class MainFragment : Fragment() {
 
     private lateinit var interstitialAd: InterstitialAd
-    private val _tag = "MainFragment"
     private val myDatabase: MyDatabase by inject()
     private val pointersDocument: DocumentFile by inject()
     private val settings: Settings by inject()
     private var extSdDir: String? = null
-    private var pointerPreviewPath: String? = null
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -100,7 +98,7 @@ class MainFragment : Fragment() {
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
 
-        activity!!.apply {
+        requireActivity().apply {
             layout_new_pointer.setOnClickListener { showListPointerChooser(pointerType = POINTER_TOUCH) }
             layout_new_mouse.setOnClickListener {
                 showListPointerChooser(
@@ -112,7 +110,7 @@ class MainFragment : Fragment() {
                 setOnClickListener {
                     applyPointer()
                 }
-                icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
             }
             setUpAd()
 
@@ -120,9 +118,9 @@ class MainFragment : Fragment() {
 
             action_customize.setOnClickListener {
                 if (!isPointerSelected()) {
-                    activity!!.container.snackbar(
+                    requireActivity().container.snackbar(
                         message = getString(R.string.msg_pointer_not_selected)
-                    ).anchorView = activity!!.navigation
+                    ).anchorView = requireActivity().navigation
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_TOUCH)
@@ -134,9 +132,9 @@ class MainFragment : Fragment() {
 
             action_customize_mouse.setOnClickListener {
                 if (!isMouseSelected()) {
-                    activity!!.container.snackbar(
+                    requireActivity().container.snackbar(
                         message = getString(R.string.msg_mouse_not_selected)
-                    ).anchorView = activity!!.navigation
+                    ).anchorView = requireActivity().navigation
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_MOUSE)
@@ -176,13 +174,15 @@ class MainFragment : Fragment() {
 
         try {
             if (size <= 0) {
-                size = context!!.getMinPointerSize()
+                size = requireContext().getMinPointerSize()
             }
             if (mouseSize <= 0) {
-                mouseSize = context!!.getMinPointerSize()
+                mouseSize = requireContext().getMinPointerSize()
             }
             if (pointerPath != null) {
                 current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
+                current_pointer.minimumHeight = requireContext().getMinPointerSizePx()
+                current_pointer.minimumWidth = requireContext().getMinPointerSizePx()
                 text_no_pointer_applied.visible(false)
             } else {
                 text_no_pointer_applied.visible(true)
@@ -209,7 +209,7 @@ class MainFragment : Fragment() {
                 } else {
                     Uri.fromFile(File(selectedPointerPath))
                 }
-                GlideApp.with(context!!)
+                GlideApp.with(requireContext())
                     .load(uri)
                     .into(selected_pointer)
             }
@@ -225,7 +225,7 @@ class MainFragment : Fragment() {
                 } else {
                     Uri.fromFile(File(selectedMousePath))
                 }
-                GlideApp.with(context!!)
+                GlideApp.with(requireContext())
                     .load(uri)
                     .into(selected_mouse)
             }
@@ -237,18 +237,18 @@ class MainFragment : Fragment() {
     @Throws(IOException::class)
     private fun applyPointer() {
         if (!isPointerSelected()) {
-            activity!!.container.snackbar(
+            requireActivity().container.snackbar(
                 message = getString(R.string.msg_pointer_not_selected)
-            ).anchorView = activity!!.navigation
+            ).anchorView = requireActivity().navigation
             return
         }
         if (!isMouseSelected()) {
-            activity!!.container.snackbar(
+            requireActivity().container.snackbar(
                 message = getString(R.string.msg_mouse_not_selected)
-            ).anchorView = activity!!.navigation
+            ).anchorView = requireActivity().navigation
             return
         }
-        val filesDir = activity!!.filesDir.path
+        val filesDir = requireActivity().filesDir.path
         val pointerPath = "$filesDir/pointer.png"
         val mousePath = "$filesDir/mouse.png"
         settings.pointerPath = pointerPath
@@ -269,30 +269,30 @@ class MainFragment : Fragment() {
 
         interstitialAd.apply {
             if (isLoaded) show() else {
-                activity!!.container.longSnackbar(
+                requireActivity().container.longSnackbar(
                     message = getString(R.string.text_pointer_applied),
                     actionText = getString(R.string.reboot)
                 ) {
                     showRebootDialog()
-                }.anchorView = activity!!.navigation
+                }.anchorView = requireActivity().navigation
             }
             adListener = object : AdListener() {
                 override fun onAdClosed() {
                     super.onAdClosed()
                     interstitialAd.loadAd(AdRequest.Builder().build())
-                    activity!!.container.longSnackbar(
+                    requireActivity().container.longSnackbar(
                         message = getString(R.string.text_pointer_applied),
                         actionText = getString(R.string.reboot)
                     ) {
                         showRebootDialog()
-                    }.anchorView = activity!!.navigation
+                    }.anchorView = requireActivity().navigation
                 }
             }
         }
     }
 
     private fun showRebootDialog() {
-        MaterialDialog(activity!!).show {
+        MaterialDialog(requireActivity()).show {
             title(res = R.string.reboot)
             message(res = R.string.text_reboot_confirm)
             positiveButton(res = R.string.reboot) {
@@ -321,7 +321,7 @@ class MainFragment : Fragment() {
         }
         banner_ad_main.loadAd(adRequest.build())
 
-        interstitialAd = InterstitialAd(this.activity!!)
+        interstitialAd = InterstitialAd(this.requireActivity())
         interstitialAd.apply {
             adUnitId = if (BuildConfig.DEBUG) {
                 getString(R.string.ad_interstitial_test_id)
@@ -415,7 +415,7 @@ class MainFragment : Fragment() {
 
     lateinit var pointerAdapter: PointerAdapterDelegate
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
-        val dialog = MaterialDialog(context!!, BottomSheet(LayoutMode.MATCH_PARENT)).show {
+        val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_list_bottomsheet)
             title(text = title)
             noAutoDismiss()
@@ -437,15 +437,15 @@ class MainFragment : Fragment() {
                     settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    GlideApp.with(context!!)
+                    GlideApp.with(requireContext())
                         .load(pointersDocument.findFile(selectedItem.file_name)?.uri)
-                        .override(context!!.getMinPointerSize())
-                        .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                        .override(requireContext().getMinPointerSize())
+                        .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
                 } else {
-                    GlideApp.with(context!!)
+                    GlideApp.with(requireContext())
                         .load(File(targetPath + selectedItem.file_name))
-                        .override(context!!.getMinPointerSize())
-                        .into(if (pointerType == POINTER_TOUCH) activity!!.selected_pointer else activity!!.selected_mouse)
+                        .override(requireContext().getMinPointerSize())
+                        .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
                 }
                 dialog.dismiss()
             }
@@ -453,7 +453,7 @@ class MainFragment : Fragment() {
             override fun onLongClick(position: Int) {
                 val selectedItem = pointerAdapter.getItem(position) as RoomPointer
                 val file = File(targetPath + selectedItem.file_name)
-                MaterialDialog(activity!!).show {
+                MaterialDialog(requireActivity()).show {
                     title(text = "${getString(R.string.text_delete)} ${file.name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
@@ -473,7 +473,7 @@ class MainFragment : Fragment() {
 
         }, getKoin())
         dialogView.list_pointers.apply {
-            val lm = LinearLayoutManager(context!!)
+            val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             this.adapter = pointerAdapter
@@ -490,7 +490,7 @@ class MainFragment : Fragment() {
                     text_dialog_hint.visible(pointerAdapter.getList().isNotEmpty())
                     bs_button_install_pointers.setOnClickListener {
                         dialog.dismiss()
-                        activity!!.findNavController(R.id.fragment_repo_nav)
+                        requireActivity().findNavController(R.id.fragment_repo_nav)
                             .navigate(R.id.repoFragment)
                     }
                     bs_button_import_pointers.setOnClickListener {
@@ -512,7 +512,7 @@ class MainFragment : Fragment() {
             }
             else -> {
                 return item.onNavDestinationSelected(
-                    activity!!.findNavController(R.id.fragment_repo_nav)
+                    requireActivity().findNavController(R.id.fragment_repo_nav)
                 ) || super.onOptionsItemSelected(
                     item
                 )
@@ -522,18 +522,18 @@ class MainFragment : Fragment() {
     }
 
     private fun signOutDialog(): AlertDialog.Builder {
-        return AlertDialog.Builder(context!!)
+        return AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.dialog_title_sign_out))
             .setMessage(getString(R.string.dialog_msg_sign_out))
             .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
-                AuthUI.getInstance().signOut(context!!).addOnSuccessListener {
+                AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
                     Toast.makeText(
-                        context!!,
+                        requireContext(),
                         getString(R.string.dialog_sign_out_result_success),
                         Toast.LENGTH_SHORT
                     )
                         .show()
-                    startActivity(Intent(context!!, SplashActivity::class.java))
+                    startActivity(Intent(requireContext(), SplashActivity::class.java))
                 }
             }
             .setNegativeButton(android.R.string.cancel) { _, _ ->
