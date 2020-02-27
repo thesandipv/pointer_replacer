@@ -65,7 +65,7 @@ class CustomizeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_customize_pointer, container, false)
-        pointerType = arguments!!.getInt("TYPE")
+        pointerType = requireArguments().getInt("TYPE")
         return view
     }
 
@@ -89,7 +89,7 @@ class CustomizeFragment : Fragment() {
 
         view.image_customize_pointer.setColorFilter(typeColor)
 
-        GlideApp.with(context!!)
+        GlideApp.with(requireContext())
             .load(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     pointersDocument.findFile(
@@ -103,26 +103,26 @@ class CustomizeFragment : Fragment() {
             )
             .into(image_customize_pointer)
 
-        activity!!.fab_apply.apply {
+        requireActivity().fab_apply.apply {
             setOnClickListener {
                 if (pointerType == POINTER_TOUCH) {
                     settings.apply {
-                        pointerSize = minSize + getView()!!.seekBarSize.progress
-                        pointerPadding = getView()!!.seekBarPadding.progress
-                        pointerAlpha = getView()!!.seekBarAlpha.progress
+                        pointerSize = minSize + requireView().seekBarSize.progress
+                        pointerPadding = requireView().seekBarPadding.progress
+                        pointerAlpha = requireView().seekBarAlpha.progress
                         pointerColor = selectedColor
                     }
                 } else {
                     settings.apply {
-                        mouseSize = minSize + getView()!!.seekBarSize.progress
-                        mousePadding = getView()!!.seekBarPadding.progress
-                        mouseAlpha = getView()!!.seekBarAlpha.progress
+                        mouseSize = minSize + requireView().seekBarSize.progress
+                        mousePadding = requireView().seekBarPadding.progress
+                        mouseAlpha = requireView().seekBarAlpha.progress
                         mouseColor = selectedColor
                     }
                 }
-                activity!!.fragment_repo_nav.findNavController().navigateUp()
+                requireActivity().fragment_repo_nav.findNavController().navigateUp()
             }
-            icon = context!!.getDrawableExt(R.drawable.ic_action_apply)
+            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
         }
 
         setSeekBars()
@@ -134,9 +134,9 @@ class CustomizeFragment : Fragment() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (pointerType == POINTER_TOUCH) {
-                view!!.image_customize_pointer.transitionName = getString(R.string.main_fragment_transition)
+                requireView().image_customize_pointer.transitionName = getString(R.string.main_fragment_transition)
             } else {
-                view!!.image_customize_pointer.transitionName = getString(R.string.transition_mouse)
+                requireView().image_customize_pointer.transitionName = getString(R.string.transition_mouse)
             }
         }
         TransitionSet()
@@ -151,7 +151,7 @@ class CustomizeFragment : Fragment() {
     }
 
     private val minSize: Int
-        get() = context!!.getMinPointerSize()
+        get() = requireContext().getMinPointerSize()
 
 
     /**
@@ -247,12 +247,12 @@ class CustomizeFragment : Fragment() {
     }
 
     private fun setLayoutSize(size: Int) {
-        activity!!.image_customize_pointer.layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
+        requireActivity().image_customize_pointer.layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
 
     }
 
     private fun setLayoutPadding(padding: Int) {
-        activity!!.image_customize_pointer.setPadding(padding, padding, padding, padding)
+        requireActivity().image_customize_pointer.setPadding(padding, padding, padding, padding)
 
     }
 
@@ -285,13 +285,13 @@ class CustomizeFragment : Fragment() {
         action_change_color.setOnClickListener {
             val tmpColor = if (pointerType == POINTER_TOUCH) settings.pointerTmpColor else settings.mouseTmpColor
 
-            MaterialDialog(context!!).show {
+            MaterialDialog(requireContext()).show {
                 title(R.string.choose_color)
                 colorChooser(
                     ColorPalette.Primary,
                     ColorPalette.PrimarySub, allowCustomArgb = true, showAlphaSelector = true, initialSelection = tmpColor
                 ) { _, selectedColor ->
-                    this@CustomizeFragment.view!!.image_customize_pointer.setColorFilter(selectedColor)
+                    this@CustomizeFragment.requireView().image_customize_pointer.setColorFilter(selectedColor)
                     this@CustomizeFragment.selectedColor = selectedColor
                     if (pointerType == POINTER_TOUCH) {
                         settings.pointerTmpColor = selectedColor
@@ -307,7 +307,7 @@ class CustomizeFragment : Fragment() {
                 settings.pointerTmpColor = 0
             } else settings.mouseTmpColor = 0
             selectedColor = 0
-            this@CustomizeFragment.view!!.image_customize_pointer.setColorFilter(0)
+            this@CustomizeFragment.requireView().image_customize_pointer.setColorFilter(0)
         }
     }
 }

@@ -96,7 +96,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun initBilling() {
         billingClient =
-            BillingClient.newBuilder(context!!).enablePendingPurchases().setListener { _, purchases ->
+            BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener { _, purchases ->
                 val purchase = purchases?.first()
                 if (purchase != null) { //Consume every time after successful purchase
                     val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
@@ -119,7 +119,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
 
             config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
-                .addOnCompleteListener(activity!!) { result ->
+                .addOnCompleteListener(requireActivity()) { result ->
                     if (result.isSuccessful) {
                         firebaseRemoteConfig.activate()
                         setDonatePref(true)
@@ -151,7 +151,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("licenses")?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 OssLicensesMenuActivity.setActivityTitle("Licences").apply { }
-                startActivity(Intent(context!!, OssLicensesMenuActivity::class.java))
+                startActivity(Intent(requireContext(), OssLicensesMenuActivity::class.java))
                 return@OnPreferenceClickListener true
             }
         }
@@ -187,10 +187,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 action = ACTION_OPEN_TEL
                 putExtra(EXTRA_TOUCH_VAL, if (newValue == true) 1 else 0)
             }
-            if (i.resolveActivity(activity!!.packageManager) != null) {
+            if (i.resolveActivity(requireActivity().packageManager) != null) {
                 startActivityForResult(i, RC_OPEN_TEL)
             } else {
-                Toast.makeText(activity!!, getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(), getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
                 installExtensionDialog().show()
             }
             true
@@ -201,7 +201,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
             summary = settings.maxPointerPadding.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(activity!!).show {
+                MaterialDialog(requireActivity()).show {
                     title(res = R.string.key_maxPaddingSize)
                     input(
                         hint = getString(R.string.input_hint_max_padding_size),
@@ -213,8 +213,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settings.maxPointerPadding = input.toString().toInt()
                             this@apply.summary = input
                         } else {
-                            activity!!.container.snackbar(String.format(getString(R.string.str_format_value_error), 0))
-                                .anchorView = activity!!.navigation
+                            requireActivity().container.snackbar(
+                                String.format(
+                                    getString(R.string.str_format_value_error),
+                                    0
+                                )
+                            )
+                                .anchorView = requireActivity().navigation
                         }
 
                     }.show()
@@ -228,7 +233,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
             summary = settings.maxPointerSize.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(activity!!).show {
+                MaterialDialog(requireActivity()).show {
                     title(res = R.string.text_max_pointer_size)
                     input(
                         hintRes = R.string.text_max_pointer_size,
@@ -239,12 +244,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settings.maxPointerSize = input.toString().toInt()
                             this@apply.summary = input
                         } else {
-                            activity!!.container.snackbar(
+                            requireActivity().container.snackbar(
                                 String.format(
                                     getString(R.string.str_format_value_error),
                                     context.getMinPointerSize()
                                 )
-                            ).anchorView = activity!!.navigation
+                            ).anchorView = requireActivity().navigation
                         }
 
                     }
@@ -255,7 +260,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setUpAds() {
-        interstitialAd = InterstitialAd(this.activity!!)
+        interstitialAd = InterstitialAd(this.requireActivity())
         interstitialAd.apply {
             adUnitId = if (BuildConfig.DEBUG) {
                 "ca-app-pub-3940256099942544/1033173712"
@@ -272,7 +277,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 if (interstitialAd.isLoaded) {
                     interstitialAd.show()
                 } else {
-                    activity!!.container.snackbar(getString(R.string.msg_ad_not_loaded))
+                    requireActivity().container.snackbar(getString(R.string.msg_ad_not_loaded))
                 }
                 true
             }
@@ -308,7 +313,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         FirebaseAnalytics.Param.ITEM_NAME,
                         getString(R.string.key_rate_on_g_play)
                     )
-                    FirebaseAnalytics.getInstance(context!!).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
+                    FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
                 }
                 Intent(Intent.ACTION_VIEW).apply {
                     data = Uri.parse(getString(R.string.url_play_store_app_page))
@@ -320,7 +325,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun installExtensionDialog(): AlertDialog {
-        dialog = AlertDialog.Builder(activity!!).setTitle(getString(R.string.title_install_ext_dialog))
+        dialog = AlertDialog.Builder(requireActivity()).setTitle(getString(R.string.title_install_ext_dialog))
             .setMessage(getString(R.string.msg_install_ext_dialog))
             .setCancelable(false)
             .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
@@ -328,13 +333,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
                 val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
-                val tmpFile = File(context!!.cacheDir, "app.apk")
-                activity!!.container.longSnackbar(getString(R.string.msg_downloading_ext)).anchorView = activity!!.navigation
+                val tmpFile = File(requireContext().cacheDir, "app.apk")
+                requireActivity().container.longSnackbar(getString(R.string.msg_downloading_ext)).anchorView =
+                    requireActivity().navigation
                 reference.getFile(tmpFile).addOnSuccessListener {
-                    activity!!.container.snackbar(getString(R.string.msg_ext_downloaded)).anchorView = activity!!.navigation
+                    requireActivity().container.snackbar(getString(R.string.msg_ext_downloaded)).anchorView =
+                        requireActivity().navigation
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         val uri = FileProvider.getUriForFile(
-                            context!!.applicationContext,
+                            requireContext().applicationContext,
                             BuildConfig.APPLICATION_ID + ".provider", tmpFile
                         )
                         val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
@@ -353,7 +360,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                 }
             }.setNeutralButton(getString(R.string.button_text_learn_more)) { _, _ ->
-                activity!!.browse(getString(R.string.url_learn_more))
+                requireActivity().browse(getString(R.string.url_learn_more))
             }.create()
         return dialog as AlertDialog
     }
@@ -361,18 +368,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
 
-        if (!activity!!.isAppInstalled(TEL_P_NAME) && settings.isExtDialogCancelled) {
+        if (!requireActivity().isAppInstalled(TEL_P_NAME) && settings.isExtDialogCancelled) {
             installExtensionDialog().show()
         }
         try {
             settings.isShowTouches =
                 android.provider.Settings.System.getInt(
-                    activity!!.contentResolver,
+                    requireActivity().contentResolver,
                     getString(R.string.key_show_touches)
                 ) == 1
             findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = settings.isShowTouches
         } catch (e: android.provider.Settings.SettingNotFoundException) {
-            activity!!.container.snackbar(getString(R.string.msg_error)).anchorView = activity!!.navigation
+            requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
         }
     }
 
@@ -387,13 +394,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 super.onActivityResult(requestCode, resultCode, data)
                 when (resultCode) {
                     1 -> { //Result OK
-                        activity!!.container.snackbar(getString(R.string.msg_done)).anchorView = activity!!.navigation
+                        requireActivity().container.snackbar(getString(R.string.msg_done)).anchorView =
+                            requireActivity().navigation
                         /* if (interstitialAd.isLoaded) {
                              interstitialAd.show()
                          }*/
                     }
                     2 -> { //Write Setting Permission not Granted
-                        activity!!.container.snackbar(getString(R.string.msg_secure_settings_permission))
+                        requireActivity().container.snackbar(getString(R.string.msg_secure_settings_permission))
                             .setAction(getString(R.string.text_action_grant)) {
                                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                                     val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
@@ -401,10 +409,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                                     startActivity(intent)
                                 }
 
-                            }.anchorView = activity!!.navigation
+                            }.anchorView = requireActivity().navigation
                     }
-                    3 -> activity!!.container.snackbar(getString(R.string.msg_error)).anchorView =
-                        activity!!.navigation //Other error
+                    3 -> requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
+                        requireActivity().navigation //Other error
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -416,11 +424,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var loadingDialog: MaterialDialog
     private fun setUpBilling() {
-        loadingDialog = context!!.showStaticProgressDialog(getString(R.string.text_please_wait))
+        loadingDialog = requireContext().showStaticProgressDialog(getString(R.string.text_please_wait))
         loadingDialog.show()
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
-                activity!!.container.snackbar("Something went wrong.").anchorView = activity!!.navigation
+                requireActivity().container.snackbar("Something went wrong.").anchorView = requireActivity().navigation
             }
 
             override fun onBillingSetupFinished(billingResult: BillingResult) {
@@ -445,11 +453,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     for (skuDetails in skuDetailsList) {
                         list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
                     }
-                    MaterialDialog(context!!, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                    MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                         listItems(items = list) { _, index, _ ->
                             val billingFlowParams =
                                 BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[index]).build()
-                            billingClient.launchBillingFlow(activity!!, billingFlowParams)
+                            billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
                         }
                         title(R.string.pref_title_donate_dev)
                         negativeButton(android.R.string.cancel)
