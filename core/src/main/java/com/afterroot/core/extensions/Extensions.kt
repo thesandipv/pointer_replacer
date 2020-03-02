@@ -88,7 +88,7 @@ fun Context.isAppInstalled(pName: String): Boolean {
     }
 }
 
-fun Context.isNetworkAvailable(): Boolean {
+fun Context.isNetworkAvailable(): Boolean { //TODO compatibility with android 10
     val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     return cm.activeNetworkInfo?.isConnectedOrConnecting == true
 }

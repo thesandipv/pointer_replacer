@@ -46,6 +46,7 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
+import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
@@ -66,6 +67,7 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
@@ -86,7 +88,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
     private val storage: FirebaseStorage by inject()
-    private val pointersDocument: DocumentFile by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -119,7 +120,14 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             layout_no_network.visible(false)
             repo_swipe_refresh.apply {
                 setOnRefreshListener {
-                    loadPointers()
+                    try {
+                        setUpList()
+                    } catch (e: IllegalStateException) {
+                        isRefreshing = false
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            MainActivity.openStorageAccess(requireActivity())
+                        }
+                    }
                 }
                 setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
             }
@@ -133,7 +141,14 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             extSdDir = Environment.getExternalStorageDirectory().toString()
             mTargetPath = extSdDir + pointersFolder
             settings = Settings(requireContext())
-            setUpList()
+            try {
+                setUpList()
+            } catch (e: IllegalStateException) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    MainActivity.openStorageAccess(requireActivity())
+                }
+            }
+
         }
     }
 
@@ -167,24 +182,24 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun setUpFilter() {
-        view!!.repo_filter_chip_group.apply {
+        requireView().repo_filter_chip_group.apply {
             clearCheck()
             when (settings.orderBy) {
                 DatabaseFields.FIELD_TIME -> this.check(R.id.filter_chip_sort_by_date)
                 DatabaseFields.FIELD_DOWNLOADS -> this.check(R.id.filter_chip_sort_by_download)
             }
         }
-        view!!.filter_chip_sort_by_date.setOnClickListener {
+        requireView().filter_chip_sort_by_date.setOnClickListener {
             loadPointers(DatabaseFields.FIELD_TIME)
-            view!!.repo_filter_chip_group.apply {
+            requireView().repo_filter_chip_group.apply {
                 clearCheck()
                 check(R.id.filter_chip_sort_by_date)
                 settings.orderBy = DatabaseFields.FIELD_TIME
             }
         }
-        view!!.filter_chip_sort_by_download.setOnClickListener {
+        requireView().filter_chip_sort_by_download.setOnClickListener {
             loadPointers(DatabaseFields.FIELD_DOWNLOADS)
-            view!!.repo_filter_chip_group.apply {
+            requireView().repo_filter_chip_group.apply {
                 clearCheck()
                 check(R.id.filter_chip_sort_by_download)
                 settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
@@ -272,7 +287,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 )
                 try {
                     this.requireActivity().contentResolver
-                        .openFileDescriptor(pointersDocument.createFile("", p.filename)?.uri!!, "w").use { pfd ->
+                        .openFileDescriptor(get<DocumentFile>().createFile("", p.filename)?.uri!!, "w").use { pfd ->
                             FileOutputStream(pfd!!.fileDescriptor).use {
                                 it.write(bytes)
                             }
@@ -281,6 +296,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     e.printStackTrace()
                 } catch (e: IOException) {
                     e.printStackTrace()
+                } catch (e: NullPointerException) {
+                    MainActivity.openStorageAccess(requireActivity())
                 } finally {
                     lifecycleScope.launch {
                         myDatabase.pointerDao().add(pointer)

@@ -49,6 +49,7 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
+import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.loadBitmapFromView
@@ -98,13 +99,27 @@ class MainFragment : Fragment() {
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
 
-        requireActivity().apply {
-            layout_new_pointer.setOnClickListener { showListPointerChooser(pointerType = POINTER_TOUCH) }
+        activity!!.apply {
+            layout_new_pointer.setOnClickListener {
+                try {
+                    showListPointerChooser(pointerType = POINTER_TOUCH)
+                } catch (e: IllegalStateException) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        MainActivity.openStorageAccess(requireActivity())
+                    }
+                }
+            }
             layout_new_mouse.setOnClickListener {
-                showListPointerChooser(
-                    pointerType = POINTER_MOUSE,
-                    title = getString(R.string.dialog_title_select_mouse_pointer)
-                )
+                try {
+                    showListPointerChooser(
+                        pointerType = POINTER_MOUSE,
+                        title = getString(R.string.dialog_title_select_mouse_pointer)
+                    )
+                } catch (e: IllegalStateException) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        MainActivity.openStorageAccess(requireActivity())
+                    }
+                }
             }
             fab_apply.apply {
                 setOnClickListener {
@@ -116,17 +131,33 @@ class MainFragment : Fragment() {
 
             loadCurrentPointers()
 
+            try {
+                get<DocumentFile>().exists()
+            } catch (e: IllegalStateException) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    MainActivity.openStorageAccess(requireActivity())
+                }
+            }
             action_customize.setOnClickListener {
-                if (!isPointerSelected()) {
-                    requireActivity().container.snackbar(
-                        message = getString(R.string.msg_pointer_not_selected)
-                    ).anchorView = requireActivity().navigation
-                } else {
-                    val bundle = Bundle().apply {
-                        putInt("TYPE", POINTER_TOUCH)
+                try {
+                    get<DocumentFile>().exists()
+                } catch (e: IllegalStateException) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        MainActivity.openStorageAccess(requireActivity())
                     }
-                    val extras = FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
-                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
+                } finally {
+                    if (!isPointerSelected()) {
+                        requireActivity().container.snackbar(
+                            message = getString(R.string.msg_pointer_not_selected)
+                        ).anchorView = requireActivity().navigation
+                    } else {
+                        val bundle = Bundle().apply {
+                            putInt("TYPE", POINTER_TOUCH)
+                        }
+                        val extras =
+                            FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
+                        findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
+                    }
                 }
             }
 
@@ -420,7 +451,13 @@ class MainFragment : Fragment() {
             title(text = title)
             noAutoDismiss()
             positiveButton(text = "Import Your Pointers") {
-                import()
+                try {
+                    import()
+                } catch (e: IllegalStateException) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        MainActivity.openStorageAccess(requireActivity())
+                    }
+                }
             }
         }
 
@@ -452,12 +489,16 @@ class MainFragment : Fragment() {
 
             override fun onLongClick(position: Int) {
                 val selectedItem = pointerAdapter.getItem(position) as RoomPointer
-                val file = File(targetPath + selectedItem.file_name)
                 MaterialDialog(requireActivity()).show {
-                    title(text = "${getString(R.string.text_delete)} ${file.name}")
+                    title(text = "${getString(R.string.text_delete)} ${selectedItem.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
-                        if (file.delete()) {
+                        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                pointersDocument.findFile(selectedItem.file_name)?.delete()!!
+                            } else {
+                                File(targetPath + selectedItem.file_name).delete()
+                            }
+                        ) {
                             lifecycleScope.launch {
                                 myDatabase.pointerDao().delete(selectedItem)
                             }

@@ -35,6 +35,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PERMISSION
 import com.afterroot.allusive.Constants.RC_STORAGE_ACCESS
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             //Greater than Lollipop
             when {
                 settings.safUri == null -> { //SAF not Accessed
-                    openStorageAccess()
+                    openStorageAccess(this)
                 }
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                     checkPermissions()
@@ -144,15 +145,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
         loadFragments()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun openStorageAccess() {
-        val myIntent =
-            Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-            }
-        startActivityForResult(myIntent, RC_STORAGE_ACCESS)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -314,5 +306,23 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+        fun openStorageAccess(activity: Activity) {
+            MaterialDialog(activity).show {
+                title(text = "Grant Storage Permissions")
+                message(text = "On next screen Select Internal Storage > Tap Allow Access and Grant Storage permission.")
+                positiveButton(text = "Grant") {
+                    activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    }, RC_STORAGE_ACCESS)
+                }
+                negativeButton(res = android.R.string.cancel) {
+                    activity.finish()
+                }
+                cancelable(false)
+                cancelOnTouchOutside(false)
+            }
+        }
+
     }
 }
