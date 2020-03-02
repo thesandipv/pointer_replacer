@@ -66,7 +66,7 @@ class SplashActivity : AppCompatActivity() {
     private fun tryLogin() {
         startActivityForResult(
             AuthUI.getInstance()
-                .createSignInIntentBuilder()
+                .createSignInIntentBuilder().setIsSmartLockEnabled(false)
                 .setLogo(R.drawable.ic_launch_screen)
                 .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
                 .setAvailableProviders(
