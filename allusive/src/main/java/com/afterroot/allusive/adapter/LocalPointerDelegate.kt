@@ -47,21 +47,18 @@ class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : Ty
         val context: Context = parent.context
 
         fun bind(pointer: RoomPointer) {
-            val path =
-                "${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}"
-            val pointerDoc = doc.findFile(pointer.file_name)?.uri
             itemView.info_pointer_pack_name.text = pointer.pointer_name
             itemView.info_username.text =
-                String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
+                    String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
             itemView.info_pointer_image.apply {
                 onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
-                    GlideApp.with(context).load(pointerDoc)
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .into(this)
+                    GlideApp.with(context).load(doc.findFile(pointer.file_name)?.uri)
+                            .override(context.getMinPointerSize(), context.getMinPointerSize())
+                            .into(this)
                 }, {
-                    GlideApp.with(context).load(path)
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .into(this)
+                    GlideApp.with(context).load("${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}")
+                            .override(context.getMinPointerSize(), context.getMinPointerSize())
+                            .into(this)
                 })
                 background = context.getDrawableExt(R.drawable.transparent_grid)
             }
