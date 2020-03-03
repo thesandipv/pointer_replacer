@@ -81,7 +81,7 @@ android {
         }
 
         prod {
-
+            dimension = 'ar'
         }
     }
     compileOptions {
