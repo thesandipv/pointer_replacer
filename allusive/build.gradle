@@ -46,9 +46,6 @@ android {
             }
         }
     }
-    signingConfigs {
-        release
-    }
     buildTypes {
         release {
             shrinkResources true
@@ -56,7 +53,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexKeepProguard file('proguard-rules.pro')
             multiDexKeepFile file('main_dex.txt')
-            signingConfig signingConfigs.release
         }
         debug {
             ext.alwaysUpdateBuildId = false
