@@ -99,7 +99,7 @@ class MainFragment : Fragment() {
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
 
-        activity!!.apply {
+        requireActivity().apply {
             layout_new_pointer.setOnClickListener {
                 try {
                     showListPointerChooser(pointerType = POINTER_TOUCH)
