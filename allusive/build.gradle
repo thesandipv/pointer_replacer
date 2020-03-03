@@ -97,17 +97,29 @@ android {
         abortOnError false
     }
 
-    /*if (System.getenv("CI") == "true") {
-        signingConfigs {
-            release {
-                storeFile = file("../keystore.jks")
-                storePassword = System.getenv("keystore_pass")
-                keyAlias = System.getenv("key_alias")
-                keyPassword = System.getenv("key_pass")
+    if (System.getenv("CI") == "true") {
+//        signingConfigs {
+//            release {
+//                storeFile = file("../keystore.jks")
+//                storePassword = System.getenv("keystore_pass")
+//                keyAlias = System.getenv("key_alias")
+//                keyPassword = System.getenv("key_pass")
+//            }
+//        }
+        productFlavors {
+            dev {
+                dimension = 'ar'
+                versionNameSuffix = '-CI'
+                applicationIdSuffix = '.ci'
+            }
+
+            prod {
+                dimension = 'ar'
+                versionNameSuffix = '-CI'
+                applicationIdSuffix = '.ci'
             }
         }
-
-    }*/
+    }
 }
 
 dependencies {
