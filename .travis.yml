@@ -17,8 +17,8 @@ cache:
     - "$HOME/.gradle/wrapper/"
     - "$HOME/.android/build-cache"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_6e4d21b7b18e_key -iv $encrypted_6e4d21b7b18e_iv
-    -in keystore.jks.enc -out keystore.jks -d
+#  - openssl aes-256-cbc -K $encrypted_6e4d21b7b18e_key -iv $encrypted_6e4d21b7b18e_iv
+#    -in keystore.jks.enc -out keystore.jks -d
   - chmod +x gradlew
 script: "./gradlew build"
 deploy:

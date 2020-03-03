@@ -97,7 +97,7 @@ android {
         abortOnError false
     }
 
-    if (System.getenv("CI") == "true") {
+    /*if (System.getenv("CI") == "true") {
         signingConfigs {
             release {
                 storeFile = file("../keystore.jks")
@@ -107,7 +107,7 @@ android {
             }
         }
 
-    }
+    }*/
 }
 
 dependencies {
