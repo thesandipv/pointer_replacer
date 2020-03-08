@@ -13,4 +13,4 @@
  * limitations under the License.
  */
 
-include ':allusive', ':touchesenabler', ':tapslegacy', ':core'
+include ':allusive', ':touchesenabler', ':tapslegacy'

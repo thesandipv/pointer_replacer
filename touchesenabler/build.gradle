@@ -92,7 +92,7 @@ dependencies {
     implementation "com.android.billingclient:billing-ktx:${billingVersion}"
 
     implementation "org.jetbrains.anko:anko-commons:${ankoCommonsVersion}"
-    implementation project(path: ':core')
+    implementation "com.afterroot.core:core:${coreVersion}"
 
     implementation "com.afollestad.material-dialogs:core:${materialDialogsVersion}"
     implementation "com.afollestad.material-dialogs:bottomsheets:${materialDialogsVersion}"
