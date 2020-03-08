@@ -26,6 +26,7 @@ import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -79,9 +80,9 @@ class MainFragment : Fragment() {
 
     private lateinit var interstitialAd: InterstitialAd
     private val myDatabase: MyDatabase by inject()
-    private val pointersDocument: DocumentFile by inject()
     private val settings: Settings by inject()
     private var extSdDir: String? = null
+    private var pointersDocument: DocumentFile? = null
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -98,6 +99,7 @@ class MainFragment : Fragment() {
         val pointersFolder = getString(R.string.pointer_folder_path)
         extSdDir = Environment.getExternalStorageDirectory().toString()
         targetPath = extSdDir!! + pointersFolder
+        pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
 
         requireActivity().apply {
             layout_new_pointer.setOnClickListener {
@@ -132,7 +134,7 @@ class MainFragment : Fragment() {
             loadCurrentPointers()
 
             try {
-                get<DocumentFile>().exists()
+                pointersDocument?.exists()
             } catch (e: IllegalStateException) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     MainActivity.openStorageAccess(requireActivity())
@@ -140,7 +142,7 @@ class MainFragment : Fragment() {
             }
             action_customize.setOnClickListener {
                 try {
-                    get<DocumentFile>().exists()
+                    pointersDocument?.exists()
                 } catch (e: IllegalStateException) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         MainActivity.openStorageAccess(requireActivity())
@@ -236,7 +238,7 @@ class MainFragment : Fragment() {
                     imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
                 val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    pointersDocument.findFile(settings.selectedPointerName!!)?.uri
+                    pointersDocument?.findFile(settings.selectedPointerName!!)?.uri
                 } else {
                     Uri.fromFile(File(selectedPointerPath))
                 }
@@ -252,7 +254,7 @@ class MainFragment : Fragment() {
                     imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
                 val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    pointersDocument.findFile(settings.selectedMouseName!!)?.uri
+                    pointersDocument?.findFile(settings.selectedMouseName!!)?.uri
                 } else {
                     Uri.fromFile(File(selectedMousePath))
                 }
@@ -426,7 +428,7 @@ class MainFragment : Fragment() {
     private fun import() {
         val fileNames = arrayListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            pointersDocument.listFiles().forEach {
+            pointersDocument?.listFiles()?.forEach {
                 if (it.name != ".nomedia") {
                     fileNames.add(it.name.toString())
                 }
@@ -475,7 +477,7 @@ class MainFragment : Fragment() {
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     GlideApp.with(requireContext())
-                        .load(pointersDocument.findFile(selectedItem.file_name)?.uri)
+                        .load(pointersDocument?.findFile(selectedItem.file_name)?.uri)
                         .override(requireContext().getMinPointerSize())
                         .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
                 } else {
@@ -494,7 +496,7 @@ class MainFragment : Fragment() {
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
                         if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                pointersDocument.findFile(selectedItem.file_name)?.delete()!!
+                                pointersDocument?.findFile(selectedItem.file_name)?.delete()!!
                             } else {
                                 File(targetPath + selectedItem.file_name).delete()
                             }
@@ -569,10 +571,10 @@ class MainFragment : Fragment() {
             .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
                 AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
                     Toast.makeText(
-                        requireContext(),
-                        getString(R.string.dialog_sign_out_result_success),
-                        Toast.LENGTH_SHORT
-                    )
+                            requireContext(),
+                            getString(R.string.dialog_sign_out_result_success),
+                            Toast.LENGTH_SHORT
+                        )
                         .show()
                     startActivity(Intent(requireContext(), SplashActivity::class.java))
                 }

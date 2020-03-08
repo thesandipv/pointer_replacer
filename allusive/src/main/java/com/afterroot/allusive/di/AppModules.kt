@@ -15,8 +15,6 @@
 
 package com.afterroot.allusive.di
 
-import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.room.Room
 import com.afterroot.allusive.Settings
 import com.afterroot.allusive.database.MyDatabase
@@ -55,17 +53,5 @@ val firebaseModule = module {
 val appModule = module {
     single {
         Settings(androidContext())
-    }
-}
-
-val documentModule = module {
-    single {
-        Settings(androidContext()).safUri?.toUri()
-    }
-    single {
-        DocumentFile.fromTreeUri(
-            androidContext(),
-            get()
-        )?.findFile("Pointer Replacer")?.findFile("Pointers")
     }
 }
