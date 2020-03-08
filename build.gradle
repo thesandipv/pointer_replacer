@@ -21,6 +21,7 @@ ext {
     commonsIoVersion = '1.3.2'
     constraintlayoutVersion = '2.0.0-beta4'
     coreKtxVersion = '1.3.0-alpha02'
+    coreVersion = '0.1.0'
     crashlyticsVersion = '2.10.1'
     firebaseAdsVersion = '19.0.0'
     firebaseAuthVersion = '19.2.0'
@@ -60,9 +61,7 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven {
-            url 'https://maven.fabric.io/public'
-        }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.1'
@@ -79,6 +78,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         mavenCentral()
+        maven { url 'https://dl.bintray.com/thesandipv/afterroot' }
     }
 }
 
