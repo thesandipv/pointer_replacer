@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         //Initialize AdMob SDK
         MobileAds.initialize(this, getString(R.string.admob_app_id))
 
-        onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Greater than Lollipop
             when {
                 settings.safUri == null -> { //SAF not Accessed
@@ -113,9 +113,9 @@ class MainActivity : AppCompatActivity() {
                     createPointerFolder()
                 }
             }
-        }, {
+        } else {
             loadFragments() //Less than Lollipop, direct load fragments
-        })
+        }
 
         //Add user in db if not available
         addUserInfoInDB()
@@ -306,6 +306,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         fun openStorageAccess(activity: Activity) {
             MaterialDialog(activity).show {
