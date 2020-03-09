@@ -54,7 +54,10 @@ class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : Ty
             itemView.info_pointer_image.apply {
                 onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
                     GlideApp.with(context).load(
-                            DocumentFile.fromTreeUri(context, settings.safUri?.toUri()!!)?.findFile(pointer.file_name)?.uri
+                            DocumentFile.fromTreeUri(context, settings.safUri?.toUri()!!)
+                                ?.findFile(context.getString(R.string.app_name))
+                                ?.findFile(context.getString(R.string.pointer_folder_name))
+                                ?.findFile(pointer.file_name)?.uri
                         )
                         .override(context.getMinPointerSize(), context.getMinPointerSize())
                         .into(this)
