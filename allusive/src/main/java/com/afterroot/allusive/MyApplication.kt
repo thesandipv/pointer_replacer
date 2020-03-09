@@ -15,10 +15,13 @@
 
 package com.afterroot.allusive
 
+import android.os.Build
 import androidx.multidex.MultiDexApplication
 import com.afterroot.allusive.di.appModule
 import com.afterroot.allusive.di.firebaseModule
 import com.afterroot.allusive.di.roomModule
+import com.afterroot.core.onVersionGreaterThanEqualTo
+import fr.dasilvacampos.network.monitoring.NetworkStateHolder.registerConnectivityBroadcaster
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -35,5 +38,8 @@ class MyApplication : MultiDexApplication() {
             androidContext(this@MyApplication)
             modules(listOf(roomModule, firebaseModule, appModule))
         }
+        onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
+            registerConnectivityBroadcaster()
+        })
     }
 }

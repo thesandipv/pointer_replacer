@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Environment
 import android.view.*
@@ -83,6 +84,7 @@ class MainFragment : Fragment() {
     private val settings: Settings by inject()
     private var extSdDir: String? = null
     private var pointersDocument: DocumentFile? = null
+    private var targetDocumentFile: DocumentFile? = null
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -96,32 +98,29 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
-        val pointersFolder = getString(R.string.pointer_folder_path)
-        extSdDir = Environment.getExternalStorageDirectory().toString()
-        targetPath = extSdDir!! + pointersFolder
-        pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
+        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            try {
+                pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
+                targetDocumentFile = pointersDocument?.findFile(getString(R.string.app_name))
+                    ?.findFile(getString(R.string.pointer_folder_name))
+            } catch (npe: NullPointerException) {
+                MainActivity.openStorageAccess(requireActivity())
+            }
+        } else {
+            val pointersFolder = getString(R.string.pointer_folder_path)
+            extSdDir = Environment.getExternalStorageDirectory().toString()
+            targetPath = extSdDir!! + pointersFolder
+        }
 
         requireActivity().apply {
             layout_new_pointer.setOnClickListener {
-                try {
-                    showListPointerChooser(pointerType = POINTER_TOUCH)
-                } catch (e: IllegalStateException) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        MainActivity.openStorageAccess(requireActivity())
-                    }
-                }
+                showListPointerChooser(pointerType = POINTER_TOUCH)
             }
             layout_new_mouse.setOnClickListener {
-                try {
-                    showListPointerChooser(
-                        pointerType = POINTER_MOUSE,
-                        title = getString(R.string.dialog_title_select_mouse_pointer)
-                    )
-                } catch (e: IllegalStateException) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        MainActivity.openStorageAccess(requireActivity())
-                    }
-                }
+                showListPointerChooser(
+                    pointerType = POINTER_MOUSE,
+                    title = getString(R.string.dialog_title_select_mouse_pointer)
+                )
             }
             fab_apply.apply {
                 setOnClickListener {
@@ -133,33 +132,18 @@ class MainFragment : Fragment() {
 
             loadCurrentPointers()
 
-            try {
-                pointersDocument?.exists()
-            } catch (e: IllegalStateException) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    MainActivity.openStorageAccess(requireActivity())
-                }
-            }
             action_customize.setOnClickListener {
-                try {
-                    pointersDocument?.exists()
-                } catch (e: IllegalStateException) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        MainActivity.openStorageAccess(requireActivity())
+                if (!isPointerSelected()) {
+                    requireActivity().container.snackbar(
+                        message = getString(R.string.msg_pointer_not_selected)
+                    ).anchorView = requireActivity().navigation
+                } else {
+                    val bundle = Bundle().apply {
+                        putInt("TYPE", POINTER_TOUCH)
                     }
-                } finally {
-                    if (!isPointerSelected()) {
-                        requireActivity().container.snackbar(
-                            message = getString(R.string.msg_pointer_not_selected)
-                        ).anchorView = requireActivity().navigation
-                    } else {
-                        val bundle = Bundle().apply {
-                            putInt("TYPE", POINTER_TOUCH)
-                        }
-                        val extras =
-                            FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
-                        findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
-                    }
+                    val extras =
+                        FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
+                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
             }
 
@@ -213,9 +197,11 @@ class MainFragment : Fragment() {
                 mouseSize = requireContext().getMinPointerSize()
             }
             if (pointerPath != null) {
-                current_pointer.setImageDrawable(Drawable.createFromPath(pointerPath))
-                current_pointer.minimumHeight = requireContext().getMinPointerSizePx()
-                current_pointer.minimumWidth = requireContext().getMinPointerSizePx()
+                current_pointer.apply {
+                    setImageDrawable(Drawable.createFromPath(pointerPath))
+                    minimumHeight = requireContext().getMinPointerSizePx()
+                    minimumWidth = requireContext().getMinPointerSizePx()
+                }
                 text_no_pointer_applied.visible(false)
             } else {
                 text_no_pointer_applied.visible(true)
@@ -237,8 +223,8 @@ class MainFragment : Fragment() {
                     setColorFilter(pointerColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
-                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    pointersDocument?.findFile(settings.selectedPointerName!!)?.uri
+                val uri = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                    targetDocumentFile?.findFile(settings.selectedPointerName!!)?.uri
                 } else {
                     Uri.fromFile(File(selectedPointerPath))
                 }
@@ -253,8 +239,8 @@ class MainFragment : Fragment() {
                     setColorFilter(mouseColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
-                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    pointersDocument?.findFile(settings.selectedMouseName!!)?.uri
+                val uri = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                    targetDocumentFile?.findFile(settings.selectedMouseName!!)?.uri
                 } else {
                     Uri.fromFile(File(selectedMousePath))
                 }
@@ -427,8 +413,8 @@ class MainFragment : Fragment() {
 
     private fun import() {
         val fileNames = arrayListOf<String>()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            pointersDocument?.listFiles()?.forEach {
+        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            targetDocumentFile?.listFiles()?.forEach {
                 if (it.name != ".nomedia") {
                     fileNames.add(it.name.toString())
                 }
@@ -456,7 +442,7 @@ class MainFragment : Fragment() {
                 try {
                     import()
                 } catch (e: IllegalStateException) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (Build.VERSION.SDK_INT >= LOLLIPOP) {
                         MainActivity.openStorageAccess(requireActivity())
                     }
                 }
@@ -475,9 +461,9 @@ class MainFragment : Fragment() {
                     settings.selectedMouseName = selectedItem.file_name
                     settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= LOLLIPOP) {
                     GlideApp.with(requireContext())
-                        .load(pointersDocument?.findFile(selectedItem.file_name)?.uri)
+                        .load(targetDocumentFile?.findFile(selectedItem.file_name)?.uri)
                         .override(requireContext().getMinPointerSize())
                         .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
                 } else {
@@ -495,8 +481,8 @@ class MainFragment : Fragment() {
                     title(text = "${getString(R.string.text_delete)} ${selectedItem.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
-                        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                pointersDocument?.findFile(selectedItem.file_name)?.delete()!!
+                        if (if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                                targetDocumentFile?.findFile(selectedItem.file_name)?.delete()!!
                             } else {
                                 File(targetPath + selectedItem.file_name).delete()
                             }

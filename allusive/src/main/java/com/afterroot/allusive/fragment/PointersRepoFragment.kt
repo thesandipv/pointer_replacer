@@ -17,11 +17,15 @@ package com.afterroot.allusive.fragment
 
 
 import android.os.Build
+import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -54,12 +58,15 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.isNetworkAvailable
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
-import com.afterroot.core.onVersionGreaterThanEqualTo
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import fr.dasilvacampos.network.monitoring.Event
+import fr.dasilvacampos.network.monitoring.NetworkEvents
+import fr.dasilvacampos.network.monitoring.NetworkState
+import fr.dasilvacampos.network.monitoring.NetworkStateHolder
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
@@ -67,7 +74,6 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
@@ -88,6 +94,42 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
     private val storage: FirebaseStorage by inject()
+    private var isConnectionLost = true
+    private var pointersDocument: DocumentFile? = null
+    private var targetDocumentFile: DocumentFile? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            isConnectionLost = it.getBoolean("isConnectionLost")
+        }
+
+        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            NetworkEvents.observe(this, Observer {
+                if (it is Event.ConnectivityEvent) {
+                    handleConnectivityEvent(it.state)
+                    Log.d("PointersRepoFragment", "Network: Connectivity Changed")
+                }
+            })
+        }
+    }
+
+    @RequiresApi(LOLLIPOP)
+    private fun handleConnectivityEvent(state: NetworkState) {
+        if (state.isConnected && !isConnectionLost) { //Network is Connected
+            onNetworkChange(true)
+        }
+        if (!state.isConnected && isConnectionLost) {
+            onNetworkChange(false)
+        }
+
+        isConnectionLost = state.isConnected
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("isConnectionLost", isConnectionLost)
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -96,7 +138,36 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     override fun onResume() {
         super.onResume()
 
-        if (!requireContext().isNetworkAvailable()) {
+        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            handleConnectivityEvent(NetworkStateHolder)
+        } else {
+            onNetworkChange(!requireContext().isNetworkAvailable())
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (FirebaseUtils.isUserSignedIn) {
+            settings = Settings(requireContext())
+            if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                try {
+                    pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
+                    targetDocumentFile = pointersDocument?.findFile(getString(R.string.app_name))
+                        ?.findFile(getString(R.string.pointer_folder_name))
+                } catch (npe: NullPointerException) {
+                    MainActivity.openStorageAccess(requireActivity())
+                }
+            } else {
+                pointersFolder = getString(R.string.pointer_folder_path)
+                extSdDir = Environment.getExternalStorageDirectory().toString()
+                mTargetPath = extSdDir + pointersFolder
+            }
+            setUpList()
+        }
+    }
+
+    private fun onNetworkChange(isAvailable: Boolean) {
+        if (isAvailable) {
             repo_swipe_refresh.visible(false)
             layout_no_network.visible(true)
             button_retry.setOnClickListener {
@@ -124,31 +195,13 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                         setUpList()
                     } catch (e: IllegalStateException) {
                         isRefreshing = false
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
                             MainActivity.openStorageAccess(requireActivity())
                         }
                     }
                 }
                 setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
             }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        if (FirebaseUtils.isUserSignedIn) {
-            pointersFolder = getString(R.string.pointer_folder_path)
-            extSdDir = Environment.getExternalStorageDirectory().toString()
-            mTargetPath = extSdDir + pointersFolder
-            settings = Settings(requireContext())
-            try {
-                setUpList()
-            } catch (e: IllegalStateException) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    MainActivity.openStorageAccess(requireActivity())
-                }
-            }
-
         }
     }
 
@@ -164,7 +217,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, Observer<ViewModelState> {
+        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ViewModelState.Loading -> {
                     repo_swipe_refresh.isRefreshing = true
@@ -266,8 +319,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private fun downloadPointer(position: Int) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
-        val file = File("$mTargetPath${pointersList[position].filename}")
-        onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
+        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
             ref.getBytes(1024 * 1024).addOnSuccessListener { bytes ->
                 requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
                     requireActivity().navigation
@@ -287,7 +339,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 )
                 try {
                     this.requireActivity().contentResolver
-                        .openFileDescriptor(get<DocumentFile>().createFile("", p.filename)?.uri!!, "w").use { pfd ->
+                        .openFileDescriptor(targetDocumentFile?.createFile("", p.filename)?.uri!!, "w").use { pfd ->
                             FileOutputStream(pfd!!.fileDescriptor).use {
                                 it.write(bytes)
                             }
@@ -297,7 +349,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 } catch (e: NullPointerException) {
-                    MainActivity.openStorageAccess(requireActivity())
+                    if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                        MainActivity.openStorageAccess(requireActivity())
+                    }
                 } finally {
                     lifecycleScope.launch {
                         myDatabase.pointerDao().add(pointer)
@@ -315,40 +369,43 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
                 dialog.dismiss()
             }
-        }, {
-            ref.getFile(file).addOnSuccessListener {
-                requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
-                    requireActivity().navigation
-                if (!BuildConfig.DEBUG) {
-                    pointersSnapshot.documents[position].reference.update(
-                        DatabaseFields.FIELD_DOWNLOADS,
-                        pointersList[position].downloads + 1
+        } else {
+            ref.getFile(File("$mTargetPath${pointersList[position].filename}"))
+                .addOnSuccessListener {
+                    requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
+                        requireActivity().navigation
+                    if (!BuildConfig.DEBUG) {
+                        pointersSnapshot.documents[position].reference.update(
+                            DatabaseFields.FIELD_DOWNLOADS,
+                            pointersList[position].downloads + 1
+                        )
+                    }
+                    val p = pointersList[position]
+                    var id = ""
+                    var name = ""
+                    p.uploadedBy!!.forEach {
+                        id = it.key
+                        name = it.value
+                    }
+                    val pointer = RoomPointer(
+                        file_name = p.filename,
+                        pointer_desc = p.description,
+                        pointer_name = p.name,
+                        uploader_id = id,
+                        uploader_name = name
                     )
-                }
-                val p = pointersList[position]
-                var id = ""
-                var name = ""
-                p.uploadedBy!!.forEach {
-                    id = it.key
-                    name = it.value
-                }
-                val pointer = RoomPointer(
-                    file_name = p.filename,
-                    pointer_desc = p.description,
-                    pointer_name = p.name,
-                    uploader_id = id,
-                    uploader_name = name
-                )
-                lifecycleScope.launch {
-                    myDatabase.pointerDao().add(pointer)
+                    lifecycleScope.launch {
+                        myDatabase.pointerDao().add(pointer)
+                    }
+
+                    dialog.dismiss()
+                }.addOnFailureListener {
+                    requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
+                        requireActivity().navigation
+                    dialog.dismiss()
                 }
 
-                dialog.dismiss()
-            }.addOnFailureListener {
-                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
-                dialog.dismiss()
-            }
-        })
+        }
     }
 
     override fun onClick(position: Int, view: View?) {
