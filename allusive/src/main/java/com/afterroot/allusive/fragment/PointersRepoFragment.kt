@@ -20,11 +20,9 @@ import android.os.Build
 import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -63,10 +61,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
-import fr.dasilvacampos.network.monitoring.Event
-import fr.dasilvacampos.network.monitoring.NetworkEvents
-import fr.dasilvacampos.network.monitoring.NetworkState
-import fr.dasilvacampos.network.monitoring.NetworkStateHolder
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.*
@@ -94,42 +88,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
     private val storage: FirebaseStorage by inject()
-    private var isConnectionLost = true
     private var pointersDocument: DocumentFile? = null
     private var targetDocumentFile: DocumentFile? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        savedInstanceState?.let {
-            isConnectionLost = it.getBoolean("isConnectionLost")
-        }
-
-        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-            NetworkEvents.observe(this, Observer {
-                if (it is Event.ConnectivityEvent) {
-                    handleConnectivityEvent(it.state)
-                    Log.d("PointersRepoFragment", "Network: Connectivity Changed")
-                }
-            })
-        }
-    }
-
-    @RequiresApi(LOLLIPOP)
-    private fun handleConnectivityEvent(state: NetworkState) {
-        if (state.isConnected && !isConnectionLost) { //Network is Connected
-            onNetworkChange(true)
-        }
-        if (!state.isConnected && isConnectionLost) {
-            onNetworkChange(false)
-        }
-
-        isConnectionLost = state.isConnected
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("isConnectionLost", isConnectionLost)
-        super.onSaveInstanceState(outState)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -137,12 +97,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
     override fun onResume() {
         super.onResume()
-
-        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-            handleConnectivityEvent(NetworkStateHolder)
-        } else {
-            onNetworkChange(!requireContext().isNetworkAvailable())
-        }
+        onNetworkChange(requireContext().isNetworkAvailable())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -167,7 +122,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun onNetworkChange(isAvailable: Boolean) {
-        if (isAvailable) {
+        if (!isAvailable) {
             repo_swipe_refresh.visible(false)
             layout_no_network.visible(true)
             button_retry.setOnClickListener {
