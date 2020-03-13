@@ -258,7 +258,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     }
                 }
             }
-            info_tv_downloads_count.text = String.format(getString(R.string.str_format_download_count), pointer.downloads)
+            info_tv_downloads_count.text =
+                resources.getQuantityString(R.plurals.str_format_download_count, pointer.downloads, pointer.downloads)
             /*info_rate_up.setOnClickListener {
                 pointersSnapshot.documents[position].reference.update(
                     DatabaseFields.FIELD_UPVOTES,
