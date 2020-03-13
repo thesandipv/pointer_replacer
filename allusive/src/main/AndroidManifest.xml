@@ -76,7 +76,7 @@
             android:name=".ui.SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/MyTheme.Main.Launch">
-            <tools:validation testUrl="https://afterroot.co/apps/pointer-replacer/launch" />
+            <tools:validation testUrl="https://afterroot.web.app/apps/pointer-replacer/launch" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -91,7 +91,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="afterroot.co"
+                    android:host="afterroot.web.app"
                     android:pathPrefix="/apps/pointer-replacer/launch"
                     android:scheme="https" />
             </intent-filter>

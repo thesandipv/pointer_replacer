@@ -65,7 +65,12 @@ class PointerDelegate(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter
 
             }
 
-            itemView.info_meta.text = String.format(context.getString(R.string.str_format_download_count), pointer.downloads)
+            itemView.info_meta.text =
+                context.resources.getQuantityString(
+                    R.plurals.str_format_download_count,
+                    pointer.downloads,
+                    pointer.downloads
+                )
 
             with(super.itemView) {
                 tag = pointer
