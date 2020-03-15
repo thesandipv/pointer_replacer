@@ -24,7 +24,7 @@ ext {
     coreVersion = '0.1.1'
     crashlyticsVersion = '2.10.1'
     firebaseAdsVersion = '19.0.0'
-    firebaseAuthVersion = '19.2.0'
+    firebaseAuthVersion = '19.3.0'
     firebaseConfigVersion = '19.1.2'
     firebaseCoreVersion = '17.2.3'
     firebaseFirestoreVersion = '21.4.1'
