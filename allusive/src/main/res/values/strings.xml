@@ -70,10 +70,10 @@
     <string name="key_rate_on_g_play" translatable="false">pref_rate_on_g_play</string>
     <string name="key_repo_order_by">repo_order_by</string>
     <string name="key_saf_uri">saf_uri</string>
-    <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
-    <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_selectedMouseName" translatable="false">SELECTED_MOUSE_NAME</string>
+    <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
     <string name="key_selectedPointerName" translatable="false">SELECTED_POINTER_NAME</string>
+    <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="key_version" translatable="false">pref_version</string>
@@ -96,6 +96,7 @@
     <string name="msg_input_error_name_empty">Pointer name can not be empty</string>
     <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
     <string name="msg_install_extension">Please install Extension First</string>
+    <string name="msg_login_failed">Login Failed</string>
     <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
     <string name="msg_no_changes">No Changes to Save.</string>
     <string name="msg_no_pointers_installed">No Pointers Installed</string>
@@ -108,8 +109,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Select and Apply Pointer</string>
-    <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
     <string name="pointer_folder_name" translatable="false">Pointers</string>
+    <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="pointer_preview">Pointer Preview</string>
     <string name="pref_category_support">Support Development</string>
