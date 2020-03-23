@@ -34,7 +34,6 @@ android {
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
         versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
         multiDexEnabled true
-        buildConfigField("String", "AD_TEST_DEVICE_ID", ADMOB_TEST_DEVICE_ID)
     }
     buildTypes {
         release {
@@ -84,6 +83,7 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:${appcompatVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${constraintlayoutVersion}"
+    implementation "androidx.lifecycle:lifecycle-extensions:${lifecycleVersion}"
     implementation "androidx.multidex:multidex:${multidexVersion}"
     implementation "androidx.preference:preference:${preferenceVersion}"
     implementation "com.google.android.material:material:${googleMaterialVersion}"

@@ -394,11 +394,7 @@ class MainFragment : PreferenceFragmentCompat() {
     private fun setUpAds() {
         interstitialAd = InterstitialAd(this.activity!!)
         interstitialAd.apply {
-            adUnitId = if (BuildConfig.DEBUG) {
-                "ca-app-pub-3940256099942544/1033173712"
-            } else {
-                getString(R.string.interstitial_ad_2_id)
-            }
+            adUnitId = getString(R.string.interstitial_ad_2_id)
             loadAd(AdRequest.Builder().build())
         }
 

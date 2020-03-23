@@ -38,7 +38,6 @@ android {
             useSupportLibrary = true
         }
         multiDexEnabled true
-        buildConfigField("String", "AD_TEST_DEVICE_ID", ADMOB_TEST_DEVICE_ID)
 
         kapt {
             arguments {
@@ -91,22 +90,6 @@ android {
     }
     lintOptions {
         abortOnError false
-    }
-
-    if (System.getenv("CI") == "true") {
-        productFlavors {
-            dev {
-                dimension = 'ar'
-                versionNameSuffix = '-CI'
-                applicationIdSuffix = '.ci'
-            }
-
-            prod {
-                dimension = 'ar'
-                versionNameSuffix = '-CI'
-                applicationIdSuffix = '.ci'
-            }
-        }
     }
 }
 
@@ -172,7 +155,7 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     implementation "com.afterroot.core:core:${coreVersion}"
 
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    debugImplementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
 }
 apply plugin: 'com.google.gms.google-services'
