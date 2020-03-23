@@ -32,8 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager.beginTransaction().replace(R.id.container, MainFragment()).commit()
         val builder = AdRequest.Builder()
-        val adRequest =
-            if (BuildConfig.DEBUG) builder.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID).build() else builder.build()
+        val adRequest = builder.build()
         adView.loadAd(adRequest)
 
         MobileAds.initialize(this, getString(R.string.admob_app_id))
