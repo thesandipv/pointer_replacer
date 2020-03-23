@@ -335,18 +335,11 @@ class MainFragment : Fragment() {
 
     private fun setUpAd() {
         val adRequest = AdRequest.Builder()
-        if (BuildConfig.DEBUG) {
-            adRequest.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID)
-        }
         banner_ad_main.loadAd(adRequest.build())
 
         interstitialAd = InterstitialAd(this.requireActivity())
         interstitialAd.apply {
-            adUnitId = if (BuildConfig.DEBUG) {
-                getString(R.string.ad_interstitial_test_id)
-            } else {
-                getString(R.string.ad_interstitial_1_id)
-            }
+            adUnitId = getString(R.string.ad_interstitial_1_id)
             loadAd(AdRequest.Builder().build())
         }
     }

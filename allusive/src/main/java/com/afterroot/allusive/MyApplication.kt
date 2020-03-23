@@ -21,7 +21,10 @@ import com.afterroot.allusive.di.appModule
 import com.afterroot.allusive.di.firebaseModule
 import com.afterroot.allusive.di.roomModule
 import com.afterroot.core.onVersionGreaterThanEqualTo
+import com.facebook.stetho.Stetho
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import fr.dasilvacampos.network.monitoring.NetworkStateHolder.registerConnectivityBroadcaster
+import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -41,5 +44,9 @@ class MyApplication : MultiDexApplication() {
         onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
             registerConnectivityBroadcaster()
         })
+        if (BuildConfig.DEBUG) {
+            OkHttpClient.Builder().addNetworkInterceptor(StethoInterceptor()).build()
+            Stetho.initializeWithDefaults(this)
+        }
     }
 }

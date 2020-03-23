@@ -171,5 +171,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinxCoroutinesVersion}"
     testImplementation 'junit:junit:4.13'
     implementation "com.afterroot.core:core:${coreVersion}"
+
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    debugImplementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
 }
 apply plugin: 'com.google.gms.google-services'
