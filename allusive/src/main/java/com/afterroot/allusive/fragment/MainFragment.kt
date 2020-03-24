@@ -19,16 +19,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Environment
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -51,7 +47,6 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
-import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.ui.SplashActivity
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.loadBitmapFromView
@@ -83,8 +78,6 @@ class MainFragment : Fragment() {
     private val myDatabase: MyDatabase by inject()
     private val settings: Settings by inject()
     private var extSdDir: String? = null
-    private var pointersDocument: DocumentFile? = null
-    private var targetDocumentFile: DocumentFile? = null
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -98,19 +91,9 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
-        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-            try {
-                pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
-                targetDocumentFile = pointersDocument?.findFile(getString(R.string.app_name))
-                    ?.findFile(getString(R.string.pointer_folder_name))
-            } catch (npe: NullPointerException) {
-                MainActivity.openStorageAccess(requireActivity())
-            }
-        } else {
-            val pointersFolder = getString(R.string.pointer_folder_path)
-            extSdDir = Environment.getExternalStorageDirectory().toString()
-            targetPath = extSdDir!! + pointersFolder
-        }
+        val pointersFolder = getString(R.string.pointer_folder_path)
+        extSdDir = Environment.getExternalStorageDirectory().toString()
+        targetPath = extSdDir!! + pointersFolder
 
         requireActivity().apply {
             layout_new_pointer.setOnClickListener {
@@ -223,13 +206,8 @@ class MainFragment : Fragment() {
                     setColorFilter(pointerColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
-                val uri = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                    targetDocumentFile?.findFile(settings.selectedPointerName!!)?.uri
-                } else {
-                    Uri.fromFile(File(selectedPointerPath))
-                }
                 GlideApp.with(requireContext())
-                    .load(uri)
+                    .load(Uri.fromFile(File(selectedPointerPath)))
                     .into(selected_pointer)
             }
             if (selectedMousePath != null) {
@@ -239,13 +217,8 @@ class MainFragment : Fragment() {
                     setColorFilter(mouseColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
-                val uri = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                    targetDocumentFile?.findFile(settings.selectedMouseName!!)?.uri
-                } else {
-                    Uri.fromFile(File(selectedMousePath))
-                }
                 GlideApp.with(requireContext())
-                    .load(uri)
+                    .load(Uri.fromFile(File(selectedMousePath)))
                     .into(selected_mouse)
             }
         } catch (throwable: Throwable) {
@@ -406,18 +379,9 @@ class MainFragment : Fragment() {
 
     private fun import() {
         val fileNames = arrayListOf<String>()
-        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-            targetDocumentFile?.listFiles()?.forEach {
-                if (it.name != ".nomedia") {
-                    fileNames.add(it.name.toString())
-                }
-            }
-        } else {
-            File(targetPath!!).listFiles()?.forEach {
-                if (it.name != ".nomedia") {
-                    fileNames.add(it.name)
-                }
-
+        File(targetPath!!).listFiles()?.forEach {
+            if (it.name != ".nomedia") {
+                fileNames.add(it.name)
             }
         }
         lifecycleScope.launch {
@@ -435,9 +399,7 @@ class MainFragment : Fragment() {
                 try {
                     import()
                 } catch (e: IllegalStateException) {
-                    if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                        MainActivity.openStorageAccess(requireActivity())
-                    }
+                    e.printStackTrace()
                 }
             }
         }
@@ -454,17 +416,11 @@ class MainFragment : Fragment() {
                     settings.selectedMouseName = selectedItem.file_name
                     settings.selectedMousePath = targetPath + selectedItem.file_name
                 }
-                if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                    GlideApp.with(requireContext())
-                        .load(targetDocumentFile?.findFile(selectedItem.file_name)?.uri)
-                        .override(requireContext().getMinPointerSize())
-                        .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
-                } else {
-                    GlideApp.with(requireContext())
-                        .load(File(targetPath + selectedItem.file_name))
-                        .override(requireContext().getMinPointerSize())
-                        .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
-                }
+                GlideApp.with(requireContext())
+                    .load(File(targetPath + selectedItem.file_name))
+                    .override(requireContext().getMinPointerSize())
+                    .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
+
                 dialog.dismiss()
             }
 
@@ -474,12 +430,7 @@ class MainFragment : Fragment() {
                     title(text = "${getString(R.string.text_delete)} ${selectedItem.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
-                        if (if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                                targetDocumentFile?.findFile(selectedItem.file_name)?.delete()!!
-                            } else {
-                                File(targetPath + selectedItem.file_name).delete()
-                            }
-                        ) {
+                        if (File(targetPath + selectedItem.file_name).delete()) {
                             lifecycleScope.launch {
                                 myDatabase.pointerDao().delete(selectedItem)
                             }
@@ -550,10 +501,10 @@ class MainFragment : Fragment() {
             .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
                 AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
                     Toast.makeText(
-                            requireContext(),
-                            getString(R.string.dialog_sign_out_result_success),
-                            Toast.LENGTH_SHORT
-                        )
+                        requireContext(),
+                        getString(R.string.dialog_sign_out_result_success),
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                     startActivity(Intent(requireContext(), SplashActivity::class.java))
                 }

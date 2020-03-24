@@ -16,11 +16,8 @@
 package com.afterroot.allusive.adapter
 
 import android.content.Context
-import android.os.Build
 import android.os.Environment
 import android.view.ViewGroup
-import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive.GlideApp
 import com.afterroot.allusive.R
@@ -31,7 +28,6 @@ import com.afterroot.allusive.model.IPointer
 import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.inflate
-import com.afterroot.core.onVersionGreaterThanEqualTo
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 import org.koin.core.Koin
 
@@ -52,21 +48,10 @@ class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : Ty
             itemView.info_username.text =
                 String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
             itemView.info_pointer_image.apply {
-                onVersionGreaterThanEqualTo(Build.VERSION_CODES.LOLLIPOP, {
-                    GlideApp.with(context).load(
-                            DocumentFile.fromTreeUri(context, settings.safUri?.toUri()!!)
-                                ?.findFile(context.getString(R.string.app_name))
-                                ?.findFile(context.getString(R.string.pointer_folder_name))
-                                ?.findFile(pointer.file_name)?.uri
-                        )
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .into(this)
-                }, {
-                    GlideApp.with(context)
-                        .load("${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}")
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .into(this)
-                })
+                GlideApp.with(context)
+                    .load("${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}")
+                    .override(context.getMinPointerSize(), context.getMinPointerSize())
+                    .into(this)
                 background = context.getDrawableExt(R.drawable.transparent_grid)
             }
 
