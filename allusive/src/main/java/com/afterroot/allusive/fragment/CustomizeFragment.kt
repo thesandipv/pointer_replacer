@@ -24,8 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.findNavController
@@ -56,7 +54,6 @@ import java.util.*
 class CustomizeFragment : Fragment() {
     private lateinit var typePath: String
     private val settings: Settings by inject()
-    private var pointersDocument: DocumentFile? = null
     private var pointerType: Int = 0
     private var selectedColor: Int = 0
     private var typeAlpha: Int = 255
@@ -90,21 +87,8 @@ class CustomizeFragment : Fragment() {
 
         view.image_customize_pointer.setColorFilter(typeColor)
 
-        pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri!!.toUri())
-            ?.findFile(getString(R.string.app_name))?.findFile(getString(R.string.pointer_folder_name))
-
         GlideApp.with(requireContext())
-            .load(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    pointersDocument?.findFile(
-                        if (pointerType == POINTER_TOUCH) settings.selectedPointerName!!
-                        else settings.selectedMouseName!!
-                    )
-                        ?.uri
-                } else {
-                    Uri.fromFile(File(typePath))
-                }
-            )
+            .load(Uri.fromFile(File(typePath)))
             .into(image_customize_pointer)
 
         requireActivity().fab_apply.apply {

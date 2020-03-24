@@ -16,29 +16,23 @@
 package com.afterroot.allusive.ui
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PERMISSION
-import com.afterroot.allusive.Constants.RC_STORAGE_ACCESS
 import com.afterroot.allusive.R
 import com.afterroot.allusive.Settings
 import com.afterroot.allusive.database.DatabaseFields
@@ -47,8 +41,6 @@ import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.utils.PermissionChecker
 import com.afterroot.core.extensions.animateProperty
 import com.afterroot.core.extensions.visible
-import com.afterroot.core.onVersionGreaterThanEqualTo
-import com.afterroot.core.onVersionLessThan
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -103,9 +95,6 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Greater than Lollipop
             when {
-                settings.safUri == null -> { //SAF not Accessed
-                    openStorageAccess(this)
-                }
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                     checkPermissions()
                 }
@@ -114,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } else {
-            loadFragments() //Less than Lollipop, direct load fragments
+            createPointerFolder() //Less than Lollipop, direct load fragments
         }
 
         //Add user in db if not available
@@ -122,49 +111,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createPointerFolder() {
-        onVersionLessThan(Build.VERSION_CODES.LOLLIPOP, {
-            val targetPath = "${Environment.getExternalStorageDirectory()}${getString(R.string.pointer_folder_path)}"
-            val pointersFolder = File(targetPath)
-            val dotNoMedia = File("${targetPath}/.nomedia")
-            if (!pointersFolder.exists()) {
-                pointersFolder.mkdirs()
-            }
-            if (!dotNoMedia.exists()) {
-                dotNoMedia.createNewFile()
-            }
-        }, {
-            val pointerFolderName = "Pointer Replacer"
-            val documentTree = DocumentFile.fromTreeUri(
-                this,
-                settings.safUri?.toUri()!!
-            ) ?: return@onVersionLessThan
-            if (documentTree.findFile(pointerFolderName) == null) {
-                documentTree.createDirectory(pointerFolderName)
-                    ?.createDirectory("Pointers")
-                    ?.createFile("", ".nomedia")
-            }
-        })
-        loadFragments()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_STORAGE_ACCESS && resultCode == Activity.RESULT_OK) {
-            data?.data?.also {
-                val uri = data.data ?: return
-                settings.safUri = uri.toString()
-                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                onVersionGreaterThanEqualTo(Build.VERSION_CODES.KITKAT, {
-                    this.applicationContext.contentResolver.takePersistableUriPermission(uri, flags)
-                })
-                onVersionGreaterThanEqualTo(Build.VERSION_CODES.M, {
-                    checkPermissions() //Check for permissions after Storage access if Android M up
-                }, {
-                    createPointerFolder() //Else direct create folder if not exists if Lollipop
-                })
-
-            }
+        val targetPath = "${Environment.getExternalStorageDirectory()}${getString(R.string.pointer_folder_path)}"
+        val pointersFolder = File(targetPath)
+        val dotNoMedia = File("${targetPath}/.nomedia")
+        if (!pointersFolder.exists()) {
+            pointersFolder.mkdirs()
         }
+        if (!dotNoMedia.exists()) {
+            dotNoMedia.createNewFile()
+        }
+        loadFragments()
     }
 
     private fun addUserInfoInDB() {
@@ -306,24 +262,5 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
-
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        fun openStorageAccess(activity: Activity) {
-            MaterialDialog(activity).show {
-                title(text = "Grant Storage Permissions")
-                message(text = "On next screen Select Internal Storage > Tap Allow Access and Grant Storage permission.")
-                positiveButton(text = "Grant") {
-                    activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                    }, RC_STORAGE_ACCESS)
-                }
-                negativeButton(res = android.R.string.cancel) {
-                    activity.finish()
-                }
-                cancelable(false)
-                cancelOnTouchOutside(false)
-            }
-        }
-
     }
 }

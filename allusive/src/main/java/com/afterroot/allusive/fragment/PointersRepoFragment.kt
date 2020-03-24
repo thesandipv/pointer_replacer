@@ -16,15 +16,11 @@
 package com.afterroot.allusive.fragment
 
 
-import android.os.Build
-import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -48,7 +44,6 @@ import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
-import com.afterroot.allusive.ui.MainActivity
 import com.afterroot.allusive.utils.FirebaseUtils
 import com.afterroot.allusive.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive.viewmodel.ViewModelState
@@ -71,9 +66,6 @@ import org.jetbrains.anko.toast
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
@@ -88,8 +80,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
     private val storage: FirebaseStorage by inject()
-    private var pointersDocument: DocumentFile? = null
-    private var targetDocumentFile: DocumentFile? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
@@ -104,19 +94,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             settings = Settings(requireContext())
-            if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                try {
-                    pointersDocument = DocumentFile.fromTreeUri(requireContext(), settings.safUri?.toUri()!!)
-                    targetDocumentFile = pointersDocument?.findFile(getString(R.string.app_name))
-                        ?.findFile(getString(R.string.pointer_folder_name))
-                } catch (npe: NullPointerException) {
-                    MainActivity.openStorageAccess(requireActivity())
-                }
-            } else {
-                pointersFolder = getString(R.string.pointer_folder_path)
-                extSdDir = Environment.getExternalStorageDirectory().toString()
-                mTargetPath = extSdDir + pointersFolder
-            }
+            pointersFolder = getString(R.string.pointer_folder_path)
+            extSdDir = Environment.getExternalStorageDirectory().toString()
+            mTargetPath = extSdDir + pointersFolder
             setUpList()
         }
     }
@@ -150,9 +130,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                         setUpList()
                     } catch (e: IllegalStateException) {
                         isRefreshing = false
-                        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                            MainActivity.openStorageAccess(requireActivity())
-                        }
+                        e.printStackTrace()
                     }
                 }
                 setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
@@ -275,10 +253,16 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private fun downloadPointer(position: Int) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
-        if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-            ref.getBytes(1024 * 1024).addOnSuccessListener { bytes ->
+        ref.getFile(File("$mTargetPath${pointersList[position].filename}"))
+            .addOnSuccessListener {
                 requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
                     requireActivity().navigation
+                if (!BuildConfig.DEBUG) {
+                    pointersSnapshot.documents[position].reference.update(
+                        DatabaseFields.FIELD_DOWNLOADS,
+                        pointersList[position].downloads + 1
+                    )
+                }
                 val p = pointersList[position]
                 var id = ""
                 var name = ""
@@ -293,75 +277,16 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     uploader_id = id,
                     uploader_name = name
                 )
-                try {
-                    this.requireActivity().contentResolver
-                        .openFileDescriptor(targetDocumentFile?.createFile("", p.filename)?.uri!!, "w").use { pfd ->
-                            FileOutputStream(pfd!!.fileDescriptor).use {
-                                it.write(bytes)
-                            }
-                        }
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } catch (e: NullPointerException) {
-                    if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-                        MainActivity.openStorageAccess(requireActivity())
-                    }
-                } finally {
-                    lifecycleScope.launch {
-                        myDatabase.pointerDao().add(pointer)
-                    }
-                    if (!BuildConfig.DEBUG) {
-                        pointersSnapshot.documents[position].reference.update(
-                            DatabaseFields.FIELD_DOWNLOADS,
-                            pointersList[position].downloads + 1
-                        )
-                    }
-                    dialog.dismiss()
+                lifecycleScope.launch {
+                    myDatabase.pointerDao().add(pointer)
                 }
 
+                dialog.dismiss()
             }.addOnFailureListener {
-                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
+                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
+                    requireActivity().navigation
                 dialog.dismiss()
             }
-        } else {
-            ref.getFile(File("$mTargetPath${pointersList[position].filename}"))
-                .addOnSuccessListener {
-                    requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
-                        requireActivity().navigation
-                    if (!BuildConfig.DEBUG) {
-                        pointersSnapshot.documents[position].reference.update(
-                            DatabaseFields.FIELD_DOWNLOADS,
-                            pointersList[position].downloads + 1
-                        )
-                    }
-                    val p = pointersList[position]
-                    var id = ""
-                    var name = ""
-                    p.uploadedBy!!.forEach {
-                        id = it.key
-                        name = it.value
-                    }
-                    val pointer = RoomPointer(
-                        file_name = p.filename,
-                        pointer_desc = p.description,
-                        pointer_name = p.name,
-                        uploader_id = id,
-                        uploader_name = name
-                    )
-                    lifecycleScope.launch {
-                        myDatabase.pointerDao().add(pointer)
-                    }
-
-                    dialog.dismiss()
-                }.addOnFailureListener {
-                    requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
-                        requireActivity().navigation
-                    dialog.dismiss()
-                }
-
-        }
     }
 
     override fun onClick(position: Int, view: View?) {
