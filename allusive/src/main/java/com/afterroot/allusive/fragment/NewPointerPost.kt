@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
@@ -92,9 +91,6 @@ class NewPointerPost : Fragment() {
         }
 
         val adRequest = AdRequest.Builder()
-        if (BuildConfig.DEBUG) {
-            adRequest.addTestDevice(BuildConfig.AD_TEST_DEVICE_ID)
-        }
         banner_ad_repo.loadAd(adRequest.build())
     }
 
