@@ -89,7 +89,7 @@ dependencies {
     implementation "com.google.android.material:material:${googleMaterialVersion}"
 
     implementation "com.android.billingclient:billing:${billingVersion}"
-    implementation "com.android.billingclient:billing-ktx:${billingVersion}"
+    implementation "com.android.billingclient:billing-ktx:${billingKtxVersion}"
 
     implementation "org.jetbrains.anko:anko-commons:${ankoCommonsVersion}"
     implementation "com.afterroot.core:core:${coreVersion}"
