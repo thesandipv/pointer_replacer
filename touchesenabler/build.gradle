@@ -28,7 +28,7 @@ ext {
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "com.afterroot.touchenabler"
+        applicationId "com.afterroot.toucher"
         minSdkVersion project.ext.minimumSdkVersion
         targetSdkVersion 29
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
