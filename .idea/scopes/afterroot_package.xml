@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="afterroot package" pattern="src[allusive]:com.afterroot.allusive..*||src[tapslegacy]:com.afterroot.toucherlegacy..*||src[touchesenabler]:com.afterroot.touchenabler..*" />
+  <scope name="afterroot package" pattern="src[allusive]:com.afterroot.allusive..*||src[tapslegacy]:com.afterroot.toucherlegacy..*||src[touchesenabler]:com.afterroot.toucher..*" />
 </component>
