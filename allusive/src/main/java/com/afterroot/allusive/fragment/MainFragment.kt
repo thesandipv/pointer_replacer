@@ -48,8 +48,8 @@ import com.afterroot.allusive.database.MyDatabase
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.model.RoomPointer
 import com.afterroot.allusive.ui.SplashActivity
+import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.loadBitmapFromView
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
@@ -323,7 +323,7 @@ class MainFragment : Fragment() {
         val out: FileOutputStream
         try {
             out = FileOutputStream(file)
-            loadBitmapFromView(view)?.compress(Bitmap.CompressFormat.PNG, 100, out)
+            view.getAsBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.flush()
             out.close()
         } catch (e: FileNotFoundException) {
