@@ -48,16 +48,14 @@ class SplashActivity : AppCompatActivity() {
                 }
                 cancelable(false)
             }
-        } else if (intent != null) {
-            if (intent.action == Intent.ACTION_VIEW) {
-                intent.extras?.let {
-                    val link = it.getString("link")
-                    if (link != null) {
-                        browse(link)
-                    }
-                    finish()
+        } else if (intent.extras != null) {
+            intent.extras?.let {
+                val link = it.getString("link")
+                if (link != null) {
+                    browse(link, true)
                 }
-            } else launchDashboard()
+                finish()
+            }
         } else {
             launchDashboard()
         }

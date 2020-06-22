@@ -62,7 +62,7 @@ class FireMessagingService : FirebaseMessagingService() {
                 message = remoteMessage.notification!!.body!!,
                 url = remoteMessage.data["link"],
                 channelId = remoteMessage.notification!!.channelId,
-                channelName = remoteMessage.data["cname"],
+                channelName = remoteMessage.data["cname"] ?: getString(R.string.fcm_channel_default),
                 title = remoteMessage.notification?.title
             )
         }

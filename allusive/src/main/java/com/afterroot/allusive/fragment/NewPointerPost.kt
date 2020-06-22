@@ -22,29 +22,36 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import com.afollestad.materialdialogs.customview.getCustomView
+import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
 import com.afterroot.allusive.database.DatabaseFields
 import com.afterroot.allusive.model.Pointer
 import com.afterroot.allusive.utils.FirebaseUtils
+import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.loadBitmapFromView
 import com.afterroot.core.extensions.showStaticProgressDialog
+import com.afterroot.core.extensions.updateProgressText
 import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdCallback
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.dialog_progress.view.*
 import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.inject
@@ -55,18 +62,22 @@ import java.io.IOException
 
 class NewPointerPost : Fragment() {
 
+    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+    private lateinit var rewardedAd: RewardedAd
     private val db: FirebaseFirestore by inject()
     private val pointerDescription: String get() = edit_desc.text.toString().trim()
     private val pointerName: String get() = edit_name.text.toString().trim()
     private val storage: FirebaseStorage by inject()
+    private var adLoaded: Boolean = false
+    private var clickedUpload: Boolean = false
     private var isPointerImported = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_new_pointer_post, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         action_upload.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/png"
@@ -81,6 +92,50 @@ class NewPointerPost : Fragment() {
             startActivityForResult(chooserIntent, RC_PICK_IMAGE)
         }
 
+        initFirebaseConfig()
+        val adRequest = AdRequest.Builder()
+        banner_ad_repo.loadAd(adRequest.build())
+    }
+
+    private fun initFirebaseConfig() {
+        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        firebaseRemoteConfig.let { config ->
+            FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
+                .build().apply {
+                    config.setConfigSettingsAsync(this)
+                }
+
+            config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
+                .addOnCompleteListener(requireActivity()) { result ->
+                    if (result.isSuccessful) {
+                        firebaseRemoteConfig.activate()
+                        if (firebaseRemoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
+                            setUpRewardedAd()
+                            requireActivity().fab_apply.apply {
+                                setOnClickListener {
+                                    clickedUpload = true
+                                    if (rewardedAd.isLoaded) {
+                                        showAd()
+                                    } else {
+                                        requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
+                                            requireActivity().navigation
+
+                                    }
+                                }
+                                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+                            }
+                        } else {
+                            setFabAsDirectUpload()
+                        }
+                    } else {
+                        setFabAsDirectUpload()
+                    }
+                }
+        }
+    }
+
+    private fun setFabAsDirectUpload() {
         requireActivity().fab_apply.apply {
             setOnClickListener {
                 if (verifyData()) {
@@ -89,9 +144,48 @@ class NewPointerPost : Fragment() {
             }
             icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
         }
+    }
 
-        val adRequest = AdRequest.Builder()
-        banner_ad_repo.loadAd(adRequest.build())
+    private fun showAd() {
+        val adCallback = object : RewardedAdCallback() {
+            override fun onUserEarnedReward(p0: RewardItem) {
+                clickedUpload = false
+                if (verifyData()) {
+                    upload(saveTmpPointer())
+                }
+            }
+
+            override fun onRewardedAdClosed() {
+                super.onRewardedAdClosed()
+                setUpRewardedAd()
+            }
+        }
+        rewardedAd.show(requireActivity(), adCallback)
+    }
+
+    private fun createAndLoadRewardedAd(): RewardedAd {
+        val rewardedAd = RewardedAd(requireContext(), getString(R.string.ad_rewarded_1_id))
+        val adLoadCallback = object : RewardedAdLoadCallback() {
+            override fun onRewardedAdLoaded() {
+                // Ad successfully loaded.
+                adLoaded = true
+                if (clickedUpload) {
+                    showAd()
+                }
+
+            }
+
+            override fun onRewardedAdFailedToLoad(errorCode: Int) {
+                // Ad failed to load.
+                adLoaded = false
+            }
+        }
+        rewardedAd.loadAd(AdRequest.Builder().build(), adLoadCallback)
+        return rewardedAd
+    }
+
+    private fun setUpRewardedAd() {
+        this.rewardedAd = createAndLoadRewardedAd()
     }
 
     //Handle retrieved image uri
@@ -108,7 +202,6 @@ class NewPointerPost : Fragment() {
 
     private fun upload(file: File) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_init))
-        val customView = dialog.getCustomView()
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
@@ -117,12 +210,12 @@ class NewPointerPost : Fragment() {
 
         uploadTask.addOnProgressListener {
             val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
-            customView.text_progress.text = String.format("%s..%s", getString(R.string.text_progress_uploading), progress)
+            dialog.updateProgressText(String.format("%s..%s", getString(R.string.text_progress_uploading), progress))
         }.addOnCompleteListener { task ->
             val map = hashMapOf<String, String>()
             map[FirebaseUtils.auth!!.uid!!] = FirebaseUtils.firebaseUser!!.displayName.toString()
             if (task.isSuccessful) {
-                customView.text_progress.text = getString(R.string.text_progress_finishing_up)
+                dialog.updateProgressText(getString(R.string.text_progress_finishing_up))
                 val pointer = Pointer(
                     name = pointerName,
                     filename = fileUri.lastPathSegment!!,
@@ -130,6 +223,7 @@ class NewPointerPost : Fragment() {
                     uploadedBy = map,
                     time = Timestamp.now().toDate()
                 )
+                Log.d(TAG, "upload: $pointer")
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
                         container.snackbar(getString(R.string.msg_pointer_upload_success)).anchorView =
@@ -137,6 +231,9 @@ class NewPointerPost : Fragment() {
                         dialog.dismiss()
                         fragment_repo_nav.findNavController().navigateUp()
                     }
+                }.addOnFailureListener {
+                    requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
+                        requireActivity().navigation
                 }
             }
         }.addOnFailureListener {
@@ -151,7 +248,7 @@ class NewPointerPost : Fragment() {
     @Throws(IOException::class)
     private fun saveTmpPointer(): File {
         pointer_thumb.background = null
-        val bitmap = loadBitmapFromView(pointer_thumb)
+        val bitmap = pointer_thumb.getAsBitmap()
         val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
         val out: FileOutputStream
         try {
@@ -211,5 +308,9 @@ class NewPointerPost : Fragment() {
                 inputLayoutView.isErrorEnabled = false
             }
         })
+    }
+
+    companion object {
+        private const val TAG = "NewPointerPost"
     }
 }

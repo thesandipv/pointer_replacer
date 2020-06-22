@@ -440,7 +440,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (billingClient.isReady) {
             val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
             billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList.isNotEmpty()) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList?.isNotEmpty()!!) {
                     Handler().postDelayed({
                         loadingDialog.dismiss()
                     }, 100)

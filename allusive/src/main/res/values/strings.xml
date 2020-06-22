@@ -17,6 +17,7 @@
     <string name="action_import_old_pointers">Import Old Pointers</string>
     <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/3357869005</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/6191545783</string>
+    <string name="ad_rewarded_1_id" translatable="false">ca-app-pub-6628325093439880/1816135318</string>
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~2651384855</string>
     <string name="app_name">Pointer Replacer</string>
     <string name="apply_pointer">Apply Pointer</string>
