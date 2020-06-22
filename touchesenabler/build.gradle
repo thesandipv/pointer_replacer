@@ -21,7 +21,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 ext {
     major = 1
     minor = 3
-    patch = 0
+    patch = 1
     minimumSdkVersion = 16
 }
 
@@ -30,7 +30,8 @@ android {
     defaultConfig {
         applicationId "com.afterroot.toucher"
         minSdkVersion project.ext.minimumSdkVersion
-        targetSdkVersion 29
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 22
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
         versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
         multiDexEnabled true

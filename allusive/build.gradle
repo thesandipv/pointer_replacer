@@ -155,7 +155,6 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     implementation "com.afterroot.core:core:${coreVersion}"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
 }
 apply plugin: 'com.google.gms.google-services'
