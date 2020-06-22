@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Initialize AdMob SDK
-        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        MobileAds.initialize(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Greater than Lollipop

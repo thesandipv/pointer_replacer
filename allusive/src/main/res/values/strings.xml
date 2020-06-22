@@ -207,4 +207,6 @@
     <string name="url_source_code" translatable="false">https://m8rg7.app.goo.gl/sourceCode</string>
     <string name="url_telegram" translatable="false">https://t.me/prdiscussion</string>
     <string name="url_xda_thread" translatable="false">https://m8rg7.app.goo.gl/pr_xda</string>
+    <string name="dialog_msg_rewarded_ad">Upload will continue after watching ad. This step is taken subject to support development and server costs. Thanks for your co-operation</string>
+    <string name="text_ok">Ok</string>
 </resources>

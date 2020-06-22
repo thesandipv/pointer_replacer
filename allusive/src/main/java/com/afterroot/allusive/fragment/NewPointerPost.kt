@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive.BuildConfig
 import com.afterroot.allusive.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive.R
@@ -114,13 +115,22 @@ class NewPointerPost : Fragment() {
                             setUpRewardedAd()
                             requireActivity().fab_apply.apply {
                                 setOnClickListener {
-                                    clickedUpload = true
-                                    if (rewardedAd.isLoaded) {
-                                        showAd()
-                                    } else {
-                                        requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
-                                            requireActivity().navigation
+                                    if (verifyData()) {
+                                        clickedUpload = true
+                                        MaterialDialog(requireContext()).show {
+                                            title(R.string.text_action_upload)
+                                            message(R.string.dialog_msg_rewarded_ad)
+                                            positiveButton(R.string.text_ok) {
+                                                if (rewardedAd.isLoaded) {
+                                                    showAd()
+                                                } else {
+                                                    requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
+                                                        requireActivity().navigation
 
+                                                }
+                                            }
+                                            negativeButton(R.string.fui_cancel)
+                                        }
                                     }
                                 }
                                 icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
