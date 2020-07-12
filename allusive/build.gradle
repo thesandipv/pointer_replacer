@@ -12,12 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.android.gms.oss-licenses-plugin'
+}
 
 ext {
     major = 1
@@ -27,9 +30,27 @@ ext {
 }
 
 android {
+    if (!System.getenv("CI")) {
+        def keystorePropertiesFile = rootProject.file("keystore.properties")
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        signingConfigs {
+            signing {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
     compileSdkVersion 29
+
+    buildFeatures {
+        dataBinding true
+    }
+
     defaultConfig {
-        applicationId "com.afterroot.allusive"
+        applicationId "com.afterroot.allusive2"
         minSdkVersion project.ext.minimumSdkVersion
         targetSdkVersion 29
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
@@ -39,9 +60,12 @@ android {
         }
         multiDexEnabled true
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental"   : "true"
+                ]
             }
         }
     }
@@ -111,7 +135,7 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:${navigationVersion}"
     implementation "androidx.navigation:navigation-ui-ktx:${navigationVersion}"
     implementation "androidx.paging:paging-runtime-ktx:${pagingVersion}"
-    implementation "androidx.preference:preference:${preferenceVersion}"
+    implementation "androidx.preference:preference-ktx:${preferenceVersion}"
     implementation "androidx.recyclerview:recyclerview:${recyclerviewVersion}"
     implementation "androidx.room:room-ktx:${roomKtxVersion}"
     implementation "androidx.room:room-runtime:${roomKtxVersion}"
@@ -155,6 +179,5 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     implementation "com.afterroot.core:core:${coreVersion}"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.8.0'
 }
-apply plugin: 'com.google.gms.google-services'
