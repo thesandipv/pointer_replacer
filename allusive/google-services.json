@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "302054959566-bbvil2q3p255n9f7lu3f2uhni7plnf50.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive",
+            "certificate_hash": "26d67c33b9013a93b29020ccae392bec93076183"
+          }
+        },
+        {
           "client_id": "302054959566-pgbsf6mcp2i72soslkeocs41uf31fvqi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -70,12 +78,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:302054959566:android:0ea9cd71de1accba69639f",
+        "mobilesdk_app_id": "1:302054959566:android:4052c1fc27ef4bb469639f",
         "android_client_info": {
-          "package_name": "com.afterroot.allusive.ci"
+          "package_name": "com.afterroot.allusive2"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "302054959566-b7s1l867i7qt8ta1qqv4skiq1tdpehu0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive2",
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+          }
+        },
+        {
+          "client_id": "302054959566-hjocl2qp94f2eq8gspo2drklddh108jt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive2",
+            "certificate_hash": "b0fc23905191f8994eb7fe75827a43257f88c9b4"
+          }
+        },
         {
           "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
           "client_type": 3
@@ -142,6 +166,43 @@
         }
       },
       "admob_app_id": "ca-app-pub-6628325093439880~3997794533"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302054959566:android:9c66d8bb27f44c6a69639f",
+        "android_client_info": {
+          "package_name": "com.afterroot.toucher"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302054959566-obn48bbtdpphukfi5oue19k8e08c5kaa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.toucher",
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+          }
+        },
+        {
+          "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-O1qrPjqq9N_S5bHO1viRIac7bYc0wCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
