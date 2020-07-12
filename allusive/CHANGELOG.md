@@ -1,3 +1,23 @@
+###1.8.9 [12/07/2020]
+- Pointer upload model changed.
+- Under the hood changes
+
+###1.8.8 [03/03/2020]
+not released
+
+###1.8.7 [10/12/2019]
+- Sort by Date and Downloads
+- Fast scroll in Pointer Repo
+- List Animations bug fix
+- New donation option
+
+###1.8.6 [19/11/2019]
+N/A
+
+###1.8.5 [09/10/2019]
+- Dark Mode (Set via App Settings > App Theme) (Default is System Theme)
+- Minor Fixes
+
 ###1.8.4 [25/09/2019]
 fix crash on custom launchers
 
