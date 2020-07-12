@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-package com.afterroot.touchenabler
+package com.afterroot.toucher
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
@@ -24,6 +28,7 @@ import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         setTheme(R.style.Main_AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,5 +41,17 @@ class MainActivity : AppCompatActivity() {
         adView.loadAd(adRequest)
 
         MobileAds.initialize(this, getString(R.string.admob_app_id))
+        if (intent.extras != null) {
+            Log.d(TAG, "onCreate: ${intent?.extras?.get("link")}")
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(intent?.extras?.getString("link"))
+            }
+            startActivity(intent)
+
+        }
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

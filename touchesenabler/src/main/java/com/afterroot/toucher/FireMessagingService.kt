@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.touchenabler
+package com.afterroot.toucher
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -47,6 +47,7 @@ class FireMessagingService : FirebaseMessagingService() {
                 channelName = remoteMessage.data["cname"],
                 title = remoteMessage.notification?.title
             )
+            Log.d(_tag, "onMessageReceived: ${remoteMessage.data}")
         }
     }
 

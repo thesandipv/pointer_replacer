@@ -15,10 +15,13 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="${applicationId}">
+    package="com.afterroot.toucher">
 
-    <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:allowBackup="true"
@@ -38,12 +41,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_splash_screen" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/color_secondary" />
+
         <activity
-            android:name="com.afterroot.touchenabler.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Main.AppTheme.Launch">
             <intent-filter>
@@ -59,21 +70,32 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="afterroot.co"
+                    android:host="afterroot.web.app"
                     android:pathPrefix="/apps/show-touches-enabler"
                     android:scheme="https" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ToucherActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Dialog">
+            <intent-filter>
+                <action android:name="com.afterroot.action.OPEN_TOUCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
-            android:name="com.afterroot.touchenabler.FireMessagingService"
-            tools:ignore="ExportedService">
+            android:name=".FireMessagingService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name="com.afterroot.touchenabler.QuickSettingsService"
+            android:name=".QuickSettingsService"
             android:icon="@drawable/ic_touch"
             android:label="@string/pref_title_show_touches"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">

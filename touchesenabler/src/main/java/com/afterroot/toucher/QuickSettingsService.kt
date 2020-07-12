@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-package com.afterroot.touchenabler
+package com.afterroot.toucher
 
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 
 
@@ -42,13 +41,12 @@ class QuickSettingsService : TileService() {
         qsTile.updateTile()
         val i = Intent().apply {
             action = MainFragment.ACTION_OPEN_TEL
-            putExtra("com.afterroot.toucherlegacy.EXTRA_TOUCH_VAL", if (!getShowTouches()) 1 else 0)
+            putExtra("com.afterroot.toucher.EXTRA_TOUCH_VAL", if (!getShowTouches()) 1 else 0)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         if (i.resolveActivity(applicationContext.packageManager) != null) {
             startActivity(i)
         } else {
-            Toast.makeText(this, getString(R.string.msg_install_extension_first), Toast.LENGTH_SHORT).show()
             startActivityAndCollapse(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
     }
