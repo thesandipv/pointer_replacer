@@ -14,12 +14,12 @@
   -->
 
 <resources>
-    <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~3997794533</string>
+    <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~5565643834</string>
     <string name="app_name">ShowTouchesEnabler</string>
-    <string name="banner_ad_1_id" translatable="false">ca-app-pub-6628325093439880/1174946806</string>
+    <string name="banner_ad_1_id" translatable="false">ca-app-pub-6628325093439880/3631413937</string>
     <string name="dialog_button_install">Install</string>
-    <string name="dialog_title_install_ext">Install Extension</string>
-    <string name="interstitial_ad_2_id" translatable="false">ca-app-pub-6628325093439880/5308407476</string>
+    <string name="dialog_title_install_ext">Support Package Required</string>
+    <string name="interstitial_ad_2_id" translatable="false">ca-app-pub-6628325093439880/1005250596</string>
     <string name="key_disable_ads" translatable="false">pref_disable_ads</string>
     <string name="key_grant_permission" translatable="false">pref_grant_permission</string>
     <string name="key_other_apps" translatable="false">pref_other_apps</string>
@@ -39,7 +39,7 @@
     <string name="msg_error">Some Error occurred.</string>
     <string name="msg_ext_downloaded">Extension Downloaded</string>
     <string name="msg_info_iab_na">In-app billing service is unavailable</string>
-    <string name="msg_install_ext_dialog">Please install small extension package for changing system settings</string>
+    <string name="msg_install_ext_dialog">Please install small support package for changing system settings</string>
     <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
     <string name="msg_setting_not_allowed">Write not allowed</string>
     <string name="msg_touch_disabled">Touches Disabled</string>
@@ -69,6 +69,6 @@
     <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
     <string name="fcm_channel_default">Updates</string>
     <string name="made_with_love">Made with ❤ In India.</string>
-    <string name="url_privacy_policy" translatable="false">https://afterroot.co/privacy-policy.html</string>
+    <string name="url_privacy_policy" translatable="false">https://afterroot.web.app/privacy-policy</string>
     <string name="text_please_wait">Please Wait..</string>
 </resources>

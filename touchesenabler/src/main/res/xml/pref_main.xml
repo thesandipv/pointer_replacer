@@ -15,7 +15,7 @@
 
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         app:defaultValue="false"
         app:key="@string/key_show_touches"
         app:summaryOff="@string/msg_touch_disabled"
@@ -29,10 +29,6 @@
         app:summaryOn="BTW, Ads help me to support development"
         app:title="@string/pref_title_disable_ads" />
     <PreferenceCategory app:title="@string/pref_category_support">
-        <Preference
-            app:key="@string/key_pref_donate"
-            app:summary="@string/pref_summary_donation"
-            app:title="@string/pref_title_donate_dev" />
         <Preference
             app:key="@string/key_watch_ads"
             app:summary="@string/pref_summary_watch_ad"
@@ -48,13 +44,13 @@
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_play_store_developer" />
         </Preference>
-        <Preference
+        <!--<Preference
             app:key="@string/key_rate_on_g_play"
             app:title="@string/pref_title_rate_g_play">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/url_play_store_app_page" />
-        </Preference>
+        </Preference>-->
         <Preference android:title="Privacy Policy">
             <intent
                 android:action="android.intent.action.VIEW"
