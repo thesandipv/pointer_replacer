@@ -18,34 +18,24 @@ package com.afterroot.allusive2.fragment
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.FileProvider
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Constants.ACTION_OPEN_TEL
-import com.afterroot.allusive2.Constants.EXTRA_TOUCH_VAL
-import com.afterroot.allusive2.Constants.RC_OPEN_TEL
-import com.afterroot.allusive2.Constants.TEL_P_NAME
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
-import com.afterroot.core.extensions.isAppInstalled
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.android.billingclient.api.*
 import com.google.android.gms.ads.AdListener
@@ -55,14 +45,10 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_dashboard.*
-import org.jetbrains.anko.browse
-import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.inject
-import java.io.File
 
 @SuppressLint("ValidFragment")
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -71,7 +57,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private lateinit var interstitialAd: InterstitialAd
     private val settings: Settings by inject()
-    private var dialog: AlertDialog? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -86,7 +71,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setMaxPointerPaddingPref()
         setMaxPointerSizePref()
         setOpenSourceLicPref()
-        setShowTouchPref()
         setVersionPref()
         setDonatePref(false)
         initBilling()
@@ -177,23 +161,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                 return@OnPreferenceChangeListener true
             }
-        }
-    }
-
-    private fun setShowTouchPref() {
-        findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!
-            .onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            val i = Intent().apply {
-                action = ACTION_OPEN_TEL
-                putExtra(EXTRA_TOUCH_VAL, if (newValue == true) 1 else 0)
-            }
-            if (i.resolveActivity(requireActivity().packageManager) != null) {
-                startActivityForResult(i, RC_OPEN_TEL)
-            } else {
-                Toast.makeText(requireActivity(), getString(R.string.msg_install_extension), Toast.LENGTH_SHORT).show()
-                installExtensionDialog().show()
-            }
-            true
         }
     }
 
@@ -318,104 +285,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 true
             }
 
-    }
-
-    private fun installExtensionDialog(): AlertDialog {
-        dialog = AlertDialog.Builder(requireActivity()).setTitle(getString(R.string.title_install_ext_dialog))
-            .setMessage(getString(R.string.msg_install_ext_dialog))
-            .setCancelable(false)
-            .setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
-                settings.isExtDialogCancelled = true
-            }
-            .setPositiveButton(getString(R.string.dialog_button_install)) { _, _ ->
-                val reference = FirebaseStorage.getInstance().reference.child("updates/tapslegacy-release.apk")
-                val tmpFile = File(requireContext().cacheDir, "app.apk")
-                requireActivity().container.longSnackbar(getString(R.string.msg_downloading_ext)).anchorView =
-                    requireActivity().navigation
-                reference.getFile(tmpFile).addOnSuccessListener {
-                    requireActivity().container.snackbar(getString(R.string.msg_ext_downloaded)).anchorView =
-                        requireActivity().navigation
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val uri = FileProvider.getUriForFile(
-                            requireContext().applicationContext,
-                            BuildConfig.APPLICATION_ID + ".provider", tmpFile
-                        )
-                        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                            .setDataAndType(uri, "application/vnd.android.package-archive")
-                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(installIntent)
-                    } else {
-                        val installIntent = Intent(Intent.ACTION_VIEW)
-                            .setDataAndType(
-                                Uri.fromFile(tmpFile),
-                                "application/vnd.android.package-archive"
-                            )
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(installIntent)
-                    }
-
-                }
-            }.setNeutralButton(getString(R.string.button_text_learn_more)) { _, _ ->
-                requireActivity().browse(getString(R.string.url_learn_more))
-            }.create()
-        return dialog as AlertDialog
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (!requireActivity().isAppInstalled(TEL_P_NAME) && settings.isExtDialogCancelled) {
-            installExtensionDialog().show()
-        }
-        try {
-            settings.isShowTouches =
-                android.provider.Settings.System.getInt(
-                    requireActivity().contentResolver,
-                    getString(R.string.key_show_touches)
-                ) == 1
-            findPreference<SwitchPreferenceCompat>(getString(R.string.key_show_touches))!!.isChecked = settings.isShowTouches
-        } catch (e: android.provider.Settings.SettingNotFoundException) {
-            requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        dialog?.dismiss()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        try {
-            if (requestCode == RC_OPEN_TEL) { //Open TouchEnablerLegacy
-                super.onActivityResult(requestCode, resultCode, data)
-                when (resultCode) {
-                    1 -> { //Result OK
-                        requireActivity().container.snackbar(getString(R.string.msg_done)).anchorView =
-                            requireActivity().navigation
-                        /* if (interstitialAd.isLoaded) {
-                             interstitialAd.show()
-                         }*/
-                    }
-                    2 -> { //Write Setting Permission not Granted
-                        requireActivity().container.snackbar(getString(R.string.msg_secure_settings_permission))
-                            .setAction(getString(R.string.text_action_grant)) {
-                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                                    intent.data = Uri.parse("package:$TEL_P_NAME")
-                                    startActivity(intent)
-                                }
-
-                            }.anchorView = requireActivity().navigation
-                    }
-                    3 -> requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
-                        requireActivity().navigation //Other error
-                }
-            } else {
-                super.onActivityResult(requestCode, resultCode, data)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     private lateinit var loadingDialog: MaterialDialog
