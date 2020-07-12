@@ -16,11 +16,6 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="@string/pref_title_pointer_settings">
-        <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:icon="@drawable/ic_touch"
-            app:key="@string/key_show_touches"
-            app:title="@string/pref_title_show_touches" />
         <Preference
             app:key="@string/key_maxPointerSize"
             app:title="@string/text_max_pointer_size" />
