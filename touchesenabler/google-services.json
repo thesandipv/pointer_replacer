@@ -78,6 +78,59 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:302054959566:android:4052c1fc27ef4bb469639f",
+        "android_client_info": {
+          "package_name": "com.afterroot.allusive2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302054959566-nm90nnqer132t0cq8u6n55j532ef2vs6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive2",
+            "certificate_hash": "d703a41186bf39f788b7b46f7918c6cc84355a38"
+          }
+        },
+        {
+          "client_id": "302054959566-b7s1l867i7qt8ta1qqv4skiq1tdpehu0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive2",
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+          }
+        },
+        {
+          "client_id": "302054959566-hjocl2qp94f2eq8gspo2drklddh108jt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.allusive2",
+            "certificate_hash": "b0fc23905191f8994eb7fe75827a43257f88c9b4"
+          }
+        },
+        {
+          "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-O1qrPjqq9N_S5bHO1viRIac7bYc0wCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302054959566-bckbjfjj9h150k1php9ehrl7fg6e25lr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:302054959566:android:bbd49db79ef4a9ce",
         "android_client_info": {
           "package_name": "com.afterroot.touchenabler"
