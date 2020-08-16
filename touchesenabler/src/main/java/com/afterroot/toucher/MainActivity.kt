@@ -15,16 +15,14 @@
 
 package com.afterroot.toucher
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.jetbrains.anko.browse
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +38,17 @@ class MainActivity : AppCompatActivity() {
         val adRequest = builder.build()
         adView.loadAd(adRequest)
 
-        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        MobileAds.initialize(this)
         if (intent.extras != null) {
-            Log.d(TAG, "onCreate: ${intent?.extras?.get("link")}")
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(intent?.extras?.getString("link"))
+            intent.extras?.let {
+                val link = it.getString("link")
+                when {
+                    link != null -> {
+                        browse(link, true)
+                        finish()
+                    }
+                }
             }
-            startActivity(intent)
-
         }
     }
 

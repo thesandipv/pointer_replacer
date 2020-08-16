@@ -77,32 +77,23 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation "com.google.code.gson:gson:${gsonVersion}"
-    implementation "com.google.firebase:firebase-ads:${firebaseAdsVersion}"
-    implementation "com.google.firebase:firebase-config:${firebaseConfigVersion}"
-    implementation "com.google.firebase:firebase-core:${firebaseCoreVersion}"
-    implementation "com.google.firebase:firebase-crashlytics:${firebaseCrashlyticsVersion}"
-    implementation "com.google.firebase:firebase-messaging:${firebaseMessagingVersion}"
-    implementation "com.google.firebase:firebase-storage:${firebaseStorageVersion}"
+    implementation "com.google.firebase:firebase-ads:$firebaseAdsVersion"
+    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseAnalyticsVersion"
+    implementation "com.google.firebase:firebase-config:$firebaseConfigVersion"
+    implementation "com.google.firebase:firebase-core:$firebaseCoreVersion"
+    implementation "com.google.firebase:firebase-crashlytics-ktx:$firebaseCrashlyticsVersion"
+    implementation "com.google.firebase:firebase-messaging:$firebaseMessagingVersion"
 
-    implementation "androidx.appcompat:appcompat:${appcompatVersion}"
-    implementation "androidx.constraintlayout:constraintlayout:${constraintlayoutVersion}"
-    implementation "androidx.lifecycle:lifecycle-extensions:${lifecycleVersion}"
-    implementation "androidx.multidex:multidex:${multidexVersion}"
-    implementation "androidx.preference:preference:${preferenceVersion}"
-    implementation "com.google.android.material:material:${googleMaterialVersion}"
+    implementation "androidx.appcompat:appcompat:$appcompatVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    implementation "com.google.android.material:material:$googleMaterialVersion"
 
-    implementation "com.android.billingclient:billing:${billingVersion}"
-    implementation "com.android.billingclient:billing-ktx:${billingKtxVersion}"
+    implementation "org.jetbrains.anko:anko-commons:$ankoCommonsVersion"
+    implementation "com.afterroot.core:core:$coreVersion"
 
-    implementation "org.jetbrains.anko:anko-commons:${ankoCommonsVersion}"
-    implementation "com.afterroot.core:core:${coreVersion}"
-
-    implementation "com.afollestad.material-dialogs:core:${materialDialogsVersion}"
-    implementation "com.afollestad.material-dialogs:bottomsheets:${materialDialogsVersion}"
-
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinxCoroutinesVersion}"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinxCoroutinesVersion}"
+    implementation "com.afollestad.material-dialogs:core:$materialDialogsVersion"
+    implementation "com.afollestad.material-dialogs:bottomsheets:$materialDialogsVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
