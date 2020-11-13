@@ -43,7 +43,7 @@ android {
             }
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     buildFeatures {
         dataBinding true
@@ -145,6 +145,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$recyclerviewVersion"
     implementation "androidx.room:room-ktx:$roomKtxVersion"
     implementation "androidx.room:room-runtime:$roomKtxVersion"
+    implementation "androidx.startup:startup-runtime:$startUpVersion"
     implementation "androidx.vectordrawable:vectordrawable:$vectordrawableVersion"
     implementation "com.android.billingclient:billing:$billingVersion"
     kapt "androidx.room:room-compiler:$roomKtxVersion"
