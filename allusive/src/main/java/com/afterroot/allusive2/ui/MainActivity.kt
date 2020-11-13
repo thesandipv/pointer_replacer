@@ -22,6 +22,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val _tag = this.javaClass.simpleName
     private val manifestPermissions =
         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
+    private val networkViewModel: NetworkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +99,7 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Greater than Lollipop
+            setUpNetworkObserver()
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                     checkPermissions()
@@ -111,6 +114,20 @@ class MainActivity : AppCompatActivity() {
 
         //Add user in db if not available
         addUserInfoInDB()
+    }
+
+    private var dialog: MaterialDialog? = null
+    private fun setUpNetworkObserver() {
+        networkViewModel.doIfNetworkConnected(this, doWhenConnected = {
+            if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
+        }, doWhenNotConnected = {
+            dialog = showNetworkDialog(
+                state = it,
+                positive = { dialog?.dismiss() },
+                negative = { finish() },
+                isShowHide = true
+            )
+        })
     }
 
     private fun createPointerFolder() {
