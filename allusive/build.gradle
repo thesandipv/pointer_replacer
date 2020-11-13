@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId "com.afterroot.allusive2"
         minSdkVersion project.ext.minimumSdkVersion
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
         versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
         vectorDrawables {
@@ -114,7 +114,6 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    buildToolsVersion = '29.0.3'
 
     kotlinOptions {
         jvmTarget = 1.8
@@ -182,10 +181,13 @@ dependencies {
     implementation "org.koin:koin-androidx-scope:$koinVersion"
     implementation "org.koin:koin-androidx-viewmodel:$koinVersion"
 
+    implementation 'com.airbnb.android:epoxy:4.1.0'
+    kapt 'com.airbnb.android:epoxy-processor:4.1.0'
+
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinxCoroutinesVersion"
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.1'
     implementation "com.afterroot.core:core:$coreVersion"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.8.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 }
