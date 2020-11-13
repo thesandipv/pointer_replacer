@@ -32,7 +32,7 @@ class PointerRepoViewModel : ViewModel() {
             order = orderBy
             FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
                 .orderBy(orderBy, Query.Direction.DESCENDING)
-                .addSnapshotListener { querySnapshot, _ ->
+                .addSnapshotListener { querySnapshot, _ -> //TODO Remove Snapshot listener and replace with query.
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
                     }

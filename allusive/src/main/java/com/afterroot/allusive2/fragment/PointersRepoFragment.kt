@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -39,9 +38,11 @@ import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.PointerAdapterDelegate
+import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
+import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.utils.FirebaseUtils
@@ -58,7 +59,6 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
-import kotlinx.android.synthetic.main.fragment_pointer_repo.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
@@ -69,6 +69,7 @@ import java.io.File
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
+    private lateinit var binding: FragmentPointerRepoBinding
     private lateinit var extSdDir: String
     private lateinit var mTargetPath: String
     private lateinit var pointerAdapter: PointerAdapterDelegate
@@ -82,7 +83,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
     private val storage: FirebaseStorage by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_pointer_repo, container, false)
+        binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onResume() {
@@ -94,18 +96,20 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             settings = Settings(requireContext())
-            pointersFolder = getString(R.string.pointer_folder_path)
-            extSdDir = Environment.getExternalStorageDirectory().toString()
+            pointersFolder = getString(R.string.pointer_folder_path) //TODO Change path to app private directory.
+            extSdDir = Environment.getExternalStorageDirectory().toString() //TODO Remove this
             mTargetPath = extSdDir + pointersFolder
-            setUpList()
+            //setUpList()
+            setUpAdapter()
+            loadPointers()
         }
     }
 
-    private fun onNetworkChange(isAvailable: Boolean) {
+    private fun onNetworkChange(isAvailable: Boolean) { //TODO Implement new network checker for SDK > 21.
         if (!isAvailable) {
-            repo_swipe_refresh.visible(false)
-            layout_no_network.visible(true)
-            button_retry.setOnClickListener {
+            binding.repoSwipeRefresh.visible(false)
+            binding.layoutNoNetwork.visible(true)
+            binding.buttonRetry.setOnClickListener {
                 onResume()
             }
             requireActivity().fab_apply.hide()
@@ -122,12 +126,12 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                 icon = requireContext().getDrawableExt(R.drawable.ic_add)
             }
 
-            repo_swipe_refresh.visible(true)
-            layout_no_network.visible(false)
-            repo_swipe_refresh.apply {
+            binding.repoSwipeRefresh.visible(true)
+            binding.layoutNoNetwork.visible(false)
+            binding.repoSwipeRefresh.apply {
                 setOnRefreshListener {
                     try {
-                        setUpList()
+                        loadPointers()
                     } catch (e: IllegalStateException) {
                         isRefreshing = false
                         e.printStackTrace()
@@ -140,28 +144,49 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
     private fun setUpList() {
         pointerAdapter = PointerAdapterDelegate(this, getKoin())
-        list.apply {
+        binding.list.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
-            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            if (itemDecorationCount <= 0) {
+                addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            }
         }
         loadPointers()
         setUpFilter()
     }
 
+    private lateinit var myAdapter: PointersAdapter
+
+    //Function for using new list adapter.
+    private fun setUpAdapter() {
+        myAdapter = PointersAdapter(this)
+        binding.list.apply {
+            val lm = LinearLayoutManager(requireContext())
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            adapter = myAdapter
+        }
+        setUpFilter()
+    }
+
+    private fun displayPointers(pointers: List<Pointer>) {
+        myAdapter.submitList(pointers)
+    }
+
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, Observer {
+        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, {
             when (it) {
                 is ViewModelState.Loading -> {
-                    repo_swipe_refresh.isRefreshing = true
+                    binding.repoSwipeRefresh.isRefreshing = true
                 }
                 is ViewModelState.Loaded<*> -> {
-                    repo_swipe_refresh.isRefreshing = false
+                    binding.repoSwipeRefresh.isRefreshing = false
                     pointersSnapshot = it.data as QuerySnapshot
                     pointersList = pointersSnapshot.toObjects()
-                    pointerAdapter.add(pointersList)
-                    list.adapter = pointerAdapter
-                    list.scheduleLayoutAnimation()
+                    displayPointers(pointersList)
+//                    pointerAdapter.add(pointersList)
+//                    binding.list.adapter = pointerAdapter
+//                    binding.list.scheduleLayoutAnimation()
                 }
             }
         })
@@ -222,7 +247,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             }
             info_action_pack.apply {
                 lifecycleScope.launch {
-                    if (myDatabase.pointerDao().exists(pointer.filename).isNotEmpty()) {
+                    if (myDatabase.pointerDao().exists(pointer.filename!!).isNotEmpty()) {
                         text = getString(R.string.text_installed)
                         setOnClickListener(null)
                         isEnabled = false
@@ -252,7 +277,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
 
     private fun downloadPointer(position: Int) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
-        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename)
+        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename!!)
         ref.getFile(File("$mTargetPath${pointersList[position].filename}"))
             .addOnSuccessListener {
                 requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
@@ -316,9 +341,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                                         querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
                                             docSnapshot!!.reference.delete().addOnSuccessListener {
                                                 //go to last position after deleting pointer
-                                                this@PointersRepoFragment.list.scrollToPosition(position)
+                                                binding.list.scrollToPosition(position)
                                                 //delete pointer from storage bucket
-                                                storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(filename)
+                                                storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(filename!!)
                                                     .delete()
                                                 context.toast(R.string.msg_delete_success)
                                             }

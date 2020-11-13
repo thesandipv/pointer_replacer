@@ -104,11 +104,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
                 .addOnCompleteListener(requireActivity()) { result ->
-                    if (result.isSuccessful) {
-                        firebaseRemoteConfig.activate()
-                        setDonatePref(true)
-                    } else {
-                        setDonatePref(false)
+                    try {
+                        if (result.isSuccessful) {
+                            firebaseRemoteConfig.activate()
+                            setDonatePref(true)
+                        } else {
+                            setDonatePref(false)
+                        }
+                    } catch (ignored: IllegalStateException) {
+                        //if user changed context before completing.
                     }
                 }
         }

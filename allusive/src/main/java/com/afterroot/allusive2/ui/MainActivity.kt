@@ -31,6 +31,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants.RC_PERMISSION
 import com.afterroot.allusive2.R
@@ -39,6 +40,8 @@ import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.PermissionChecker
+import com.afterroot.allusive2.utils.showNetworkDialog
+import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.animateProperty
 import com.afterroot.core.extensions.visible
 import com.google.android.gms.ads.MobileAds
