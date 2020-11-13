@@ -15,25 +15,9 @@
 
 package com.afterroot.allusive2
 
+import androidx.annotation.Keep
 import androidx.multidex.MultiDexApplication
-import com.afterroot.allusive2.di.appModule
-import com.afterroot.allusive2.di.firebaseModule
-import com.afterroot.allusive2.di.roomModule
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
 
-class MyApplication : MultiDexApplication() {
-    override fun onCreate() {
-        super.onCreate()
-        init()
-    }
-
-    private fun init() {
-        startKoin {
-            androidLogger()
-            androidContext(this@MyApplication)
-            modules(listOf(roomModule, firebaseModule, appModule))
-        }
-    }
-}
+@Suppress("unused")
+@Keep
+class MyApplication : MultiDexApplication()

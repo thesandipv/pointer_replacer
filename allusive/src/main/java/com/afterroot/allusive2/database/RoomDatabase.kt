@@ -18,6 +18,20 @@ package com.afterroot.allusive2.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.afterroot.allusive2.model.RoomPointer
+import org.koin.android.ext.koin.androidApplication
+import org.koin.dsl.module
+
+val roomModule = module {
+    single {
+        Room.databaseBuilder(
+            androidApplication(),
+            MyDatabase::class.java,
+            "installed-pointers"
+        ).build()
+    }
+
+    single { get<MyDatabase>().pointerDao() }
+}
 
 @Dao
 interface PointerDao {
