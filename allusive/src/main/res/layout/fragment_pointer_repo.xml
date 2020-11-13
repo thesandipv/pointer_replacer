@@ -13,96 +13,103 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:id="@+id/layout_no_network"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <data>
 
-        <androidx.appcompat.widget.AppCompatTextView
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_no_network"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dialog_title_no_network"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_retry"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_action_retry" />
-    </LinearLayout>
-
-    <HorizontalScrollView
-        android:id="@+id/filter_scroll_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/repo_filter_chip_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
-            android:animateLayoutChanges="true"
-            app:checkedChip="@id/filter_chip_sort_by_date"
-            app:singleLine="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_chip_sort_by_date"
-                style="@style/MyStyle.FilterChip"
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_chip_sort_by_date" />
+                android:text="@string/dialog_title_no_network"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_chip_sort_by_download"
-                style="@style/MyStyle.FilterChip"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_retry"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_chip_sort_by_downloads" />
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
+                android:text="@string/text_action_retry" />
+        </LinearLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/repo_swipe_refresh"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/filter_scroll_view">
+        <HorizontalScrollView
+            android:id="@+id/filter_scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layoutAnimation="@anim/layout_anim_fall_down"
-            android:scrollbars="vertical"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_track_line"
-            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_track_line"
-            tools:listitem="@layout/item_pointer_repo" />
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/repo_filter_chip_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                android:animateLayoutChanges="true"
+                app:checkedChip="@id/filter_chip_sort_by_date"
+                app:singleLine="true">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_chip_sort_by_date"
+                    style="@style/MyStyle.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_chip_sort_by_date" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_chip_sort_by_download"
+                    style="@style/MyStyle.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_chip_sort_by_downloads" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/repo_swipe_refresh"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filter_scroll_view">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layoutAnimation="@anim/layout_anim_fall_down"
+                android:scrollbars="vertical"
+                app:fastScrollEnabled="true"
+                app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb"
+                app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_track_line"
+                app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb"
+                app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_track_line"
+                tools:listitem="@layout/item_pointer_repo" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

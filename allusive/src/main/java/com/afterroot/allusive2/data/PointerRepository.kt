@@ -13,23 +13,5 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive2.model
+package com.afterroot.allusive2.data
 
-import com.google.firebase.firestore.ServerTimestamp
-import java.io.Serializable
-import java.util.*
-
-//Collection 'pointers'
-data class Pointer(
-    var name: String? = null,
-    var filename: String? = null,
-    var description: String? = null,
-    var uploadedBy: HashMap<String, String>? = null,
-    @ServerTimestamp var time: Date? = null,
-    var downloads: Int = 0,
-    var reasonCode: Int = 0
-) : Serializable, IPointer {
-    override fun type(): Int {
-        return IPointer.TYPE_POINTER
-    }
-}

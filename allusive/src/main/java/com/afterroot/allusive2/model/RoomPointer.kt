@@ -24,9 +24,9 @@ import androidx.room.PrimaryKey
 data class RoomPointer(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(index = true, name = BaseColumns._ID)
     val id: Int = 0,
-    @ColumnInfo val pointer_name: String,
-    @ColumnInfo val file_name: String,
-    @ColumnInfo val pointer_desc: String,
+    @ColumnInfo val pointer_name: String?,
+    @ColumnInfo val file_name: String?,
+    @ColumnInfo val pointer_desc: String?,
     @ColumnInfo val uploader_id: String,
     @ColumnInfo val uploader_name: String
 ) : IPointer {
