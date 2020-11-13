@@ -16,37 +16,37 @@
 ext {
     ankoCommonsVersion = '0.10.8'
     appcompatVersion = '1.2.0'
-    billingVersion = '3.0.0'
+    billingVersion = '3.0.1'
     billingKtxVersion = '3.0.0'
     cardviewVersion = '1.0.0'
     commonsIoVersion = '1.3.2'
-    constraintlayoutVersion = '2.0.0-rc1'
-    coreKtxVersion = '1.5.0-alpha01'
+    constraintlayoutVersion = '2.0.4'
+    coreKtxVersion = '1.5.0-alpha04'
     coreVersion = '0.2.0'
-    firebaseAnalyticsVersion = '17.5.0'
-    firebaseAdsVersion = '19.3.0'
-    firebaseAuthVersion = '19.3.2'
-    firebaseConfigVersion = '19.2.0'
-    firebaseCoreVersion = '17.5.0'
-    firebaseCrashlyticsVersion = '17.2.1'
-    firebaseFirestoreVersion = '21.5.0'
-    firebaseMessagingVersion = '20.2.4'
-    firebaseStorageVersion = '19.1.1'
+    firebaseAnalyticsVersion = '18.0.0'
+    firebaseAdsVersion = '19.5.0'
+    firebaseAuthVersion = '20.0.0'
+    firebaseConfigVersion = '20.0.0'
+    firebaseCoreVersion = '18.0.0'
+    firebaseCrashlyticsVersion = '17.2.2'
+    firebaseFirestoreVersion = '22.0.0'
+    firebaseMessagingVersion = '21.0.0'
+    firebaseStorageVersion = '19.2.0'
     firebaseUiAuthVersion = '4.3.2'
     firebaseUiFirestoreVersion = '5.0.0'
     firebaseUiStorageVersion = '4.3.1'
     fragmentKtxVersion = '1.2.5'
     glideVersion = '4.11.0'
-    googleMaterialVersion = '1.3.0-alpha02'
+    googleMaterialVersion = '1.3.0-alpha03'
     gsonVersion = '2.8.6'
     koinVersion = '2.1.5'
-    kotlinxCoroutinesVersion = '1.3.9'
+    kotlinxCoroutinesVersion = '1.4.1'
     legacySupportV13Version = '1.0.0'
     legacySupportV4Version = '1.0.0'
     lifecycleVersion = '2.2.0'
     materialDialogsVersion = '3.1.0'
     multidexVersion = '2.0.1'
-    navigationVersion = '2.3.0'
+    navigationVersion = '2.3.1'
     pagingVersion = '2.1.2'
     preferenceVersion = '1.1.1'
     recyclerviewVersion = '1.1.0'
@@ -59,16 +59,16 @@ ext {
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.0'
+    ext.kotlin_version = '1.4.10'
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0-alpha07'
-        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.google.gms:google-services:4.3.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.2'
     }
 }
