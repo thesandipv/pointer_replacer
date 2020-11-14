@@ -32,7 +32,7 @@
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@+id/mainFragment" />
         <action
-            android:id="@+id/action_repo_dest_to_newPointerPost"
+            android:id="@+id/repo_to_new_pointer"
             app:destination="@id/newPostFragment"
             app:enterAnim="@anim/fui_slide_in_right"
             app:exitAnim="@anim/fui_slide_out_left"

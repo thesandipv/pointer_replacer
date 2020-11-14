@@ -109,37 +109,40 @@ class NewPointerPost : Fragment() {
 
             config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
                 .addOnCompleteListener(requireActivity()) { result ->
-                    if (result.isSuccessful) {
-                        firebaseRemoteConfig.activate()
-                        if (firebaseRemoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
-                            setUpRewardedAd()
-                            requireActivity().fab_apply.apply {
-                                setOnClickListener {
-                                    if (verifyData()) {
-                                        clickedUpload = true
-                                        MaterialDialog(requireContext()).show {
-                                            title(R.string.text_action_upload)
-                                            message(R.string.dialog_msg_rewarded_ad)
-                                            positiveButton(R.string.text_ok) {
-                                                if (rewardedAd.isLoaded) {
-                                                    showAd()
-                                                } else {
-                                                    requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
-                                                        requireActivity().navigation
+                    kotlin.runCatching {
+                        if (result.isSuccessful) {
+                            firebaseRemoteConfig.activate()
+                            if (firebaseRemoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
+                                setUpRewardedAd()
+                                requireActivity().fab_apply.apply {
+                                    setOnClickListener {
+                                        if (verifyData()) {
+                                            clickedUpload = true
+                                            MaterialDialog(requireContext()).show {
+                                                title(R.string.text_action_upload)
+                                                message(R.string.dialog_msg_rewarded_ad)
+                                                positiveButton(R.string.text_ok) {
+                                                    if (rewardedAd.isLoaded) {
+                                                        showAd()
+                                                    } else {
+                                                        requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
+                                                            requireActivity().navigation
 
+                                                    }
                                                 }
+                                                negativeButton(R.string.fui_cancel)
                                             }
-                                            negativeButton(R.string.fui_cancel)
                                         }
                                     }
+                                    icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
                                 }
-                                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+                            } else {
+                                setFabAsDirectUpload()
                             }
                         } else {
                             setFabAsDirectUpload()
                         }
-                    } else {
-                        setFabAsDirectUpload()
+
                     }
                 }
         }
@@ -195,7 +198,9 @@ class NewPointerPost : Fragment() {
     }
 
     private fun setUpRewardedAd() {
-        this.rewardedAd = createAndLoadRewardedAd()
+        kotlin.runCatching {
+            this.rewardedAd = createAndLoadRewardedAd()
+        }
     }
 
     //Handle retrieved image uri
