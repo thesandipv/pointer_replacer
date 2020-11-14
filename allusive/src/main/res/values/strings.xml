@@ -139,7 +139,7 @@
     <string name="reset_size">Reset Size &amp; Padding</string>
     <string name="str_format_uploaded_by">by %s</string>
     <string name="str_format_value_error">Value must be greater than %1$d</string>
-    <string name="str_format_version">Version %1$s (%2$d)</string>
+    <string name="str_format_version">v%1$s (%2$d) - %3$s</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>

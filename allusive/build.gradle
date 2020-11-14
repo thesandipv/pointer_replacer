@@ -71,6 +71,9 @@ android {
         if (!System.getenv("CI")) {
             signingConfig signingConfigs.allusive
         }
+
+        def commit = "git rev-list --max-count=1 HEAD".execute([], project.rootDir).text.substring(0, 7)
+        buildConfigField "String", "COMMIT_ID", "\"$commit\""
     }
     buildTypes {
         release {
