@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.allusive2.fragment
+package com.afterroot.allusive2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent

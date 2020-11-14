@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/repoFragment"
-        android:name="com.afterroot.allusive2.fragment.PointersRepoFragment"
+        android:name="com.afterroot.allusive2.ui.fragment.PointersRepoFragment"
         android:label="Pointer Repository"
         tools:layout="@layout/fragment_pointer_repo">
         <action
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.afterroot.allusive2.fragment.MainFragment"
+        android:name="com.afterroot.allusive2.ui.fragment.MainFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
@@ -65,20 +65,20 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.afterroot.allusive2.fragment.SettingsFragment"
+        android:name="com.afterroot.allusive2.ui.fragment.SettingsFragment"
         android:label="Settings" />
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.afterroot.allusive2.fragment.EditProfileFragment"
+        android:name="com.afterroot.allusive2.ui.fragment.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/newPostFragment"
-        android:name="com.afterroot.allusive2.fragment.NewPointerPost"
+        android:name="com.afterroot.allusive2.ui.fragment.NewPointerPost"
         android:label="New Pointer"
         tools:layout="@layout/fragment_new_pointer_post" />
     <fragment
         android:id="@+id/customizeFragment"
-        android:name="com.afterroot.allusive2.fragment.CustomizeFragment"
+        android:name="com.afterroot.allusive2.ui.fragment.CustomizeFragment"
         android:label="Customize Pointer" />
 </navigation>
