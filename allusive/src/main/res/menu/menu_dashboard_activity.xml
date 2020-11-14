@@ -16,7 +16,7 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/editProfileFragment"
+        android:id="@+id/toEditProfile"
         android:title="@string/edit_profile" />
     <item
         android:id="@+id/profile_logout"

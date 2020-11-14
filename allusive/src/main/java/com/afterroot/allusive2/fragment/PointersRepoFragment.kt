@@ -121,7 +121,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                         requireContext().toast(getString(R.string.dialog_title_no_network))
                         return@setOnClickListener
                     }
-                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.newPostFragment)
+                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.repo_to_new_pointer)
                 }
                 icon = requireContext().getDrawableExt(R.drawable.ic_add)
             }
