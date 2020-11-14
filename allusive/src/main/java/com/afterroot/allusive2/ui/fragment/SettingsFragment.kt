@@ -131,7 +131,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun setVersionPref() {
         findPreference<Preference>("pref_version")?.apply {
             summary =
-                String.format(getString(R.string.str_format_version), BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+                String.format(
+                    getString(R.string.str_format_version),
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.VERSION_CODE,
+                    BuildConfig.COMMIT_ID
+                )
         }
     }
 
@@ -146,25 +151,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setAppThemePref() {
-        findPreference<ListPreference>("key_app_theme")?.apply {
-            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+        findPreference<ListPreference>("key_app_theme")?.setOnPreferenceChangeListener { _, newValue ->
+            AppCompatDelegate.setDefaultNightMode(
                 when (newValue) {
-                    getString(R.string.theme_device_default) -> {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                    }
-                    getString(R.string.theme_light) -> {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    }
-                    getString(R.string.theme_dark) -> {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    }
-                    getString(R.string.theme_battery) -> {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
-                    }
+                    getString(R.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    getString(R.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                    getString(R.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
+                    getString(R.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
+                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
-
-                return@OnPreferenceChangeListener true
-            }
+            )
+            return@setOnPreferenceChangeListener true
         }
     }
 
