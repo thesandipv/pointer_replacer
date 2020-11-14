@@ -19,6 +19,8 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -29,8 +31,11 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.inflate
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
+
 
 /**
  * New list adapter for Repository screen.
@@ -66,9 +71,16 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback) :
                 itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
             }
             itemThumb.apply {
+                updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    height = context.getMinPointerSize()
+                    width = context.getMinPointerSize()
+                }
                 if (pointer.reasonCode <= 0) {
-                    GlideApp.with(context).load(storageReference)
+                    val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                    GlideApp.with(context)
+                        .load(storageReference)
                         .override(context.getMinPointerSize(), context.getMinPointerSize())
+                        .transition(DrawableTransitionOptions.withCrossFade(factory))
                         .into(this)
                     background = context.getDrawableExt(R.drawable.transparent_grid)
                 } else {
