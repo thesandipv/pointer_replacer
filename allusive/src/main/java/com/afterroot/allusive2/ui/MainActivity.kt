@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val curUser = FirebaseUtils.auth!!.currentUser
             val userRef = get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS).document(curUser!!.uid)
-            FirebaseInstanceId.getInstance().instanceId
+            get<FirebaseMessaging>().token
                 .addOnCompleteListener(OnCompleteListener { tokenTask ->
                     if (!tokenTask.isSuccessful) {
                         return@OnCompleteListener
@@ -148,23 +148,23 @@ class MainActivity : AppCompatActivity() {
                         if (getUserTask.isSuccessful) {
                             if (!getUserTask.result!!.exists()) {
                                 container.snackbar("User not available. Creating User..").anchorView = navigation
-                                val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result?.token!!)
+                                val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
                                 userRef.set(user).addOnCompleteListener { setUserTask ->
                                     if (!setUserTask.isSuccessful) Log.e(
-                                        _tag,
+                                        TAG,
                                         "Can't create firebaseUser",
                                         setUserTask.exception
                                     )
                                 }
-                            } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result?.token!!) {
-                                userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result?.token!!)
+                            } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
+                                userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
                             }
 
-                        } else Log.e(_tag, "Unknown Error", getUserTask.exception)
+                        } else Log.e(TAG, "Unknown Error", getUserTask.exception)
                     }
                 })
         } catch (e: Exception) {
-            Log.e(_tag, "addUserInfoInDB: $e")
+            Log.e(TAG, "addUserInfoInDB: $e")
         }
     }
 
