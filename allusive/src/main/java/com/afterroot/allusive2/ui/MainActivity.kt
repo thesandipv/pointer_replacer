@@ -15,16 +15,12 @@
 
 package com.afterroot.allusive2.ui
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -34,13 +30,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Constants.RC_PERMISSION
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.FirebaseUtils
-import com.afterroot.allusive2.utils.PermissionChecker
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.animateProperty
@@ -50,9 +44,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_dashboard.*
-import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -62,10 +55,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private val settings: Settings by inject()
-    private val _tag = this.javaClass.simpleName
-    private val manifestPermissions =
-        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
     private val networkViewModel: NetworkViewModel by viewModels()
+    //private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,20 +91,22 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Greater than Lollipop
             setUpNetworkObserver()
-            when {
+            /*when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                     checkPermissions()
                 }
                 else -> {
                     createPointerFolder()
                 }
-            }
-        } else {
+            }*/
+        } /*else {
             createPointerFolder() //Less than Lollipop, direct load fragments
-        }
+        }*/
 
         //Add user in db if not available
         addUserInfoInDB()
+        createPointerFolder()
+        loadFragments()
     }
 
     private var dialog: MaterialDialog? = null
@@ -131,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createPointerFolder() {
-        val targetPath = "${Environment.getExternalStorageDirectory()}${getString(R.string.pointer_folder_path)}"
+        val targetPath = "${filesDir.path}${getString(R.string.pointer_folder_path_new)}"
         val pointersFolder = File(targetPath)
         val dotNoMedia = File("${targetPath}/.nomedia")
         if (!pointersFolder.exists()) {
@@ -140,7 +133,6 @@ class MainActivity : AppCompatActivity() {
         if (!dotNoMedia.exists()) {
             dotNoMedia.createNewFile()
         }
-        loadFragments()
     }
 
     private fun addUserInfoInDB() {
@@ -176,6 +168,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+/*
     private fun checkPermissions() {
         val permissionChecker = PermissionChecker(this)
         if (permissionChecker.lacksPermissions(manifestPermissions)) {
@@ -184,7 +177,9 @@ class MainActivity : AppCompatActivity() {
             createPointerFolder()
         }
     }
+*/
 
+/*
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             RC_PERMISSION -> {
@@ -202,6 +197,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+*/
 
     private fun hideNavigation() {
         if (navigation.isVisible) {

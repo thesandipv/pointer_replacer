@@ -110,6 +110,7 @@
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Select and Apply Pointer</string>
     <string name="pointer_folder_name" translatable="false">Pointers</string>
     <string name="pointer_folder_path" translatable="false">/Pointer Replacer/Pointers/</string>
+    <string name="pointer_folder_path_new" translatable="false">/Pointers/</string>
     <string name="pointer_grid_hint">Long press pointer for delete.</string>
     <string name="pointer_preview">Pointer Preview</string>
     <string name="pref_category_support">Support Development</string>

@@ -20,7 +20,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -91,8 +90,8 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
-        val pointersFolder = getString(R.string.pointer_folder_path)
-        extSdDir = Environment.getExternalStorageDirectory().toString()
+        val pointersFolder = getString(R.string.pointer_folder_path_new)
+        extSdDir = requireContext().filesDir.path
         targetPath = extSdDir!! + pointersFolder
 
         requireActivity().apply {

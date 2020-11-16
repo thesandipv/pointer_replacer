@@ -17,7 +17,6 @@ package com.afterroot.allusive2.ui.fragment
 
 
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +62,6 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
-import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
 
@@ -96,8 +94,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             settings = Settings(requireContext())
-            pointersFolder = getString(R.string.pointer_folder_path) //TODO Change path to app private directory.
-            extSdDir = Environment.getExternalStorageDirectory().toString() //TODO Remove this
+            pointersFolder = getString(R.string.pointer_folder_path_new) //TODO Change path to app private directory.
+            extSdDir = requireActivity().filesDir.path //TODO Remove this
             mTargetPath = extSdDir + pointersFolder
             //setUpList()
             setUpAdapter()
@@ -142,19 +140,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
         }
     }
 
-    private fun setUpList() {
-        pointerAdapter = PointerAdapterDelegate(this, getKoin())
-        binding.list.apply {
-            val lm = LinearLayoutManager(requireContext())
-            layoutManager = lm
-            if (itemDecorationCount <= 0) {
-                addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            }
-        }
-        loadPointers()
-        setUpFilter()
-    }
-
     private lateinit var myAdapter: PointersAdapter
 
     //Function for using new list adapter.
@@ -184,9 +169,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
                     pointersSnapshot = it.data as QuerySnapshot
                     pointersList = pointersSnapshot.toObjects()
                     displayPointers(pointersList)
-//                    pointerAdapter.add(pointersList)
-//                    binding.list.adapter = pointerAdapter
-//                    binding.list.scheduleLayoutAnimation()
                 }
             }
         })
