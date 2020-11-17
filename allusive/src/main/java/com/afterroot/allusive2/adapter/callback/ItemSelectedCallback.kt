@@ -17,7 +17,8 @@ package com.afterroot.allusive2.adapter.callback
 
 import android.view.View
 
-interface ItemSelectedCallback {
-    fun onClick(position: Int, view: View? = null)
-    fun onLongClick(position: Int)
+interface ItemSelectedCallback<T> {
+    fun onClick(position: Int, view: View? = null) {}
+    fun onClick(position: Int, view: View? = null, item: T) {}
+    fun onLongClick(position: Int, item: T) {}
 }

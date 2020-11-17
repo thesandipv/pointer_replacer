@@ -25,7 +25,6 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -40,7 +39,7 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive2.*
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
-import com.afterroot.allusive2.adapter.PointerAdapterDelegate
+import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
@@ -64,7 +63,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
-import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
@@ -76,7 +74,6 @@ class MainFragment : Fragment() {
     private lateinit var interstitialAd: InterstitialAd
     private val myDatabase: MyDatabase by inject()
     private val settings: Settings by inject()
-    private var extSdDir: String? = null
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -90,9 +87,7 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
-        val pointersFolder = getString(R.string.pointer_folder_path_new)
-        extSdDir = requireContext().filesDir.path
-        targetPath = extSdDir!! + pointersFolder
+        targetPath = requireContext().getPointerSaveDir()
 
         requireActivity().apply {
             layout_new_pointer.setOnClickListener {
@@ -239,7 +234,7 @@ class MainFragment : Fragment() {
             ).anchorView = requireActivity().navigation
             return
         }
-        val filesDir = requireActivity().filesDir.path
+        val filesDir = requireContext().getPointerSaveRootDir()
         val pointerPath = "$filesDir/pointer.png"
         val mousePath = "$filesDir/mouse.png"
         settings.pointerPath = pointerPath
@@ -282,7 +277,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun showRebootDialog() {
+    private fun showRebootDialog() { //TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
         MaterialDialog(requireActivity()).show {
             title(res = R.string.reboot)
             message(res = R.string.text_reboot_confirm)
@@ -295,7 +290,7 @@ class MainFragment : Fragment() {
                 }
             }
             negativeButton(res = R.string.text_soft_reboot) {
-                try {
+                try { //Also try "killall zygote"
                     val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                     process.waitFor()
                 } catch (e: Exception) {
@@ -376,7 +371,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun import() {
+    private fun import() { //TODO Remove this
         val fileNames = arrayListOf<String>()
         File(targetPath!!).listFiles()?.forEach {
             if (it.name != ".nomedia") {
@@ -388,7 +383,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    lateinit var pointerAdapter: PointerAdapterDelegate
+    private lateinit var pointerAdapter: LocalPointersAdapter
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.layout_list_bottomsheet)
@@ -405,33 +400,31 @@ class MainFragment : Fragment() {
 
         val dialogView = dialog.getCustomView()
 
-        pointerAdapter = PointerAdapterDelegate(object : ItemSelectedCallback {
-            override fun onClick(position: Int, view: View?) {
-                val selectedItem = pointerAdapter.getItem(position) as RoomPointer
+        pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
+            override fun onClick(position: Int, view: View?, item: RoomPointer) {
                 if (pointerType == POINTER_TOUCH) {
-                    settings.selectedPointerName = selectedItem.file_name
-                    settings.selectedPointerPath = targetPath + selectedItem.file_name
+                    settings.selectedPointerName = item.file_name
+                    settings.selectedPointerPath = targetPath + item.file_name
                 } else {
-                    settings.selectedMouseName = selectedItem.file_name
-                    settings.selectedMousePath = targetPath + selectedItem.file_name
+                    settings.selectedMouseName = item.file_name
+                    settings.selectedMousePath = targetPath + item.file_name
                 }
                 GlideApp.with(requireContext())
-                    .load(File(targetPath + selectedItem.file_name))
+                    .load(File(targetPath + item.file_name))
                     .override(requireContext().getMinPointerSize())
                     .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
 
                 dialog.dismiss()
             }
 
-            override fun onLongClick(position: Int) {
-                val selectedItem = pointerAdapter.getItem(position) as RoomPointer
+            override fun onLongClick(position: Int, item: RoomPointer) {
                 MaterialDialog(requireActivity()).show {
-                    title(text = "${getString(R.string.text_delete)} ${selectedItem.pointer_name}")
+                    title(text = "${getString(R.string.text_delete)} ${item.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
-                        if (File(targetPath + selectedItem.file_name).delete()) {
+                        if (File(targetPath + item.file_name).delete()) {
                             lifecycleScope.launch {
-                                myDatabase.pointerDao().delete(selectedItem)
+                                myDatabase.pointerDao().delete(item)
                             }
                             Toast.makeText(context, getString(R.string.msg_delete_success), Toast.LENGTH_SHORT)
                                 .show()
@@ -443,7 +436,8 @@ class MainFragment : Fragment() {
                 }
             }
 
-        }, getKoin())
+        })
+
         dialogView.list_pointers.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
@@ -454,12 +448,12 @@ class MainFragment : Fragment() {
 
         lifecycleScope.launch {
             //Observe Db on CoroutineScope
-            myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, Observer {
-                pointerAdapter.add(it)
+            myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, {
+                pointerAdapter.submitList(it)
                 //Show install msg if no pointer installed
                 dialogView.apply {
-                    info_no_pointer_installed.visible(pointerAdapter.getList().isEmpty())
-                    text_dialog_hint.visible(pointerAdapter.getList().isNotEmpty())
+                    info_no_pointer_installed.visible(pointerAdapter.itemCount <= 0)
+                    text_dialog_hint.visible(pointerAdapter.itemCount > 0)
                     bs_button_install_pointers.setOnClickListener {
                         dialog.dismiss()
                         requireActivity().findNavController(R.id.fragment_repo_nav)

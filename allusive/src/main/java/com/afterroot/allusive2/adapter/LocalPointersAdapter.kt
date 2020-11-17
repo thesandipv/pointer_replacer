@@ -16,31 +16,46 @@
 package com.afterroot.allusive2.adapter
 
 import android.content.Context
-import android.os.Environment
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
-import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
-import com.afterroot.allusive2.model.IPointer
+import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.inflate
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
-import org.koin.core.Koin
 
-class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : TypeDelegateAdapter {
-    val settings = koin.get<Settings>()
-    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = PointerVH(parent)
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: IPointer) {
-        holder as PointerVH
-        holder.bind(item as RoomPointer)
+/**
+ * New list adapter for Pointer Choose screen.
+ * */
+class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPointer>) :
+    ListAdapter<RoomPointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<RoomPointer?>() {
+        override fun areItemsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean = oldItem == newItem
+
+        override fun areContentsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
+            oldItem.hashCode() == newItem.hashCode()
+    }) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return PointerVH(parent, callbacks)
     }
 
-    inner class PointerVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        holder as PointerVH
+        holder.bind(getItem(position))
+    }
+
+    inner class PointerVH(parent: ViewGroup, private val callbacks: ItemSelectedCallback<RoomPointer>) :
+        RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
         val context: Context = parent.context
 
         fun bind(pointer: RoomPointer) {
@@ -48,9 +63,15 @@ class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : Ty
             itemView.info_username.text =
                 String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
             itemView.info_pointer_image.apply {
+                updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    height = context.getMinPointerSize()
+                    width = context.getMinPointerSize()
+                }
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 GlideApp.with(context)
-                    .load("${Environment.getExternalStorageDirectory()}${context.getString(R.string.pointer_folder_path)}${pointer.file_name}")
+                    .load("${context.getPointerSaveDir()}${pointer.file_name}")
                     .override(context.getMinPointerSize(), context.getMinPointerSize())
+                    .transition(DrawableTransitionOptions.withCrossFade(factory))
                     .into(this)
                 background = context.getDrawableExt(R.drawable.transparent_grid)
             }
@@ -58,14 +79,13 @@ class LocalPointerDelegate(val callbacks: ItemSelectedCallback, koin: Koin) : Ty
             with(super.itemView) {
                 tag = pointer
                 setOnClickListener {
-                    callbacks.onClick(adapterPosition, itemView)
+                    callbacks.onClick(adapterPosition, itemView, pointer)
                 }
                 setOnLongClickListener {
-                    callbacks.onLongClick(adapterPosition)
+                    callbacks.onLongClick(adapterPosition, pointer)
                     return@setOnLongClickListener true
                 }
             }
         }
     }
-
 }

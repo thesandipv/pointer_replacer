@@ -1,1 +1,1 @@
-com/afterroot/allusive/XposedMod.class
+com/afterroot/allusive2/XposedMod.class

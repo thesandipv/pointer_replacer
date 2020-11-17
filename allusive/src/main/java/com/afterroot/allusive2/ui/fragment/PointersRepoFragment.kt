@@ -36,7 +36,6 @@ import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
-import com.afterroot.allusive2.adapter.PointerAdapterDelegate
 import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
@@ -65,12 +64,11 @@ import org.jetbrains.anko.toast
 import org.koin.android.ext.android.inject
 import java.io.File
 
-class PointersRepoFragment : Fragment(), ItemSelectedCallback {
+class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     private lateinit var binding: FragmentPointerRepoBinding
     private lateinit var extSdDir: String
     private lateinit var mTargetPath: String
-    private lateinit var pointerAdapter: PointerAdapterDelegate
     private lateinit var pointersFolder: String
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
@@ -296,11 +294,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback {
             }
     }
 
-    override fun onClick(position: Int, view: View?) {
+    override fun onClick(position: Int, view: View?, item: Pointer) {
         showPointerInfoDialog(position)
     }
 
-    override fun onLongClick(position: Int) {
+    override fun onLongClick(position: Int, item: Pointer) {
         val isIdMatch = if (BuildConfig.DEBUG) true
         else pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
         if (!isIdMatch) return
