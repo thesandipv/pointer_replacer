@@ -40,7 +40,7 @@ import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 /**
  * New list adapter for Repository screen.
  * */
-class PointersAdapter(private val callbacks: ItemSelectedCallback) :
+class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
     ListAdapter<Pointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<Pointer?>() {
         override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem == newItem
 
@@ -56,7 +56,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback) :
         holder.bind(getItem(position))
     }
 
-    inner class PointerVH(parent: ViewGroup, private val callbacks: ItemSelectedCallback) :
+    inner class PointerVH(parent: ViewGroup, private val callbacks: ItemSelectedCallback<Pointer>) :
         RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
         val context: Context = parent.context
         private val itemName: AppCompatTextView = itemView.info_pointer_pack_name
@@ -100,10 +100,10 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback) :
             with(super.itemView) {
                 tag = pointer
                 setOnClickListener {
-                    callbacks.onClick(adapterPosition, itemView)
+                    callbacks.onClick(adapterPosition, itemView, pointer)
                 }
                 setOnLongClickListener {
-                    callbacks.onLongClick(adapterPosition)
+                    callbacks.onLongClick(adapterPosition, pointer)
                     return@setOnLongClickListener true
                 }
             }

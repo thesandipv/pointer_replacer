@@ -28,6 +28,7 @@ object Constants {
 }
 
 object Reason {
+    //TODO Design Admin UI
     const val DUPLICATE = 1
     const val NOT_A_POINTER = 2
     const val OTHER = 3
@@ -36,3 +37,7 @@ object Reason {
 fun Context.getMinPointerSize(): Int = this.resources.getInteger(R.integer.min_pointer_size)
 
 fun Context.getMinPointerSizePx(): Int = (this.getMinPointerSize() * this.resources.displayMetrics.density.toInt()) / 160
+
+fun Context.getPointerSaveDir(): String = getPointerSaveRootDir() + getString(R.string.pointer_folder_path_new)
+
+fun Context.getPointerSaveRootDir(): String = filesDir.path

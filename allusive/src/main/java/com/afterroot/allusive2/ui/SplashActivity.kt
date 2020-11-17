@@ -17,6 +17,7 @@ package com.afterroot.allusive2.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -54,7 +55,9 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        setUpNetworkObserver()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setUpNetworkObserver()
+        }
         when {
             get<FirebaseAuth>().currentUser == null -> {
                 tryLogin()
