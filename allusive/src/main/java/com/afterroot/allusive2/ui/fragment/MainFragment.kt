@@ -41,9 +41,7 @@ import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
-import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
-import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.core.extensions.getAsBitmap
@@ -53,16 +51,12 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.bs_button_install_pointers
-import kotlinx.android.synthetic.main.layout_grid_bottomsheet.view.info_no_pointer_installed
 import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
@@ -326,7 +320,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
+    /*private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
         val roomPointers = arrayListOf<RoomPointer>()
         fileNames.forEach { filename ->
             get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_POINTERS)
@@ -371,17 +365,17 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun import() { //TODO Remove this
-        val fileNames = arrayListOf<String>()
-        File(targetPath!!).listFiles()?.forEach {
-            if (it.name != ".nomedia") {
-                fileNames.add(it.name)
-            }
-        }
-        lifecycleScope.launch {
-            generateRoomPointerFromFileName(fileNames)
-        }
-    }
+   private fun import() { //Remove this
+         val fileNames = arrayListOf<String>()
+         File(targetPath!!).listFiles()?.forEach {
+             if (it.name != ".nomedia") {
+                 fileNames.add(it.name)
+             }
+         }
+         lifecycleScope.launch {
+             generateRoomPointerFromFileName(fileNames)
+         }
+     }*/
 
     private lateinit var pointerAdapter: LocalPointersAdapter
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
@@ -389,13 +383,13 @@ class MainFragment : Fragment() {
             customView(R.layout.layout_list_bottomsheet)
             title(text = title)
             noAutoDismiss()
-            positiveButton(text = "Import Your Pointers") {
+            /*positiveButton(text = "Import Your Pointers") { //Remove this
                 try {
                     import()
                 } catch (e: IllegalStateException) {
                     e.printStackTrace()
                 }
-            }
+            }*/
         }
 
         val dialogView = dialog.getCustomView()
@@ -452,16 +446,16 @@ class MainFragment : Fragment() {
                 pointerAdapter.submitList(it)
                 //Show install msg if no pointer installed
                 dialogView.apply {
-                    info_no_pointer_installed.visible(pointerAdapter.itemCount <= 0)
-                    text_dialog_hint.visible(pointerAdapter.itemCount > 0)
+                    info_no_pointer_installed.visible(it.isEmpty())
+                    text_dialog_hint.visible(it.isNotEmpty())
                     bs_button_install_pointers.setOnClickListener {
                         dialog.dismiss()
                         requireActivity().findNavController(R.id.fragment_repo_nav)
                             .navigate(R.id.repoFragment)
                     }
-                    bs_button_import_pointers.setOnClickListener {
-                        import()
-                    }
+                    /*bs_button_import_pointers.setOnClickListener {
+                         import()
+                     }*/
                 }
             })
         }
