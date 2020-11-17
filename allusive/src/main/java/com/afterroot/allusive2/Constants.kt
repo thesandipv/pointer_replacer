@@ -24,7 +24,7 @@ object Constants {
     const val RC_LOGIN = 42
     const val RC_PERMISSION = 256
     const val RC_PICK_IMAGE: Int = 478
-    const val PREF_KEY_THEME = "app_theme"
+    const val PREF_KEY_THEME = "key_app_theme"
 }
 
 object Reason {
