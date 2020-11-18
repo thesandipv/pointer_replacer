@@ -20,18 +20,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 
 class PointerRepoViewModel : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
-    private lateinit var order: String
 
-    fun getPointerSnapshot(orderBy: String = DatabaseFields.FIELD_TIME): LiveData<ViewModelState> {
-        if (pointerSnapshot.value == null || orderBy != order) {
+    fun getPointerSnapshot(): LiveData<ViewModelState> {
+        if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
-            order = orderBy
             FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
-                .orderBy(orderBy, Query.Direction.DESCENDING)
                 .addSnapshotListener { querySnapshot, _ -> //TODO Remove Snapshot listener and replace with query.
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))

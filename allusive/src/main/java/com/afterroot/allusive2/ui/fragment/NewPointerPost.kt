@@ -121,7 +121,7 @@ class NewPointerPost : Fragment() {
                                             MaterialDialog(requireContext()).show {
                                                 title(R.string.text_action_upload)
                                                 message(R.string.dialog_msg_rewarded_ad)
-                                                positiveButton(R.string.text_ok) {
+                                                positiveButton(android.R.string.ok) {
                                                     if (rewardedAd.isLoaded) {
                                                         showAd()
                                                     } else {
