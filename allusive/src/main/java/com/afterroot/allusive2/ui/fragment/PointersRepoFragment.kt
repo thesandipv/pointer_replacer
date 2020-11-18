@@ -32,10 +32,7 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.listItems
-import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.GlideApp
-import com.afterroot.allusive2.R
-import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.*
 import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
@@ -50,6 +47,7 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.isNetworkAvailable
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -61,22 +59,23 @@ import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.toast
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.io.File
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     private lateinit var binding: FragmentPointerRepoBinding
-    private lateinit var extSdDir: String
-    private lateinit var mTargetPath: String
-    private lateinit var pointersFolder: String
+    private lateinit var pointersAdapter: PointersAdapter
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
-    private lateinit var settings: Settings
-    private val db: FirebaseFirestore by inject()
+    private lateinit var targetPath: String
+    private val firestore: FirebaseFirestore by inject()
     private val myDatabase: MyDatabase by inject()
     private val pointerViewModel: PointerRepoViewModel by viewModels()
+    private val settings: Settings by inject()
     private val storage: FirebaseStorage by inject()
+    private var filteredList: List<Pointer>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -91,10 +90,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
-            settings = Settings(requireContext())
-            pointersFolder = getString(R.string.pointer_folder_path_new) //TODO Change path to app private directory.
-            extSdDir = requireActivity().filesDir.path //TODO Remove this
-            mTargetPath = extSdDir + pointersFolder
+            targetPath = requireContext().getPointerSaveDir()
             //setUpList()
             setUpAdapter()
             loadPointers()
@@ -102,9 +98,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun onNetworkChange(isAvailable: Boolean) { //TODO Implement new network checker for SDK > 21.
+        binding.repoSwipeRefresh.visible(isAvailable)
+        binding.layoutNoNetwork.visible(!isAvailable)
         if (!isAvailable) {
-            binding.repoSwipeRefresh.visible(false)
-            binding.layoutNoNetwork.visible(true)
             binding.buttonRetry.setOnClickListener {
                 onResume()
             }
@@ -122,8 +118,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 icon = requireContext().getDrawableExt(R.drawable.ic_add)
             }
 
-            binding.repoSwipeRefresh.visible(true)
-            binding.layoutNoNetwork.visible(false)
             binding.repoSwipeRefresh.apply {
                 setOnRefreshListener {
                     try {
@@ -138,34 +132,38 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
-    private lateinit var myAdapter: PointersAdapter
-
     //Function for using new list adapter.
     private fun setUpAdapter() {
-        myAdapter = PointersAdapter(this)
+        pointersAdapter = PointersAdapter(this)
         binding.list.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            adapter = myAdapter
+            adapter = pointersAdapter
         }
         setUpFilter()
     }
 
     private fun displayPointers(pointers: List<Pointer>) {
-        myAdapter.submitList(pointers)
+        pointersList = pointers
+        pointersAdapter.submitList(pointers)
     }
 
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        pointerViewModel.getPointerSnapshot(orderBy).observe(viewLifecycleOwner, {
-            when (it) {
+        pointerViewModel.getPointerSnapshot().observe(viewLifecycleOwner, { state ->
+            when (state) {
                 is ViewModelState.Loading -> {
                     binding.repoSwipeRefresh.isRefreshing = true
                 }
                 is ViewModelState.Loaded<*> -> {
                     binding.repoSwipeRefresh.isRefreshing = false
-                    pointersSnapshot = it.data as QuerySnapshot
-                    pointersList = pointersSnapshot.toObjects()
+                    pointersSnapshot = state.data as QuerySnapshot
+                    val result: List<Pointer> = pointersSnapshot.toObjects()
+                    pointersList = if (orderBy == DatabaseFields.FIELD_TIME) {
+                        result.sortedByDescending { it.time }
+                    } else {
+                        result.sortedByDescending { it.downloads }
+                    }
                     displayPointers(pointersList)
                 }
             }
@@ -173,27 +171,51 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun setUpFilter() {
-        requireView().repo_filter_chip_group.apply {
-            clearCheck()
+        requireView().repo_sort_chip_group.apply {
             when (settings.orderBy) {
                 DatabaseFields.FIELD_TIME -> this.check(R.id.filter_chip_sort_by_date)
                 DatabaseFields.FIELD_DOWNLOADS -> this.check(R.id.filter_chip_sort_by_download)
             }
         }
-        requireView().filter_chip_sort_by_date.setOnClickListener {
-            loadPointers(DatabaseFields.FIELD_TIME)
-            requireView().repo_filter_chip_group.apply {
-                clearCheck()
-                check(R.id.filter_chip_sort_by_date)
-                settings.orderBy = DatabaseFields.FIELD_TIME
+
+        requireView().filter_chip_sort_by_date.apply {
+            setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    displayPointers((filteredList ?: pointersList).sortedByDescending {
+                        it.time
+                    })
+                    settings.orderBy = DatabaseFields.FIELD_TIME
+                }
             }
         }
-        requireView().filter_chip_sort_by_download.setOnClickListener {
-            loadPointers(DatabaseFields.FIELD_DOWNLOADS)
-            requireView().repo_filter_chip_group.apply {
-                clearCheck()
-                check(R.id.filter_chip_sort_by_download)
-                settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
+        requireView().filter_chip_sort_by_download.apply {
+            setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    displayPointers((filteredList ?: pointersList).sortedByDescending {
+                        it.downloads
+                    })
+                    settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
+                }
+            }
+        }
+
+        requireView().filter_chip_show_user_uploaded.apply {
+            setOnCheckedChangeListener { _, isChecked ->
+                isCloseIconVisible = isChecked
+                if (isChecked) {
+                    binding.repoSwipeRefresh.isEnabled = false
+                    filteredList = pointersList.filter {
+                        it.uploadedBy?.containsKey(get<FirebaseAuth>().currentUser?.uid) ?: false
+                    }
+                    displayPointers(filteredList ?: pointersList)
+                } else {
+                    filteredList = null
+                    binding.repoSwipeRefresh.isEnabled = true
+                    loadPointers()
+                }
+            }
+            setOnCloseIconClickListener {
+                isChecked = false
             }
         }
     }
@@ -258,7 +280,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private fun downloadPointer(position: Int) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename!!)
-        ref.getFile(File("$mTargetPath${pointersList[position].filename}"))
+        ref.getFile(File("$targetPath${pointersList[position].filename}"))
             .addOnSuccessListener {
                 requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
                     requireActivity().navigation
@@ -315,7 +337,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             message(text = getString(R.string.dialog_delete_confirm))
                             positiveButton(R.string.text_delete) {
                                 val filename = pointersList[position].filename
-                                db.collection(DatabaseFields.COLLECTION_POINTERS)
+                                firestore.collection(DatabaseFields.COLLECTION_POINTERS)
                                     .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
                                     .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
                                         querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
@@ -330,7 +352,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                         }
                                     }
                             }
-                            negativeButton(android.R.string.no) {
+                            negativeButton(android.R.string.cancel) {
                                 it.dismiss()
                             }
                         }

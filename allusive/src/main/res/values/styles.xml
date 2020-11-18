@@ -23,5 +23,5 @@
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
     </style>
 
-    <style name="MyStyle.FilterChip" parent="Widget.MaterialComponents.Chip.Choice"></style>
+    <style name="MyStyle.FilterChip" parent="Widget.MaterialComponents.Chip.Choice" />
 </resources>
