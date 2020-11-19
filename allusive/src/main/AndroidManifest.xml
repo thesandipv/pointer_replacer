@@ -24,6 +24,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
+    <uses-sdk tools:overrideLibrary="me.zhanghai.android.fastscroll" />
+
     <application
         android:name="com.afterroot.allusive2.MyApplication"
         android:allowBackup="false"
