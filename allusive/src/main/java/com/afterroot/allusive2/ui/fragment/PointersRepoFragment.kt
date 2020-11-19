@@ -16,6 +16,7 @@
 package com.afterroot.allusive2.ui.fragment
 
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -57,7 +58,9 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -140,6 +143,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = pointersAdapter
+            doFromSdk(Build.VERSION_CODES.LOLLIPOP) { FastScrollerBuilder(this).build() }
         }
         setUpFilter()
     }
