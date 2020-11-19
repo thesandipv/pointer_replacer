@@ -154,6 +154,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = pointersAdapter
+            setHasFixedSize(true)
             doFromSdk(Build.VERSION_CODES.LOLLIPOP) { FastScrollerBuilder(this).build() }
         }
         setUpFilter()
@@ -174,7 +175,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     binding.repoSwipeRefresh.isRefreshing = false
                     pointersSnapshot = state.data as QuerySnapshot
                     val result: List<Pointer> = pointersSnapshot.toObjects()
-                    pointersList = if (orderBy == DatabaseFields.FIELD_TIME) {
+                    val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
+                    pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
                         result.sortedByDescending { it.time }
                     } else {
                         result.sortedByDescending { it.downloads }
