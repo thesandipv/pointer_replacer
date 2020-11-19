@@ -31,21 +31,24 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:padding="16dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_network_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:text="@string/dialog_title_no_network"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/button_retry"
-                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/text_action_retry" />
@@ -63,17 +66,20 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:clipToPadding="false"
+                android:divider="?android:attr/dividerHorizontal"
+                android:dividerPadding="8dp"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:showDividers="middle">
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/repo_sort_chip_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginRight="4dp"
                     android:animateLayoutChanges="true"
+                    android:paddingEnd="@dimen/padding_normal"
                     app:checkedChip="@id/filter_chip_sort_by_date"
                     app:singleLine="true"
                     app:singleSelection="true">
@@ -96,7 +102,8 @@
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/repo_filter_chip_group"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_normal">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/filter_chip_show_user_uploaded"

@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
     private var dialog: MaterialDialog? = null
     private fun setUpNetworkObserver() {
-        networkViewModel.doIfNetworkConnected(this, doWhenConnected = {
+        networkViewModel.monitor(this, doWhenConnected = {
             if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
         }, doWhenNotConnected = {
             dialog = showNetworkDialog(

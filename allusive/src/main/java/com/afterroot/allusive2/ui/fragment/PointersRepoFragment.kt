@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -42,6 +43,7 @@ import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.allusive2.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive2.viewmodel.ViewModelState
 import com.afterroot.core.extensions.getDrawableExt
@@ -79,6 +81,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private val settings: Settings by inject()
     private val storage: FirebaseStorage by inject()
     private var filteredList: List<Pointer>? = null
+    private val networkViewModel: NetworkViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -87,7 +90,15 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     override fun onResume() {
         super.onResume()
-        onNetworkChange(requireContext().isNetworkAvailable())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            networkViewModel.monitor(this, doWhenConnected = {
+                onNetworkChange(true)
+            }, doWhenNotConnected = {
+                onNetworkChange(false)
+            })
+        } else {
+            onNetworkChange(requireContext().isNetworkAvailable())
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,7 +111,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
-    private fun onNetworkChange(isAvailable: Boolean) { //TODO Implement new network checker for SDK > 21.
+    private fun onNetworkChange(isAvailable: Boolean) {
         binding.repoSwipeRefresh.visible(isAvailable)
         binding.layoutNoNetwork.visible(!isAvailable)
         if (!isAvailable) {
@@ -112,7 +123,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             requireActivity().fab_apply.apply {
                 show()
                 setOnClickListener {
-                    if (!requireContext().isNetworkAvailable()) {
+                    if (!requireContext().isNetworkAvailable() && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                         requireContext().toast(getString(R.string.dialog_title_no_network))
                         return@setOnClickListener
                     }
