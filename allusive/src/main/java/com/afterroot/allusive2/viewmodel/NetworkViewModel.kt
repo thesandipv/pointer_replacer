@@ -26,11 +26,12 @@ import org.koin.core.inject
 class NetworkViewModel : ViewModel(), KoinComponent {
     val networkMonitor: LiveData<NetworkState> by inject<NetworkStateMonitor>()
 
-    inline fun doIfNetworkConnected(
+    inline fun monitor(
         lifecycleOwner: LifecycleOwner,
         crossinline doWhenConnected: (state: NetworkState) -> Unit,
         noinline doWhenNotConnected: ((state: NetworkState) -> Unit)? = null
     ) {
+        doWhenConnected(NetworkState.CONNECTED) //Run [doWhenConnected] always first time
         this.networkMonitor.observe(lifecycleOwner, {
             when (it) {
                 NetworkState.CONNECTED -> {
