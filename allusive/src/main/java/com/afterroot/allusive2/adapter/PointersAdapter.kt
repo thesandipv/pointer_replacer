@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
+import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
@@ -65,37 +66,48 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
 
 
         fun bind(pointer: Pointer) {
-            val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
-            itemName.text = pointer.name
-            pointer.uploadedBy!!.forEach {
-                itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
-            }
-            itemThumb.apply {
-                updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    height = context.getMinPointerSize()
-                    width = context.getMinPointerSize()
-                }
-                if (pointer.reasonCode <= 0) {
-                    val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                    GlideApp.with(context)
-                        .load(storageReference)
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .transition(DrawableTransitionOptions.withCrossFade(factory))
-                        .into(this)
-                    background = context.getDrawableExt(R.drawable.transparent_grid)
-                } else {
-                    background = null
-                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
-                }
+            when (pointer.reasonCode) {
+                Reason.OK -> {
+                    val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
+                    itemName.text = pointer.name
+                    pointer.uploadedBy!!.forEach {
+                        itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
+                    }
+                    itemThumb.apply {
+                        updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = context.getMinPointerSize()
+                            width = context.getMinPointerSize()
+                        }
+                        val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                        GlideApp.with(context)
+                            .load(storageReference)
+                            .override(context.getMinPointerSize(), context.getMinPointerSize())
+                            .transition(DrawableTransitionOptions.withCrossFade(factory))
+                            .into(this)
+                        background = context.getDrawableExt(R.drawable.transparent_grid)
 
+                    }
+                    itemView.info_meta.text =
+                        context.resources.getQuantityString(
+                            R.plurals.str_format_download_count,
+                            pointer.downloads,
+                            pointer.downloads
+                        )
+                }
+                else -> {
+                    itemThumb.apply {
+                        updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = context.getMinPointerSize()
+                            width = context.getMinPointerSize()
+                        }
+                        background = null
+                        setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                    }
+                    itemName.text = pointer.name
+                    itemView.info_meta.text = null
+                    itemUploader.text = null
+                }
             }
-
-            itemView.info_meta.text =
-                context.resources.getQuantityString(
-                    R.plurals.str_format_download_count,
-                    pointer.downloads,
-                    pointer.downloads
-                )
 
             with(super.itemView) {
                 tag = pointer

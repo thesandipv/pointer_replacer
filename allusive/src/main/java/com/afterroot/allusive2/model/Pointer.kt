@@ -27,6 +27,9 @@ data class Pointer(
     var uploadedBy: HashMap<String, String>? = null,
     @ServerTimestamp var time: Date? = null,
     var downloads: Int = 0,
+    /**
+     * Use constants from [com.afterroot.allusive2.Reason]
+     * */
     var reasonCode: Int = 0
 ) : Serializable, IPointer {
     override fun type(): Int {
