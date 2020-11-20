@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -43,8 +42,8 @@ import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.allusive2.viewmodel.PointerRepoViewModel
 import com.afterroot.allusive2.viewmodel.ViewModelState
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.isNetworkAvailable
@@ -77,11 +76,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private lateinit var targetPath: String
     private val firestore: FirebaseFirestore by inject()
     private val myDatabase: MyDatabase by inject()
-    private val pointerViewModel: PointerRepoViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by activityViewModels()
     private val settings: Settings by inject()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private val storage: FirebaseStorage by inject()
     private var filteredList: List<Pointer>? = null
-    private val networkViewModel: NetworkViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -166,7 +165,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        pointerViewModel.getPointerSnapshot().observe(viewLifecycleOwner, { state ->
+        sharedViewModel.getPointerSnapshot().observe(viewLifecycleOwner, { state ->
             when (state) {
                 is ViewModelState.Loading -> {
                     binding.repoSwipeRefresh.isRefreshing = true

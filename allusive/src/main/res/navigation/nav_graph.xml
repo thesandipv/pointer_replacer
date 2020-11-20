@@ -21,7 +21,6 @@
     <fragment
         android:id="@+id/repoFragment"
         android:name="com.afterroot.allusive2.ui.fragment.PointersRepoFragment"
-        android:label="Pointer Repository"
         tools:layout="@layout/fragment_pointer_repo">
         <action
             android:id="@+id/action_repo_dest_to_settings_dest"
@@ -34,16 +33,15 @@
         <action
             android:id="@+id/repo_to_new_pointer"
             app:destination="@id/newPostFragment"
-            app:enterAnim="@anim/fui_slide_in_right"
-            app:exitAnim="@anim/fui_slide_out_left"
-            app:popEnterAnim="@anim/fui_slide_in_right"
-            app:popExitAnim="@anim/fui_slide_out_left"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@+id/repoFragment" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.afterroot.allusive2.ui.fragment.MainFragment"
-        android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/toRepo"
@@ -65,20 +63,16 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.afterroot.allusive2.ui.fragment.SettingsFragment"
-        android:label="Settings" />
+        android:name="com.afterroot.allusive2.ui.fragment.SettingsFragment" />
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.afterroot.allusive2.ui.fragment.EditProfileFragment"
-        android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/newPostFragment"
         android:name="com.afterroot.allusive2.ui.fragment.NewPointerPost"
-        android:label="New Pointer"
         tools:layout="@layout/fragment_new_pointer_post" />
     <fragment
         android:id="@+id/customizeFragment"
-        android:name="com.afterroot.allusive2.ui.fragment.CustomizeFragment"
-        android:label="Customize Pointer" />
+        android:name="com.afterroot.allusive2.ui.fragment.CustomizeFragment" />
 </navigation>
