@@ -290,18 +290,20 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/banner_ad_main"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ad_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:adSize="BANNER"
-            app:adUnitId="@string/ad_banner_unit_id"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_current_mouse" />
+            app:layout_constraintTop_toBottomOf="@+id/card_current_mouse"
+            tools:layout_height="50dp"
+            tools:layout_width="match_parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

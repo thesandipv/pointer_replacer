@@ -27,12 +27,12 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView"
+            style="@style/Widget.MaterialComponents.CardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.CardView"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -47,9 +47,9 @@
                     android:id="@+id/appCompatTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
                     android:text="@string/text_browse_pointer_image"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -81,8 +81,8 @@
                     android:id="@+id/textView3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/padding_normal"
                     android:layout_margin="@dimen/padding_normal"
+                    android:drawablePadding="@dimen/padding_normal"
                     android:text="@string/text_pointer_upload_notes"
                     app:drawableStartCompat="@drawable/ic_info_round"
                     app:drawableTint="@color/color_secondary"
@@ -97,13 +97,13 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="@string/input_hint_name"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:hint="@string/input_hint_name"
             app:helperText="@string/helper_text_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -118,13 +118,13 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_desc"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="@string/input_hint_desc"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:hint="@string/input_hint_desc"
             app:counterEnabled="true"
             app:counterMaxLength="124"
             app:endIconMode="clear_text"
@@ -140,17 +140,19 @@
                 android:inputType="textLongMessage|textMultiLine|textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/banner_ad_repo"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ad_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:adSize="BANNER"
-            app:adUnitId="@string/ad_banner_unit_id"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/input_desc" />
+            app:layout_constraintTop_toBottomOf="@+id/input_desc"
+            tools:layout_height="50dp"
+            tools:layout_width="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

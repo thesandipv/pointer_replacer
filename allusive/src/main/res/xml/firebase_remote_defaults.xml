@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2016-2020 Sandip Vaghela
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,5 +17,21 @@
     <entry>
         <key>pokemon_pack_play_store</key>
         <value>tk.afterroot.pokmonpointers</value>
+    </entry>
+    <entry>
+        <key>ad_main_unit_id</key>
+        <value>ca-app-pub-6628325093439880/8486157233</value>
+    </entry>
+    <entry>
+        <key>ad_interstitial_1_id</key>
+        <value>ca-app-pub-6628325093439880/4145271758</value>
+    </entry>
+    <entry>
+        <key>ad_rewarded_1_id</key>
+        <value>ca-app-pub-6628325093439880/8486157233</value>
+    </entry>
+    <entry>
+        <key>ad_banner_new_pointer</key>
+        <value>ca-app-pub-6628325093439880/5238011519</value>
     </entry>
 </defaultsMap>

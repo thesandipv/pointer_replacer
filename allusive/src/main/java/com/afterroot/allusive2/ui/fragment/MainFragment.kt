@@ -39,6 +39,7 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive2.*
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
+import com.afterroot.allusive2.R
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.MyDatabase
@@ -48,9 +49,8 @@ import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.*
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
@@ -69,6 +69,7 @@ class MainFragment : Fragment() {
     private val myDatabase: MyDatabase by inject()
     private val settings: Settings by inject()
     private var targetPath: String? = null
+    private val remoteConfig: FirebaseRemoteConfig by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -295,13 +296,27 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpAd() {
-        val adRequest = AdRequest.Builder()
-        banner_ad_main.loadAd(adRequest.build())
-
         interstitialAd = InterstitialAd(this.requireActivity())
-        interstitialAd.apply {
-            adUnitId = getString(R.string.ad_interstitial_1_id)
-            loadAd(AdRequest.Builder().build())
+        remoteConfig.fetchAndActivate().addOnCompleteListener {
+            kotlin.runCatching {
+                val adView = AdView(requireContext())
+                adView.apply {
+                    adSize = AdSize.BANNER
+                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful && BuildConfig.DEBUG)) {
+                        getString(R.string.ad_banner_unit_id)
+                    } else remoteConfig.getString("ad_main_unit_id")
+
+                    ad_container.addView(this)
+                    loadAd(AdRequest.Builder().build())
+                }
+
+                interstitialAd.apply {
+                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful && BuildConfig.DEBUG)) {
+                        getString(R.string.ad_interstitial_1_id)
+                    } else remoteConfig.getString("ad_interstitial_1_id")
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
         }
     }
 
