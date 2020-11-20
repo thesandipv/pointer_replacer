@@ -123,6 +123,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/MyTheme.Main.ActionBar" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/MyTheme.Main.ActionBar" />
+
         <service
             android:name="com.afterroot.allusive2.FireMessagingService"
             tools:ignore="ExportedService">

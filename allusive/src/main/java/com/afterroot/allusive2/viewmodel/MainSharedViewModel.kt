@@ -21,8 +21,9 @@ import androidx.lifecycle.ViewModel
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
 
-class PointerRepoViewModel : ViewModel() {
+class MainSharedViewModel : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
+    val liveTitle = MutableLiveData<String>()
 
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {
@@ -35,5 +36,9 @@ class PointerRepoViewModel : ViewModel() {
                 }
         }
         return pointerSnapshot
+    }
+
+    fun setTitle(title: String?) {
+        liveTitle.value = title
     }
 }

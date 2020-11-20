@@ -55,4 +55,9 @@
         <item name="colorPrimaryDark">?colorPrimaryVariant</item>
         <item name="colorAccent">?colorSecondary</item>
     </style>
+
+    <style name="MyTheme.Main.ActionBar" parent="MyTheme.Main">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
 </resources>

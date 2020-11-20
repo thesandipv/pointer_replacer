@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
+import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -33,14 +35,17 @@ import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.showNetworkDialog
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.animateProperty
 import com.afterroot.core.extensions.visible
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -54,14 +59,17 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private val settings: Settings by inject()
+    private lateinit var binding: ActivityDashboardBinding
     private val networkViewModel: NetworkViewModel by viewModels()
+    private val settings: Settings by inject()
+    private val sharedViewModel: MainSharedViewModel by viewModels()
     //private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dashboard)
-        setSupportActionBar(toolbar)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard)
+        setSupportActionBar(binding.toolbar)
+        title = null
     }
 
     override fun onStart() {
@@ -107,6 +115,33 @@ class MainActivity : AppCompatActivity() {
         addUserInfoInDB()
         createPointerFolder()
         loadFragments()
+        setUpTitleObserver()
+    }
+
+    private fun setUpTitleObserver() {
+        binding.titleBarTitleSwitcher.apply {
+            setInAnimation(this@MainActivity, R.anim.text_switcher_in)
+            setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
+        }
+        sharedViewModel.liveTitle.observe(this, {
+            setTitle(it)
+        })
+    }
+
+    private fun setTitle(title: String?) {
+        binding.apply {
+            val params = fragmentRepoNav.layoutParams as CoordinatorLayout.LayoutParams
+            if (title.isNullOrBlank()) {
+                params.behavior = null
+                titleLayout.visible(false)
+            } else {
+                params.behavior = AppBarLayout.ScrollingViewBehavior()
+                //this.title = title
+                titleLayout.visible(true)
+                titleBarTitleSwitcher.setText(title)
+
+            }
+        }
     }
 
     private var dialog: MaterialDialog? = null
@@ -232,15 +267,18 @@ class MainActivity : AppCompatActivity() {
                         if (!isShown) show()
                         text = getString(R.string.text_action_apply)
                     }
+                    setTitle(getString(R.string.title_home))
                 }
                 R.id.repoFragment -> {
                     fab_apply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_post)
                     }
+                    setTitle(getString(R.string.title_dashboard))
                 }
                 R.id.settingsFragment -> {
                     fab_apply.hide()
+                    setTitle(getString(R.string.title_settings))
                 }
                 R.id.editProfileFragment -> {
                     fab_apply.apply {
@@ -248,6 +286,7 @@ class MainActivity : AppCompatActivity() {
                         text = getString(R.string.text_action_save)
                     }
                     hideNavigation()
+                    setTitle(getString(R.string.title_edit_profile))
                 }
                 R.id.newPostFragment -> {
                     fab_apply.apply {
@@ -255,6 +294,7 @@ class MainActivity : AppCompatActivity() {
                         text = getString(R.string.text_action_upload)
                     }
                     hideNavigation()
+                    setTitle(getString(R.string.title_new_pointer))
                 }
                 R.id.customizeFragment -> {
                     fab_apply.apply {
@@ -262,6 +302,7 @@ class MainActivity : AppCompatActivity() {
                         text = getString(R.string.text_action_apply)
                     }
                     hideNavigation()
+                    setTitle(getString(R.string.title_customizer_pointer))
                 }
             }
         }
