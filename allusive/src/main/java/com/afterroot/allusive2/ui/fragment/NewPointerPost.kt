@@ -41,6 +41,8 @@ import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.updateProgressText
 import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
@@ -50,7 +52,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
@@ -63,7 +64,7 @@ import java.io.IOException
 
 class NewPointerPost : Fragment() {
 
-    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig by inject()
     private lateinit var rewardedAd: RewardedAd
     private val db: FirebaseFirestore by inject()
     private val pointerDescription: String get() = edit_desc.text.toString().trim()
@@ -94,57 +95,53 @@ class NewPointerPost : Fragment() {
         }
 
         initFirebaseConfig()
-        val adRequest = AdRequest.Builder()
-        banner_ad_repo.loadAd(adRequest.build())
     }
 
     private fun initFirebaseConfig() {
-        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        firebaseRemoteConfig.let { config ->
-            FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
-                .build().apply {
-                    config.setConfigSettingsAsync(this)
+        remoteConfig.fetchAndActivate().addOnCompleteListener { result ->
+            kotlin.runCatching {
+                //Load Banner Ad
+                val adView = AdView(requireContext())
+                adView.apply {
+                    adSize = AdSize.BANNER
+                    adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
+                        getString(R.string.ad_banner_new_pointer)
+                    } else remoteConfig.getString("ad_banner_new_pointer")
+                    ad_container.addView(this)
+                    loadAd(AdRequest.Builder().build())
                 }
 
-            config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
-                .addOnCompleteListener(requireActivity()) { result ->
-                    kotlin.runCatching {
-                        if (result.isSuccessful) {
-                            firebaseRemoteConfig.activate()
-                            if (firebaseRemoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
-                                setUpRewardedAd()
-                                requireActivity().fab_apply.apply {
-                                    setOnClickListener {
-                                        if (verifyData()) {
-                                            clickedUpload = true
-                                            MaterialDialog(requireContext()).show {
-                                                title(R.string.text_action_upload)
-                                                message(R.string.dialog_msg_rewarded_ad)
-                                                positiveButton(android.R.string.ok) {
-                                                    if (rewardedAd.isLoaded) {
-                                                        showAd()
-                                                    } else {
-                                                        requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
-                                                            requireActivity().navigation
-
-                                                    }
-                                                }
-                                                negativeButton(R.string.fui_cancel)
+                if (result.isSuccessful) {
+                    if (remoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
+                        setUpRewardedAd()
+                        requireActivity().fab_apply.apply {
+                            setOnClickListener {
+                                if (verifyData()) {
+                                    clickedUpload = true
+                                    MaterialDialog(requireContext()).show {
+                                        title(R.string.text_action_upload)
+                                        message(R.string.dialog_msg_rewarded_ad)
+                                        positiveButton(android.R.string.ok) {
+                                            if (rewardedAd.isLoaded) {
+                                                showAd()
+                                            } else {
+                                                requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
+                                                    requireActivity().navigation
                                             }
                                         }
+                                        negativeButton(R.string.fui_cancel)
                                     }
-                                    icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
                                 }
-                            } else {
-                                setFabAsDirectUpload()
                             }
-                        } else {
-                            setFabAsDirectUpload()
+                            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
                         }
-
+                    } else {
+                        setFabAsDirectUpload()
                     }
+                } else {
+                    setFabAsDirectUpload()
                 }
+            }
         }
     }
 
@@ -177,7 +174,10 @@ class NewPointerPost : Fragment() {
     }
 
     private fun createAndLoadRewardedAd(): RewardedAd {
-        val rewardedAd = RewardedAd(requireContext(), getString(R.string.ad_rewarded_1_id))
+        val adUnitId = if (BuildConfig.DEBUG) {
+            getString(R.string.ad_rewarded_1_id)
+        } else remoteConfig.getString("ad_rewarded_1_id")
+        val rewardedAd = RewardedAd(requireContext(), adUnitId)
         val adLoadCallback = object : RewardedAdLoadCallback() {
             override fun onRewardedAdLoaded() {
                 // Ad successfully loaded.

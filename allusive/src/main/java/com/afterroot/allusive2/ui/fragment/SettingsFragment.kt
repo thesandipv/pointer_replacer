@@ -84,8 +84,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val purchase = purchases?.first()
                 if (purchase != null) { //Consume every time after successful purchase
                     val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
-                    billingClient.consumeAsync(params) { result, purchaseToken ->
-                        if (result.responseCode == BillingClient.BillingResponseCode.OK && purchaseToken != null) {
+                    billingClient.consumeAsync(params) { result, _ ->
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                             Log.d(TAG, "initBilling: Purchase Done and Consumed")
                         } else Log.d(TAG, "initBilling: Purchase Done but not Consumed.")
                     }
@@ -230,7 +230,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun setUpAds() {
         interstitialAd = InterstitialAd(this.requireActivity())
         interstitialAd.apply {
-            adUnitId = getString(R.string.ad_interstitial_1_id)
+            adUnitId = if (BuildConfig.DEBUG) {
+                getString(R.string.ad_interstitial_1_id)
+            } else firebaseRemoteConfig.getString("ad_interstitial_1_id")
             loadAd(AdRequest.Builder().build())
         }
 

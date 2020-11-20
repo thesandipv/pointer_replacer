@@ -97,6 +97,7 @@ class AuthInitializer : Initializer<FirebaseAuth> {
 
 class ConfigInitializer : Initializer<FirebaseRemoteConfig> {
     override fun create(context: Context): FirebaseRemoteConfig = Firebase.remoteConfig.apply {
+        setDefaultsAsync(R.xml.firebase_remote_defaults)
         setConfigSettingsAsync(
             remoteConfigSettings {
                 fetchTimeoutInSeconds = if (BuildConfig.DEBUG) 0 else 3600
