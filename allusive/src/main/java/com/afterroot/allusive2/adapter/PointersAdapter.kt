@@ -70,7 +70,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
                 Reason.OK -> {
                     val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
                     itemName.text = pointer.name
-                    pointer.uploadedBy!!.forEach {
+                    pointer.uploadedBy?.forEach {
                         itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
                     }
                     itemThumb.apply {
