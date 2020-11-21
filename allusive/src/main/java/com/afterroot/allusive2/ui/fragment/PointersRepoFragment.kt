@@ -21,6 +21,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +51,8 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.isNetworkAvailable
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -66,6 +70,7 @@ import org.jetbrains.anko.toast
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.io.File
+import java.text.SimpleDateFormat
 
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
@@ -244,52 +249,69 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         val pointer = pointersList[position]
 
         dialog.getCustomView().apply {
-            val storageReference =
-                FirebaseStorage.getInstance().reference.child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
-            info_pointer_pack_name.text = pointer.name
-            info_pack_desc.text = pointer.description
-            pointer.uploadedBy!!.forEach {
-                info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
-            }
-            info_pointer_image.apply {
-                if (pointer.reasonCode <= 0) {
-                    background = context.getDrawableExt(R.drawable.transparent_grid)
-                    GlideApp.with(context)
-                        .load(storageReference)
-                        .override(128, 128).into(this)
-                } else {
-                    background = null
-                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
-                }
-
-            }
-            info_action_pack.apply {
-                lifecycleScope.launch {
-                    if (myDatabase.pointerDao().exists(pointer.filename!!).isNotEmpty()) {
-                        text = getString(R.string.text_installed)
-                        setOnClickListener(null)
-                        isEnabled = false
-                    } else {
-                        text = getString(R.string.text_download)
-                        setOnClickListener {
-                            downloadPointer(position)
-                            dialog.dismiss()
+            when (pointer.reasonCode) {
+                Reason.OK -> {
+                    info_pointer_pack_name.text = pointer.name
+                    info_pack_desc.text = pointer.description
+                    info_pointer_image.apply {
+                        updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = 128
+                            width = 128
                         }
-                        isEnabled = pointer.reasonCode == 0
+                        val storageReference = get<FirebaseStorage>().reference
+                            .child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
+                        val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                        background = context.getDrawableExt(R.drawable.transparent_grid)
+                        GlideApp.with(context)
+                            .load(storageReference)
+                            .override(128, 128)
+                            .transition(DrawableTransitionOptions.withCrossFade(factory))
+                            .into(this)
+                    }
+                    info_action_pack.apply {
+                        lifecycleScope.launch {
+                            if (myDatabase.pointerDao().exists(pointer.filename!!).isNotEmpty()) {
+                                text = getString(R.string.text_installed)
+                                setOnClickListener(null)
+                                isEnabled = false
+                            } else {
+                                text = getString(R.string.text_download)
+                                setOnClickListener {
+                                    downloadPointer(position)
+                                    dialog.dismiss()
+                                }
+                                isEnabled = pointer.reasonCode == Reason.OK
+                            }
+                        }
+                    }
+                    val downloads = resources.getQuantityString(
+                        R.plurals.str_format_download_count,
+                        pointer.downloads,
+                        pointer.downloads
+                    )
+                    val date = SimpleDateFormat.getDateInstance().format(pointer.time)
+                    info_tv_downloads_count.text =
+                        String.format(getString(R.string.format_text_downloads_and_date), downloads, date)
+                    pointer.uploadedBy?.forEach {
+                        info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
                     }
                 }
+                else -> {
+                    info_pointer_image.apply {
+                        updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = 128
+                            width = 128
+                        }
+                        background = null
+                        setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                    }
+                    info_pointer_pack_name.text = pointer.name
+                    info_pack_desc.text = pointer.description
+                    info_tv_downloads_count.text = null
+                    info_username.text = null
+                    info_action_pack.visible(false)
+                }
             }
-            info_tv_downloads_count.text =
-                resources.getQuantityString(R.plurals.str_format_download_count, pointer.downloads, pointer.downloads)
-            /*info_rate_up.setOnClickListener {
-                pointersSnapshot.documents[position].reference.update(
-                    DatabaseFields.FIELD_UPVOTES,
-                    pointersList[position].upvotes + 1
-                )
-            }
-            info_rate_down.setOnClickListener {
-
-            }*/
         }
     }
 
