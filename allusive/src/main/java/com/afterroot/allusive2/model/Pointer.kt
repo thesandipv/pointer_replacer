@@ -15,6 +15,7 @@
 
 package com.afterroot.allusive2.model
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.*
@@ -25,7 +26,7 @@ data class Pointer(
     var filename: String? = null,
     var description: String? = null,
     var uploadedBy: HashMap<String, String>? = null,
-    @ServerTimestamp var time: Date? = null,
+    @ServerTimestamp var time: Date = Timestamp.now().toDate(),
     var downloads: Int = 0,
     /**
      * Use constants from [com.afterroot.allusive2.Reason]

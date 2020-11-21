@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"
-                    android:paddingEnd="@dimen/padding_normal"
+                    android:paddingEnd="16dp"
                     app:checkedChip="@id/filter_chip_sort_by_date"
                     app:singleLine="true"
                     app:singleSelection="true">
@@ -103,7 +103,7 @@
                     android:id="@+id/repo_filter_chip_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/padding_normal">
+                    android:paddingStart="16dp">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/filter_chip_show_user_uploaded"

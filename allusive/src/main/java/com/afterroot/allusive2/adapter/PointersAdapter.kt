@@ -36,6 +36,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.item_pointer_repo.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.get
 
 
 /**
@@ -58,7 +60,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
     }
 
     inner class PointerVH(parent: ViewGroup, private val callbacks: ItemSelectedCallback<Pointer>) :
-        RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)) {
+        RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)), KoinComponent {
         val context: Context = parent.context
         private val itemName: AppCompatTextView = itemView.info_pointer_pack_name
         private val itemThumb: AppCompatImageView = itemView.info_pointer_image
@@ -68,7 +70,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
         fun bind(pointer: Pointer) {
             when (pointer.reasonCode) {
                 Reason.OK -> {
-                    val storageReference = FirebaseStorage.getInstance().reference.child("pointers/${pointer.filename}")
+                    val storageReference = get<FirebaseStorage>().reference.child("pointers/${pointer.filename}")
                     itemName.text = pointer.name
                     pointer.uploadedBy?.forEach {
                         itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
