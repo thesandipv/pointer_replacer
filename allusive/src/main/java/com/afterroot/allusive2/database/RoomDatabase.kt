@@ -50,5 +50,6 @@ interface PointerDao {
 
 @Database(entities = [RoomPointer::class], version = 1)
 abstract class MyDatabase : RoomDatabase() {
+    //TODO Verify migration.
     abstract fun pointerDao(): PointerDao
 }

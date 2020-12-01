@@ -117,8 +117,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
                     callbacks.onClick(adapterPosition, itemView, pointer)
                 }
                 setOnLongClickListener {
-                    callbacks.onLongClick(adapterPosition, pointer)
-                    return@setOnLongClickListener true
+                    return@setOnLongClickListener callbacks.onLongClick(adapterPosition, pointer)
                 }
             }
         }

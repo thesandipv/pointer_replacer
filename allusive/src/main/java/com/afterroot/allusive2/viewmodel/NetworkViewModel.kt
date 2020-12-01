@@ -28,17 +28,22 @@ class NetworkViewModel : ViewModel(), KoinComponent {
 
     inline fun monitor(
         lifecycleOwner: LifecycleOwner,
-        crossinline doWhenConnected: (state: NetworkState) -> Unit,
-        noinline doWhenNotConnected: ((state: NetworkState) -> Unit)? = null
+        noinline doInitially: (() -> Unit)? = null,
+        crossinline onConnect: (state: NetworkState) -> Unit,
+        noinline onDisconnect: ((state: NetworkState) -> Unit)? = null
     ) {
-        doWhenConnected(NetworkState.CONNECTED) //Run [doWhenConnected] always first time
+        if (doInitially == null) {
+            onConnect(NetworkState.CONNECTED) // Run [doWhenConnected] id [doInitially] is null
+        } else {
+            doInitially.invoke()
+        }
         this.networkMonitor.observe(lifecycleOwner, {
             when (it) {
                 NetworkState.CONNECTED -> {
-                    doWhenConnected(NetworkState.CONNECTED)
+                    onConnect(NetworkState.CONNECTED)
                 }
                 else -> {
-                    doWhenNotConnected?.invoke(it)
+                    onDisconnect?.invoke(it)
                 }
             }
         })

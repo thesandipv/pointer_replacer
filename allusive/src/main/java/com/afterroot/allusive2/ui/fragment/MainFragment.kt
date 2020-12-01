@@ -426,7 +426,7 @@ class MainFragment : Fragment() {
                 dialog.dismiss()
             }
 
-            override fun onLongClick(position: Int, item: RoomPointer) {
+            override fun onLongClick(position: Int, item: RoomPointer): Boolean {
                 MaterialDialog(requireActivity()).show {
                     title(text = "${getString(R.string.text_delete)} ${item.pointer_name}")
                     message(res = R.string.text_delete_confirm)
@@ -443,6 +443,7 @@ class MainFragment : Fragment() {
                     }
                     negativeButton(res = R.string.text_no)
                 }
+                return true
             }
 
         })
