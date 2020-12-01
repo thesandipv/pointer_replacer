@@ -57,9 +57,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.android.synthetic.main.dialog_edit_pointer.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
 import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
@@ -95,9 +97,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     override fun onResume() {
         super.onResume()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            networkViewModel.monitor(this, doWhenConnected = {
+            networkViewModel.monitor(this, onConnect = {
                 onNetworkChange(true)
-            }, doWhenNotConnected = {
+            }, onDisconnect = {
                 onNetworkChange(false)
             })
         } else {
@@ -354,21 +356,54 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             }
     }
 
+    private fun showEditPointerDialog(pointer: Pointer) {
+        val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT))
+        dialog.show {
+            customView(viewRes = R.layout.dialog_edit_pointer)
+            val cView = getCustomView()
+            val titleView = cView.ti_title
+            val descView = cView.ti_desc
+            title(text = "Edit Pointer Info")
+            val oldTitle = pointer.name
+            val oldDesc = pointer.description
+            titleView.setText(oldTitle)
+            descView.setText(oldDesc)
+            positiveButton(res = R.string.text_action_save) {
+                val newTitle = cView.ti_title.text.toString()
+                val newDesc = cView.ti_desc.text.toString()
+                if (oldTitle != newTitle || oldDesc != newDesc) {
+                    pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
+                        .addOnSuccessListener {
+                            val docId = it.documents.first().id
+                            val updates = mapOf(
+                                Pair(DatabaseFields.FIELD_NAME, newTitle),
+                                Pair(DatabaseFields.FIELD_DESC, newDesc)
+                            )
+                            firestore.collection(DatabaseFields.COLLECTION_POINTERS).document(docId).update(updates)
+                        }
+                } else {
+                    //No changes to save. dismiss dialog.
+                    dismiss()
+                }
+            }
+        }
+    }
+
     override fun onClick(position: Int, view: View?, item: Pointer) {
         showPointerInfoDialog(position)
     }
 
-    override fun onLongClick(position: Int, item: Pointer) {
-        val isIdMatch = if (BuildConfig.DEBUG) true
-        else pointersList[position].uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid)
-        if (!isIdMatch) return
-        val list = arrayListOf(getString(R.string.text_edit), getString(R.string.text_delete))
+    override fun onLongClick(position: Int, item: Pointer): Boolean {
+        if (!item.uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid) || item.reasonCode != Reason.OK) {
+            return BuildConfig.DEBUG
+        }
+        val list = mutableListOf(getString(R.string.text_edit), getString(R.string.text_delete))
         MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             cornerRadius(16f)
             listItems(items = list) { _, _, text ->
                 when (text) {
                     getString(R.string.text_edit) -> {
-                        requireActivity().container.snackbar("Will arrive soon.").anchorView = requireActivity().navigation
+                        showEditPointerDialog(item)
                     }
                     getString(R.string.text_delete) -> {
                         MaterialDialog(context).show {
@@ -398,5 +433,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 }
             }
         }
+        return true
+    }
+
+    companion object {
+        private const val TAG = "PointersRepoFragment"
     }
 }

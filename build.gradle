@@ -16,7 +16,7 @@
 ext {
     ankoCommonsVersion = '0.10.8'
     appcompatVersion = '1.2.0'
-    billingVersion = '3.0.1'
+    billingVersion = '3.0.2'
     billingKtxVersion = '3.0.0'
     cardviewVersion = '1.0.0'
     commonsIoVersion = '1.3.2'
@@ -37,7 +37,7 @@ ext {
     firebaseUiStorageVersion = '4.3.1'
     fragmentKtxVersion = '1.2.5'
     glideVersion = '4.11.0'
-    googleMaterialVersion = '1.3.0-alpha03'
+    googleMaterialVersion = '1.3.0-alpha04'
     gsonVersion = '2.8.6'
     koinVersion = '2.1.5'
     kotlinxCoroutinesVersion = '1.4.1'
@@ -60,7 +60,7 @@ ext {
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.10'
+    ext.kotlin_version = '1.4.20'
     repositories {
         google()
         jcenter()
