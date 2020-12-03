@@ -50,6 +50,8 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.*
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -248,6 +250,23 @@ class MainFragment : Fragment() {
             setImageDrawable(Drawable.createFromPath(mousePath))
         }
 
+        val reviewManager =
+            if (BuildConfig.DEBUG) FakeReviewManager(requireContext()) else ReviewManagerFactory.create(requireContext())
+        val request = reviewManager.requestReviewFlow()
+        request.addOnCompleteListener {
+            if (it.isSuccessful) {
+                val reviewInfo = it.result
+                val flow = reviewManager.launchReviewFlow(requireActivity(), reviewInfo)
+                flow.addOnCompleteListener {
+                    showInterstitialAd()
+                }
+            } else {
+                showInterstitialAd()
+            }
+        }
+    }
+
+    private fun showInterstitialAd() {
         interstitialAd.apply {
             if (isLoaded) show() else {
                 requireActivity().container.longSnackbar(
