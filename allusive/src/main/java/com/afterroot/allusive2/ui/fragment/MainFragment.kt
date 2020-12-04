@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -42,23 +43,27 @@ import com.afterroot.allusive2.Constants.POINTER_TOUCH
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.*
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.toast
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
@@ -69,9 +74,10 @@ class MainFragment : Fragment() {
 
     private lateinit var interstitialAd: InterstitialAd
     private val myDatabase: MyDatabase by inject()
-    private val settings: Settings by inject()
-    private var targetPath: String? = null
     private val remoteConfig: FirebaseRemoteConfig by inject()
+    private val settings: Settings by inject()
+    private val storage: FirebaseStorage by inject()
+    private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -478,6 +484,14 @@ class MainFragment : Fragment() {
         lifecycleScope.launch {
             //Observe Db on CoroutineScope
             myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, {
+                it.any { pointer ->
+                    val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
+                    if (!file.exists()) {
+                        Log.d(TAG, "Missing: ${pointer.file_name}")
+                        downloadPointer(pointer)
+                    }
+                    return@any !file.exists()
+                }
                 pointerAdapter.submitList(it)
                 //Show install msg if no pointer installed
                 dialogView.apply {
@@ -495,6 +509,20 @@ class MainFragment : Fragment() {
             })
         }
     }
+
+    private fun downloadPointer(roomPointer: RoomPointer) {
+        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading_missing))
+        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
+        ref.getFile(File("$targetPath${roomPointer.file_name}"))
+            .addOnSuccessListener {
+                requireContext().toast(getString(R.string.msg_missing_pointers_auto_downloaded))
+                dialog.dismiss()
+            }.addOnFailureListener {
+                requireContext().toast(getString(R.string.msg_error_pointers_missing))
+                dialog.dismiss()
+            }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_dashboard_activity, menu)
@@ -534,5 +562,9 @@ class MainFragment : Fragment() {
             .setNegativeButton(android.R.string.cancel) { _, _ ->
 
             }.setCancelable(true)
+    }
+
+    companion object {
+        private const val TAG = "MainFragment"
     }
 }

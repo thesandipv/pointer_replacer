@@ -183,6 +183,7 @@
     <string name="text_pointer_exists">Pointer already exists!</string>
     <string name="text_pointer_upload_notes">The recommended minimum Pointer Size is 128*128 and the recommended aspect ratio is 1:1. If the pointer image does not follow the above conditions then it will be downsized and center cropped.</string>
     <string name="text_progress_downloading">Downloading</string>
+    <string name="text_progress_downloading_missing">Downloading missing Pointers</string>
     <string name="text_progress_finishing_up">Finishing Up</string>
     <string name="text_progress_init">Initializing</string>
     <string name="text_progress_uploading">Uploading</string>
@@ -218,4 +219,6 @@
     <string name="text_chip_uploaded_by_you">Uploaded by You</string>
     <string name="hint_pointer_title">Pointer Title</string>
     <string name="hint_pointer_description">Pointer Description</string>
+    <string name="msg_error_pointers_missing">Some Pointer(s) are missing. Please delete them and re-download</string>
+    <string name="msg_missing_pointers_auto_downloaded">Missing Pointers automatically downloaded.</string>
 </resources>
