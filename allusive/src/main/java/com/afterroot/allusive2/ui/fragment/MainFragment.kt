@@ -60,6 +60,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
@@ -484,13 +485,12 @@ class MainFragment : Fragment() {
         lifecycleScope.launch {
             //Observe Db on CoroutineScope
             myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, {
-                it.any { pointer ->
+                it.forEach { pointer ->
                     val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
                     if (!file.exists()) {
                         Log.d(TAG, "Missing: ${pointer.file_name}")
                         downloadPointer(pointer)
                     }
-                    return@any !file.exists()
                 }
                 pointerAdapter.submitList(it)
                 //Show install msg if no pointer installed
@@ -512,17 +512,18 @@ class MainFragment : Fragment() {
 
     private fun downloadPointer(roomPointer: RoomPointer) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading_missing))
-        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
-        ref.getFile(File("$targetPath${roomPointer.file_name}"))
-            .addOnSuccessListener {
-                requireContext().toast(getString(R.string.msg_missing_pointers_auto_downloaded))
-                dialog.dismiss()
-            }.addOnFailureListener {
-                requireContext().toast(getString(R.string.msg_error_pointers_missing))
-                dialog.dismiss()
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
+            ref.getFile(File("$targetPath${roomPointer.file_name}"))
+                .addOnSuccessListener {
+                    requireContext().toast(getString(R.string.msg_missing_pointers_auto_downloaded))
+                    dialog.dismiss()
+                }.addOnFailureListener {
+                    requireContext().toast(getString(R.string.msg_error_pointers_missing))
+                    dialog.dismiss()
+                }
+        }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_dashboard_activity, menu)
