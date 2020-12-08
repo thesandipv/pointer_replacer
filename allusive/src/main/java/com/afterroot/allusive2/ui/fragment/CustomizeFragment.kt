@@ -30,7 +30,9 @@ import androidx.navigation.findNavController
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeTransform
 import androidx.transition.TransitionSet
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.color.ColorPalette
 import com.afollestad.materialdialogs.color.colorChooser
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
@@ -273,7 +275,7 @@ class CustomizeFragment : Fragment() {
         action_change_color.setOnClickListener {
             val tmpColor = if (pointerType == POINTER_TOUCH) settings.pointerTmpColor else settings.mouseTmpColor
 
-            MaterialDialog(requireContext()).show {
+            MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 title(R.string.choose_color)
                 colorChooser(
                     ColorPalette.Primary,

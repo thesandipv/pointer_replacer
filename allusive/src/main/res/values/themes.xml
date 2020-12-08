@@ -43,6 +43,7 @@
 
         <item name="md_corner_radius">16dp</item>
         <item name="md_color_button_text">@color/color_primary</item>
+        <item name="md_font_title">@font/ubuntu</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
