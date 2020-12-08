@@ -299,7 +299,7 @@ class MainFragment : Fragment() {
     }
 
     private fun showRebootDialog() { //TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
-        MaterialDialog(requireActivity()).show {
+        MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             title(res = R.string.reboot)
             message(res = R.string.text_reboot_confirm)
             positiveButton(res = R.string.reboot) {
@@ -453,7 +453,7 @@ class MainFragment : Fragment() {
             }
 
             override fun onLongClick(position: Int, item: RoomPointer): Boolean {
-                MaterialDialog(requireActivity()).show {
+                MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                     title(text = "${getString(R.string.text_delete)} ${item.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {

@@ -20,15 +20,21 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.util.Log
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.setMargins
+import androidx.core.view.updateLayoutParams
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
@@ -169,8 +175,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
             summary = settings.maxPointerPadding.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(requireActivity()).show {
-                    title(res = R.string.key_maxPaddingSize)
+                MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                    title(res = R.string.text_max_padding_size)
                     input(
                         hint = getString(R.string.input_hint_max_padding_size),
                         prefill = settings.maxPointerPadding.toString(),
@@ -189,8 +195,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             )
                                 .anchorView = requireActivity().navigation
                         }
-
-                    }.show()
+                    }
+                    (getInputLayout().getChildAt(0) as FrameLayout).updateLayoutParams<LinearLayout.LayoutParams> {
+                        setMargins(0)
+                    }
                 }
                 false
             }
@@ -201,7 +209,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
             summary = settings.maxPointerSize.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                MaterialDialog(requireActivity()).show {
+                MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                     title(res = R.string.text_max_pointer_size)
                     input(
                         hintRes = R.string.text_max_pointer_size,
@@ -220,6 +228,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             ).anchorView = requireActivity().navigation
                         }
 
+                    }
+                    (getInputLayout().getChildAt(0) as FrameLayout).updateLayoutParams<LinearLayout.LayoutParams> {
+                        setMargins(0)
                     }
                 }
                 false
@@ -313,7 +324,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
             billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList?.isNotEmpty()!!) {
-                    Handler().postDelayed({
+                    Handler(Looper.getMainLooper()).postDelayed({
                         loadingDialog.dismiss()
                     }, 100)
 
