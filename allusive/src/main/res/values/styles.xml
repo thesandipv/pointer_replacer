@@ -24,4 +24,14 @@
     </style>
 
     <style name="MyStyle.FilterChip" parent="Widget.MaterialComponents.Chip.Choice" />
+
+    <style name="MyStyle.ShapeAppearance.SmallComponents" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="MyStyle.ShapeAppearance.MediumComponents" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
 </resources>

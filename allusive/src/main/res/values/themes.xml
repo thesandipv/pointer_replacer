@@ -17,6 +17,8 @@
 
     <style name="MyTheme.Main" parent="Base.MyTheme">
         <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="shapeAppearanceSmallComponent">@style/MyStyle.ShapeAppearance.SmallComponents</item>
+        <item name="shapeAppearanceMediumComponent">@style/MyStyle.ShapeAppearance.MediumComponents</item>
     </style>
 
     <style name="MyTheme.Main.Launch">
