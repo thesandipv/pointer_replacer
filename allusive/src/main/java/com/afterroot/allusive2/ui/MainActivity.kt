@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         //Add user in db if not available
         addUserInfoInDB()
         createPointerFolder()
-        loadFragments()
+        setUpNavigation()
         setUpTitleObserver()
     }
 
@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadFragments() {
+    private fun setUpNavigation() {
         val host: NavHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment? ?: return
         val navController = host.navController
