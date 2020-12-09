@@ -16,10 +16,12 @@
 package com.afterroot.allusive2.model
 
 import android.provider.BaseColumns
+import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Keep
 @Entity(tableName = RoomPointer.TABLE_NAME)
 data class RoomPointer(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(index = true, name = BaseColumns._ID)
@@ -29,9 +31,7 @@ data class RoomPointer(
     @ColumnInfo val pointer_desc: String?,
     @ColumnInfo val uploader_id: String,
     @ColumnInfo val uploader_name: String
-) : IPointer {
-    override fun type(): Int = IPointer.TYPE_LOCAL_P
-
+) {
     companion object {
         const val TABLE_NAME = "pointers"
     }

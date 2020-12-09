@@ -15,14 +15,14 @@
 
 package com.afterroot.allusive2.model
 
+import androidx.annotation.Keep
 import java.io.Serializable
 
 //Collection 'users'
+@Keep
 data class User(
-    var name: String?,
-    var email: String?,
-    var uid: String,
-    var fcmId: String
-) : Serializable {
-    constructor() : this("", "", "", "")
-}
+    var name: String? = null,
+    var email: String? = null,
+    var uid: String = "",
+    var fcmId: String = "'"
+) : Serializable
