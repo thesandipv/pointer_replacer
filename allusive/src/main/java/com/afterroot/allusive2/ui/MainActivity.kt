@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (FirebaseAuth.getInstance().currentUser == null) { //If not logged in, go to login.
+        if (get<FirebaseAuth>().currentUser == null) { //If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
     }

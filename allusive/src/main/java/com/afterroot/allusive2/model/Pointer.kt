@@ -15,12 +15,15 @@
 
 package com.afterroot.allusive2.model
 
+import androidx.annotation.Keep
+import com.afterroot.allusive2.Reason
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.*
 
 //Collection 'pointers'
+@Keep
 data class Pointer(
     var name: String? = null,
     var filename: String? = null,
@@ -31,9 +34,5 @@ data class Pointer(
     /**
      * Use constants from [com.afterroot.allusive2.Reason]
      * */
-    var reasonCode: Int = 0
-) : Serializable, IPointer {
-    override fun type(): Int {
-        return IPointer.TYPE_POINTER
-    }
-}
+    var reasonCode: Int = Reason.OK
+) : Serializable
