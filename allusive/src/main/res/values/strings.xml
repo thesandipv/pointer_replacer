@@ -15,7 +15,7 @@
 
 <resources>
     <string name="action_import_old_pointers">Import Old Pointers</string>
-    <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/8486157233</string>
+    <string name="ad_banner_unit_id" translatable="false">ca-app-pub-6628325093439880/80845167643</string>
     <string name="ad_banner_new_pointer" translatable="false">ca-app-pub-6628325093439880/5238011519</string>
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/4145271758</string>
     <string name="ad_rewarded_1_id" translatable="false">ca-app-pub-6628325093439880/8486157233</string>
