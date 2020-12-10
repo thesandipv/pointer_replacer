@@ -15,5 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+#noinspection ShrinkerUnresolvedReference
+-keepattributes Signature
+-keepclassmembers class com.afterroot.allusive2.model.** { *; }
+-keepclassmembers class com.afollestad.materialdialogs.** { *; }
 -keep class com.afterroot.** { *; }
 -keep class androidx.navigation.fragment.NavHostFragment
