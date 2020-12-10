@@ -24,8 +24,8 @@ plugins {
 
 ext {
     major = 1
-    minor = 8
-    patch = 9
+    minor = 9
+    patch = 0
     minimumSdkVersion = 16
 }
 

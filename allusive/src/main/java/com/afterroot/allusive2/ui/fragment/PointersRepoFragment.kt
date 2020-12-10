@@ -89,7 +89,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private val storage: FirebaseStorage by inject()
     private var filteredList: List<Pointer>? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -394,49 +394,56 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     override fun onLongClick(position: Int, item: Pointer): Boolean {
-        if (!item.uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid) || item.reasonCode != Reason.OK) {
-            return BuildConfig.DEBUG
-        }
-        val list = mutableListOf(getString(R.string.text_edit), getString(R.string.text_delete))
-        MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-            cornerRadius(16f)
-            listItems(items = list) { _, _, text ->
-                when (text) {
-                    getString(R.string.text_edit) -> {
-                        showEditPointerDialog(item)
-                    }
-                    getString(R.string.text_delete) -> {
-                        MaterialDialog(context).show {
-                            message(text = getString(R.string.dialog_delete_confirm))
-                            positiveButton(R.string.text_delete) {
-                                val filename = pointersList[position].filename
-                                firestore.collection(DatabaseFields.COLLECTION_POINTERS)
-                                    .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
-                                    .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
-                                        querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
-                                            docSnapshot!!.reference.delete().addOnSuccessListener {
-                                                //go to last position after deleting pointer
-                                                binding.list.scrollToPosition(position)
-                                                //delete pointer from storage bucket
-                                                storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(filename!!)
-                                                    .delete()
-                                                context.toast(R.string.msg_delete_success)
+        val result = kotlin.runCatching {
+            if (!item.uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid) || item.reasonCode != Reason.OK) {
+                return false
+            }
+            val list = mutableListOf(getString(R.string.text_edit), getString(R.string.text_delete))
+            MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+                cornerRadius(16f)
+                listItems(items = list) { _, _, text ->
+                    when (text) {
+                        getString(R.string.text_edit) -> {
+                            showEditPointerDialog(item)
+                        }
+                        getString(R.string.text_delete) -> {
+                            MaterialDialog(context).show {
+                                message(text = getString(R.string.dialog_delete_confirm))
+                                positiveButton(R.string.text_delete) {
+                                    val filename = pointersList[position].filename
+                                    firestore.collection(DatabaseFields.COLLECTION_POINTERS)
+                                        .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
+                                        .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
+                                            querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
+                                                docSnapshot!!.reference.delete().addOnSuccessListener {
+                                                    //go to last position after deleting pointer
+                                                    binding.list.scrollToPosition(position)
+                                                    //delete pointer from storage bucket
+                                                    storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
+                                                        .child(filename!!)
+                                                        .delete()
+                                                    context.toast(R.string.msg_delete_success)
+                                                }
                                             }
                                         }
-                                    }
-                            }
-                            negativeButton(android.R.string.cancel) {
-                                it.dismiss()
+                                }
+                                negativeButton(android.R.string.cancel) {
+                                    it.dismiss()
+                                }
                             }
                         }
                     }
                 }
             }
         }
+        result.onFailure {
+            it.message?.let { it1 -> requireContext().toast(it1) }
+        }
         return true
     }
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "PointersRepoFragment"
     }
 }
