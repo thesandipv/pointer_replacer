@@ -243,12 +243,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
-    private fun showPointerInfoDialog(position: Int) {
+    private fun showPointerInfoDialog(pointer: Pointer) {
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(R.layout.fragment_pointer_info, scrollable = true)
         }
-
-        val pointer = pointersList[position]
 
         dialog.getCustomView().apply {
             when (pointer.reasonCode) {
@@ -279,7 +277,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             } else {
                                 text = getString(R.string.text_download)
                                 setOnClickListener {
-                                    downloadPointer(position)
+                                    downloadPointer(pointer)
                                     dialog.dismiss()
                                 }
                                 isEnabled = pointer.reasonCode == Reason.OK
@@ -317,35 +315,38 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
-    private fun downloadPointer(position: Int) {
+    private fun downloadPointer(pointer: Pointer) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
-        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointersList[position].filename!!)
-        ref.getFile(File("$targetPath${pointersList[position].filename}"))
+        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointer.filename!!)
+        ref.getFile(File("$targetPath${pointer.filename}"))
             .addOnSuccessListener {
                 requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
                     requireActivity().navigation
                 if (!BuildConfig.DEBUG) {
-                    pointersSnapshot.documents[position].reference.update(
-                        DatabaseFields.FIELD_DOWNLOADS,
-                        pointersList[position].downloads + 1
-                    )
+                    pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
+                        .addOnSuccessListener {
+                            val docId = it.documents.first().id
+                            firestore.collection(DatabaseFields.COLLECTION_POINTERS).document(docId).update(
+                                DatabaseFields.FIELD_DOWNLOADS,
+                                pointer.downloads + 1
+                            )
+                        }
                 }
-                val p = pointersList[position]
                 var id = ""
                 var name = ""
-                p.uploadedBy!!.forEach {
+                pointer.uploadedBy!!.forEach {
                     id = it.key
                     name = it.value
                 }
-                val pointer = RoomPointer(
-                    file_name = p.filename,
-                    pointer_desc = p.description,
-                    pointer_name = p.name,
+                val roomPointer = RoomPointer(
+                    file_name = pointer.filename,
+                    pointer_desc = pointer.description,
+                    pointer_name = pointer.name,
                     uploader_id = id,
                     uploader_name = name
                 )
                 lifecycleScope.launch {
-                    myDatabase.pointerDao().add(pointer)
+                    myDatabase.pointerDao().add(roomPointer)
                 }
 
                 dialog.dismiss()
@@ -390,7 +391,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     override fun onClick(position: Int, view: View?, item: Pointer) {
-        showPointerInfoDialog(position)
+        showPointerInfoDialog(item)
     }
 
     override fun onLongClick(position: Int, item: Pointer): Boolean {
@@ -410,7 +411,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             MaterialDialog(context).show {
                                 message(text = getString(R.string.dialog_delete_confirm))
                                 positiveButton(R.string.text_delete) {
-                                    val filename = pointersList[position].filename
+                                    val filename = item.filename
                                     firestore.collection(DatabaseFields.COLLECTION_POINTERS)
                                         .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
                                         .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
