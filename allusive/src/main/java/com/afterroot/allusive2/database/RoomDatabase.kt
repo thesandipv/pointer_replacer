@@ -48,7 +48,7 @@ interface PointerDao {
     suspend fun exists(fileName: String): List<RoomPointer>
 }
 
-@Database(entities = [RoomPointer::class], version = 1)
+@Database(entities = [RoomPointer::class], version = 2)
 abstract class MyDatabase : RoomDatabase() {
     //TODO Verify migration.
     abstract fun pointerDao(): PointerDao
