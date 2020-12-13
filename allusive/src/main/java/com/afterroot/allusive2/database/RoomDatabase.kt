@@ -17,9 +17,23 @@ package com.afterroot.allusive2.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.apply {
+            execSQL("CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)")
+            execSQL("CREATE INDEX IF NOT EXISTS `index_pointers_new__id` ON pointers_new (_id)")
+            execSQL("INSERT INTO pointers_new (pointer_name, file_name, pointer_desc, uploader_id, uploader_name) SELECT pointer_name, file_name, pointer_desc, uploader_id, uploader_name FROM pointers")
+            execSQL("DROP TABLE pointers")
+            execSQL("ALTER TABLE pointers_new RENAME TO pointers")
+        }
+    }
+}
 
 val roomModule = module {
     single {
@@ -27,7 +41,7 @@ val roomModule = module {
             androidApplication(),
             MyDatabase::class.java,
             "installed-pointers"
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
     }
 
     single { get<MyDatabase>().pointerDao() }
@@ -50,6 +64,5 @@ interface PointerDao {
 
 @Database(entities = [RoomPointer::class], version = 2)
 abstract class MyDatabase : RoomDatabase() {
-    //TODO Verify migration.
     abstract fun pointerDao(): PointerDao
 }
