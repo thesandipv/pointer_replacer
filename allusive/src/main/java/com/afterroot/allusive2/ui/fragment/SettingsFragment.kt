@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.activityViewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -42,6 +43,7 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.android.billingclient.api.*
 import com.google.android.gms.ads.AdListener
@@ -52,8 +54,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.inject
 
 @SuppressLint("ValidFragment")
@@ -63,6 +63,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private lateinit var interstitialAd: InterstitialAd
     private val settings: Settings by inject()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -187,13 +188,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settings.maxPointerPadding = input.toString().toInt()
                             this@apply.summary = input
                         } else {
-                            requireActivity().container.snackbar(
-                                String.format(
-                                    getString(R.string.str_format_value_error),
-                                    0
-                                )
-                            )
-                                .anchorView = requireActivity().navigation
+                            sharedViewModel.displayMsg(String.format(getString(R.string.str_format_value_error), 0))
                         }
                     }
                     (getInputLayout().getChildAt(0) as FrameLayout).updateLayoutParams<LinearLayout.LayoutParams> {
@@ -220,12 +215,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settings.maxPointerSize = input.toString().toInt()
                             this@apply.summary = input
                         } else {
-                            requireActivity().container.snackbar(
-                                String.format(
-                                    getString(R.string.str_format_value_error),
-                                    context.getMinPointerSize()
-                                )
-                            ).anchorView = requireActivity().navigation
+                            sharedViewModel.displayMsg(
+                                String.format(getString(R.string.str_format_value_error), context.getMinPointerSize())
+                            )
                         }
 
                     }
@@ -254,7 +246,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 if (interstitialAd.isLoaded) {
                     interstitialAd.show()
                 } else {
-                    requireActivity().container.snackbar(getString(R.string.msg_ad_not_loaded))
+                    sharedViewModel.displayMsg(getString(R.string.msg_ad_not_loaded))
                 }
                 true
             }
@@ -307,7 +299,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         loadingDialog.show()
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
-                requireActivity().container.snackbar("Something went wrong.").anchorView = requireActivity().navigation
+                sharedViewModel.displayMsg("Something went wrong.")
             }
 
             override fun onBillingSetupFinished(billingResult: BillingResult) {

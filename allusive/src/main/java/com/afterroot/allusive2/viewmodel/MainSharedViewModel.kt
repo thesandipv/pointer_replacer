@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class MainSharedViewModel : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
+    private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
 
     fun getPointerSnapshot(): LiveData<ViewModelState> {
@@ -39,6 +40,15 @@ class MainSharedViewModel : ViewModel() {
     }
 
     fun setTitle(title: String?) {
-        liveTitle.value = title
+        if (liveTitle.value != title) { //Don't change title if new title is equal to old.
+            liveTitle.value = title!!
+        }
+    }
+
+    val snackbarMsg: LiveData<Event<String>>
+        get() = _snackbarMsg
+
+    fun displayMsg(msg: String) {
+        _snackbarMsg.value = Event(msg)
     }
 }

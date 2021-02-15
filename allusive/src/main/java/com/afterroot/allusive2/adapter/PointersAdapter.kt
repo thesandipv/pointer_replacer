@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 package com.afterroot.allusive2.adapter
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -28,14 +29,13 @@ import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.databinding.ItemPointerRepoBinding
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.inflate
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.item_pointer_repo.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.get
 
@@ -51,7 +51,8 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
             oldItem.hashCode() == newItem.hashCode()
     }) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return PointerVH(parent, callbacks)
+        val binding = ItemPointerRepoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PointerVH(binding, callbacks)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -59,12 +60,13 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
         holder.bind(getItem(position))
     }
 
-    inner class PointerVH(parent: ViewGroup, private val callbacks: ItemSelectedCallback<Pointer>) :
-        RecyclerView.ViewHolder(parent.inflate(R.layout.item_pointer_repo)), KoinComponent {
-        val context: Context = parent.context
-        private val itemName: AppCompatTextView = itemView.info_pointer_pack_name
-        private val itemThumb: AppCompatImageView = itemView.info_pointer_image
-        private val itemUploader: AppCompatTextView = itemView.info_username
+    inner class PointerVH(binding: ItemPointerRepoBinding, private val callbacks: ItemSelectedCallback<Pointer>) :
+        RecyclerView.ViewHolder(binding.root), KoinComponent {
+        val context: Context = binding.root.context
+        private val itemName: AppCompatTextView = binding.infoPointerPackName
+        private val itemThumb: AppCompatImageView = binding.infoPointerImage
+        private val itemUploader: AppCompatTextView = binding.infoUsername
+        private val infoMeta: AppCompatTextView = binding.infoMeta
 
 
         fun bind(pointer: Pointer) {
@@ -89,12 +91,11 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
                         background = context.getDrawableExt(R.drawable.transparent_grid)
 
                     }
-                    itemView.info_meta.text =
-                        context.resources.getQuantityString(
-                            R.plurals.str_format_download_count,
-                            pointer.downloads,
-                            pointer.downloads
-                        )
+                    infoMeta.text = context.resources.getQuantityString(
+                        R.plurals.str_format_download_count,
+                        pointer.downloads,
+                        pointer.downloads
+                    )
                 }
                 else -> {
                     itemThumb.apply {
@@ -106,7 +107,7 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
                         setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
                     }
                     itemName.text = pointer.name
-                    itemView.info_meta.text = null
+                    infoMeta.text = null
                     itemUploader.text = null
                 }
             }

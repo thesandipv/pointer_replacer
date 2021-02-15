@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,14 +27,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
@@ -47,15 +50,14 @@ import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.fragment_new_pointer_post.*
-import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileNotFoundException
@@ -64,23 +66,26 @@ import java.io.IOException
 
 class NewPointerPost : Fragment() {
 
-    private val remoteConfig: FirebaseRemoteConfig by inject()
+    private lateinit var binding: FragmentNewPointerPostBinding
     private lateinit var rewardedAd: RewardedAd
     private val db: FirebaseFirestore by inject()
-    private val pointerDescription: String get() = edit_desc.text.toString().trim()
-    private val pointerName: String get() = edit_name.text.toString().trim()
+    private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
+    private val pointerName: String get() = binding.editName.text.toString().trim()
+    private val remoteConfig: FirebaseRemoteConfig by inject()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private val storage: FirebaseStorage by inject()
     private var adLoaded: Boolean = false
     private var clickedUpload: Boolean = false
     private var isPointerImported = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_new_pointer_post, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentNewPointerPostBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        action_upload.setOnClickListener {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.actionUpload.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/png"
             }
@@ -91,6 +96,7 @@ class NewPointerPost : Fragment() {
             val chooserIntent = Intent.createChooser(intent, "Choose Pointer Image").apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
             }
+            //FIXME update method https://developer.android.com/training/basics/intents/result#kotlin
             startActivityForResult(chooserIntent, RC_PICK_IMAGE)
         }
 
@@ -107,14 +113,14 @@ class NewPointerPost : Fragment() {
                     adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
                         getString(R.string.ad_banner_new_pointer)
                     } else remoteConfig.getString("ad_banner_new_pointer")
-                    ad_container.addView(this)
+                    binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
 
                 if (result.isSuccessful) {
                     if (remoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
                         setUpRewardedAd()
-                        requireActivity().fab_apply.apply {
+                        requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
                             setOnClickListener {
                                 if (verifyData()) {
                                     clickedUpload = true
@@ -125,8 +131,7 @@ class NewPointerPost : Fragment() {
                                             if (rewardedAd.isLoaded) {
                                                 showAd()
                                             } else {
-                                                requireActivity().container.snackbar("Ad is not loaded yet. Loading...").anchorView =
-                                                    requireActivity().navigation
+                                                sharedViewModel.displayMsg("Ad is not loaded yet. Loading...")
                                             }
                                         }
                                         negativeButton(R.string.fui_cancel)
@@ -146,7 +151,7 @@ class NewPointerPost : Fragment() {
     }
 
     private fun setFabAsDirectUpload() {
-        requireActivity().fab_apply.apply {
+        requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
             setOnClickListener {
                 if (verifyData()) {
                     upload(saveTmpPointer())
@@ -209,8 +214,8 @@ class NewPointerPost : Fragment() {
         if (requestCode == RC_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             isPointerImported = true
             data?.data?.also { uri ->
-                Glide.with(this).load(uri).override(128, 128).centerCrop().into(pointer_thumb)
-                pointer_thumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
+                Glide.with(this).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
+                binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
             }
         }
     }
@@ -241,19 +246,17 @@ class NewPointerPost : Fragment() {
                 Log.d(TAG, "upload: $pointer")
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
-                        container.snackbar(getString(R.string.msg_pointer_upload_success)).anchorView =
-                            requireActivity().navigation
+                        sharedViewModel.displayMsg(getString(R.string.msg_pointer_upload_success))
                         dialog.dismiss()
-                        fragment_repo_nav.findNavController().navigateUp()
+                        findNavController().navigateUp()
                     }
                 }.addOnFailureListener {
-                    requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
-                        requireActivity().navigation
+                    sharedViewModel.displayMsg(getString(R.string.msg_error))
                 }
             }
         }.addOnFailureListener {
-            pointer_thumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
-            requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView = requireActivity().navigation
+            binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
+            sharedViewModel.displayMsg(getString(R.string.msg_error))
         }
     }
 
@@ -262,8 +265,8 @@ class NewPointerPost : Fragment() {
      */
     @Throws(IOException::class)
     private fun saveTmpPointer(): File {
-        pointer_thumb.background = null
-        val bitmap = pointer_thumb.getAsBitmap()
+        binding.pointerThumb.background = null
+        val bitmap = binding.pointerThumb.getAsBitmap()
         val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
         val out: FileOutputStream
         try {
@@ -281,25 +284,24 @@ class NewPointerPost : Fragment() {
 
     private fun verifyData(): Boolean {
         var isOK = true
+        binding.apply {
+            if (pointerName.isEmpty()) {
+                setListener(editName, inputName)
+                setError(inputName)
+                isOK = false
+            }
 
-        if (pointerName.isEmpty()) {
-            setListener(edit_name, input_name)
-            setError(input_name)
-            isOK = false
+            if (pointerDescription.length >= inputDesc.counterMaxLength) {
+                setListener(editDesc, inputDesc)
+                inputDesc.error = "Maximum Characters"
+                isOK = false
+            }
+
+            if (!isPointerImported) {
+                sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_imported))
+                isOK = false
+            }
         }
-
-        if (pointerDescription.length >= input_desc.counterMaxLength) {
-            setListener(edit_desc, input_desc)
-            input_desc.error = "Maximum Characters"
-            isOK = false
-        }
-
-        if (!isPointerImported) {
-            requireActivity().container.snackbar(getString(R.string.msg_pointer_not_imported)).anchorView =
-                requireActivity().navigation
-            isOK = false
-        }
-
         return isOK
     }
 
