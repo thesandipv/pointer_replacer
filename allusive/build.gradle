@@ -15,7 +15,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -138,7 +138,7 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v13:$legacySupportV13Version"
     implementation "androidx.legacy:legacy-support-v4:$legacySupportV4Version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -170,9 +170,9 @@ dependencies {
 
     implementation "com.google.android.gms:play-services-oss-licenses:17.0.0"
     implementation "com.google.android.material:material:$googleMaterialVersion"
-    implementation "com.google.android.play:core:1.9.0"
+    implementation 'com.google.android.gms:play-services-ads:19.7.0'
+    implementation 'com.google.android.play:core:1.9.1'
     implementation "com.google.code.gson:gson:$gsonVersion"
-    implementation "com.google.firebase:firebase-ads"
     implementation "com.google.firebase:firebase-analytics-ktx"
     implementation "com.google.firebase:firebase-auth-ktx"
     implementation "com.google.firebase:firebase-config-ktx"
@@ -189,14 +189,14 @@ dependencies {
     implementation "org.koin:koin-androidx-scope:$koinVersion"
     implementation "org.koin:koin-androidx-viewmodel:$koinVersion"
 
-    implementation 'com.airbnb.android:epoxy:4.1.0'
-    kapt 'com.airbnb.android:epoxy-processor:4.1.0'
+    implementation 'com.airbnb.android:epoxy:4.3.1'
+    kapt 'com.airbnb.android:epoxy-processor:4.3.1'
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinxCoroutinesVersion"
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     implementation "com.afterroot.core:core:$coreVersion"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'me.zhanghai.android.fastscroll:library:1.1.5'
 }
