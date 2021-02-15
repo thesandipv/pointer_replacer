@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,8 @@ import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
+import com.afterroot.allusive2.databinding.DialogEditPointerBinding
+import com.afterroot.allusive2.databinding.FragmentPointerInfoBinding
 import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
@@ -53,6 +55,7 @@ import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -60,13 +63,8 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.dialog_edit_pointer.view.*
-import kotlinx.android.synthetic.main.fragment_pointer_info.view.*
-import kotlinx.android.synthetic.main.fragment_pointer_repo.view.*
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
 import org.koin.android.ext.android.get
@@ -81,6 +79,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var targetPath: String
+    private lateinit var fabApply: ExtendedFloatingActionButton
     private val firestore: FirebaseFirestore by inject()
     private val myDatabase: MyDatabase by inject()
     private val networkViewModel: NetworkViewModel by activityViewModels()
@@ -91,6 +90,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
+        fabApply = requireActivity().findViewById(R.id.fab_apply)
         return binding.root
     }
 
@@ -124,9 +124,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             binding.buttonRetry.setOnClickListener {
                 onResume()
             }
-            requireActivity().fab_apply.hide()
+            fabApply.hide()
         } else {
-            requireActivity().fab_apply.apply {
+            fabApply.apply {
                 show()
                 setOnClickListener {
                     if (!requireContext().isNetworkAvailable() && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -194,14 +194,14 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun setUpFilter() {
-        requireView().repo_sort_chip_group.apply {
+        binding.repoSortChipGroup.apply {
             when (settings.orderBy) {
                 DatabaseFields.FIELD_TIME -> this.check(R.id.filter_chip_sort_by_date)
                 DatabaseFields.FIELD_DOWNLOADS -> this.check(R.id.filter_chip_sort_by_download)
             }
         }
 
-        requireView().filter_chip_sort_by_date.apply {
+        binding.filterChipSortByDate.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     displayPointers((filteredList ?: pointersList).sortedByDescending {
@@ -211,7 +211,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 }
             }
         }
-        requireView().filter_chip_sort_by_download.apply {
+        binding.filterChipSortByDownload.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     displayPointers((filteredList ?: pointersList).sortedByDescending {
@@ -222,7 +222,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             }
         }
 
-        requireView().filter_chip_show_user_uploaded.apply {
+
+        binding.filterChipShowUserUploaded.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
                 if (isChecked) {
@@ -244,16 +245,17 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun showPointerInfoDialog(pointer: Pointer) {
+        //FIXME check this is working or not
+        val binding = FragmentPointerInfoBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
-            customView(R.layout.fragment_pointer_info, scrollable = true)
+            customView(view = binding.root, scrollable = true)
         }
 
         dialog.getCustomView().apply {
             when (pointer.reasonCode) {
                 Reason.OK -> {
-                    info_pointer_pack_name.text = pointer.name
-                    info_pack_desc.text = pointer.description
-                    info_pointer_image.apply {
+                    binding.pointer = pointer
+                    binding.infoPointerImage.apply {
                         updateLayoutParams<ConstraintLayout.LayoutParams> {
                             height = 128
                             width = 128
@@ -268,7 +270,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             .transition(DrawableTransitionOptions.withCrossFade(factory))
                             .into(this)
                     }
-                    info_action_pack.apply {
+                    binding.infoActionPack.apply {
                         lifecycleScope.launch {
                             if (myDatabase.pointerDao().exists(pointer.filename!!).isNotEmpty()) {
                                 text = getString(R.string.text_installed)
@@ -290,14 +292,14 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         pointer.downloads
                     )
                     val date = SimpleDateFormat.getDateInstance().format(pointer.time)
-                    info_tv_downloads_count.text =
+                    binding.downloadsText =
                         String.format(getString(R.string.format_text_downloads_and_date), downloads, date)
                     pointer.uploadedBy?.forEach {
-                        info_username.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
+                        binding.uploadedBy = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
                     }
                 }
                 else -> {
-                    info_pointer_image.apply {
+                    binding.infoPointerImage.apply {
                         updateLayoutParams<ConstraintLayout.LayoutParams> {
                             height = 128
                             width = 128
@@ -305,11 +307,12 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         background = null
                         setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
                     }
-                    info_pointer_pack_name.text = pointer.name
-                    info_pack_desc.text = pointer.description
-                    info_tv_downloads_count.text = null
-                    info_username.text = null
-                    info_action_pack.visible(false)
+                    binding.apply {
+                        this.pointer = pointer
+                        downloadsText = null
+                        uploadedBy = null
+                        infoActionPack.visible(false)
+                    }
                 }
             }
         }
@@ -320,8 +323,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointer.filename!!)
         ref.getFile(File("$targetPath${pointer.filename}"))
             .addOnSuccessListener {
-                requireActivity().container.snackbar(getString(R.string.msg_pointer_downloaded)).anchorView =
-                    requireActivity().navigation
+                sharedViewModel.displayMsg(getString(R.string.msg_pointer_downloaded))
                 if (!BuildConfig.DEBUG) {
                     pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
                         .addOnSuccessListener {
@@ -351,27 +353,24 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
                 dialog.dismiss()
             }.addOnFailureListener {
-                requireActivity().container.snackbar(getString(R.string.msg_error)).anchorView =
-                    requireActivity().navigation
+                sharedViewModel.displayMsg(getString(R.string.msg_error))
                 dialog.dismiss()
             }
     }
 
     private fun showEditPointerDialog(pointer: Pointer) {
+        val binding = DialogEditPointerBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT))
         dialog.show {
-            customView(viewRes = R.layout.dialog_edit_pointer)
-            val cView = getCustomView()
-            val titleView = cView.ti_title
-            val descView = cView.ti_desc
+            customView(view = binding.root)
             title(text = "Edit Pointer Info")
             val oldTitle = pointer.name
             val oldDesc = pointer.description
-            titleView.setText(oldTitle)
-            descView.setText(oldDesc)
+            binding.tiTitle.setText(oldTitle)
+            binding.tiDesc.setText(oldDesc)
             positiveButton(res = R.string.text_action_save) {
-                val newTitle = cView.ti_title.text.toString()
-                val newDesc = cView.ti_desc.text.toString()
+                val newTitle = binding.tiTitle.text.toString()
+                val newDesc = binding.tiDesc.text.toString()
                 if (oldTitle != newTitle || oldDesc != newDesc) {
                     pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
                         .addOnSuccessListener {

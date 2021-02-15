@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.showNetworkDialog
+import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.animateProperty
@@ -46,11 +47,12 @@ import com.afterroot.core.extensions.visible
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -60,6 +62,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDashboardBinding
+    private lateinit var navigation: BottomNavigationView
+    private lateinit var fabApply: ExtendedFloatingActionButton
     private val networkViewModel: NetworkViewModel by viewModels()
     private val settings: Settings by inject()
     private val sharedViewModel: MainSharedViewModel by viewModels()
@@ -93,6 +97,9 @@ class MainActivity : AppCompatActivity() {
             settings.isFirstInstalled = false
         }
 
+        navigation = findViewById(R.id.navigation)
+        fabApply = findViewById(R.id.fab_apply)
+
         //Initialize AdMob SDK
         MobileAds.initialize(this)
 
@@ -116,6 +123,13 @@ class MainActivity : AppCompatActivity() {
         createPointerFolder()
         setUpNavigation()
         setUpTitleObserver()
+        setUpErrorObserver()
+    }
+
+    private fun setUpErrorObserver() {
+        sharedViewModel.snackbarMsg.observe(this, EventObserver {
+            findViewById<CoordinatorLayout>(R.id.container).snackbar(it).anchorView = navigation
+        })
     }
 
     private fun setUpTitleObserver() {
@@ -124,11 +138,15 @@ class MainActivity : AppCompatActivity() {
             setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
         }
         sharedViewModel.liveTitle.observe(this, {
-            setTitle(it)
+            updateTitle(it)
         })
     }
 
     private fun setTitle(title: String?) {
+        sharedViewModel.setTitle(title)
+    }
+
+    private fun updateTitle(title: String?) {
         binding.apply {
             val params = fragmentRepoNav.layoutParams as CoordinatorLayout.LayoutParams
             if (title.isNullOrBlank()) {
@@ -182,7 +200,7 @@ class MainActivity : AppCompatActivity() {
                     userRef.get().addOnCompleteListener { getUserTask ->
                         if (getUserTask.isSuccessful) {
                             if (!getUserTask.result!!.exists()) {
-                                container.snackbar("User not available. Creating User..").anchorView = navigation
+                                sharedViewModel.displayMsg("User not available. Creating User..")
                                 val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
                                 userRef.set(user).addOnCompleteListener { setUserTask ->
                                     if (!setUserTask.isSuccessful) Log.e(
@@ -257,31 +275,31 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment? ?: return
         val navController = host.navController
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (!fab_apply.isExtended) {
-                fab_apply.extend()
+            if (!fabApply.isExtended) {
+                fabApply.extend()
             }
             showNavigation()
             when (destination.id) {
                 R.id.mainFragment -> {
-                    fab_apply.apply {
+                    fabApply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_apply)
                     }
                     setTitle(getString(R.string.title_home))
                 }
                 R.id.repoFragment -> {
-                    fab_apply.apply {
+                    fabApply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_post)
                     }
                     setTitle(getString(R.string.title_dashboard))
                 }
                 R.id.settingsFragment -> {
-                    fab_apply.hide()
+                    fabApply.hide()
                     setTitle(getString(R.string.title_settings))
                 }
                 R.id.editProfileFragment -> {
-                    fab_apply.apply {
+                    fabApply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_save)
                     }
@@ -289,7 +307,7 @@ class MainActivity : AppCompatActivity() {
                     setTitle(getString(R.string.title_edit_profile))
                 }
                 R.id.newPostFragment -> {
-                    fab_apply.apply {
+                    fabApply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_upload)
                     }
@@ -297,7 +315,7 @@ class MainActivity : AppCompatActivity() {
                     setTitle(getString(R.string.title_new_pointer))
                 }
                 R.id.customizeFragment -> {
-                    fab_apply.apply {
+                    fabApply.apply {
                         if (!isShown) show()
                         text = getString(R.string.text_action_apply)
                     }

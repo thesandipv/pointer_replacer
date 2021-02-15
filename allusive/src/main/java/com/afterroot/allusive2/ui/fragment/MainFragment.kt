@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,9 @@ import android.view.*
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -36,7 +38,6 @@ import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.afterroot.allusive2.*
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
@@ -45,25 +46,27 @@ import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
+import com.afterroot.allusive2.databinding.FragmentMainBinding
+import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.layout_list_bottomsheet.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
-import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.find
 import org.jetbrains.anko.toast
 import org.koin.android.ext.android.inject
 import java.io.File
@@ -73,16 +76,19 @@ import java.io.IOException
 
 class MainFragment : Fragment() {
 
+    private lateinit var binding: FragmentMainBinding
     private lateinit var interstitialAd: InterstitialAd
     private val myDatabase: MyDatabase by inject()
     private val remoteConfig: FirebaseRemoteConfig by inject()
     private val settings: Settings by inject()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private val storage: FirebaseStorage by inject()
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentMainBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,16 +100,16 @@ class MainFragment : Fragment() {
         targetPath = requireContext().getPointerSaveDir()
 
         requireActivity().apply {
-            layout_new_pointer.setOnClickListener {
+            binding.layoutNewPointer.setOnClickListener {
                 showListPointerChooser(pointerType = POINTER_TOUCH)
             }
-            layout_new_mouse.setOnClickListener {
+            binding.layoutNewMouse.setOnClickListener {
                 showListPointerChooser(
                     pointerType = POINTER_MOUSE,
                     title = getString(R.string.dialog_title_select_mouse_pointer)
                 )
             }
-            fab_apply.apply {
+            findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
                 setOnClickListener {
                     applyPointer()
                 }
@@ -113,31 +119,27 @@ class MainFragment : Fragment() {
 
             loadCurrentPointers()
 
-            action_customize.setOnClickListener {
+            binding.actionCustomize.setOnClickListener {
                 if (!isPointerSelected()) {
-                    requireActivity().container.snackbar(
-                        message = getString(R.string.msg_pointer_not_selected)
-                    ).anchorView = requireActivity().navigation
+                    sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_TOUCH)
                     }
                     val extras =
-                        FragmentNavigatorExtras(selected_pointer to getString(R.string.main_fragment_transition))
+                        FragmentNavigatorExtras(binding.selectedPointer to getString(R.string.main_fragment_transition))
                     findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
             }
 
-            action_customize_mouse.setOnClickListener {
+            binding.actionCustomizeMouse.setOnClickListener {
                 if (!isMouseSelected()) {
-                    requireActivity().container.snackbar(
-                        message = getString(R.string.msg_mouse_not_selected)
-                    ).anchorView = requireActivity().navigation
+                    sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_MOUSE)
                     }
-                    val extras = FragmentNavigatorExtras(selected_mouse to getString(R.string.transition_mouse))
+                    val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(R.string.transition_mouse))
                     findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
             }
@@ -145,14 +147,14 @@ class MainFragment : Fragment() {
     }
 
     private fun isPointerSelected(): Boolean {
-        if (selected_pointer.width == 0 || selected_pointer.height == 0) {
+        if (binding.selectedPointer.width == 0 || binding.selectedPointer.height == 0) {
             return false
         }
         return true
     }
 
     private fun isMouseSelected(): Boolean {
-        if (selected_mouse.width == 0 || selected_mouse.height == 0) {
+        if (binding.selectedMouse.width == 0 || binding.selectedMouse.height == 0) {
             return false
         }
         return true
@@ -178,27 +180,27 @@ class MainFragment : Fragment() {
                 mouseSize = requireContext().getMinPointerSize()
             }
             if (pointerPath != null) {
-                current_pointer.apply {
+                binding.currentPointer.apply {
                     setImageDrawable(Drawable.createFromPath(pointerPath))
                     minimumHeight = requireContext().getMinPointerSizePx()
                     minimumWidth = requireContext().getMinPointerSizePx()
                 }
-                text_no_pointer_applied.visible(false)
+                binding.textNoPointerApplied.visible(false)
             } else {
-                text_no_pointer_applied.visible(true)
-                current_pointer.visible(false)
+                binding.textNoPointerApplied.visible(true)
+                binding.currentPointer.visible(false)
             }
 
             if (mousePath != null) {
-                current_mouse.setImageDrawable(Drawable.createFromPath(mousePath))
-                text_no_mouse_applied.visible(false)
+                binding.currentMouse.setImageDrawable(Drawable.createFromPath(mousePath))
+                binding.textNoMouseApplied.visible(false)
             } else {
-                text_no_mouse_applied.visible(true)
-                current_mouse.visible(false)
+                binding.textNoMouseApplied.visible(true)
+                binding.currentMouse.visible(false)
             }
 
             if (selectedPointerPath != null) {
-                selected_pointer.apply {
+                binding.selectedPointer.apply {
                     layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
                     setPadding(padding, padding, padding, padding)
                     setColorFilter(pointerColor)
@@ -206,10 +208,10 @@ class MainFragment : Fragment() {
                 }
                 GlideApp.with(requireContext())
                     .load(Uri.fromFile(File(selectedPointerPath)))
-                    .into(selected_pointer)
+                    .into(binding.selectedPointer)
             }
             if (selectedMousePath != null) {
-                selected_mouse.apply {
+                binding.selectedMouse.apply {
                     layoutParams = FrameLayout.LayoutParams(mouseSize, mouseSize, Gravity.CENTER)
                     setPadding(mousePadding, mousePadding, mousePadding, mousePadding)
                     setColorFilter(mouseColor)
@@ -217,7 +219,7 @@ class MainFragment : Fragment() {
                 }
                 GlideApp.with(requireContext())
                     .load(Uri.fromFile(File(selectedMousePath)))
-                    .into(selected_mouse)
+                    .into(binding.selectedMouse)
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
@@ -227,15 +229,11 @@ class MainFragment : Fragment() {
     @Throws(IOException::class)
     private fun applyPointer() {
         if (!isPointerSelected()) {
-            requireActivity().container.snackbar(
-                message = getString(R.string.msg_pointer_not_selected)
-            ).anchorView = requireActivity().navigation
+            sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
             return
         }
         if (!isMouseSelected()) {
-            requireActivity().container.snackbar(
-                message = getString(R.string.msg_mouse_not_selected)
-            ).anchorView = requireActivity().navigation
+            sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
             return
         }
         val filesDir = requireContext().getPointerSaveRootDir()
@@ -243,16 +241,16 @@ class MainFragment : Fragment() {
         val mousePath = "$filesDir/mouse.png"
         settings.pointerPath = pointerPath
         settings.mousePath = mousePath
-        createFileFromView(selected_pointer, pointerPath)
-        createFileFromView(selected_mouse, mousePath)
+        createFileFromView(binding.selectedPointer, pointerPath)
+        createFileFromView(binding.selectedMouse, mousePath)
 
-        text_no_pointer_applied.visible(false)
-        text_no_mouse_applied.visible(false)
-        current_pointer.apply {
+        binding.textNoPointerApplied.visible(false)
+        binding.textNoMouseApplied.visible(false)
+        binding.currentPointer.apply {
             visible(true)
             setImageDrawable(Drawable.createFromPath(pointerPath))
         }
-        current_mouse.apply {
+        binding.currentMouse.apply {
             visible(true)
             setImageDrawable(Drawable.createFromPath(mousePath))
         }
@@ -276,23 +274,24 @@ class MainFragment : Fragment() {
     private fun showInterstitialAd() {
         interstitialAd.apply {
             if (isLoaded) show() else {
-                requireActivity().container.longSnackbar(
+                //TODO test SnackBarMsg data class
+                requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
                     message = getString(R.string.text_pointer_applied),
                     actionText = getString(R.string.reboot)
                 ) {
                     showRebootDialog()
-                }.anchorView = requireActivity().navigation
+                }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
             }
             adListener = object : AdListener() {
                 override fun onAdClosed() {
                     super.onAdClosed()
                     interstitialAd.loadAd(AdRequest.Builder().build())
-                    requireActivity().container.longSnackbar(
+                    requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
                         message = getString(R.string.text_pointer_applied),
                         actionText = getString(R.string.reboot)
                     ) {
                         showRebootDialog()
-                    }.anchorView = requireActivity().navigation
+                    }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
                 }
             }
         }
@@ -327,17 +326,17 @@ class MainFragment : Fragment() {
             kotlin.runCatching {
                 val adView = AdView(requireContext())
                 adView.apply {
+                    //TODO Verify ad unit ids
                     adSize = AdSize.BANNER
-                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful && BuildConfig.DEBUG)) {
+                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful)) {
                         getString(R.string.ad_banner_unit_id)
                     } else remoteConfig.getString("ad_main_unit_id")
-
-                    ad_container.addView(this)
+                    binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
 
                 interstitialAd.apply {
-                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful && BuildConfig.DEBUG)) {
+                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful)) {
                         getString(R.string.ad_interstitial_1_id)
                     } else remoteConfig.getString("ad_interstitial_1_id")
                     loadAd(AdRequest.Builder().build())
@@ -420,8 +419,9 @@ class MainFragment : Fragment() {
 
     private lateinit var pointerAdapter: LocalPointersAdapter
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
+        val bottomSheetListBinding = LayoutListBottomsheetBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
-            customView(R.layout.layout_list_bottomsheet)
+            customView(view = bottomSheetListBinding.root)
             title(text = title)
             noAutoDismiss()
             /*positiveButton(text = "Import Your Pointers") { //Remove this
@@ -432,8 +432,6 @@ class MainFragment : Fragment() {
                 }
             }*/
         }
-
-        val dialogView = dialog.getCustomView()
 
         pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
             override fun onClick(position: Int, view: View?, item: RoomPointer) {
@@ -447,7 +445,7 @@ class MainFragment : Fragment() {
                 GlideApp.with(requireContext())
                     .load(File(targetPath + item.file_name))
                     .override(requireContext().getMinPointerSize())
-                    .into(if (pointerType == POINTER_TOUCH) requireActivity().selected_pointer else requireActivity().selected_mouse)
+                    .into(if (pointerType == POINTER_TOUCH) binding.selectedPointer else binding.selectedMouse)
 
                 dialog.dismiss()
             }
@@ -474,7 +472,7 @@ class MainFragment : Fragment() {
 
         })
 
-        dialogView.list_pointers.apply {
+        bottomSheetListBinding.listPointers.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
@@ -494,10 +492,10 @@ class MainFragment : Fragment() {
                 }
                 pointerAdapter.submitList(it)
                 //Show install msg if no pointer installed
-                dialogView.apply {
-                    info_no_pointer_installed.visible(it.isEmpty())
-                    text_dialog_hint.visible(it.isNotEmpty())
-                    bs_button_install_pointers.setOnClickListener {
+                bottomSheetListBinding.apply {
+                    infoNoPointerInstalled.visible(it.isEmpty())
+                    textDialogHint.visible(it.isNotEmpty())
+                    bsButtonInstallPointers.setOnClickListener {
                         dialog.dismiss()
                         requireActivity().findNavController(R.id.fragment_repo_nav)
                             .navigate(R.id.repoFragment)

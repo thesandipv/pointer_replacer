@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,23 +21,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.allusive2.databinding.FragmentEditProfileBinding
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getDrawableExt
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_dashboard.*
-import kotlinx.android.synthetic.main.fragment_edit_profile.view.*
-import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.inject
 
 class EditProfileFragment : Fragment() {
+    private lateinit var binding: FragmentEditProfileBinding
+    private lateinit var fabApply: ExtendedFloatingActionButton
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_edit_profile, container, false)
+        binding = FragmentEditProfileBinding.inflate(inflater, container, false)
+        fabApply = requireActivity().findViewById(R.id.fab_apply)
+        return binding.root
     }
 
     private val db: FirebaseFirestore by inject()
@@ -49,27 +55,27 @@ class EditProfileFragment : Fragment() {
         if (FirebaseUtils.isUserSignedIn) {
             user = FirebaseUtils.auth!!.currentUser!!
             with(view) {
-                input_profile_name.setText(user.displayName)
-                input_email.setText(user.email)
-                input_email.isEnabled = false
-                requireActivity().fab_apply.apply {
+                with(binding) {
+                    inputProfileName.setText(user.displayName)
+                    inputEmail.setText(user.email)
+                    inputEmail.isEnabled = false
+                }
+                fabApply.apply {
                     setOnClickListener {
-                        val newName = this@with.input_profile_name.text.toString().trim()
+                        val newName = binding.inputProfileName.text.toString().trim()
                         if (user.displayName != newName) {
                             val request = UserProfileChangeRequest.Builder()
                                 .setDisplayName(newName)
                                 .build()
                             user.updateProfile(request).addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    requireActivity().container.snackbar(getString(R.string.msg_profile_updated))
-                                        .anchorView = requireActivity().navigation
+                                    sharedViewModel.displayMsg(getString(R.string.msg_profile_updated))
                                     db.collection(DatabaseFields.COLLECTION_USERS)
                                         .document(user.uid)
                                         .update(DatabaseFields.FIELD_NAME, newName)
                                 }
                             }
-                        } else requireActivity().container.snackbar(getString(R.string.msg_no_changes))
-                            .anchorView = requireActivity().navigation
+                        } else sharedViewModel.displayMsg(getString(R.string.msg_no_changes))
                     }
                     icon = requireContext().getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
                 }
