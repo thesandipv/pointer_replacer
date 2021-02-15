@@ -52,14 +52,14 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@string/app_name"
-                        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6"
+                        android:textAppearance="@style/TextAppearance.MyStyles.Title"
                         tools:text="@string/app_name" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6"
+                        android:textAppearance="@style/TextAppearance.MyStyles.Title"
                         tools:text="@string/app_name" />
                 </TextSwitcher>
 
