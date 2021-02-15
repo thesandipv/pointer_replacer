@@ -1,6 +1,6 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9d283fa0bdb144128da5c58ac3b62775)](https://app.codacy.com/manual/sandipv22/pointer_replacer?utm_source=github.com&utm_medium=referral&utm_content=sandipv22/pointer_replacer&utm_campaign=Badge_Grade_Dashboard)
-![Android CI](https://github.com/sandipv22/pointer_replacer/workflows/Android%20CI/badge.svg)
+![Android CI](https://github.com/thesandipv/pointer_replacer/workflows/Android%20CI/badge.svg)
 
 This module replaces pointer_spot_touch drawable in framework-res.apk.
 In short it replaces a dot appears when user touch the screen [Require Show Touches to be enabled in Developer Options.]
