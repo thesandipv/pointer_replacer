@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,14 @@
 package com.afterroot.allusive2
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Build
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import androidx.startup.AppInitializer
 import androidx.startup.Initializer
 import com.afterroot.allusive2.database.roomModule
-import com.afterroot.allusive2.network.networkModule
+import com.afterroot.core.network.NetworkStateMonitor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -63,6 +65,17 @@ val firebaseModule = module {
 
     single {
         get<AppInitializer>().initializeComponent(MessagingInitializer::class.java)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+val networkModule = module {
+    single {
+        NetworkStateMonitor(get())
+    }
+
+    single {
+        androidContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 }
 
