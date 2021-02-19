@@ -86,14 +86,12 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         mavenCentral()
-        if (publishPropertiesFile.exists()) {
-            maven {
-                name = "gphCore"
-                url = uri("https://maven.pkg.github.com/afterroot/core")
-                credentials {
-                    username = properties.getProperty("gpr.user") ?: System.getenv("USERNAME")
-                    password = properties.getProperty("gpr.key") ?: System.getenv("TOKEN")
-                }
+        maven {
+            name = "gphCore"
+            url = uri("https://maven.pkg.github.com/afterroot/core")
+            credentials {
+                username = properties.getProperty("gpr.user") ?: System.getenv("GHUSERNAME")
+                password = properties.getProperty("gpr.key") ?: System.getenv("GHTOKEN")
             }
         }
     }
