@@ -95,23 +95,13 @@ android {
             if (!System.getenv("CI")) {
                 signingConfig signingConfigs.allusive
             }
+
+            versionNameSuffix = '-beta'
         }
     }
     dexOptions {
         javaMaxHeapSize "4g"
         preDexLibraries = false
-    }
-    flavorDimensions 'ar'
-    productFlavors {
-        dev {
-            dimension = 'ar'
-            resConfigs('en', 'xhdpi')
-            versionNameSuffix = '-beta'
-        }
-
-        prod {
-            dimension = 'ar'
-        }
     }
     compileOptions {
         sourceCompatibility = 1.8
@@ -152,7 +142,7 @@ dependencies {
     implementation "androidx.vectordrawable:vectordrawable:$vectordrawableVersion"
     implementation "com.android.billingclient:billing:$billingVersion"
     kapt "androidx.room:room-compiler:$roomKtxVersion"
-    testImplementation "androidx.room:room-testing:$roomKtxVersion"
+    androidTestImplementation "androidx.room:room-testing:$roomKtxVersion"
 
     implementation "com.afollestad.material-dialogs:input:$materialDialogsVersion"
     implementation "com.afollestad.material-dialogs:core:$materialDialogsVersion"
@@ -199,4 +189,7 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'me.zhanghai.android.fastscroll:library:1.1.5'
+
+    implementation 'androidx.test.ext:junit-ktx:1.1.2'
+    implementation 'androidx.test:core-ktx:1.3.0'
 }

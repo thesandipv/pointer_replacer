@@ -46,20 +46,10 @@ android {
             splits.abi.enable = false
             splits.density.enable = false
             crunchPngs false
+            versionNameSuffix = '-beta'
         }
     }
     flavorDimensions 'ar'
-    productFlavors {
-        dev {
-            dimension = 'ar'
-            resConfigs('en', 'xhdpi')
-            versionNameSuffix = '-beta'
-        }
-
-        prod {
-            dimension = 'ar'
-        }
-    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -85,7 +75,7 @@ dependencies {
     implementation "com.google.firebase:firebase-messaging:$firebaseMessagingVersion"
 
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "com.google.android.material:material:$googleMaterialVersion"
 
