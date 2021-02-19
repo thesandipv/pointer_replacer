@@ -57,4 +57,11 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: build-outputs
-          path: app/build/outputs
+          path: allusive/build/outputs
+
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-reports
+          path: allusive/build/reports
