@@ -70,7 +70,7 @@ jobs:
         with:
           draft: true
           files: |
-            allusive/build/outputs/apk/release/app-release.apk
+            allusive/build/outputs/apk/release/allusive-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
