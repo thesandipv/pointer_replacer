@@ -61,8 +61,8 @@ jobs:
           serviceAccountJson: release/serviceAccount.json
           packageName: com.afterroot.allusive2
           track: internal
-          releaseFiles: app/build/outputs/bundle/release/allusive-release.aab
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          releaseFiles: allusive/build/outputs/bundle/release/allusive-release.aab
+          mappingFile: allusive/build/outputs/mapping/release/mapping.txt
 
       - name: Create release for tags
         uses: softprops/action-gh-release@v1
@@ -70,7 +70,7 @@ jobs:
         with:
           draft: true
           files: |
-            app/build/outputs/apk/release/app-release.apk
+            allusive/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
