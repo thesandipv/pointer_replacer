@@ -21,6 +21,9 @@ jobs:
         with:
           java-version: 11
 
+      - name: Grant execute permissions
+        run: chmod +x release/decrypt.sh release/clean.sh
+
       - name: Decrypt Task
         run: ./release/decrypt.sh
         env:
