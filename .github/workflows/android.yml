@@ -10,9 +10,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      ORG_GRADLE_PROJECT_SIGN_KEY_PW: ${{ secrets.SIGN_KEY_PW }}
-      ORG_GRADLE_PROJECT_SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
 
     steps:
       - uses: actions/checkout@v2
@@ -52,6 +49,8 @@ jobs:
         env:
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
           GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SIGN_KEY_PW: ${{ secrets.SIGN_KEY_PW }}
+          SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
 
       - name: Publish to Play Store
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/allusive_v')
@@ -65,7 +64,7 @@ jobs:
 
       - name: Create release for tags
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v') && github.ref == 'refs/heads/master'
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
         with:
           draft: true
           files: |
