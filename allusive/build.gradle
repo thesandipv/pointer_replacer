@@ -27,22 +27,9 @@ ext {
     minor = 9
     patch = 2
     minimumSdkVersion = 16
+    ci = System.getenv("CI") == "true"
 }
-
 android {
-    if (!System.getenv("CI")) {
-        def keystorePropertiesFile = rootProject.file("keystore.properties")
-        def keystoreProperties = new Properties()
-        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-        signingConfigs {
-            allusive {
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-            }
-        }
-    }
     compileSdkVersion 30
 
     buildFeatures {
@@ -68,13 +55,26 @@ android {
                 ]
             }
         }
-        if (!System.getenv("CI")) {
-            signingConfig signingConfigs.allusive
-        }
 
         def commit = "git rev-list --max-count=1 HEAD".execute([], project.rootDir).text.substring(0, 7)
         buildConfigField "String", "COMMIT_ID", "\"$commit\""
     }
+
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        allusive {
+            keyAlias "allusive"
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv("SIGN_KEY_PW")
+            storeFile rootProject.file("release/keystore.jks")
+            storePassword keystoreProperties['storePassword'] ?: System.getenv("SIGN_STORE_PW")
+        }
+    }
+
     buildTypes {
         release {
             shrinkResources true
@@ -82,6 +82,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexKeepProguard file('proguard-rules.pro')
             multiDexKeepFile file('main_dex.txt')
+            signingConfig signingConfigs.allusive
         }
         debug {
             ext.alwaysUpdateBuildId = false
@@ -89,12 +90,7 @@ android {
             splits.density.enable = false
             crunchPngs false
 
-            multiDexKeepProguard file('proguard-rules.pro')
-            multiDexKeepFile file('main_dex.txt')
-
-            if (!System.getenv("CI")) {
-                signingConfig signingConfigs.allusive
-            }
+            signingConfig signingConfigs.allusive
 
             versionNameSuffix = '-beta'
         }
@@ -114,7 +110,19 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    packagingOptions {
+        // Exclude AndroidX version files
+        exclude 'META-INF/*.version'
+        // Exclude consumer proguard files
+        exclude 'META-INF/proguard/*'
+        // Exclude the Firebase/Fabric/other random properties files
+        exclude '/*.properties'
+        exclude 'fabric/*.properties'
+        exclude 'META-INF/*.properties'
+    }
 }
+
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
