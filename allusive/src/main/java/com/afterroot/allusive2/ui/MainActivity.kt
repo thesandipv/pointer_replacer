@@ -56,6 +56,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import org.jetbrains.anko.design.snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -64,9 +65,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var navigation: BottomNavigationView
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private val networkViewModel: NetworkViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by viewModel()
     private val settings: Settings by inject()
     private val sharedViewModel: MainSharedViewModel by viewModels()
+    private val firebaseUtils: FirebaseUtils by inject()
     //private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,27 +105,14 @@ class MainActivity : AppCompatActivity() {
         //Initialize AdMob SDK
         MobileAds.initialize(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //Greater than Lollipop
-            setUpNetworkObserver()
-            /*when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                    checkPermissions()
-                }
-                else -> {
-                    createPointerFolder()
-                }
-            }*/
-        } /*else {
-            createPointerFolder() //Less than Lollipop, direct load fragments
-        }*/
-
         //Add user in db if not available
         addUserInfoInDB()
         createPointerFolder()
         setUpNavigation()
         setUpTitleObserver()
         setUpErrorObserver()
+        setUpNetworkObserver()
+
     }
 
     private fun setUpErrorObserver() {
@@ -190,8 +179,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun addUserInfoInDB() {
         try {
-            val curUser = FirebaseUtils.auth!!.currentUser
-            val userRef = get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS).document(curUser!!.uid)
+            val curUser = firebaseUtils.firebaseUser!!
+            val userRef = get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS).document(curUser.uid)
             get<FirebaseMessaging>().token
                 .addOnCompleteListener(OnCompleteListener { tokenTask ->
                     if (!tokenTask.isSuccessful) {

@@ -33,10 +33,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 
 class FireMessagingService : FirebaseMessagingService() {
 
     private val _tag = "FireMessagingService"
+    private val firebaseUtils: FirebaseUtils by inject()
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -46,9 +48,9 @@ class FireMessagingService : FirebaseMessagingService() {
 
     private fun updateToken(token: String) {
         try {
-            if (FirebaseUtils.isUserSignedIn) {
+            if (firebaseUtils.isUserSignedIn) {
                 get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS)
-                    .document(FirebaseUtils.firebaseUser!!.uid)
+                    .document(firebaseUtils.uid!!)
                     .update(DatabaseFields.FIELD_FCM_ID, token)
             }
         } catch (e: Exception) {

@@ -13,10 +13,15 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.google.firebase.crashlytics'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+//    id 'com.google.android.gms.oss-licenses-plugin'
+}
 
 ext {
     major = 1
@@ -54,36 +59,32 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    buildToolsVersion = '29.0.3'
 
-    kotlinOptions {
-        jvmTarget = 1.8
-    }
     lintOptions {
         abortOnError false
     }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation Libs.Kotlin.stdLib
 
-    implementation "com.google.firebase:firebase-ads:$firebaseAdsVersion"
-    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseAnalyticsVersion"
-    implementation "com.google.firebase:firebase-config:$firebaseConfigVersion"
-    implementation "com.google.firebase:firebase-core:$firebaseCoreVersion"
-    implementation "com.google.firebase:firebase-crashlytics-ktx:$firebaseCrashlyticsVersion"
-    implementation "com.google.firebase:firebase-messaging:$firebaseMessagingVersion"
+    implementation platform(Libs.Firebase.bom)
 
-    implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.preference:preference-ktx:$preferenceVersion"
-    implementation "com.google.android.material:material:$googleMaterialVersion"
+    implementation Libs.Firebase.ads
+    implementation Libs.Firebase.analytics
+    implementation Libs.Firebase.config
+    implementation Libs.Firebase.core
+    implementation Libs.Firebase.crashlytics
+    implementation Libs.Firebase.messaging
 
-    implementation "org.jetbrains.anko:anko-commons:$ankoCommonsVersion"
-    implementation "com.afterroot.core:core:$coreVersion"
+    implementation Libs.AndroidX.appCompat
+    implementation Libs.AndroidX.Lifecycle.extensions
+    implementation Libs.AndroidX.preference
+    implementation Libs.Google.material
 
-    implementation "com.afollestad.material-dialogs:core:$materialDialogsVersion"
-    implementation "com.afollestad.material-dialogs:bottomsheets:$materialDialogsVersion"
+    implementation Libs.Kotlin.anko
+    implementation Libs.AfterROOT.Core.core
+
+    implementation Libs.MaterialDialogs.core
+    implementation Libs.MaterialDialogs.bottomSheets
 }
-
-apply plugin: 'com.google.gms.google-services'

@@ -16,15 +16,11 @@
 package com.afterroot.allusive2.viewmodel
 
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.core.network.NetworkState
 import com.afterroot.core.network.NetworkStateMonitor
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
-class NetworkViewModel : ViewModel(), KoinComponent {
-    val networkMonitor: LiveData<NetworkState> by inject<NetworkStateMonitor>()
+class NetworkViewModel(val networkStateMonitor: NetworkStateMonitor) : ViewModel() {
 
     inline fun monitor(
         lifecycleOwner: LifecycleOwner,
@@ -37,7 +33,7 @@ class NetworkViewModel : ViewModel(), KoinComponent {
         } else {
             doInitially.invoke()
         }
-        this.networkMonitor.observe(lifecycleOwner, {
+        networkStateMonitor.observe(lifecycleOwner, {
             when (it) {
                 NetworkState.CONNECTED -> {
                     onConnect(NetworkState.CONNECTED)

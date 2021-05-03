@@ -17,6 +17,7 @@ package com.afterroot.allusive2.utils
 
 import android.content.Context
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.core.network.NetworkState
 
@@ -46,3 +47,32 @@ fun Context.showNetworkDialog(
             }
         }
     }
+
+/**
+ * Helper Function for getting different values for Debug and Release builds
+ * @param T type of value to return
+ * @param debug value to return if build is Debug
+ * @param release value to return if build is Release
+ * @since v1.9.4
+ * @return either [debug] or [release] with provided type [T]
+ */
+fun <T> whenBuildIs(debug: T, release: T): T = if (BuildConfig.DEBUG) debug else release
+
+/**
+ * Helper Function for invoking different functions for Debug and Release builds
+ * @param T type of value to return
+ * @param debug function to invoke if build is Debug
+ * @param release function to invoke if build is Release
+ * @since v1.9.4
+ * @return either [debug] or [release] with provided type [T]
+ */
+fun <T> whenBuildIs(debug: () -> T, release: () -> T): T = whenBuildIs(debug.invoke(), release.invoke())
+
+/**
+ * Helper Function for invoking function only if build is Debug
+ * @param debug function to invoke if build is Debug
+ * @since v1.9.4
+ */
+fun whenBuildIs(debug: () -> Unit) {
+    if (BuildConfig.DEBUG) debug.invoke()
+}

@@ -47,38 +47,37 @@ class EditProfileFragment : Fragment() {
     }
 
     private val db: FirebaseFirestore by inject()
+    private val firebaseUtils: FirebaseUtils by inject()
     private lateinit var user: FirebaseUser
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (FirebaseUtils.isUserSignedIn) {
-            user = FirebaseUtils.auth!!.currentUser!!
-            with(view) {
-                with(binding) {
-                    inputProfileName.setText(user.displayName)
-                    inputEmail.setText(user.email)
-                    inputEmail.isEnabled = false
-                }
-                fabApply.apply {
-                    setOnClickListener {
-                        val newName = binding.inputProfileName.text.toString().trim()
-                        if (user.displayName != newName) {
-                            val request = UserProfileChangeRequest.Builder()
-                                .setDisplayName(newName)
-                                .build()
-                            user.updateProfile(request).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    sharedViewModel.displayMsg(getString(R.string.msg_profile_updated))
-                                    db.collection(DatabaseFields.COLLECTION_USERS)
-                                        .document(user.uid)
-                                        .update(DatabaseFields.FIELD_NAME, newName)
-                                }
+        if (firebaseUtils.isUserSignedIn) {
+            user = firebaseUtils.firebaseUser!!
+            with(binding) {
+                inputProfileName.setText(user.displayName)
+                inputEmail.setText(user.email)
+                inputEmail.isEnabled = false
+            }
+            fabApply.apply {
+                setOnClickListener {
+                    val newName = binding.inputProfileName.text.toString().trim()
+                    if (user.displayName != newName) {
+                        val request = UserProfileChangeRequest.Builder()
+                            .setDisplayName(newName)
+                            .build()
+                        user.updateProfile(request).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                sharedViewModel.displayMsg(getString(R.string.msg_profile_updated))
+                                db.collection(DatabaseFields.COLLECTION_USERS)
+                                    .document(user.uid)
+                                    .update(DatabaseFields.FIELD_NAME, newName)
                             }
-                        } else sharedViewModel.displayMsg(getString(R.string.msg_no_changes))
-                    }
-                    icon = requireContext().getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
+                        }
+                    } else sharedViewModel.displayMsg(getString(R.string.msg_no_changes))
                 }
+                icon = requireContext().getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
             }
         } else {
             startActivity(Intent(this.context, SplashActivity::class.java))

@@ -32,7 +32,7 @@ data class Pointer(
     @ServerTimestamp var time: Date = Timestamp.now().toDate(),
     var downloads: Int = 0,
     /**
-     * Use constants from [com.afterroot.allusive2.Reason]
+     * Use constants from [Reason]
      * */
     var reasonCode: Int = Reason.OK
 ) : Serializable

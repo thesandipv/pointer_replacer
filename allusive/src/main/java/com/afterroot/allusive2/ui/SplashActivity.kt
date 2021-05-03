@@ -17,10 +17,8 @@ package com.afterroot.allusive2.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.afollestad.materialdialogs.MaterialDialog
@@ -33,11 +31,12 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import org.jetbrains.anko.browse
 import org.koin.android.ext.android.get
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SplashActivity : AppCompatActivity() {
 
     private val _tag = "SplashActivity"
-    private val networkViewModel: NetworkViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val theme = get<Settings>().theme
@@ -55,9 +54,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setUpNetworkObserver()
-        }
+        setUpNetworkObserver()
         when {
             get<FirebaseAuth>().currentUser == null -> {
                 tryLogin()

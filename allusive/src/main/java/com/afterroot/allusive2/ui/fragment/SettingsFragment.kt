@@ -46,9 +46,7 @@ import com.afterroot.allusive2.model.SkuModel
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.android.billingclient.api.*
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -81,7 +79,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setVersionPref()
         setDonatePref(false)
         initBilling()
-        setUpAds()
+//        setUpAds()
         setRateOnGPlay()
     }
 
@@ -230,6 +228,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+/*
     private fun setUpAds() {
         interstitialAd = InterstitialAd(this.requireActivity())
         interstitialAd.apply {
@@ -273,6 +272,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
     }
+*/
 
     private fun setRateOnGPlay() {
         preferenceScreen.findPreference<Preference>(getString(R.string.key_rate_on_g_play))!!.onPreferenceClickListener =
