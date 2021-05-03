@@ -37,6 +37,7 @@ import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
@@ -46,9 +47,8 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
@@ -77,6 +77,7 @@ class NewPointerPost : Fragment() {
     private var adLoaded: Boolean = false
     private var clickedUpload: Boolean = false
     private var isPointerImported = false
+    private val firebaseUtils: FirebaseUtils by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentNewPointerPostBinding.inflate(inflater, container, false)
@@ -128,11 +129,13 @@ class NewPointerPost : Fragment() {
                                         title(R.string.text_action_upload)
                                         message(R.string.dialog_msg_rewarded_ad)
                                         positiveButton(android.R.string.ok) {
+/*
                                             if (rewardedAd.isLoaded) {
                                                 showAd()
                                             } else {
                                                 sharedViewModel.displayMsg("Ad is not loaded yet. Loading...")
                                             }
+*/
                                         }
                                         negativeButton(R.string.fui_cancel)
                                     }
@@ -161,7 +164,12 @@ class NewPointerPost : Fragment() {
         }
     }
 
-    private fun showAd() {
+    private fun showAd() { //TODO Rewrite logic
+        rewardedAd.setOnPaidEventListener {
+
+        }
+
+/*
         val adCallback = object : RewardedAdCallback() {
             override fun onUserEarnedReward(p0: RewardItem) {
                 clickedUpload = false
@@ -175,36 +183,35 @@ class NewPointerPost : Fragment() {
                 setUpRewardedAd()
             }
         }
-        rewardedAd.show(requireActivity(), adCallback)
+*/
     }
 
-    private fun createAndLoadRewardedAd(): RewardedAd {
-        val adUnitId = if (BuildConfig.DEBUG) {
-            getString(R.string.ad_rewarded_1_id)
-        } else remoteConfig.getString("ad_rewarded_1_id")
-        val rewardedAd = RewardedAd(requireContext(), adUnitId)
+    private fun createAndLoadRewardedAd() {
+        val adUnitId = whenBuildIs(
+            debug = getString(R.string.ad_rewarded_1_id),
+            release = remoteConfig.getString("ad_rewarded_1_id")
+        )
         val adLoadCallback = object : RewardedAdLoadCallback() {
-            override fun onRewardedAdLoaded() {
-                // Ad successfully loaded.
+            override fun onAdLoaded(ad: RewardedAd) {
+                super.onAdLoaded(ad)
                 adLoaded = true
+                rewardedAd = ad
                 if (clickedUpload) {
                     showAd()
                 }
-
             }
 
-            override fun onRewardedAdFailedToLoad(errorCode: Int) {
-                // Ad failed to load.
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
                 adLoaded = false
             }
         }
-        rewardedAd.loadAd(AdRequest.Builder().build(), adLoadCallback)
-        return rewardedAd
+        RewardedAd.load(requireContext(), adUnitId, AdRequest.Builder().build(), adLoadCallback)
     }
 
     private fun setUpRewardedAd() {
         kotlin.runCatching {
-            this.rewardedAd = createAndLoadRewardedAd()
+            createAndLoadRewardedAd()
         }
     }
 
@@ -233,7 +240,7 @@ class NewPointerPost : Fragment() {
             dialog.updateProgressText(String.format("%s..%s", getString(R.string.text_progress_uploading), progress))
         }.addOnCompleteListener { task ->
             val map = hashMapOf<String, String>()
-            map[FirebaseUtils.auth!!.uid!!] = FirebaseUtils.firebaseUser!!.displayName.toString()
+            map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
             if (task.isSuccessful) {
                 dialog.updateProgressText(getString(R.string.text_progress_finishing_up))
                 val pointer = Pointer(

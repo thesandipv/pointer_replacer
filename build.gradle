@@ -13,69 +13,35 @@
  * limitations under the License.
  */
 
-ext {
-    ankoCommonsVersion = '0.10.8'
-    appcompatVersion = '1.2.0'
-    billingVersion = '3.0.2'
-    billingKtxVersion = '3.0.0'
-    cardviewVersion = '1.0.0'
-    commonsIoVersion = '1.3.2'
-    constraintlayoutVersion = '2.0.4'
-    coreKtxVersion = '1.5.0-beta01'
-    coreVersion = '0.3.1'
-    firebaseAnalyticsVersion = '18.0.2'
-    firebaseAdsVersion = '19.7.0'
-    firebaseAuthVersion = '20.0.0'
-    firebaseConfigVersion = '20.0.3'
-    firebaseCoreVersion = '18.0.2'
-    firebaseCrashlyticsVersion = '17.3.1'
-    firebaseFirestoreVersion = '22.0.0'
-    firebaseMessagingVersion = '21.0.1'
-    firebaseStorageVersion = '19.2.0'
-    firebaseUiVersion = '7.1.1'
-    firebaseUiAuthVersion = firebaseUiVersion
-    firebaseUiFirestoreVersion = firebaseUiVersion
-    firebaseUiStorageVersion = firebaseUiVersion
-    fragmentKtxVersion = '1.3.0'
-    glideVersion = '4.12.0'
-    googleMaterialVersion = '1.3.0'
-    gsonVersion = '2.8.6'
-    koinVersion = '2.1.5'
-    kotlinxCoroutinesVersion = '1.4.2'
-    legacySupportV13Version = '1.0.0'
-    legacySupportV4Version = '1.0.0'
-    lifecycleVersion = '2.3.0'
-    materialDialogsVersion = '3.3.0'
-    multidexVersion = '2.0.1'
-    navigationVersion = '2.3.3'
-    pagingVersion = '2.1.2'
-    preferenceVersion = '1.1.1'
-    recyclerviewVersion = '1.1.0'
-    roomKtxVersion = '2.2.6'
-    startUpVersion = '1.0.0'
-    transitionVersion = '1.3.1'
-    vectordrawableVersion = '1.1.0'
-    xposedAPIVersion = '82'
-}
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.30'
+    apply from: rootProject.file('deps.gradle')
+
     repositories {
         google()
         jcenter()
+        maven { url "https://jitpack.io" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath 'com.google.gms:google-services:4.3.5'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.0'
-        classpath 'com.google.android.gms:oss-licenses-plugin:0.10.2'
+        classpath Libs.AGP
+        classpath Libs.Kotlin.gradlePlugin
+        classpath Libs.Google.servicesPlugin
+        classpath Libs.Firebase.crashlyticsPlugin
+        //classpath Libs.Google.ossLicPlugin
+        classpath Libs.AndroidX.Navigation.safeArgsPlugin
     }
 }
 
+plugins {
+    id 'com.diffplug.spotless' version '5.11.1'
+    id 'com.github.ben-manes.versions' version '0.38.0'
+}
+
 allprojects {
+    apply from: rootProject.file('deps.gradle')
+
     def publishPropertiesFile = rootProject.file("publish.properties")
     def properties = new Properties()
     if (publishPropertiesFile.exists()) {
@@ -87,8 +53,8 @@ allprojects {
         maven { url "https://jitpack.io" }
         mavenCentral()
         maven {
-            name = "gphCore"
-            url = uri("https://maven.pkg.github.com/afterroot/core")
+            name = "github-afterroot-core"
+            url = uri(Libs.AfterROOT.Core.mavenUrl)
             credentials {
                 username = properties.getProperty("gpr.user") ?: System.getenv("GHUSERNAME")
                 password = properties.getProperty("gpr.key") ?: System.getenv("GHTOKEN")
@@ -97,6 +63,43 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            // Treat all Kotlin warnings as errors
+            // allWarningsAsErrors = true
+
+            // Enable experimental coroutines APIs, including Flow
+            freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+            freeCompilerArgs += "-Xopt-in=kotlin.Experimental"
+/*
+            freeCompilerArgs += [
+                    "-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+            ]
+*/
+
+            // freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
+
+            // Set JVM target to 1.8
+            jvmTarget = "1.8"
+        }
+    }
+
+    apply plugin: 'com.diffplug.spotless'
+    spotless {
+        kotlin {
+            target '**/*.kt'
+            targetExclude("$buildDir/**/*.kt")
+            targetExclude('bin/**/*.kt')
+
+            ktlint(Versions.ktlint)
+            //licenseHeaderFile rootProject.file('copyright.kt')
+        }
+    }
+}
+
+
+task clean2(type: Delete) {
     delete rootProject.buildDir
 }

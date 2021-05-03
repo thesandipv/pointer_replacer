@@ -34,8 +34,6 @@ import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import kotlinx.android.synthetic.main.content_main.*
-import org.jetbrains.anko.design.snackbar
 
 class MainFragment : PreferenceFragmentCompat() {
 

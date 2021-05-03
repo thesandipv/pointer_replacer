@@ -66,32 +66,6 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="com.afterroot.allusive2.KoinInitializer"
-                android:value="androidx.startup" />
-            <meta-data
-                android:name="com.afterroot.allusive2.FirestoreInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.afterroot.allusive2.AuthInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.afterroot.allusive2.ConfigInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.afterroot.allusive2.MessagingInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-        </provider>
-
         <activity
             android:name="com.afterroot.allusive2.ui.MainActivity"
             android:label="@string/app_name"

@@ -19,18 +19,20 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-object FirebaseUtils {
-    var auth: FirebaseAuth? = null
-        get() {
-            Log.d("FirebaseUtils", "FirebaseUtils.auth: initializing Auth")
-            return field ?: FirebaseAuth.getInstance()
-        }
+/**
+ * @param firebaseAuth Firebase Auth Instance
+ */
+class FirebaseUtils(/*Injected*/firebaseAuth: FirebaseAuth) {
+    var auth: FirebaseAuth = firebaseAuth
 
-    val firebaseUser: FirebaseUser? = null
+    val firebaseUser: FirebaseUser?
         get() {
             Log.d("FirebaseUtils", "FirebaseUtils.getFirebaseUser: getting user")
-            return field ?: auth!!.currentUser
+            return auth.currentUser
         }
+
+    val uid: String?
+        get() = firebaseUser?.uid
 
     val isUserSignedIn: Boolean
         get() {
@@ -39,4 +41,8 @@ object FirebaseUtils {
             }
             return true
         }
+
+    fun isUidSame(uidForCompare: String?): Boolean {
+        return uid == uidForCompare
+    }
 }

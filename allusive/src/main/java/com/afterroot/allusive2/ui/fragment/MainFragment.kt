@@ -41,7 +41,6 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afterroot.allusive2.*
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
-import com.afterroot.allusive2.R
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
@@ -50,13 +49,19 @@ import com.afterroot.allusive2.databinding.FragmentMainBinding
 import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
+import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -271,9 +276,10 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun showInterstitialAd() {
+    private fun showInterstitialAd() { //TODO Rewrite logic
+/*
         interstitialAd.apply {
-            if (isLoaded) show() else {
+            if (isLoaded) show(requireActivity()) else {
                 //TODO test SnackBarMsg data class
                 requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
                     message = getString(R.string.text_pointer_applied),
@@ -295,6 +301,17 @@ class MainFragment : Fragment() {
                 }
             }
         }
+*/
+    }
+
+    fun showPointerAppliedMessage() {
+        requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
+            message = getString(R.string.text_pointer_applied),
+            actionText = getString(R.string.reboot)
+        ) {
+            showRebootDialog()
+        }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
+
     }
 
     private fun showRebootDialog() { //TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
@@ -320,27 +337,48 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun loadInterstitialAd() {
+        val interstitialAdUnitId: String = whenBuildIs(
+            debug = getString(R.string.ad_interstitial_1_id),
+            release = remoteConfig.getString("ad_interstitial_1_id")
+        )
+
+        InterstitialAd.load(
+            requireContext(),
+            interstitialAdUnitId,
+            AdRequest.Builder().build(),
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    super.onAdLoaded(ad)
+                    interstitialAd = ad
+                    interstitialAd.show(requireActivity())
+                }
+
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    super.onAdFailedToLoad(loadAdError)
+
+                }
+            })
+
+    }
+
     private fun setUpAd() {
-        interstitialAd = InterstitialAd(this.requireActivity())
         remoteConfig.fetchAndActivate().addOnCompleteListener {
             kotlin.runCatching {
+                val bannerAdUnitId: String = whenBuildIs(
+                    debug = getString(R.string.ad_banner_unit_id),
+                    release = remoteConfig.getString("ad_main_unit_id")
+                )
+
                 val adView = AdView(requireContext())
                 adView.apply {
                     //TODO Verify ad unit ids
                     adSize = AdSize.BANNER
-                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful)) {
-                        getString(R.string.ad_banner_unit_id)
-                    } else remoteConfig.getString("ad_main_unit_id")
+                    adUnitId = bannerAdUnitId
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
 
-                interstitialAd.apply {
-                    adUnitId = if (BuildConfig.DEBUG || (!it.isSuccessful)) {
-                        getString(R.string.ad_interstitial_1_id)
-                    } else remoteConfig.getString("ad_interstitial_1_id")
-                    loadAd(AdRequest.Builder().build())
-                }
             }
         }
     }

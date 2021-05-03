@@ -16,7 +16,6 @@
 package com.afterroot.allusive2.ui.fragment
 
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -25,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.findNavController
 import androidx.transition.ChangeBounds
@@ -111,9 +111,7 @@ class CustomizeFragment : Fragment() {
                         mouseColor = selectedColor
                     }
                 }
-                //TODO verify
-                //requireActivity().find<FragmentContainerView>(R.id.fragment_repo_nav).findNavController().navigateUp()
-                findNavController().navigateUp()
+                requireActivity().find<FragmentContainerView>(R.id.fragment_repo_nav).findNavController().navigateUp()
             }
             icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
         }
@@ -125,12 +123,10 @@ class CustomizeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (pointerType == POINTER_TOUCH) {
-                binding.imageCustomizePointer.transitionName = getString(R.string.main_fragment_transition)
-            } else {
-                binding.imageCustomizePointer.transitionName = getString(R.string.transition_mouse)
-            }
+        if (pointerType == POINTER_TOUCH) {
+            binding.imageCustomizePointer.transitionName = getString(R.string.main_fragment_transition)
+        } else {
+            binding.imageCustomizePointer.transitionName = getString(R.string.transition_mouse)
         }
         TransitionSet()
             .addTransition(ChangeBounds())

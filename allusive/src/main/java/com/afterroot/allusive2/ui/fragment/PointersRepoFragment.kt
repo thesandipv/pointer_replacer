@@ -50,7 +50,6 @@ import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.allusive2.viewmodel.ViewModelState
 import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.isNetworkAvailable
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -87,6 +86,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private val storage: FirebaseStorage by inject()
     private var filteredList: List<Pointer>? = null
+    private val firebaseUtils: FirebaseUtils by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -96,20 +96,16 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            networkViewModel.monitor(this, onConnect = {
-                onNetworkChange(true)
-            }, onDisconnect = {
-                onNetworkChange(false)
-            })
-        } else {
-            onNetworkChange(requireContext().isNetworkAvailable())
-        }
+        networkViewModel.monitor(this, onConnect = {
+            onNetworkChange(true)
+        }, onDisconnect = {
+            onNetworkChange(false)
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (FirebaseUtils.isUserSignedIn) {
+        if (firebaseUtils.isUserSignedIn) {
             targetPath = requireContext().getPointerSaveDir()
             //setUpList()
             setUpAdapter()
@@ -129,10 +125,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             fabApply.apply {
                 show()
                 setOnClickListener {
-                    if (!requireContext().isNetworkAvailable() && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                        requireContext().toast(getString(R.string.dialog_title_no_network))
-                        return@setOnClickListener
-                    }
                     requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.repo_to_new_pointer)
                 }
                 icon = requireContext().getDrawableExt(R.drawable.ic_add)
@@ -395,7 +387,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     override fun onLongClick(position: Int, item: Pointer): Boolean {
         val result = kotlin.runCatching {
-            if (!item.uploadedBy!!.containsKey(FirebaseUtils.firebaseUser!!.uid) || item.reasonCode != Reason.OK) {
+            if (!item.uploadedBy!!.containsKey(firebaseUtils.uid) || item.reasonCode != Reason.OK) {
                 return false
             }
             val list = mutableListOf(getString(R.string.text_edit), getString(R.string.text_delete))
