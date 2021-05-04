@@ -18,6 +18,7 @@ package com.afterroot.allusive2
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.afterroot.allusive2.data.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.core.extensions.getPrefs
 

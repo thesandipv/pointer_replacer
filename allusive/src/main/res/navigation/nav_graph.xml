@@ -60,6 +60,13 @@
         <action
             android:id="@+id/toCustomize"
             app:destination="@id/customizeFragment" />
+        <action
+            android:id="@+id/toMagisk"
+            app:destination="@id/magiskFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -75,4 +82,7 @@
     <fragment
         android:id="@+id/customizeFragment"
         android:name="com.afterroot.allusive2.ui.fragment.CustomizeFragment" />
+    <fragment
+        android:id="@+id/magiskFragment"
+        android:name="com.afterroot.allusive2.magisk.MagiskFragment" />
 </navigation>
