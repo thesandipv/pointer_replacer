@@ -32,6 +32,6 @@
         android:gravity="bottom|center">
         <bitmap
             android:antialias="true"
-            android:src="@drawable/ic_afterroot" />
+            android:src="@drawable/ar_logo" />
     </item>
 </layer-list>
