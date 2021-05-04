@@ -22,9 +22,9 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 @Throws(IOException::class)
-fun File.unzip(folder: File, path: String = "", junkPath: Boolean = false) {
+fun File.unzip(toFolder: File, path: String = "", junkPath: Boolean = false) {
     inputStream().buffered().use {
-        it.unzip(folder, path, junkPath)
+        it.unzip(toFolder, path, junkPath)
     }
 }
 
@@ -57,6 +57,7 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
 var filesListInDir: MutableList<String> = ArrayList()
 
 fun zip(sourceFolder: File, exportPath: String): File {
+    filesListInDir.clear()
     runCatching {
         populateFilesList(sourceFolder)
         val fos = FileOutputStream(exportPath)
@@ -65,11 +66,7 @@ fun zip(sourceFolder: File, exportPath: String): File {
             val ze = ZipEntry(filePath.substring(sourceFolder.absolutePath.length + 1, filePath.length))
             zos.putNextEntry(ze)
             val fis = FileInputStream(filePath)
-            val buffer = ByteArray(1024)
-            var len: Int
-            while (fis.read(buffer).also { len = it } > 0) {
-                zos.write(buffer, 0, len)
-            }
+            fis.copyTo(zos)
             zos.closeEntry()
             fis.close()
         }

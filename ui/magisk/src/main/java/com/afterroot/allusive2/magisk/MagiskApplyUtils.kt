@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use this file except `in` compliance with the License.
  * You may obtain a copy of the License at
  *
  *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to `in` writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -16,16 +16,24 @@
 package com.afterroot.allusive2.magisk
 
 import android.content.Context
+import android.content.res.AssetManager
 import android.graphics.Bitmap
-import java.io.File
-import java.io.FileOutputStream
+import android.util.Log
+import java.io.*
+import java.util.*
 
 const val FRAMEWORK_APK = "/system/framework/framework-res.apk"
 fun frameworkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/framework.apk"
 fun frameworkExtractPath(context: Context) = "${context.externalCacheDir?.path}/framework"
+fun repackedFrameworkPath(context: Context) = "${context.externalCacheDir?.path}/repacked.apk"
+fun repackedMagiskModulePath(context: Context, name: String) = "${context.getExternalFilesDir(null)?.path}/$name"
+fun magiskEmptyModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/empty-module.zip"
+fun magiskEmptyModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/empty-module"
 const val POINTER_XHDPI = "/res/drawable-xhdpi-v4/pointer_spot_touch.png"
 const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
 const val POINTER_HDPI = "/res/drawable-hdpi-v4/pointer_spot_touch.png"
+const val MAGISK_EMPTY_ZIP = "empty-module.zip"
+const val MAGISK_PACKAGE = "com.topjohnwu.magisk"
 
 fun copyFrameworkRes(context: Context): File {
     val file = File(FRAMEWORK_APK)
@@ -83,4 +91,38 @@ fun Bitmap.saveAs(path: String): File {
         fos.close()
     }
     return file
+}
+
+fun copyMagiskEmptyZip(context: Context, to: String) {
+    val assetManager: AssetManager = context.assets
+    val inputStream: InputStream?
+    val outputStream: OutputStream?
+    try {
+        inputStream = assetManager.open(MAGISK_EMPTY_ZIP)
+        val outFile = File(to)
+        outputStream = FileOutputStream(outFile)
+        inputStream.copyTo(outputStream)
+        inputStream.close()
+        outputStream.flush()
+        outputStream.close()
+    } catch (e: IOException) {
+        Log.e("tag", "Failed to copy asset file: $MAGISK_EMPTY_ZIP", e)
+    }
+}
+
+fun extractMagiskZip(context: Context) {
+    val file = File(magiskEmptyModuleZipPath(context))
+    if (!file.exists()) return
+    file.unzip(toFolder = File(magiskEmptyModuleExtractPath(context)))
+}
+
+fun copyRepackedFrameworkResApk(context: Context): File {
+    val repacked = File(repackedFrameworkPath(context))
+    return repacked.copyTo(target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"), overwrite = true)
+}
+
+fun createModuleProp(context: Context) {
+    val properties = Properties()
+    properties.load(FileReader(File(magiskEmptyModuleExtractPath(context) + "/module.prop")))
+    properties.keys
 }
