@@ -19,7 +19,7 @@ def libs = [:]
 def version = [
         MAJOR: 1,
         MINOR: 9,
-        PATCH: 3,
+        PATCH: 4,
 ]
 
 def versions = [
@@ -90,7 +90,7 @@ config.GPH = [
         url: "https://maven.pkg.github.com"
 ]
 
-libs.AGP = "com.android.tools.build:gradle:7.0.0-alpha15"
+libs.AGP = "com.android.tools.build:gradle:4.2.0"
 
 libs.commonsCodec = "commons-codec:commons-codec:20041127.091804"
 libs.commonsIo = "org.apache.commons:commons-io:${versions.commonsIo}"
