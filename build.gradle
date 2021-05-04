@@ -26,7 +26,7 @@ buildscript {
     }
     dependencies {
         classpath Libs.AGP
-        classpath Libs.Kotlin.gradlePlugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
         classpath Libs.Google.servicesPlugin
         classpath Libs.Firebase.crashlyticsPlugin
         //classpath Libs.Google.ossLicPlugin

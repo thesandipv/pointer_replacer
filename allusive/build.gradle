@@ -134,6 +134,10 @@ android {
 
 
 dependencies {
+    implementation project(":data")
+    implementation project(":ui:magisk")
+    implementation project(":ui:resources")
+
     implementation Libs.AfterROOT.Core.core
 
     implementation Libs.Kotlin.stdLib
@@ -197,10 +201,6 @@ dependencies {
 
     implementation Libs.commonsIo
     compileOnly "de.robv.android.xposed:api:82"
-
-    /*implementation "org.koin:koin-android:$koinVersion"
-    implementation "org.koin:koin-androidx-scope:$koinVersion"
-    implementation "org.koin:koin-androidx-viewmodel:$koinVersion"*/
 
     implementation Libs.Koin3.android
     implementation Libs.Koin3.ext

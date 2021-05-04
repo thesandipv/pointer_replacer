@@ -311,6 +311,11 @@ class MainActivity : AppCompatActivity() {
                     hideNavigation()
                     setTitle(getString(R.string.title_customizer_pointer))
                 }
+                R.id.magiskFragment -> {
+                    fabApply.hide()
+                    hideNavigation()
+                    setTitle("Apply with Magisk")
+                }
             }
         }
 

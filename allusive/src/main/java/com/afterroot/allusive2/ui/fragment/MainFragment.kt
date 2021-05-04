@@ -38,6 +38,7 @@ import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.*
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
@@ -116,7 +117,22 @@ class MainFragment : Fragment() {
             }
             findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
                 setOnClickListener {
-                    applyPointer()
+                    MaterialDialog(requireContext()).show {
+                        title(text = "Apply Pointer With")
+                        listItems(items = listOf("Xposed", "Magisk")) { _, _, text ->
+                            when (text) {
+                                "Xposed" -> {
+                                    applyPointer()
+
+                                }
+                                "Magisk" -> {
+                                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.magiskFragment)
+                                }
+                                else -> {
+                                }
+                            }
+                        }
+                    }
                 }
                 icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
             }
@@ -474,10 +490,10 @@ class MainFragment : Fragment() {
         pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
             override fun onClick(position: Int, view: View?, item: RoomPointer) {
                 if (pointerType == POINTER_TOUCH) {
-                    settings.selectedPointerName = item.file_name
+                    settings.selectedPointerName = item.pointer_name
                     settings.selectedPointerPath = targetPath + item.file_name
                 } else {
-                    settings.selectedMouseName = item.file_name
+                    settings.selectedMouseName = item.pointer_name
                     settings.selectedMousePath = targetPath + item.file_name
                 }
                 GlideApp.with(requireContext())
