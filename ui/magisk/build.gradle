@@ -36,7 +36,7 @@ dependencies {
     implementation Libs.MaterialDialogs.core
 
     implementation Libs.AndroidX.constraintLayout
-    implementation Libs.AndroidX.Lifecycle.common
+    implementation Libs.AndroidX.Lifecycle.runtime
     implementation Libs.AndroidX.Lifecycle.livedata
     implementation Libs.AndroidX.Lifecycle.extensions
 
