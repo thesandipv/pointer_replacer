@@ -47,8 +47,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import java.io.File
-import java.util.*
-
+import java.util.Locale
 
 /**
  * Created by Sandip on 04-10-2017.
@@ -142,7 +141,6 @@ class CustomizeFragment : Fragment() {
     private val minSize: Int
         get() = requireContext().getMinPointerSize()
 
-
     /**
      * Set initial values to SeekBar
      */
@@ -163,17 +161,17 @@ class CustomizeFragment : Fragment() {
 
             imageCustomizePointer.imageAlpha = alpha
 
-            //pointer size
+            // pointer size
             seekBarSize.max = maxSize - minSize
             seekBarSize.progress = pointerSize - minSize
             textSize.text = String.format(formatTextSize, getString(R.string.text_size), pointerSize, pointerSize)
 
-            //pointer padding
+            // pointer padding
             seekBarPadding.max = maxPadding
             seekBarPadding.progress = padding
             textPadding.text = String.format(formatPadding, getString(R.string.text_padding), padding)
 
-            //pointer alpha
+            // pointer alpha
             textAlpha.text = String.format(formatPadding, getString(R.string.text_alpha), alpha)
             seekBarAlpha.progress = alpha
 
@@ -189,13 +187,11 @@ class CustomizeFragment : Fragment() {
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     setPointerImageParams(currentSize, seekBarPadding.progress)
                 }
-
             })
 
             seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -207,7 +203,6 @@ class CustomizeFragment : Fragment() {
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
-
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
@@ -222,7 +217,6 @@ class CustomizeFragment : Fragment() {
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {
-
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
@@ -239,14 +233,11 @@ class CustomizeFragment : Fragment() {
 
     private fun setLayoutSize(size: Int) {
         binding.imageCustomizePointer.layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
-
     }
 
     private fun setLayoutPadding(padding: Int) {
         binding.imageCustomizePointer.setPadding(padding, padding, padding, padding)
-
     }
-
 
     private fun setClickListeners() {
         binding.apply {

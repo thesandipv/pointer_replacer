@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,7 +90,8 @@ class SplashActivity : AppCompatActivity() {
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
                         AuthUI.IdpConfig.GoogleBuilder().build()
                     )
-                ).build(), RC_LOGIN
+                ).build(),
+            RC_LOGIN
         )
     }
 
@@ -114,10 +115,14 @@ class SplashActivity : AppCompatActivity() {
 
     private var dialog: MaterialDialog? = null
     private fun setUpNetworkObserver() {
-        networkViewModel.monitor(this, onConnect = {
-            if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
-        }, onDisconnect = {
-            dialog = showNetworkDialog(state = it, positive = { setUpNetworkObserver() }, negative = { finish() })
-        })
+        networkViewModel.monitor(
+            this,
+            onConnect = {
+                if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
+            },
+            onDisconnect = {
+                dialog = showNetworkDialog(state = it, positive = { setUpNetworkObserver() }, negative = { finish() })
+            }
+        )
     }
 }

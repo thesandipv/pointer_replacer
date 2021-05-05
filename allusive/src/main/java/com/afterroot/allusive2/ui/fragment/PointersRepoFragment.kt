@@ -15,7 +15,6 @@
 
 package com.afterroot.allusive2.ui.fragment
 
-
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -35,7 +34,11 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.listItems
-import com.afterroot.allusive2.*
+import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.GlideApp
+import com.afterroot.allusive2.R
+import com.afterroot.allusive2.Reason
+import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
@@ -43,6 +46,7 @@ import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.DialogEditPointerBinding
 import com.afterroot.allusive2.databinding.FragmentPointerInfoBinding
 import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
+import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.utils.FirebaseUtils
@@ -96,18 +100,22 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     override fun onResume() {
         super.onResume()
-        networkViewModel.monitor(this, onConnect = {
-            onNetworkChange(true)
-        }, onDisconnect = {
-            onNetworkChange(false)
-        })
+        networkViewModel.monitor(
+            this,
+            onConnect = {
+                onNetworkChange(true)
+            },
+            onDisconnect = {
+                onNetworkChange(false)
+            }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (firebaseUtils.isUserSignedIn) {
             targetPath = requireContext().getPointerSaveDir()
-            //setUpList()
+            // setUpList()
             setUpAdapter()
             loadPointers()
         }
@@ -144,7 +152,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
-    //Function for using new list adapter.
+    // Function for using new list adapter.
     private fun setUpAdapter() {
         pointersAdapter = PointersAdapter(this)
         binding.list.apply {
@@ -164,25 +172,28 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        sharedViewModel.getPointerSnapshot().observe(viewLifecycleOwner, { state ->
-            when (state) {
-                is ViewModelState.Loading -> {
-                    binding.repoSwipeRefresh.isRefreshing = true
-                }
-                is ViewModelState.Loaded<*> -> {
-                    binding.repoSwipeRefresh.isRefreshing = false
-                    pointersSnapshot = state.data as QuerySnapshot
-                    val result: List<Pointer> = pointersSnapshot.toObjects()
-                    val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
-                    pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
-                        result.sortedByDescending { it.time }
-                    } else {
-                        result.sortedByDescending { it.downloads }
+        sharedViewModel.getPointerSnapshot().observe(
+            viewLifecycleOwner,
+            { state ->
+                when (state) {
+                    is ViewModelState.Loading -> {
+                        binding.repoSwipeRefresh.isRefreshing = true
                     }
-                    displayPointers(pointersList)
+                    is ViewModelState.Loaded<*> -> {
+                        binding.repoSwipeRefresh.isRefreshing = false
+                        pointersSnapshot = state.data as QuerySnapshot
+                        val result: List<Pointer> = pointersSnapshot.toObjects()
+                        val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
+                        pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
+                            result.sortedByDescending { it.time }
+                        } else {
+                            result.sortedByDescending { it.downloads }
+                        }
+                        displayPointers(pointersList)
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun setUpFilter() {
@@ -196,9 +207,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipSortByDate.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    displayPointers((filteredList ?: pointersList).sortedByDescending {
-                        it.time
-                    })
+                    displayPointers(
+                        (filteredList ?: pointersList).sortedByDescending {
+                            it.time
+                        }
+                    )
                     settings.orderBy = DatabaseFields.FIELD_TIME
                 }
             }
@@ -206,14 +219,15 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipSortByDownload.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    displayPointers((filteredList ?: pointersList).sortedByDescending {
-                        it.downloads
-                    })
+                    displayPointers(
+                        (filteredList ?: pointersList).sortedByDescending {
+                            it.downloads
+                        }
+                    )
                     settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
                 }
             }
         }
-
 
         binding.filterChipShowUserUploaded.apply {
             setOnCheckedChangeListener { _, isChecked ->
@@ -237,7 +251,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun showPointerInfoDialog(pointer: Pointer) {
-        //FIXME check this is working or not
+        // FIXME check this is working or not
         val binding = FragmentPointerInfoBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(view = binding.root, scrollable = true)
@@ -374,7 +388,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             firestore.collection(DatabaseFields.COLLECTION_POINTERS).document(docId).update(updates)
                         }
                 } else {
-                    //No changes to save. dismiss dialog.
+                    // No changes to save. dismiss dialog.
                     dismiss()
                 }
             }
@@ -408,9 +422,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                         .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
                                             querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
                                                 docSnapshot!!.reference.delete().addOnSuccessListener {
-                                                    //go to last position after deleting pointer
+                                                    // go to last position after deleting pointer
                                                     binding.list.scrollToPosition(position)
-                                                    //delete pointer from storage bucket
+                                                    // delete pointer from storage bucket
                                                     storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
                                                         .child(filename!!)
                                                         .delete()
