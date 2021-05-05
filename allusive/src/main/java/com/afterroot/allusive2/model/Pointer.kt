@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,9 @@ import com.afterroot.allusive2.Reason
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
-import java.util.*
+import java.util.Date
 
-//Collection 'pointers'
+// Collection 'pointers'
 @Keep
 data class Pointer(
     var name: String? = null,

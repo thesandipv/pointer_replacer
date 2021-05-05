@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,28 +26,36 @@ import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
 
-
 class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) :
     CoordinatorLayout.Behavior<V>(context, attrs) {
 
     override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        directTargetChild: View,
+        target: View,
+        axes: Int,
+        type: Int
     ): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
     }
 
     override fun onNestedPreScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        target: View,
+        dx: Int,
+        dy: Int,
+        consumed: IntArray,
+        type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
         child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
     }
 
-
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
-
         }
         return super.layoutDependsOn(parent, child, dependency)
     }
@@ -76,7 +84,7 @@ class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
         type: Int
     ): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL ||
-                super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
+            super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
     }
 
     override fun onNestedScroll(

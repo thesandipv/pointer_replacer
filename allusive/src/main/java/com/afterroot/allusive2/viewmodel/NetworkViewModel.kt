@@ -33,15 +33,18 @@ class NetworkViewModel(val networkStateMonitor: NetworkStateMonitor) : ViewModel
         } else {
             doInitially.invoke()
         }
-        networkStateMonitor.observe(lifecycleOwner, {
-            when (it) {
-                NetworkState.CONNECTED -> {
-                    onConnect(NetworkState.CONNECTED)
-                }
-                else -> {
-                    onDisconnect?.invoke(it)
+        networkStateMonitor.observe(
+            lifecycleOwner,
+            {
+                when (it) {
+                    NetworkState.CONNECTED -> {
+                        onConnect(NetworkState.CONNECTED)
+                    }
+                    else -> {
+                        onDisconnect?.invoke(it)
+                    }
                 }
             }
-        })
+        )
     }
 }

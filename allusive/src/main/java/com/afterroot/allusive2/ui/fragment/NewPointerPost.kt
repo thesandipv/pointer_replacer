@@ -97,7 +97,7 @@ class NewPointerPost : Fragment() {
             val chooserIntent = Intent.createChooser(intent, "Choose Pointer Image").apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
             }
-            //FIXME update method https://developer.android.com/training/basics/intents/result#kotlin
+            // FIXME update method https://developer.android.com/training/basics/intents/result#kotlin
             startActivityForResult(chooserIntent, RC_PICK_IMAGE)
         }
 
@@ -107,7 +107,7 @@ class NewPointerPost : Fragment() {
     private fun initFirebaseConfig() {
         remoteConfig.fetchAndActivate().addOnCompleteListener { result ->
             kotlin.runCatching {
-                //Load Banner Ad
+                // Load Banner Ad
                 val adView = AdView(requireContext())
                 adView.apply {
                     adSize = AdSize.BANNER
@@ -164,9 +164,8 @@ class NewPointerPost : Fragment() {
         }
     }
 
-    private fun showAd() { //TODO Rewrite logic
+    private fun showAd() { // TODO Rewrite logic
         rewardedAd.setOnPaidEventListener {
-
         }
 
 /*
@@ -215,7 +214,7 @@ class NewPointerPost : Fragment() {
         }
     }
 
-    //Handle retrieved image uri
+    // Handle retrieved image uri
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
@@ -322,7 +321,6 @@ class NewPointerPost : Fragment() {
     private fun setListener(editTextView: TextInputEditText, inputLayoutView: TextInputLayout) {
         editTextView.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
