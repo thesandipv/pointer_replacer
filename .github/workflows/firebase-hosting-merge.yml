@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: yarn run build
+      - run: yarn install --frozen-lockfile && yarn run build
         working-directory: web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
