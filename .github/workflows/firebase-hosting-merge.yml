@@ -19,3 +19,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_POINTER_REPLACER }}"
           channelId: live
           projectId: pointer-replacer
+          entryPoint: web
