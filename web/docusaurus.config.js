@@ -8,8 +8,12 @@ module.exports = {
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'afterroot', // Usually your GitHub org/user name.
-  projectName: 'pointer-replacer', // Usually your repo name.
+  projectName: 'pointer_replacer', // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       title: 'Pointer Replacer',
       logo: {
@@ -26,7 +30,9 @@ module.exports = {
         // {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/thesandipv/pointer-replacer',
-          label: 'GitHub',
+          // label: 'GitHub',
+          'aria-label': 'GitHub repository',
+          className: 'header-github-link',
           position: 'right',
         },
       ],
@@ -70,6 +76,11 @@ module.exports = {
           ],
         },
       ],
+      logo: {
+        alt: 'AfterROOT Logo',
+        src: 'img/afterroot.png',
+        href: 'https://afterroot.web.app',
+      },
       copyright: `Copyright © ${new Date().getFullYear()} AfterROOT. Built with Docusaurus.`,
     },
   },
