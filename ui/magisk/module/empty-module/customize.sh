@@ -144,7 +144,7 @@ set_permissions() {
   # then you place the path
   # set_perm  $MODPATH/system/etc/mixer_paths.xml
   # the permissions are --- rw- r-- r-- which is 0644
-  set_perm  $MODPATH/system/framework/framework_res.apk       0       0       0644
+  set_perm  $MODPATH/system/framework/framework-res.apk       0       0       0644
 }
 
 # You can add more functions to assist your custom script code

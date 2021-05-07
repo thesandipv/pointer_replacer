@@ -101,3 +101,4 @@ output.json
 /others
 /keystore.properties
 /publish.properties
+/ui/magisk/src/main/assets/empty-module.zip
