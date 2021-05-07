@@ -37,6 +37,10 @@ jobs:
       - name: Copy CI gradle.properties
         run: cp .github/ci-gradle.properties gradle.properties
 
+      - name: Create empty-module.zip
+        run: mkdir ../../src/main/assets && zip -r ../../src/main/assets/empty-module.zip ./
+        working-directory: ui/magisk/module/empty-module
+
       - uses: actions/cache@v2
         continue-on-error: true # continue if the cache restore/upload fails
         with:
