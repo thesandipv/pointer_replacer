@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create empty-module.zip
-        run: zip -r ../../src/main/assets/empty-module.zip ./
+        run: mkdir ../../src/main/assets && zip -r ../../src/main/assets/empty-module.zip ./
         working-directory: ui/magisk/module/empty-module
 
       - name: Upload build outputs
