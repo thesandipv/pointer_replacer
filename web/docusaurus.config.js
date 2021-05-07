@@ -8,8 +8,12 @@ module.exports = {
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'afterroot', // Usually your GitHub org/user name.
-  projectName: 'pointer-replacer', // Usually your repo name.
+  projectName: 'pointer_replacer', // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       title: 'Pointer Replacer',
       logo: {
@@ -25,8 +29,10 @@ module.exports = {
         }, */
         // {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/thesandipv/pointer_replacer',
-          label: 'GitHub',
+          href: 'https://github.com/thesandipv/pointer-replacer',
+          // label: 'GitHub',
+          'aria-label': 'GitHub repository',
+          className: 'header-github-link',
           position: 'right',
         },
       ],
@@ -65,11 +71,16 @@ module.exports = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/thesandipv/pointer_replacer',
+              href: 'https://github.com/thesandipv/pointer-replacer',
             },
           ],
         },
       ],
+      logo: {
+        alt: 'AfterROOT Logo',
+        src: 'img/afterroot.png',
+        href: 'https://afterroot.web.app',
+      },
       copyright: `Copyright © ${new Date().getFullYear()} AfterROOT. Built with Docusaurus.`,
     },
   },
@@ -81,13 +92,13 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/thesandipv/pointer_replacer/edit/master/web/',
+            'https://github.com/thesandipv/pointer-replacer/edit/master/web/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/thesandipv/pointer_replacer/edit/master/web/blog/',
+            'https://github.com/thesandipv/pointer-replacer/edit/master/web/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
