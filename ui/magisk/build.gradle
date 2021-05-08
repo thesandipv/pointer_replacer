@@ -20,6 +20,7 @@ plugins {
 }
 
 apply from: "$rootDir/common-config.gradle"
+apply from: "$rootDir/create-zip.gradle"
 
 android {
     buildFeatures {

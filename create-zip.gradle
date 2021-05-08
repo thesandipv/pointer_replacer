@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2016-2021 Sandip Vaghela
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+import org.gradle.work.Incremental
+import org.gradle.work.InputChanges
+
+/**
+ * Create Empty Magisk Module Zip
+ */
+abstract class CreateEmptyModuleZip extends DefaultTask {
+    @Incremental
+    @InputDirectory
+    abstract DirectoryProperty getInputDir()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void execute(InputChanges inputChanges) {
+        Boolean isCreate = false
+
+        inputChanges.getFileChanges(inputDir).each { change ->
+            if (change.fileType == FileType.DIRECTORY) return
+            isCreate = true
+        }
+        if (isCreate) {
+            println "py build.py".execute([], project.rootDir).text
+        }
+    }
+}
+
+tasks.register('createEmptyModuleZip', CreateEmptyModuleZip) {
+    //Task Meta data
+    group = BasePlugin.BUILD_GROUP
+    description = "Creates Empty Magisk Module Zip"
+
+    inputDir = file("$rootDir/ui/magisk/module/empty-module")
+    outputDir = file("$rootDir/ui/magisk/src/main/assets")
+}
+
+tasks.whenTaskAdded { task ->
+    if ((task.name =~ /package\w*Assets/).matches()) { //Matches tasks packageReleaseAssets, packageDebugAssets
+        task.dependsOn 'createEmptyModuleZip'
+    }
+}
