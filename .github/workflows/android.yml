@@ -5,12 +5,13 @@ on:
     branches: [ main, dev ]
     tags:
       - allusive_v*
+      - run_ci_build
   pull_request:
     branches: [ main, dev ]
 
 jobs:
   build:
-
+    name: Android Build
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +21,11 @@ jobs:
         with:
           java-version: 11
 
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
       - name: Grant execute permissions
         run: chmod +x release/decrypt.sh release/clean.sh
 
@@ -28,27 +34,28 @@ jobs:
         env:
           ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew checksum.sh
-
-      - name: Generate cache key
-        run: ./checksum.sh checksum.txt
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew checksum.sh
+#
+#      - name: Generate cache key
+#        run: ./checksum.sh checksum.txt
 
       - name: Copy CI gradle.properties
         run: cp .github/ci-gradle.properties gradle.properties
 
-      - name: Create empty-module.zip
-        run: mkdir ../../src/main/assets && zip -r ../../src/main/assets/empty-module.zip ./
-        working-directory: ui/magisk/module/empty-module
+#      - name: Create empty-module.zip
+#        run: mkdir ../../src/main/assets && zip -r ../../src/main/assets/empty-module.zip ./
+#        working-directory: ui/magisk/module/empty-module
 
-      - uses: actions/cache@v2
+      - name: Cache Gradle
+        uses: actions/cache@v2
         continue-on-error: true # continue if the cache restore/upload fails
         with:
           path: |
-            ~/.gradle/caches/modules-*
-            ~/.gradle/caches/jars-*
-            ~/.gradle/caches/build-cache-*
-          key: ${{ runner.os }}-gradle-${{ hashFiles('checksum.txt') }}
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
         run: ./gradlew assemble bundle lintDebug testDebug --stacktrace

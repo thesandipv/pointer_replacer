@@ -52,7 +52,7 @@ def versions = [
         koin3              : "3.0.1-beta-2",
         koin               : "2.2.2",
         ktlint             : "0.41.0",
-        kotlin_version     : "1.4.32",
+        kotlin_version     : "1.5.0",
         kotlinxCoroutines  : "1.4.3",
         legacySupportV13   : "1.0.0",
         legacySupportV4    : "1.0.0",
@@ -90,7 +90,7 @@ config.GPH = [
         url: "https://maven.pkg.github.com"
 ]
 
-libs.AGP = "com.android.tools.build:gradle:4.2.0"
+libs.AGP = "com.android.tools.build:gradle:4.2.1"
 
 libs.commonsCodec = "commons-codec:commons-codec:20041127.091804"
 libs.commonsIo = "org.apache.commons:commons-io:${versions.commonsIo}"
