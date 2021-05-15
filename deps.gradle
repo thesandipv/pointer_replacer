@@ -52,7 +52,7 @@ def versions = [
         koin3              : "3.0.1-beta-2",
         koin               : "2.2.2",
         ktlint             : "0.41.0",
-        kotlin_version     : "1.5.0",
+        kotlin             : "1.5.0",
         kotlinxCoroutines  : "1.4.3",
         legacySupportV13   : "1.0.0",
         legacySupportV4    : "1.0.0",
@@ -107,9 +107,9 @@ libs.AfterROOT.Core = [
 ]
 
 libs.Kotlin = [
-        stdLib      : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin_version}",
+        stdLib      : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
         anko        : "org.jetbrains.anko:anko-commons:${versions.ankoCommons}",
-        gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin_version}"
+        gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 ]
 
 libs.Kotlin.Coroutines = [
