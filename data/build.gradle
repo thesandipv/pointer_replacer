@@ -18,7 +18,7 @@ plugins {
     id 'kotlin-kapt'
 }
 
-apply from: "$rootDir/common-config.gradle"
+apply from: "$rootDir/gradle/common-config.gradle"
 
 dependencies {
     implementation project(":ui:resources")

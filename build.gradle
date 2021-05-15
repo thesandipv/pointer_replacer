@@ -16,7 +16,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    apply from: rootProject.file('deps.gradle')
+    apply from: rootProject.file('gradle/deps.gradle')
 
     repositories {
         google()
@@ -40,7 +40,7 @@ plugins {
 }
 
 allprojects {
-    apply from: rootProject.file('deps.gradle')
+    apply from: rootProject.file('gradle/deps.gradle')
 
     def publishPropertiesFile = rootProject.file("publish.properties")
     def properties = new Properties()
