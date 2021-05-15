@@ -1,3 +1,6 @@
 [submodule "core"]
 	path = core
 	url = https://github.com/afterroot/core.git
+[submodule "website"]
+	path = website
+	url = https://github.com/thesandipv/allusive-web.git
