@@ -17,3 +17,8 @@ include ':allusive'
 include ':ui:magisk'
 include ':ui:resources'
 include ':data'
+
+//AfterROOT Core
+include ':core'
+project(':core').projectDir = file('core/core')
+
