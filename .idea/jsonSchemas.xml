@@ -15,7 +15,7 @@
                     <option name="path" value=".github/workflows/android.yml" />
                   </Item>
                   <Item>
-                    <option name="path" value=".github/workflows/firebase-hosting-merge.yml" />
+                    <option name="path" value="website/.github/workflows/firebase-hosting-merge.yml" />
                   </Item>
                 </list>
               </option>
