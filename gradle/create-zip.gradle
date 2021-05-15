@@ -37,7 +37,7 @@ abstract class CreateEmptyModuleZip extends DefaultTask {
             isCreate = true
         }
         if (isCreate) {
-            println "py build.py".execute([], project.rootDir).text
+            println "python build.py".execute([], project.rootDir).text
         }
     }
 }
