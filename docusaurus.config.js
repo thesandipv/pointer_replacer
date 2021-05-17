@@ -21,12 +21,12 @@ module.exports = {
         src: 'img/logo.svg',
       },
       items: [
-        /* {
+        {
           type: 'doc',
           docId: 'intro',
           position: 'left',
           label: 'Docs',
-        }, */
+        },
         // {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/thesandipv/pointer_replacer',
@@ -40,15 +40,15 @@ module.exports = {
     footer: {
       style: 'dark',
       links: [
-        /* {
+        {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Intro',
               to: '/docs/intro',
             },
           ],
-        }, */
+        },
         {
           title: 'Community',
           items: [
