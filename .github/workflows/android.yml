@@ -5,20 +5,29 @@ on:
     branches: [ main, dev ]
     tags:
       - allusive_v*
+      - run_ci_build
   pull_request:
-    branches: [ main, dev ]
 
 jobs:
   build:
-
+    name: Android Build
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check Out
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
       - name: set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
       - name: Grant execute permissions
         run: chmod +x release/decrypt.sh release/clean.sh
@@ -29,22 +38,20 @@ jobs:
           ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew checksum.sh
-
-      - name: Generate cache key
-        run: ./checksum.sh checksum.txt
+        run: chmod +x gradlew
 
       - name: Copy CI gradle.properties
-        run: cp .github/ci-gradle.properties gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
-      - uses: actions/cache@v2
+      - name: Cache Gradle
+        uses: actions/cache@v2
         continue-on-error: true # continue if the cache restore/upload fails
         with:
           path: |
-            ~/.gradle/caches/modules-*
-            ~/.gradle/caches/jars-*
-            ~/.gradle/caches/build-cache-*
-          key: ${{ runner.os }}-gradle-${{ hashFiles('checksum.txt') }}
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
         run: ./gradlew assemble bundle lintDebug testDebug --stacktrace
@@ -55,7 +62,7 @@ jobs:
           SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
 
       - name: Publish to Play Store
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/allusive_v')
+        if: startsWith(github.ref, 'refs/tags/allusive_v')
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: release/serviceAccount.json
@@ -66,7 +73,7 @@ jobs:
 
       - name: Create release for tags
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/allusive_v') || github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/allusive_v')
         with:
           draft: true
           files: |

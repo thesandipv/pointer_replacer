@@ -45,7 +45,12 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.showStaticProgressDialog
-import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
+import com.android.billingclient.api.SkuDetailsParams
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -87,7 +92,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         billingClient =
             BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener { _, purchases ->
                 val purchase = purchases?.first()
-                if (purchase != null) { //Consume every time after successful purchase
+                if (purchase != null) { // Consume every time after successful purchase
                     val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
                     billingClient.consumeAsync(params) { result, _ ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -117,7 +122,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             setDonatePref(false)
                         }
                     } catch (ignored: IllegalStateException) {
-                        //if user changed context before completing.
+                        // if user changed context before completing.
                     }
                 }
         }
@@ -217,7 +222,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                                 String.format(getString(R.string.str_format_value_error), context.getMinPointerSize())
                             )
                         }
-
                     }
                     (getInputLayout().getChildAt(0) as FrameLayout).updateLayoutParams<LinearLayout.LayoutParams> {
                         setMargins(0)
@@ -290,7 +294,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 true
             }
-
     }
 
     private lateinit var loadingDialog: MaterialDialog
@@ -316,9 +319,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
             billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList?.isNotEmpty()!!) {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        loadingDialog.dismiss()
-                    }, 100)
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            loadingDialog.dismiss()
+                        },
+                        100
+                    )
 
                     val list = ArrayList<String>()
                     for (skuDetails in skuDetailsList) {

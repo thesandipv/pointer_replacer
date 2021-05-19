@@ -36,7 +36,6 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 
-
 /**
  * New list adapter for Pointer Choose screen.
  * */

@@ -15,7 +15,7 @@
 
 apply plugin: 'com.android.library'
 
-apply from: "$rootDir/common-config.gradle"
+apply from: "$rootDir/gradle/common-config.gradle"
 
 dependencies {
     api Libs.Google.material

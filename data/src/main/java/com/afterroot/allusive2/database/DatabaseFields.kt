@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 package com.afterroot.allusive2.database
 
 object DatabaseFields {
-    //table 'users'
+    // table 'users'
     const val COLLECTION_USERS = "users"
     const val FIELD_NAME = "name"
     const val FIELD_EMAIL = "email"
     const val FIELD_UID = "uid"
     const val FIELD_FCM_ID = "fcmId"
 
-    //table 'pointers'
+    // table 'pointers'
     const val COLLECTION_POINTERS = "pointers"
     const val FIELD_DESC = "description"
     const val FIELD_FILENAME = "filename"

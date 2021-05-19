@@ -39,7 +39,6 @@ import com.google.firebase.storage.FirebaseStorage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
-
 /**
  * New list adapter for Repository screen.
  * */
@@ -68,7 +67,6 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
         private val itemUploader: AppCompatTextView = binding.infoUsername
         private val infoMeta: AppCompatTextView = binding.infoMeta
 
-
         fun bind(pointer: Pointer) {
             when (pointer.reasonCode) {
                 Reason.OK -> {
@@ -89,7 +87,6 @@ class PointersAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
                             .transition(DrawableTransitionOptions.withCrossFade(factory))
                             .into(this)
                         background = context.getDrawableExt(R.drawable.transparent_grid)
-
                     }
                     infoMeta.text = context.resources.getQuantityString(
                         R.plurals.str_format_download_count,

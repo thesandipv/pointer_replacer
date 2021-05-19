@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     private val settings: Settings by inject()
     private val sharedViewModel: MainSharedViewModel by viewModels()
     private val firebaseUtils: FirebaseUtils by inject()
-    //private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
+    // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (get<FirebaseAuth>().currentUser == null) { //If not logged in, go to login.
+        if (get<FirebaseAuth>().currentUser == null) { // If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
     }
@@ -102,23 +102,25 @@ class MainActivity : AppCompatActivity() {
         navigation = findViewById(R.id.navigation)
         fabApply = findViewById(R.id.fab_apply)
 
-        //Initialize AdMob SDK
+        // Initialize AdMob SDK
         MobileAds.initialize(this)
 
-        //Add user in db if not available
+        // Add user in db if not available
         addUserInfoInDB()
         createPointerFolder()
         setUpNavigation()
         setUpTitleObserver()
         setUpErrorObserver()
         setUpNetworkObserver()
-
     }
 
     private fun setUpErrorObserver() {
-        sharedViewModel.snackbarMsg.observe(this, EventObserver {
-            findViewById<CoordinatorLayout>(R.id.container).snackbar(it).anchorView = navigation
-        })
+        sharedViewModel.snackbarMsg.observe(
+            this,
+            EventObserver {
+                findViewById<CoordinatorLayout>(R.id.container).snackbar(it).anchorView = navigation
+            }
+        )
     }
 
     private fun setUpTitleObserver() {
@@ -126,9 +128,12 @@ class MainActivity : AppCompatActivity() {
             setInAnimation(this@MainActivity, R.anim.text_switcher_in)
             setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
         }
-        sharedViewModel.liveTitle.observe(this, {
-            updateTitle(it)
-        })
+        sharedViewModel.liveTitle.observe(
+            this,
+            {
+                updateTitle(it)
+            }
+        )
     }
 
     private fun setTitle(title: String?) {
@@ -143,32 +148,35 @@ class MainActivity : AppCompatActivity() {
                 titleLayout.visible(false)
             } else {
                 params.behavior = AppBarLayout.ScrollingViewBehavior()
-                //this.title = title
+                // this.title = title
                 titleLayout.visible(true)
                 titleBarTitleSwitcher.setText(title)
-
             }
         }
     }
 
     private var dialog: MaterialDialog? = null
     private fun setUpNetworkObserver() {
-        networkViewModel.monitor(this, onConnect = {
-            if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
-        }, onDisconnect = {
-            dialog = showNetworkDialog(
-                state = it,
-                positive = { dialog?.dismiss() },
-                negative = { finish() },
-                isShowHide = true
-            )
-        })
+        networkViewModel.monitor(
+            this,
+            onConnect = {
+                if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
+            },
+            onDisconnect = {
+                dialog = showNetworkDialog(
+                    state = it,
+                    positive = { dialog?.dismiss() },
+                    negative = { finish() },
+                    isShowHide = true
+                )
+            }
+        )
     }
 
     private fun createPointerFolder() {
         val targetPath = "${filesDir.path}${getString(R.string.pointer_folder_path_new)}"
         val pointersFolder = File(targetPath)
-        val dotNoMedia = File("${targetPath}/.nomedia")
+        val dotNoMedia = File("$targetPath/.nomedia")
         if (!pointersFolder.exists()) {
             pointersFolder.mkdirs()
         }
@@ -182,29 +190,30 @@ class MainActivity : AppCompatActivity() {
             val curUser = firebaseUtils.firebaseUser!!
             val userRef = get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS).document(curUser.uid)
             get<FirebaseMessaging>().token
-                .addOnCompleteListener(OnCompleteListener { tokenTask ->
-                    if (!tokenTask.isSuccessful) {
-                        return@OnCompleteListener
-                    }
-                    userRef.get().addOnCompleteListener { getUserTask ->
-                        if (getUserTask.isSuccessful) {
-                            if (!getUserTask.result!!.exists()) {
-                                sharedViewModel.displayMsg("User not available. Creating User..")
-                                val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
-                                userRef.set(user).addOnCompleteListener { setUserTask ->
-                                    if (!setUserTask.isSuccessful) Log.e(
-                                        TAG,
-                                        "Can't create firebaseUser",
-                                        setUserTask.exception
-                                    )
+                .addOnCompleteListener(
+                    OnCompleteListener { tokenTask ->
+                        if (!tokenTask.isSuccessful) {
+                            return@OnCompleteListener
+                        }
+                        userRef.get().addOnCompleteListener { getUserTask ->
+                            if (getUserTask.isSuccessful) {
+                                if (!getUserTask.result!!.exists()) {
+                                    sharedViewModel.displayMsg("User not available. Creating User..")
+                                    val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
+                                    userRef.set(user).addOnCompleteListener { setUserTask ->
+                                        if (!setUserTask.isSuccessful) Log.e(
+                                            TAG,
+                                            "Can't create firebaseUser",
+                                            setUserTask.exception
+                                        )
+                                    }
+                                } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
+                                    userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
                                 }
-                            } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
-                                userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
-                            }
-
-                        } else Log.e(TAG, "Unknown Error", getUserTask.exception)
+                            } else Log.e(TAG, "Unknown Error", getUserTask.exception)
+                        }
                     }
-                })
+                )
         } catch (e: Exception) {
             Log.e(TAG, "addUserInfoInDB: $e")
         }
