@@ -7,7 +7,6 @@ on:
       - allusive_v*
       - run_ci_build
   pull_request:
-    branches: [ main, dev ]
 
 jobs:
   build:
@@ -63,7 +62,7 @@ jobs:
           SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
 
       - name: Publish to Play Store
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/allusive_v')
+        if: startsWith(github.ref, 'refs/tags/allusive_v')
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: release/serviceAccount.json
@@ -74,7 +73,7 @@ jobs:
 
       - name: Create release for tags
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/allusive_v') || github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/allusive_v')
         with:
           draft: true
           files: |
