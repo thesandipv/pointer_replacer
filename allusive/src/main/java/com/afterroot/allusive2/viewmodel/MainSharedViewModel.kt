@@ -30,7 +30,7 @@ class MainSharedViewModel : ViewModel() {
         if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
             FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
-                .addSnapshotListener { querySnapshot, _ -> //TODO Remove Snapshot listener and replace with query.
+                .addSnapshotListener { querySnapshot, _ -> // TODO Remove Snapshot listener and replace with query.
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
                     }
@@ -40,7 +40,7 @@ class MainSharedViewModel : ViewModel() {
     }
 
     fun setTitle(title: String?) {
-        if (liveTitle.value != title) { //Don't change title if new title is equal to old.
+        if (liveTitle.value != title) { // Don't change title if new title is equal to old.
             liveTitle.value = title!!
         }
     }

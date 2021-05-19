@@ -22,6 +22,8 @@ plugins {
 //    id 'com.google.android.gms.oss-licenses-plugin'
 }
 
+apply from: "$rootDir/gradle/common-config.gradle"
+
 ext {
     major = 1
     minor = 9
@@ -30,15 +32,12 @@ ext {
     ci = System.getenv("CI") == "true"
 }
 android {
-    compileSdkVersion SDK.COMPILE
-
     buildFeatures {
         dataBinding true
     }
 
     defaultConfig {
         applicationId "com.afterroot.allusive2"
-        minSdkVersion SDK.MIN
         targetSdkVersion SDK.TARGET
         versionCode VERSION_CODE
         versionName VERSION_NAME
@@ -111,10 +110,6 @@ android {
         javaMaxHeapSize "4g"
         preDexLibraries = false
     }
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
 
     lintOptions {
         abortOnError false
@@ -130,6 +125,11 @@ android {
         exclude 'fabric/*.properties'
         exclude 'META-INF/*.properties'
     }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
 }
 
 
@@ -140,14 +140,12 @@ dependencies {
 
     implementation Libs.AfterROOT.Core.core
 
-    implementation Libs.Kotlin.stdLib
     implementation Libs.Kotlin.anko
 
     implementation Libs.AndroidX.appCompat
     implementation Libs.AndroidX.billing
     implementation Libs.AndroidX.cardView
     implementation Libs.AndroidX.constraintLayout
-    implementation Libs.AndroidX.core
     implementation Libs.AndroidX.fragment
     implementation Libs.AndroidX.Lifecycle.common
     implementation Libs.AndroidX.Lifecycle.extensions

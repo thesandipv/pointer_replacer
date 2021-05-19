@@ -21,7 +21,13 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -39,15 +45,22 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.listItems
-import com.afterroot.allusive2.*
+import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
+import com.afterroot.allusive2.GlideApp
+import com.afterroot.allusive2.R
+import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.FragmentMainBinding
 import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
+import com.afterroot.allusive2.getMinPointerSize
+import com.afterroot.allusive2.getMinPointerSizePx
+import com.afterroot.allusive2.getPointerSaveDir
+import com.afterroot.allusive2.getPointerSaveRootDir
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
@@ -91,7 +104,7 @@ class MainFragment : Fragment() {
     private val storage: FirebaseStorage by inject()
     private var targetPath: String? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
         return binding.root
@@ -123,7 +136,6 @@ class MainFragment : Fragment() {
                             when (text) {
                                 "Xposed" -> {
                                     applyPointer()
-
                                 }
                                 "Magisk" -> {
                                     requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.magiskFragment)
@@ -292,7 +304,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun showInterstitialAd() { //TODO Rewrite logic
+    private fun showInterstitialAd() { // TODO Rewrite logic
 /*
         interstitialAd.apply {
             if (isLoaded) show(requireActivity()) else {
@@ -327,10 +339,9 @@ class MainFragment : Fragment() {
         ) {
             showRebootDialog()
         }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
-
     }
 
-    private fun showRebootDialog() { //TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
+    private fun showRebootDialog() { // TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
         MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             title(res = R.string.reboot)
             message(res = R.string.text_reboot_confirm)
@@ -343,7 +354,7 @@ class MainFragment : Fragment() {
                 }
             }
             negativeButton(res = R.string.text_soft_reboot) {
-                try { //Also try "killall zygote"
+                try { // Also try "killall zygote"
                     val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                     process.waitFor()
                 } catch (e: Exception) {
@@ -372,10 +383,9 @@ class MainFragment : Fragment() {
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     super.onAdFailedToLoad(loadAdError)
-
                 }
-            })
-
+            }
+        )
     }
 
     private fun setUpAd() {
@@ -388,13 +398,12 @@ class MainFragment : Fragment() {
 
                 val adView = AdView(requireContext())
                 adView.apply {
-                    //TODO Verify ad unit ids
+                    // TODO Verify ad unit ids
                     adSize = AdSize.BANNER
                     adUnitId = bannerAdUnitId
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
-
             }
         }
     }
@@ -523,7 +532,6 @@ class MainFragment : Fragment() {
                 }
                 return true
             }
-
         })
 
         bottomSheetListBinding.listPointers.apply {
@@ -535,30 +543,33 @@ class MainFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            //Observe Db on CoroutineScope
-            myDatabase.pointerDao().getAll().observe(viewLifecycleOwner, {
-                it.forEach { pointer ->
-                    val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
-                    if (!file.exists()) {
-                        Log.d(TAG, "Missing: ${pointer.file_name}")
-                        downloadPointer(pointer)
+            // Observe Db on CoroutineScope
+            myDatabase.pointerDao().getAll().observe(
+                viewLifecycleOwner,
+                {
+                    it.forEach { pointer ->
+                        val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
+                        if (!file.exists()) {
+                            Log.d(TAG, "Missing: ${pointer.file_name}")
+                            downloadPointer(pointer)
+                        }
+                    }
+                    pointerAdapter.submitList(it)
+                    // Show install msg if no pointer installed
+                    bottomSheetListBinding.apply {
+                        infoNoPointerInstalled.visible(it.isEmpty())
+                        textDialogHint.visible(it.isNotEmpty())
+                        bsButtonInstallPointers.setOnClickListener {
+                            dialog.dismiss()
+                            requireActivity().findNavController(R.id.fragment_repo_nav)
+                                .navigate(R.id.repoFragment)
+                        }
+                        /*bs_button_import_pointers.setOnClickListener {
+                             import()
+                         }*/
                     }
                 }
-                pointerAdapter.submitList(it)
-                //Show install msg if no pointer installed
-                bottomSheetListBinding.apply {
-                    infoNoPointerInstalled.visible(it.isEmpty())
-                    textDialogHint.visible(it.isNotEmpty())
-                    bsButtonInstallPointers.setOnClickListener {
-                        dialog.dismiss()
-                        requireActivity().findNavController(R.id.fragment_repo_nav)
-                            .navigate(R.id.repoFragment)
-                    }
-                    /*bs_button_import_pointers.setOnClickListener {
-                         import()
-                     }*/
-                }
-            })
+            )
         }
     }
 
@@ -613,7 +624,6 @@ class MainFragment : Fragment() {
                 }
             }
             .setNegativeButton(android.R.string.cancel) { _, _ ->
-
             }.setCancelable(true)
     }
 

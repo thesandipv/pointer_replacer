@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,23 +46,28 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
 
     @Throws(Throwable::class)
     override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
-        XResources.setSystemWideReplacement("android", "drawable", "pointer_spot_touch", object : XResources.DrawableLoader() {
-            @Throws(Throwable::class)
-            override fun newDrawable(xResources: XResources, i: Int): Drawable? {
-                XposedBridge.log("Created Pointer Drawable")
-                XposedBridge.log(Throwable())
-                return drawable
+        XResources.setSystemWideReplacement(
+            "android", "drawable", "pointer_spot_touch",
+            object : XResources.DrawableLoader() {
+                @Throws(Throwable::class)
+                override fun newDrawable(xResources: XResources, i: Int): Drawable? {
+                    XposedBridge.log("Created Pointer Drawable")
+                    XposedBridge.log(Throwable())
+                    return drawable
+                }
             }
-        })
+        )
 
-        XResources.setSystemWideReplacement("android", "drawable", "pointer_arrow", object : XResources.DrawableLoader() {
-            @Throws(Throwable::class)
-            override fun newDrawable(res: XResources?, id: Int): Drawable? {
-                XposedBridge.log("Created Mouse Pointer Drawable")
-                XposedBridge.log(Throwable())
-                return mousePointer
+        XResources.setSystemWideReplacement(
+            "android", "drawable", "pointer_arrow",
+            object : XResources.DrawableLoader() {
+                @Throws(Throwable::class)
+                override fun newDrawable(res: XResources?, id: Int): Drawable? {
+                    XposedBridge.log("Created Mouse Pointer Drawable")
+                    XposedBridge.log(Throwable())
+                    return mousePointer
+                }
             }
-
-        })
+        )
     }
 }

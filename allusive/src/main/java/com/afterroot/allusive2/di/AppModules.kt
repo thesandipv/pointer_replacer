@@ -83,7 +83,6 @@ val firebaseModule = module {
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 val networkModule = module {
     single {
@@ -98,7 +97,6 @@ val networkModule = module {
         NetworkViewModel(get())
     }
 }
-
 
 val settingsModule = module {
     single {

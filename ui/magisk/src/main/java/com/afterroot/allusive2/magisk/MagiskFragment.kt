@@ -58,7 +58,6 @@ class MagiskFragment : Fragment() {
         progress.observe(viewLifecycleOwner) {
             when (it) {
                 is Result.Failed -> {
-
                 }
                 is Result.Running -> {
                     binding.progressBar.visible(true)
@@ -78,7 +77,7 @@ class MagiskFragment : Fragment() {
         }
 
         val selectedPointerModule =
-            File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName.toString()}_Magisk.zip"))
+            File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_Magisk.zip"))
         if (selectedPointerModule.exists()) {
             updateProgress()
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
@@ -93,7 +92,6 @@ class MagiskFragment : Fragment() {
                     createMagiskModule()
                 }
                 negativeButton(android.R.string.cancel) {
-
                 }
             }
             lifecycleScope.launch {
@@ -127,7 +125,6 @@ class MagiskFragment : Fragment() {
             delay(300)
             updateProgress(completed = true)
         }
-
     }
 
     private fun updateProgress(progressText: String = "", completed: Boolean = false) {
@@ -144,7 +141,6 @@ class MagiskFragment : Fragment() {
         }
         progress.value = Result.Running(stringBuilder.toString())
     }
-
 
     private suspend fun copyAndExtractFrameworkResApk() {
         updateProgress()
@@ -172,7 +168,6 @@ class MagiskFragment : Fragment() {
                     scaled.saveAs("${frameworkExtractPath(requireContext())}$POINTER_MDPI").apply {
                         if (this.exists()) updateProgress("- Replaced MDPI pointer_spot_touch.png")
                     }
-
                 }
                 Variant.HDPI -> {
                     val scaled = bmp.scale(VariantSizes.HDPI, VariantSizes.HDPI)
@@ -194,7 +189,7 @@ class MagiskFragment : Fragment() {
         var result: File?
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
-            val path = frameworkExtractPath(requireContext()) //+ "/assets" //TODO Remove "/assets"
+            val path = frameworkExtractPath(requireContext()) // + "/assets" //TODO Remove "/assets"
             result = zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
         }
         updateProgress("- Repack Successful")
@@ -206,7 +201,7 @@ class MagiskFragment : Fragment() {
         updateProgress("- Repacking magisk module")
         withContext(Dispatchers.IO) {
             val path = magiskEmptyModuleExtractPath(requireContext())
-            val fileName = "${settings.selectedPointerName.toString()}_Magisk.zip"
+            val fileName = "${settings.selectedPointerName}_Magisk.zip"
             result = zip(sourceFolder = File(path), exportPath = repackedMagiskModulePath(requireContext(), fileName))
         }
         updateProgress("- Repack Successful")

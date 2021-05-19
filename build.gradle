@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020 Sandip Vaghela
+ * Copyright (C) 2016-2021 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    apply from: rootProject.file('deps.gradle')
+    apply from: rootProject.file('gradle/deps.gradle')
 
     repositories {
         google()
@@ -29,7 +29,7 @@ buildscript {
         classpath Libs.Kotlin.gradlePlugin
         classpath Libs.Google.servicesPlugin
         classpath Libs.Firebase.crashlyticsPlugin
-        //classpath Libs.Google.ossLicPlugin
+        classpath Libs.Google.ossLicPlugin
         classpath Libs.AndroidX.Navigation.safeArgsPlugin
     }
 }
@@ -40,7 +40,7 @@ plugins {
 }
 
 allprojects {
-    apply from: rootProject.file('deps.gradle')
+    apply from: rootProject.file('gradle/deps.gradle')
 
     def publishPropertiesFile = rootProject.file("publish.properties")
     def properties = new Properties()
@@ -73,13 +73,6 @@ subprojects {
             freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
             freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
             freeCompilerArgs += "-Xopt-in=kotlin.Experimental"
-/*
-            freeCompilerArgs += [
-                    "-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-            ]
-*/
-
-            // freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
 
             // Set JVM target to 1.8
             jvmTarget = "1.8"
