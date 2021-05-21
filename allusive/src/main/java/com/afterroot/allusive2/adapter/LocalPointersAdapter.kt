@@ -28,10 +28,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
-import com.afterroot.allusive2.databinding.ItemPointerRepoBinding
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.RoomPointer
+import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
 import com.afterroot.core.extensions.getDrawableExt
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory

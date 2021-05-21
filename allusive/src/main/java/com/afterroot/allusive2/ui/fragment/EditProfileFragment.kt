@@ -34,11 +34,12 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditProfileFragment : Fragment() {
     private lateinit var binding: FragmentEditProfileBinding
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private val sharedViewModel: MainSharedViewModel by activityViewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false)

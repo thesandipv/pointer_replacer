@@ -72,6 +72,7 @@ import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
 
@@ -85,9 +86,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private lateinit var fabApply: ExtendedFloatingActionButton
     private val firestore: FirebaseFirestore by inject()
     private val myDatabase: MyDatabase by inject()
-    private val networkViewModel: NetworkViewModel by activityViewModels()
+    private val networkViewModel: NetworkViewModel by viewModel()
     private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by activityViewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModel()
     private val storage: FirebaseStorage by inject()
     private var filteredList: List<Pointer>? = null
     private val firebaseUtils: FirebaseUtils by inject()

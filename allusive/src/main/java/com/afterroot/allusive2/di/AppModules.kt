@@ -24,6 +24,7 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.roomModule
 import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.whenBuildIs
+import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.network.NetworkStateMonitor
 import com.google.firebase.auth.ktx.auth
@@ -48,6 +49,10 @@ val appModule = module {
 
     single(qualifier("version_name")) {
         BuildConfig.VERSION_NAME
+    }
+
+    viewModel {
+        MainSharedViewModel()
     }
 }
 
