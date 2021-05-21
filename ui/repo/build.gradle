@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
@@ -20,13 +21,23 @@ plugins {
 
 apply from: "$rootDir/gradle/common-config.gradle"
 
+android {
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+}
+
 dependencies {
+    implementation project(":base")
+    implementation project(":data")
     implementation project(":ui:resources")
 
     implementation Libs.AfterROOT.Core.core
 
     implementation platform(Libs.Firebase.bom)
     implementation Libs.Firebase.firestore
+    implementation Libs.Firebase.storage
 
     implementation Libs.AndroidX.paging
 
@@ -34,9 +45,7 @@ dependencies {
     implementation Libs.Kotlin.Coroutines.android
     implementation Libs.Kotlin.Coroutines.playServices
 
-    implementation Libs.AndroidX.preference
+    implementation Libs.Koin3.android
 
-    api Libs.AndroidX.Room.room
-    api Libs.AndroidX.Room.runtime
-    kapt Libs.AndroidX.Room.compiler
+
 }

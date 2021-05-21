@@ -19,7 +19,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
@@ -67,7 +66,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fabApply: ExtendedFloatingActionButton
     private val networkViewModel: NetworkViewModel by viewModel()
     private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModel()
     private val firebaseUtils: FirebaseUtils by inject()
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
