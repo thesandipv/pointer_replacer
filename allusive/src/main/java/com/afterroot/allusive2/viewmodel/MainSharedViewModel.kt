@@ -18,10 +18,17 @@ package com.afterroot.allusive2.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import com.afterroot.allusive2.data.FirestorePagingSource
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
-class MainSharedViewModel : ViewModel() {
+class MainSharedViewModel : ViewModel(), KoinComponent {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
@@ -38,6 +45,10 @@ class MainSharedViewModel : ViewModel() {
         }
         return pointerSnapshot
     }
+
+    val pointers = Pager(PagingConfig(20)) {
+        FirestorePagingSource(get())
+    }.flow.cachedIn(viewModelScope)
 
     fun setTitle(title: String?) {
         if (liveTitle.value != title) { // Don't change title if new title is equal to old.

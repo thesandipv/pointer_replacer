@@ -27,7 +27,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
@@ -59,6 +58,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
 import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -72,7 +72,7 @@ class NewPointerPost : Fragment() {
     private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
     private val pointerName: String get() = binding.editName.text.toString().trim()
     private val remoteConfig: FirebaseRemoteConfig by inject()
-    private val sharedViewModel: MainSharedViewModel by activityViewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModel()
     private val storage: FirebaseStorage by inject()
     private var adLoaded: Boolean = false
     private var clickedUpload: Boolean = false

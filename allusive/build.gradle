@@ -95,17 +95,6 @@ android {
         }
     }
 
-    packagingOptions {
-        // Exclude AndroidX version files
-        exclude 'META-INF/*.version'
-        // Exclude consumer proguard files
-        exclude 'META-INF/proguard/*'
-        // Exclude the Firebase/Fabric/other random properties files
-        exclude '/*.properties'
-        exclude 'fabric/*.properties'
-        exclude 'META-INF/*.properties'
-    }
-
     dexOptions {
         javaMaxHeapSize "4g"
         preDexLibraries = false
@@ -124,6 +113,7 @@ android {
         exclude '/*.properties'
         exclude 'fabric/*.properties'
         exclude 'META-INF/*.properties'
+        exclude "DebugProbesKt.bin" //Exclude coroutines debug file
     }
 
     sourceSets {
@@ -134,8 +124,10 @@ android {
 
 
 dependencies {
+    implementation project(":base")
     implementation project(":data")
     implementation project(":ui:magisk")
+    implementation project(":ui:repo")
     implementation project(":ui:resources")
 
     implementation Libs.AfterROOT.Core.core
@@ -183,7 +175,7 @@ dependencies {
 
     implementation Libs.Google.ossLic
     implementation Libs.Google.material
-    implementation Libs.Firebase.ads
+    implementation Libs.Google.ads
     implementation Libs.Firebase.analytics
     implementation Libs.Firebase.auth
     implementation Libs.Firebase.config
@@ -209,7 +201,7 @@ dependencies {
 
     implementation Libs.Kotlin.Coroutines.core
     implementation Libs.Kotlin.Coroutines.android
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
 
     testImplementation Libs.Test.junit
     androidTestImplementation Libs.Test.junitExt
