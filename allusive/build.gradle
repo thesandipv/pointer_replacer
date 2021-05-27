@@ -175,7 +175,7 @@ dependencies {
 
     implementation Libs.Google.ossLic
     implementation Libs.Google.material
-    implementation Libs.Firebase.ads
+    implementation Libs.Google.ads
     implementation Libs.Firebase.analytics
     implementation Libs.Firebase.auth
     implementation Libs.Firebase.config
