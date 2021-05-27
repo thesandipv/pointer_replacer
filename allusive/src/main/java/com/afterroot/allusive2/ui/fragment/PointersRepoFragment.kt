@@ -23,9 +23,10 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.LayoutMode
@@ -49,6 +50,7 @@ import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
+import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
@@ -66,6 +68,8 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.doFromSdk
@@ -80,6 +84,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     private lateinit var binding: FragmentPointerRepoBinding
     private lateinit var pointersAdapter: PointersAdapter
+    private lateinit var pointersPagingAdapter: PointerPagingAdapter
     private lateinit var pointersList: List<Pointer>
     private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var targetPath: String
@@ -156,45 +161,70 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     // Function for using new list adapter.
     private fun setUpAdapter() {
         pointersAdapter = PointersAdapter(this)
+        pointersPagingAdapter = PointerPagingAdapter(this)
         binding.list.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            adapter = pointersAdapter
+            adapter = pointersPagingAdapter
             setHasFixedSize(true)
             doFromSdk(Build.VERSION_CODES.LOLLIPOP) { FastScrollerBuilder(this).build() }
         }
         setUpFilter()
     }
 
-    private fun displayPointers(pointers: List<Pointer>) {
-        pointersList = pointers
-        pointersAdapter.submitList(pointers)
+    private fun displayPointers(pointers: List<Pointer> = emptyList(), pagedData: PagingData<Pointer>? = null) {
+        if (pagedData == null) {
+            pointersList = pointers
+            pointersAdapter.submitList(pointers)
+        } else {
+            lifecycleScope.launch {
+                pointersPagingAdapter.submitData(pagedData)
+                pointersPagingAdapter
+            }
+        }
     }
 
     private fun loadPointers(orderBy: String = settings.orderBy!!) {
-        sharedViewModel.getPointerSnapshot().observe(
-            viewLifecycleOwner,
-            { state ->
-                when (state) {
-                    is ViewModelState.Loading -> {
-                        binding.repoSwipeRefresh.isRefreshing = true
-                    }
-                    is ViewModelState.Loaded<*> -> {
-                        binding.repoSwipeRefresh.isRefreshing = false
-                        pointersSnapshot = state.data as QuerySnapshot
-                        val result: List<Pointer> = pointersSnapshot.toObjects()
-                        val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
-                        pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
-                            result.sortedByDescending { it.time }
-                        } else {
-                            result.sortedByDescending { it.downloads }
-                        }
-                        displayPointers(pointersList)
-                    }
+        val enablePaged = true
+        if (enablePaged) {
+            lifecycleScope.launch {
+                sharedViewModel.pointers.collect {
+//                    pointersPagingAdapter.submitData(it)
+                    displayPointers(pagedData = it)
                 }
             }
-        )
+
+            lifecycleScope.launch {
+                pointersPagingAdapter.loadStateFlow.collectLatest {
+                    binding.repoSwipeRefresh.isRefreshing = it.refresh is LoadState.Loading || it.append is LoadState.Loading
+                }
+            }
+        } else {
+            sharedViewModel.getPointerSnapshot().observe(
+                viewLifecycleOwner,
+                { state ->
+                    when (state) {
+                        is ViewModelState.Loading -> {
+                            binding.repoSwipeRefresh.isRefreshing = true
+                        }
+                        is ViewModelState.Loaded<*> -> {
+                            binding.repoSwipeRefresh.isRefreshing = false
+                            pointersSnapshot = state.data as QuerySnapshot
+                            val result: List<Pointer> = pointersSnapshot.toObjects()
+                            val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
+                            pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
+                                result.sortedByDescending { it.time }
+                            } else {
+                                result.sortedByDescending { it.downloads }
+                            }
+                            displayPointers(pointersList)
+                        }
+                    }
+                }
+            )
+
+        }
     }
 
     private fun setUpFilter() {
