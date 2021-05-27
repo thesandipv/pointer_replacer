@@ -17,7 +17,10 @@ package com.afterroot.allusive2.magisk
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +35,6 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.visible
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -69,6 +71,9 @@ class MagiskFragment : Fragment() {
             }
         }
 
+        //Fake Update one time
+        updateProgress()
+
         binding.openMagisk.setOnClickListener {
             val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
             if (intent != null) {
@@ -76,10 +81,15 @@ class MagiskFragment : Fragment() {
             } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            updateProgress("- Android 11 and Up Not Supported")
+            updateProgress(completed = true)
+            return
+        }
+
         val selectedPointerModule =
             File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_Magisk.zip"))
         if (selectedPointerModule.exists()) {
-            updateProgress()
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialDialog(requireContext()).show {
                 title(text = "Magisk module exist")
@@ -94,10 +104,7 @@ class MagiskFragment : Fragment() {
                 negativeButton(android.R.string.cancel) {
                 }
             }
-            lifecycleScope.launch {
-                delay(300)
-                updateProgress(completed = true)
-            }
+            updateProgress(completed = true)
             return
         }
         createMagiskModule()
@@ -109,7 +116,6 @@ class MagiskFragment : Fragment() {
             if (!extracted.exists()) {
                 copyAndExtractFrameworkResApk()
             } else {
-                updateProgress()
                 updateProgress("- Using already extracted framework-res.apk")
             }
 
@@ -122,7 +128,6 @@ class MagiskFragment : Fragment() {
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
             }
-            delay(300)
             updateProgress(completed = true)
         }
     }
@@ -136,14 +141,17 @@ class MagiskFragment : Fragment() {
         }
 
         if (completed) {
-            progress.value = Result.Success
+            //Wait before sending result
+            Handler(Looper.getMainLooper()).postDelayed({
+                progress.value = Result.Success
+            }, 300)
+
             return
         }
         progress.value = Result.Running(stringBuilder.toString())
     }
 
     private suspend fun copyAndExtractFrameworkResApk() {
-        updateProgress()
         updateProgress("- Copying framework-res.apk from /system/framework")
         withContext(Dispatchers.IO) {
             val frameworkResApk = copyFrameworkRes(requireContext())
