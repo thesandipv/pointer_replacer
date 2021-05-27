@@ -23,29 +23,30 @@ def version = [
 ]
 
 def versions = [
+        ads                : "20.1.0",
         accompanist        : "0.6.1",
         ankoCommons        : "0.10.8",
         appcompat          : "1.3.0",
-        billing            : "3.0.3",
+        billing            : "4.0.0",
         browser            : "1.0.0",
         cardView           : "1.0.0",
         collection         : "1.1.0",
         commonsIo          : "1.3.2",
         compose            : "1.0.0-beta04",
         constraintLayout   : "2.0.4",
-        coreKtx            : "1.5.0-beta02",
+        coreKtx            : "1.5.0",
         core               : "0.3.1",
         crshlyticsPlugin   : "2.5.2",
         dagger             : "2.31.2",
         emoji              : "1.1.0",
         epoxy              : "4.4.1",
-        firebaseBom        : "27.0.0",
+        firebaseBom        : "28.0.1",
         firebaseUiAuth     : "7.1.1",
         firebaseUiFirestore: "7.1.1",
         firebaseUiStorage  : "7.1.1",
-        fragmentKtx        : "1.3.2",
+        fragmentKtx        : "1.3.4",
         glide              : "4.12.0",
-        googleMaterial     : "1.3.0",
+        googleMaterial     : "1.4.0-beta01",
         gson               : "2.8.6",
         hilt               : "2.33-beta",
         jackson            : '2.12.2',
@@ -59,14 +60,14 @@ def versions = [
         lifecycle          : "2.3.1",
         materialDialogs    : "3.3.0",
         multidex           : "2.0.1",
-        navigation         : "2.3.4",
+        navigation         : "2.3.5",
         okHttp             : '4.9.0',
         paging             : "3.0.0",
         palette            : "1.0.0",
         preference         : "1.1.1",
         recyclerview       : "1.2.0",
         retrofit           : '2.9.0',
-        roomKtx            : "2.3.0-rc01",
+        roomKtx            : "2.3.0",
         startUp            : "1.0.0",
         transition         : "1.3.1",
         vectorDrawable     : "1.1.0"
@@ -223,10 +224,11 @@ libs.Firebase = [
 
 libs.Google = [
         ossLic        : "com.google.android.gms:play-services-oss-licenses:17.0.0",
-        ossLicPlugin  : "com.google.android.gms:oss-licenses-plugin:0.10.2",
+        ossLicPlugin  : "com.google.android.gms:oss-licenses-plugin:0.10.4",
         material      : "com.google.android.material:material:${versions.googleMaterial}",
         gson          : "com.google.code.gson:gson:${versions.gson}",
-        servicesPlugin: "com.google.gms:google-services:4.3.5"
+        servicesPlugin: "com.google.gms:google-services:4.3.8",
+        ads           : "com.google.android.gms:play-services-ads:$versions.ads"
 ]
 
 libs.Dagger = [
