@@ -209,7 +209,7 @@ dependencies {
 
     implementation Libs.Kotlin.Coroutines.core
     implementation Libs.Kotlin.Coroutines.android
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
 
     testImplementation Libs.Test.junit
     androidTestImplementation Libs.Test.junitExt
