@@ -45,13 +45,13 @@
         <item name="md_color_button_text">@color/color_primary</item>
         <item name="md_font_title">@font/ubuntu</item>
 
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Material3.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
     </style>
 
-    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor" tools:targetApi="lollipop">?colorPrimaryVariant</item>
         <!-- <item name="android:navigationBarColor">?android:colorBackground</item>
          <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>-->

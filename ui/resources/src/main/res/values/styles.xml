@@ -16,7 +16,7 @@
 <resources>
 
     <!--Toolbar-->
-    <style name="Widget.MyTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+    <style name="Widget.MyTheme.Toolbar" parent="Widget.Material3.Toolbar.Surface">
         <item name="actionMenuTextColor">@color/color_on_primary</item>
     </style>
 
@@ -25,14 +25,14 @@
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
     </style>
 
-    <style name="MyStyle.FilterChip" parent="Widget.MaterialComponents.Chip.Choice" />
+    <style name="MyStyle.FilterChip" parent="Widget.Material3.Chip.Filter" />
 
-    <style name="MyStyle.ShapeAppearance.SmallComponents" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+    <style name="MyStyle.ShapeAppearance.SmallComponents" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="MyStyle.ShapeAppearance.MediumComponents" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+    <style name="MyStyle.ShapeAppearance.MediumComponents" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
     </style>
