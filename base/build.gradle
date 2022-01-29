@@ -20,14 +20,15 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/common-config.gradle"
+apply from: "$rootDir/gradle/common-config-library.gradle"
+apply from: "$rootDir/gradle/oss-licence.gradle"
 
 dependencies {
-    api Libs.Glide.glide
-    kapt Libs.Glide.compiler
+    api libs.glide.glide
+    kapt libs.glide.compiler
 
-    implementation platform(Libs.Firebase.bom)
-    implementation Libs.Firebase.firestore
+    implementation libs.firebase.firestore
 
-    implementation Libs.FirebaseUI.firestore
-    implementation Libs.FirebaseUI.storage
+    implementation libs.firebase.ui.firestore
+    implementation libs.firebase.ui.storage
 }

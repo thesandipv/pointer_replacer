@@ -137,7 +137,7 @@ class NewPointerPost : Fragment() {
                                             }
 */
                                         }
-                                        negativeButton(R.string.fui_cancel)
+                                        negativeButton(android.R.string.cancel)
                                     }
                                 }
                             }

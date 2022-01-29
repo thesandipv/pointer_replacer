@@ -12,6 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+    id "com.gradle.enterprise" version "3.8"
+}
+
+gradleEnterprise {
+    buildScan {
+        // Accept the license agreement for com.gradle.build-scan plugin
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+        publishOnFailure()
+    }
+}
+
+enableFeaturePreview("VERSION_CATALOGS")
 
 include ':allusive'
 include ':base'

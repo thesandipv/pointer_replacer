@@ -19,7 +19,10 @@ plugins {
     id 'kotlin-kapt'
 }
 
+apply from: "$rootDir/gradle/apply-core.gradle"
 apply from: "$rootDir/gradle/common-config.gradle"
+apply from: "$rootDir/gradle/common-config-library.gradle"
+apply from: "$rootDir/gradle/oss-licence.gradle"
 
 android {
     buildFeatures {
@@ -33,19 +36,15 @@ dependencies {
     implementation project(":data")
     implementation project(":ui:resources")
 
-    implementation Libs.AfterROOT.Core.core
+    implementation libs.bundles.firebase
 
-    implementation platform(Libs.Firebase.bom)
-    implementation Libs.Firebase.firestore
-    implementation Libs.Firebase.storage
+    implementation libs.androidx.paging
 
-    implementation Libs.AndroidX.paging
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
+    implementation libs.kotlin.coroutines.play
 
-    implementation Libs.Kotlin.Coroutines.core
-    implementation Libs.Kotlin.Coroutines.android
-    implementation Libs.Kotlin.Coroutines.playServices
-
-    implementation Libs.Koin3.android
+    implementation libs.koin.android
 
 
 }

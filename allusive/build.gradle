@@ -19,25 +19,35 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
-//    id 'com.google.android.gms.oss-licenses-plugin'
+    id 'com.google.android.gms.oss-licenses-plugin'
 }
 
-apply from: "$rootDir/gradle/common-config.gradle"
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+}
+
+apply from: "$rootDir/gradle/oss-licence.gradle"
+apply from: "$rootDir/gradle/apply-core.gradle"
 
 ext {
-    major = 1
-    minor = 9
-    patch = 3
-    minimumSdkVersion = 16
+//    major = 1
+//    minor = 9
+//    patch = 3
+//    minimumSdkVersion = 16
     ci = System.getenv("CI") == "true"
 }
 android {
+    compileSdkVersion SDK.COMPILE
+
     buildFeatures {
+        viewBinding true
         dataBinding true
     }
 
     defaultConfig {
         applicationId "com.afterroot.allusive2"
+        minSdkVersion SDK.MIN
         targetSdkVersion SDK.TARGET
         versionCode VERSION_CODE
         versionName VERSION_NAME
@@ -55,7 +65,14 @@ android {
             }
         }
 
-        def commit = "git rev-list --max-count=1 HEAD".execute([], project.rootDir).text.substring(0, 7)
+        manifestPlaceholders = [
+                hostName  : "afterroot.web.app",
+                pathPrefix: "/apps/pointer-replacer/launch"
+        ]
+
+        resConfigs "en"
+
+        def commit = System.getenv("COMMIT_ID") ?: "git rev-list --max-count=1 HEAD".execute([], project.rootDir).text.substring(0, 7)
         buildConfigField "String", "COMMIT_ID", "\"$commit\""
     }
 
@@ -120,6 +137,15 @@ android {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 
@@ -130,85 +156,69 @@ dependencies {
     implementation project(":ui:repo")
     implementation project(":ui:resources")
 
-    implementation Libs.AfterROOT.Core.core
+    implementation libs.kotlin.stdLib
 
-    implementation Libs.Kotlin.anko
+    implementation libs.androidx.appCompat
+    implementation libs.androidx.billing
+    implementation libs.androidx.cardView
+    implementation libs.androidx.constraintLayout
+    implementation libs.androidx.fragment
+    implementation libs.bundles.lifecycle
+    implementation libs.androidx.multiDex
+    implementation libs.androidx.navigation.fragment
+    implementation libs.androidx.navigation.ui
+    implementation libs.androidx.paging
+    implementation libs.androidx.palette
+    implementation libs.androidx.preference
+    implementation libs.androidx.recyclerView
+    implementation libs.androidx.supportV13
+    implementation libs.androidx.supportV4
+    implementation libs.androidx.vectorDrawable
 
-    implementation Libs.AndroidX.appCompat
-    implementation Libs.AndroidX.billing
-    implementation Libs.AndroidX.cardView
-    implementation Libs.AndroidX.constraintLayout
-    implementation Libs.AndroidX.fragment
-    implementation Libs.AndroidX.Lifecycle.common
-    implementation Libs.AndroidX.Lifecycle.extensions
-    implementation Libs.AndroidX.Lifecycle.livedata
-    implementation Libs.AndroidX.Lifecycle.viewmodel
-    implementation Libs.AndroidX.multiDex
-    implementation Libs.AndroidX.Navigation.fragment
-    implementation Libs.AndroidX.Navigation.ui
-    implementation Libs.AndroidX.paging
-    implementation Libs.AndroidX.palette
-    implementation Libs.AndroidX.preference
-    implementation Libs.AndroidX.recyclerView
-    implementation Libs.AndroidX.supportV13
-    implementation Libs.AndroidX.supportV4
-    implementation Libs.AndroidX.vectorDrawable
+    implementation libs.androidx.room.room
+    implementation libs.androidx.room.runtime
+    kapt libs.androidx.room.compiler
+    androidTestImplementation libs.androidx.room.test
 
-    implementation Libs.AndroidX.Room.room
-    implementation Libs.AndroidX.Room.runtime
-    kapt Libs.AndroidX.Room.compiler
-    androidTestImplementation Libs.AndroidX.Room.testing
+    implementation libs.materialdialogs.input
+    implementation libs.materialdialogs.core
+    implementation libs.materialdialogs.bottomSheets
+    implementation libs.materialdialogs.color
 
-    implementation Libs.MaterialDialogs.input
-    implementation Libs.MaterialDialogs.core
-    implementation Libs.MaterialDialogs.bottomSheets
-    implementation Libs.MaterialDialogs.color
+    implementation libs.firebase.ui.auth
+    implementation libs.firebase.ui.firestore
+    implementation libs.firebase.ui.storage
 
-    implementation Libs.FirebaseUI.auth
-    implementation Libs.FirebaseUI.firestore
-    implementation Libs.FirebaseUI.storage
+    kapt libs.glide.compiler
 
-    implementation Libs.Glide.glide
-    kapt Libs.Glide.compiler
+    implementation libs.google.ossLic
+    implementation libs.google.material
+    implementation libs.google.ads
+    implementation libs.bundles.firebase
 
-    implementation platform(Libs.Firebase.bom)
+    implementation 'com.google.android.play:core:1.10.3'
+    implementation libs.google.gson
 
-    implementation Libs.Google.ossLic
-    implementation Libs.Google.material
-    implementation Libs.Google.ads
-    implementation Libs.Firebase.analytics
-    implementation Libs.Firebase.auth
-    implementation Libs.Firebase.config
-    implementation Libs.Firebase.core
-    implementation Libs.Firebase.crashlytics
-    implementation Libs.Firebase.database
-    implementation Libs.Firebase.firestore
-    implementation Libs.Firebase.messaging
-    implementation Libs.Firebase.storage
-
-    implementation 'com.google.android.play:core:1.10.0'
-    implementation Libs.Google.gson
-
-    implementation Libs.commonsIo
+    implementation libs.commonsIo
     compileOnly "de.robv.android.xposed:api:82"
 
-    implementation Libs.Koin3.android
-    implementation Libs.Koin3.ext
-    testImplementation Libs.Koin3.test
+    implementation libs.koin.android
+    implementation libs.koin.ext
+    testImplementation libs.koin.test
 
     implementation 'com.airbnb.android:epoxy:4.6.1'
     kapt 'com.airbnb.android:epoxy-processor:4.6.1'
 
-    implementation Libs.Kotlin.Coroutines.core
-    implementation Libs.Kotlin.Coroutines.android
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
+    testImplementation libs.kotlin.coroutines.test
 
-    testImplementation Libs.Test.junit
-    androidTestImplementation Libs.Test.junitExt
-    androidTestImplementation Libs.Test.espresso
+    testImplementation libs.test.junit
+    androidTestImplementation libs.androidx.test.junitExt
+    androidTestImplementation libs.androidx.test.espresso
 
-    testImplementation 'androidx.test:core:1.3.0'
+    testImplementation libs.androidx.test.core
 
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.3'
     implementation 'me.zhanghai.android.fastscroll:library:1.1.5'
 }

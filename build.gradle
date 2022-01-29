@@ -13,13 +13,26 @@
  * limitations under the License.
  */
 
-import com.afterroot.allusive2.buildSrc.DependencyUpdates
-import com.afterroot.allusive2.buildSrc.ReleaseType
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    apply from: rootProject.file('gradle/deps.gradle')
+    def version = [
+            MAJOR: 1,
+            MINOR: 10,
+            PATCH: 0,
+    ]
+
+    ext.SDK = [
+            MIN    : 19,
+            COMPILE: 31,
+            TARGET : 31
+    ]
+
+    ext.VERSION_CODE = SDK.MIN * 10000000 + version.MAJOR * 10000 + version.MINOR * 100 + version.PATCH
+    ext.VERSION_NAME = "${version.MAJOR}.${version.MINOR}.${version.PATCH}"
+
+//    apply from: rootProject.file('gradle/deps.gradle')
+//    apply from: rootProject.file('gradle/test.gradle.kts')
 
     repositories {
         google()
@@ -27,23 +40,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath Libs.AGP
-        classpath Libs.Kotlin.gradlePlugin
-        classpath Libs.Google.servicesPlugin
-        classpath Libs.Firebase.crashlyticsPlugin
-        classpath Libs.Google.ossLicPlugin
-        classpath Libs.AndroidX.Navigation.safeArgsPlugin
+        classpath libs.agp
+        classpath libs.kotlin.pluginGradle
+        classpath libs.google.pluginGservices
+        classpath libs.firebase.pluginCrashlytics
+        classpath libs.google.pluginOssLic
+        classpath libs.androidx.navigation.pluginSafeArgs
+//        classpath libs.hilt.pluginGradle
     }
 }
 
 plugins {
-    id 'com.diffplug.spotless' version '5.12.5'
-    id 'com.github.ben-manes.versions' version '0.39.0'
+    alias(libs.plugins.spotless)
+//    alias(libs.plugins.depUpdates)
 }
 
 allprojects {
-    apply from: rootProject.file('gradle/deps.gradle')
-
     def publishPropertiesFile = rootProject.file("publish.properties")
     def properties = new Properties()
     if (publishPropertiesFile.exists()) {
@@ -56,7 +68,7 @@ allprojects {
         mavenCentral()
         maven {
             name = "github-afterroot-core"
-            url = uri(Libs.AfterROOT.Core.mavenUrl)
+            url = uri("https://maven.pkg.github.com/afterroot/core")
             credentials {
                 username = properties.getProperty("gpr.user") ?: System.getenv("GHUSERNAME")
                 password = properties.getProperty("gpr.key") ?: System.getenv("GHTOKEN")
@@ -83,13 +95,20 @@ subprojects {
 
     apply plugin: 'com.diffplug.spotless'
     spotless {
+        format 'misc', {
+            // define the files to apply `misc` to
+            target '*.gradle', '*.md', '.gitignore'
+            indentWithSpaces()
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
         kotlin {
             target '**/*.kt'
             targetExclude("$buildDir/**/*.kt")
             targetExclude('bin/**/*.kt')
 
-            ktlint(Versions.ktlint)
-            //licenseHeaderFile rootProject.file('copyright.kt')
+            ktlint(libs.versions.ktlint.get())
         }
     }
 }
@@ -98,18 +117,27 @@ subprojects {
  * Update dependencyUpdates task to reject versions which are more 'unstable' than our
  * current version.
  */
-tasks.named("dependencyUpdates").configure {
-    rejectVersionIf {
-        def current = DependencyUpdates.versionToRelease(it.currentVersion)
-        // If we're using a SNAPSHOT, ignore since we must be doing so for a reason.
-        if (current == ReleaseType.SNAPSHOT) return true
+try {
+    tasks.named("dependencyUpdates").configure {
+        rejectVersionIf {
+            def current = DependencyUpdates.versionToRelease(it.currentVersion)
+            // If we're using a SNAPSHOT, ignore since we must be doing so for a reason.
+            if (current == ReleaseType.SNAPSHOT) return true
 
-        // Otherwise we reject if the candidate is more 'unstable' than our version
-        def candidate = DependencyUpdates.versionToRelease(it.candidate.version)
-        return candidate.isLessStableThan(current)
+            // Otherwise we reject if the candidate is more 'unstable' than our version
+            def candidate = DependencyUpdates.versionToRelease(it.candidate.version)
+            return candidate.isLessStableThan(current)
+        }
     }
+} catch (ignored) {
+
 }
 
 task clean2(type: Delete) {
     delete rootProject.buildDir
+}
+
+tasks.withType(Test) {
+    environment 'Test', true
+//    testLogging.showStandardStreams = Boolean.parseBoolean(findProperty('showStandardStreams'))
 }

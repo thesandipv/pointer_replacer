@@ -19,8 +19,11 @@ plugins {
     id 'kotlin-kapt'
 }
 
+apply from: "$rootDir/gradle/apply-core.gradle"
 apply from: "$rootDir/gradle/common-config.gradle"
+apply from: "$rootDir/gradle/common-config-library.gradle"
 apply from: "$rootDir/gradle/create-zip.gradle"
+apply from: "$rootDir/gradle/oss-licence.gradle"
 
 android {
     buildFeatures {
@@ -32,16 +35,14 @@ dependencies {
     implementation project(":data")
     implementation project(":ui:resources")
 
-    implementation Libs.AfterROOT.Core.core
+    implementation libs.materialdialogs.core
 
-    implementation Libs.MaterialDialogs.core
+    implementation libs.androidx.constraintLayout
+    implementation libs.androidx.lifecycle.runtime
+    implementation libs.androidx.lifecycle.livedata
+    implementation libs.androidx.lifecycle.extensions
 
-    implementation Libs.AndroidX.constraintLayout
-    implementation Libs.AndroidX.Lifecycle.runtime
-    implementation Libs.AndroidX.Lifecycle.livedata
-    implementation Libs.AndroidX.Lifecycle.extensions
-
-    implementation Libs.Koin3.android
-    implementation Libs.Koin3.ext
+    implementation libs.koin.android
+    implementation libs.koin.ext
 }
 
