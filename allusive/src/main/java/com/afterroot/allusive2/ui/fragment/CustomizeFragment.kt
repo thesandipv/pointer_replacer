@@ -16,6 +16,7 @@
 package com.afterroot.allusive2.ui.fragment
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -119,6 +121,7 @@ class CustomizeFragment : Fragment() {
         setClickListeners()
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onStart() {
         super.onStart()
 
@@ -271,7 +274,7 @@ class CustomizeFragment : Fragment() {
 
                 MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                     title(R.string.choose_color)
-                    colorChooser(
+                    @Suppress("UNUSED_VARIABLE") var dialog = colorChooser(
                         ColorPalette.Primary,
                         ColorPalette.PrimarySub,
                         allowCustomArgb = true,
