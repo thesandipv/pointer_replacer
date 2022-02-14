@@ -68,7 +68,7 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 depUpdates = { id = "com.github.ben-manes.versions", version.ref = "depUpdates" }
 
 [libraries]
-agp = "com.android.tools.build:gradle:7.1.0"
+agp = "com.android.tools.build:gradle:7.1.1"
 
 commonsCodec = "commons-codec:commons-codec:1.15"
 commonsIo = { module = "org.apache.commons:commons-io", version.ref = "commonsIo" }

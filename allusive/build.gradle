@@ -112,11 +112,6 @@ android {
         }
     }
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-    }
-
     lintOptions {
         abortOnError false
     }
