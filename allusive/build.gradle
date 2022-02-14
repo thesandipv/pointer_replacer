@@ -201,7 +201,7 @@ dependencies {
     implementation libs.koin.ext
     testImplementation libs.koin.test
 
-    implementation 'com.airbnb.android:epoxy:4.6.1'
+    implementation 'com.airbnb.android:epoxy:4.6.4'
     kapt 'com.airbnb.android:epoxy-processor:4.6.1'
 
     implementation libs.kotlin.coroutines.core
