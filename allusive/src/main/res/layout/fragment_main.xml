@@ -56,18 +56,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/current_pointer"
+                        <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="8dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:src="@drawable/pointer" />
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/current_pointer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:src="@drawable/pointer" />
+                        </FrameLayout>
 
                         <TextView
                             android:id="@+id/text_no_pointer_applied"
@@ -75,7 +79,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="8dp"
-                            android:layout_marginRight="8dp"
                             android:layout_marginBottom="8dp"
                             android:gravity="end"
                             android:text="@string/no_pointer_applied"
@@ -90,7 +93,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:text="@string/text_cur_pointer"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -110,8 +112,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:layout_marginTop="8dp"
+                            android:animateLayoutChanges="true"
                             android:text="@string/text_action_customize"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -122,7 +124,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:layout_marginTop="8dp"
                             android:text="@string/text_will_change_to"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -142,7 +143,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="8dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -188,18 +188,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/current_mouse"
+                        <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="8dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:src="@drawable/pointer" />
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/current_mouse"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:src="@drawable/pointer" />
+                        </FrameLayout>
 
                         <TextView
                             android:id="@+id/text_no_mouse_applied"
@@ -207,7 +211,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="8dp"
-                            android:layout_marginRight="8dp"
                             android:layout_marginBottom="8dp"
                             android:gravity="end"
                             android:text="@string/no_pointer_applied"
@@ -222,7 +225,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
                             android:text="@string/text_cur_mouse"
@@ -243,7 +245,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:layout_marginTop="8dp"
                             android:text="@string/mouse_pointer"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -263,7 +264,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="8dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -284,8 +284,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
                             android:layout_marginTop="8dp"
+                            android:animateLayoutChanges="true"
                             android:text="@string/text_action_customize"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"

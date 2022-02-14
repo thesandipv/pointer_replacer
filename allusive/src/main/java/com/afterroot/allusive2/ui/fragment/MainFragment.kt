@@ -32,6 +32,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -197,6 +198,10 @@ class MainFragment : Fragment() {
     private fun loadCurrentPointers() {
         val pointerPath = settings.pointerPath
         val mousePath = settings.mousePath
+        val appliedPointerSize = settings.appliedPointerSize
+        val appliedPointerPadding = settings.appliedPointerPadding
+        val appliedMouseSize = settings.appliedMouseSize
+        val appliedMousePadding = settings.appliedMousePadding
         val selectedPointerPath = settings.selectedPointerPath
         val selectedMousePath = settings.selectedMousePath
         var size = settings.pointerSize
@@ -216,8 +221,10 @@ class MainFragment : Fragment() {
             if (pointerPath != null) {
                 binding.currentPointer.apply {
                     setImageDrawable(Drawable.createFromPath(pointerPath))
-                    minimumHeight = requireContext().getMinPointerSizePx()
-                    minimumWidth = requireContext().getMinPointerSizePx()
+                    // minimumHeight = requireContext().getMinPointerSizePx()
+                    // minimumWidth = requireContext().getMinPointerSizePx()
+                    layoutParams = FrameLayout.LayoutParams(appliedPointerSize, appliedPointerSize, Gravity.CENTER)
+                    setPadding(appliedPointerPadding)
                 }
                 binding.textNoPointerApplied.visible(false)
             } else {
@@ -226,7 +233,11 @@ class MainFragment : Fragment() {
             }
 
             if (mousePath != null) {
-                binding.currentMouse.setImageDrawable(Drawable.createFromPath(mousePath))
+                binding.currentMouse.apply{
+                    setImageDrawable(Drawable.createFromPath(mousePath))
+                    layoutParams = FrameLayout.LayoutParams(appliedMouseSize, appliedMouseSize, Gravity.CENTER)
+                    setPadding(appliedMousePadding)
+                }
                 binding.textNoMouseApplied.visible(false)
             } else {
                 binding.textNoMouseApplied.visible(true)
@@ -273,8 +284,14 @@ class MainFragment : Fragment() {
         val filesDir = requireContext().getPointerSaveRootDir()
         val pointerPath = "$filesDir/pointer.png"
         val mousePath = "$filesDir/mouse.png"
+
         settings.pointerPath = pointerPath
         settings.mousePath = mousePath
+        settings.appliedPointerSize = settings.pointerSize
+        settings.appliedPointerPadding = settings.pointerPadding
+        settings.appliedMouseSize = settings.mouseSize
+        settings.appliedMousePadding = settings.mousePadding
+
         createFileFromView(binding.selectedPointer, pointerPath)
         createFileFromView(binding.selectedMouse, mousePath)
 

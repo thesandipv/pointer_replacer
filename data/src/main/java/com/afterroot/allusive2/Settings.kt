@@ -49,9 +49,25 @@ class Settings(val context: Context) {
         get() = preferences.getString(context.getString(R.string.key_selectedPointerPath), null)
         set(value) = putString(context.getString(R.string.key_selectedPointerPath), value)
 
+    var appliedPointerSize
+        get() = preferences.getInt(context.getString(R.string.key_appliedPointerSize), pointerSize)
+        set(value) = putInt(context.getString(R.string.key_appliedPointerSize), value)
+
+    var appliedPointerPadding
+        get() = preferences.getInt(context.getString(R.string.key_appliedPointerPadding), pointerPadding)
+        set(value) = putInt(context.getString(R.string.key_appliedPointerPadding), value)
+
     var selectedMousePath
         get() = preferences.getString(context.getString(R.string.key_selectedMousePath), null)
         set(value) = putString(context.getString(R.string.key_selectedMousePath), value)
+
+    var appliedMouseSize
+        get() = preferences.getInt(context.getString(R.string.key_appliedMouseSize), mouseSize)
+        set(value) = putInt(context.getString(R.string.key_appliedMouseSize), value)
+
+    var appliedMousePadding
+        get() = preferences.getInt(context.getString(R.string.key_appliedMousePadding), mousePadding)
+        set(value) = putInt(context.getString(R.string.key_appliedMousePadding), value)
 
     var selectedPointerName
         get() = preferences.getString(context.getString(R.string.key_selectedPointerName), null)
