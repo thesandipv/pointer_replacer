@@ -47,7 +47,7 @@ tasks.register('createEmptyModuleZip', CreateEmptyModuleZip) {
     group = BasePlugin.BUILD_GROUP
     description = "Creates Empty Magisk Module Zip"
 
-    inputDir = file("$rootDir/ui/magisk/module/empty-module")
+    inputDir = file("$rootDir/ui/magisk/module/")
     outputDir = file("$rootDir/ui/magisk/src/main/assets")
 }
 
