@@ -47,6 +47,7 @@ kotlinxCoroutines = "1.6.0"
 ktlint = "0.41.0"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
+libsuVersion = '3.2.1'
 lifecycle = "2.4.0"
 materialDialogs = "3.3.0"
 multidex = "2.0.1"
@@ -215,6 +216,10 @@ accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeho
 test-junit = "junit:junit:4.13.2"
 test-mockk = "io.mockk:mockk:1.12.2"
 test-robolectric = "org.robolectric:robolectric:4.7.3"
+
+libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsuVersion" }
+libsu-io = { module = "com.github.topjohnwu.libsu:io", version.ref = "libsuVersion" }
+libsu-service = { module = "com.github.topjohnwu.libsu:service", version.ref = "libsuVersion" }
 
 [bundles]
 firebase = [

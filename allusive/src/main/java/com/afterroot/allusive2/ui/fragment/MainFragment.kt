@@ -19,6 +19,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -34,7 +35,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -53,15 +53,14 @@ import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
-import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.FragmentMainBinding
 import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.getMinPointerSize
-import com.afterroot.allusive2.getMinPointerSizePx
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.getPointerSaveRootDir
+import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
@@ -70,6 +69,7 @@ import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.afterroot.core.onVersionGreaterThanEqualTo
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -132,20 +132,58 @@ class MainFragment : Fragment() {
             }
             findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
                 setOnClickListener {
+                    //TODO Replace with Alert Dialog
                     MaterialDialog(requireContext()).show {
                         title(text = "Apply Pointer With")
-                        listItems(items = listOf("Xposed", "Magisk")) { _, _, text ->
-                            when (text) {
-                                "Xposed" -> {
-                                    applyPointer()
-                                }
-                                "Magisk" -> {
-                                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.magiskFragment)
-                                }
-                                else -> {
+                        val availableMethods = mutableListOf<String>(
+                            getString(R.string.method_xposed),
+                            getString(R.string.method_magisk_fw_res)
+                        )
+                        onVersionGreaterThanEqualTo(Build.VERSION_CODES.R, trueFun = {
+                            availableMethods.add(getString(R.string.method_magisk_rro))
+                        })
+                        @Suppress("UNUSED_VARIABLE") val dialog =
+                            listItems(items = availableMethods) { _, _, text ->
+                                when (text) {
+                                    getString(R.string.method_xposed) -> {
+                                        applyPointer()
+                                    }
+                                    getString(R.string.method_magisk_fw_res) -> {
+                                        if (!isPointerSelected()) {
+                                            sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
+                                            return@listItems
+                                        }
+                                        if (!isMouseSelected()) {
+                                            sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
+                                            return@listItems
+                                        }
+                                        val filesDir = requireContext().getPointerSaveRootDir()
+                                        val pointerPath = "$filesDir/pointer.png"
+                                        val mousePath = "$filesDir/mouse.png"
+                                        settings.pointerPath = pointerPath
+                                        settings.mousePath = mousePath
+                                        createFileFromView(binding.selectedPointer, pointerPath)
+                                        createFileFromView(binding.selectedMouse, mousePath)
+
+                                        binding.textNoPointerApplied.visible(false)
+                                        binding.textNoMouseApplied.visible(false)
+                                        binding.currentPointer.apply {
+                                            visible(true)
+                                            setImageDrawable(Drawable.createFromPath(pointerPath))
+                                        }
+                                        binding.currentMouse.apply {
+                                            visible(true)
+                                            setImageDrawable(Drawable.createFromPath(mousePath))
+                                        }
+                                        requireActivity().findNavController(R.id.fragment_repo_nav)
+                                            .navigate(R.id.magiskFragment)
+                                    }
+                                    getString(R.string.method_magisk_rro) -> {
+                                        requireActivity().findNavController(R.id.fragment_repo_nav)
+                                            .navigate(R.id.magiskRROFragment)
+                                    }
                                 }
                             }
-                        }
                     }
                 }
                 icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
@@ -233,7 +271,7 @@ class MainFragment : Fragment() {
             }
 
             if (mousePath != null) {
-                binding.currentMouse.apply{
+                binding.currentMouse.apply {
                     setImageDrawable(Drawable.createFromPath(mousePath))
                     layoutParams = FrameLayout.LayoutParams(appliedMouseSize, appliedMouseSize, Gravity.CENTER)
                     setPadding(appliedMousePadding)
@@ -359,14 +397,13 @@ class MainFragment : Fragment() {
         }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
     }
 
-    private fun showRebootDialog() { // TODO Implement libsuperuser https://github.com/Chainfire/libsuperuser
+    private fun showRebootDialog() {
         MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             title(res = R.string.reboot)
             message(res = R.string.text_reboot_confirm)
             positiveButton(res = R.string.reboot) {
                 try {
-                    val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "reboot"))
-                    process.waitFor()
+                    reboot()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

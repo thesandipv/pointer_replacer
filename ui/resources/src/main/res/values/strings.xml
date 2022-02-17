@@ -226,4 +226,8 @@
     <string name="msg_error_pointers_missing">Some Pointer(s) are missing. Please delete them and re-download</string>
     <string name="msg_missing_pointers_auto_downloaded">Missing Pointers automatically downloaded.</string>
     <string name="open_magisk_manager">Open Magisk Manager</string>
+    <string name="install_module">Install Magisk Module</string>
+    <string name="method_xposed">Xposed</string>
+    <string name="method_magisk_fw_res">Replace Pointer in framework-res.apk with Magisk</string>
+    <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
 </resources>

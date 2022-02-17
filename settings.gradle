@@ -28,6 +28,7 @@ gradleEnterprise {
 enableFeaturePreview("VERSION_CATALOGS")
 
 include ':allusive'
+include ':allusive_rro'
 include ':base'
 include ':data'
 include ':ui:magisk'

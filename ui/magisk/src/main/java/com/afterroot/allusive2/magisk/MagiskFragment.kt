@@ -164,7 +164,7 @@ class MagiskFragment : Fragment() {
     }
 
     private fun createAndReplacePointerFiles(variants: List<Variant>) {
-        val selectedPointer = settings.selectedPointerPath ?: return
+        val selectedPointer = settings.pointerPath ?: return
         updateProgress("- Selected Pointer: ${settings.selectedPointerName}")
 
         val bmp: Bitmap = BitmapFactory.decodeFile(selectedPointer)
