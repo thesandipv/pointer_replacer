@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.magisk
 
 import android.graphics.Bitmap
@@ -71,7 +70,7 @@ class MagiskFragment : Fragment() {
             }
         }
 
-        //Fake Update one time
+        // Fake Update one time
         updateProgress()
 
         binding.openMagisk.setOnClickListener {
@@ -141,10 +140,13 @@ class MagiskFragment : Fragment() {
         }
 
         if (completed) {
-            //Wait before sending result
-            Handler(Looper.getMainLooper()).postDelayed({
-                progress.value = Result.Success
-            }, 300)
+            // Wait before sending result
+            Handler(Looper.getMainLooper()).postDelayed(
+                {
+                    progress.value = Result.Success
+                },
+                300
+            )
 
             return
         }

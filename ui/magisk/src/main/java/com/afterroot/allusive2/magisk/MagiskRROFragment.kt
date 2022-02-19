@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.magisk
 
 import android.graphics.Bitmap
@@ -75,7 +74,7 @@ class MagiskRROFragment : Fragment() {
             }
         }
 
-        //Fake Update one time
+        // Fake Update one time
         updateProgress()
 
         binding.openMagisk.setOnClickListener {
@@ -160,7 +159,6 @@ class MagiskRROFragment : Fragment() {
                         }
                     }
                 }
-
             }
             updateProgress(completed = true)
         }
@@ -182,7 +180,6 @@ class MagiskRROFragment : Fragment() {
         }
     }
 
-
     private fun updateProgress(progressText: String = "", completed: Boolean = false) {
         val stringBuilder = StringBuilder()
         if (progress.value is Result.Running) {
@@ -192,10 +189,13 @@ class MagiskRROFragment : Fragment() {
         }
 
         if (completed) {
-            //Wait before sending result
-            Handler(Looper.getMainLooper()).postDelayed({
-                progress.value = Result.Success
-            }, 300)
+            // Wait before sending result
+            Handler(Looper.getMainLooper()).postDelayed(
+                {
+                    progress.value = Result.Success
+                },
+                300
+            )
 
             return
         }
@@ -213,7 +213,7 @@ class MagiskRROFragment : Fragment() {
             File(magiskRROModuleZipPath(requireContext()))
                 .unzip(toFolder = File(magiskRROModuleExtractPath(requireContext())))
 
-            //Delete placeholder file if exists
+            // Delete placeholder file if exists
             File("${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder").apply {
                 if (exists() && delete()) {
                     withContext(Dispatchers.Main) { updateProgress("- Deleted Placeholder file") }

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.ui.fragment
 
 import android.content.Intent
@@ -53,6 +52,7 @@ import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
+import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.FragmentMainBinding
@@ -132,16 +132,19 @@ class MainFragment : Fragment() {
             }
             findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
                 setOnClickListener {
-                    //TODO Replace with Alert Dialog
+                    // TODO Replace with Alert Dialog
                     MaterialDialog(requireContext()).show {
                         title(text = "Apply Pointer With")
                         val availableMethods = mutableListOf<String>(
                             getString(R.string.method_xposed),
                             getString(R.string.method_magisk_fw_res)
                         )
-                        onVersionGreaterThanEqualTo(Build.VERSION_CODES.R, trueFun = {
-                            availableMethods.add(getString(R.string.method_magisk_rro))
-                        })
+                        onVersionGreaterThanEqualTo(
+                            Build.VERSION_CODES.R,
+                            trueFun = {
+                                availableMethods.add(getString(R.string.method_magisk_rro))
+                            }
+                        )
                         @Suppress("UNUSED_VARIABLE") val dialog =
                             listItems(items = availableMethods) { _, _, text ->
                                 when (text) {
@@ -551,8 +554,7 @@ class MainFragment : Fragment() {
             }*/
         }
 
-        pointerAdapter = LocalPointersAdapter(object :
-            com.afterroot.allusive2.adapter.callback.ItemSelectedCallback<RoomPointer> {
+        pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
             override fun onClick(position: Int, view: View?, item: RoomPointer) {
                 if (pointerType == POINTER_TOUCH) {
                     settings.selectedPointerName = item.pointer_name
@@ -600,32 +602,29 @@ class MainFragment : Fragment() {
 
         lifecycleScope.launch {
             // Observe Db on CoroutineScope
-            myDatabase.pointerDao().getAll().observe(
-                viewLifecycleOwner,
-                {
-                    it.forEach { pointer ->
-                        val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
-                        if (!file.exists()) {
-                            Log.d(TAG, "Missing: ${pointer.file_name}")
-                            downloadPointer(pointer)
-                        }
-                    }
-                    pointerAdapter.submitList(it)
-                    // Show install msg if no pointer installed
-                    bottomSheetListBinding.apply {
-                        infoNoPointerInstalled.visible(it.isEmpty())
-                        textDialogHint.visible(it.isNotEmpty())
-                        bsButtonInstallPointers.setOnClickListener {
-                            dialog.dismiss()
-                            requireActivity().findNavController(R.id.fragment_repo_nav)
-                                .navigate(R.id.repoFragment)
-                        }
-                        /*bs_button_import_pointers.setOnClickListener {
-                             import()
-                         }*/
+            myDatabase.pointerDao().getAll().observe(viewLifecycleOwner) {
+                it.forEach { pointer ->
+                    val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
+                    if (!file.exists()) {
+                        Log.d(TAG, "Missing: ${pointer.file_name}")
+                        downloadPointer(pointer)
                     }
                 }
-            )
+                pointerAdapter.submitList(it)
+                // Show install msg if no pointer installed
+                bottomSheetListBinding.apply {
+                    infoNoPointerInstalled.visible(it.isEmpty())
+                    textDialogHint.visible(it.isNotEmpty())
+                    bsButtonInstallPointers.setOnClickListener {
+                        dialog.dismiss()
+                        requireActivity().findNavController(R.id.fragment_repo_nav)
+                            .navigate(R.id.repoFragment)
+                    }
+                    /*bs_button_import_pointers.setOnClickListener {
+                         import()
+                     }*/
+                }
+            }
         }
     }
 
