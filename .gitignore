@@ -101,5 +101,6 @@ output.json
 /others
 /keystore.properties
 /publish.properties
+google-services.json
 /ui/magisk/src/main/assets/empty-module.zip
 /ui/magisk/src/main/assets/rro-module.zip
