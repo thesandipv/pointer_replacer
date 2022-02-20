@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.magisk
 
 import android.content.Context
@@ -39,6 +38,16 @@ const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
 const val POINTER_HDPI = "/res/drawable-hdpi-v4/pointer_spot_touch.png"
 const val MAGISK_EMPTY_ZIP = "empty-module.zip"
 const val MAGISK_PACKAGE = "com.topjohnwu.magisk"
+
+const val MAGISK_RRO_ZIP = "rro-module.zip"
+fun magiskRROModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/rro-module.zip"
+fun magiskRROModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/rro-module"
+fun magiskRROSourceApkPath(context: Context) =
+    "${magiskRROModuleExtractPath(context)}/system/vendor/overlay/allusive_rro.apk"
+
+fun magiskRROApkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro.apk"
+fun magiskRROApkExtractPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro"
+fun repackedRROApkPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro_repacked.apk"
 
 fun copyFrameworkRes(context: Context): File {
     val file = File(FRAMEWORK_APK)
@@ -86,6 +95,16 @@ fun variantsToReplace(context: Context): List<Variant> {
     return list
 }
 
+fun variantsToReplace(targetPath: String): List<Variant> {
+    if (!File(targetPath).exists()) return emptyList()
+
+    val list = mutableListOf<Variant>()
+    if (File("$targetPath$POINTER_HDPI").exists()) list.add(Variant.HDPI)
+    if (File("$targetPath$POINTER_MDPI").exists()) list.add(Variant.MDPI)
+    if (File("$targetPath$POINTER_XHDPI").exists()) list.add(Variant.XHDPI)
+    return list
+}
+
 fun Bitmap.saveAs(path: String): File {
     val file = File(path)
     if (file.exists()) file.delete()
@@ -99,20 +118,11 @@ fun Bitmap.saveAs(path: String): File {
 }
 
 fun copyMagiskEmptyZip(context: Context, to: String) {
-    val assetManager: AssetManager = context.assets
-    val inputStream: InputStream?
-    val outputStream: OutputStream?
-    try {
-        inputStream = assetManager.open(MAGISK_EMPTY_ZIP)
-        val outFile = File(to)
-        outputStream = FileOutputStream(outFile)
-        inputStream.copyTo(outputStream)
-        inputStream.close()
-        outputStream.flush()
-        outputStream.close()
-    } catch (e: IOException) {
-        Log.e("tag", "Failed to copy asset file: $MAGISK_EMPTY_ZIP", e)
-    }
+    copyAssetFile(context, MAGISK_EMPTY_ZIP, to)
+}
+
+fun copyMagiskRROZip(context: Context, to: String) {
+    copyAssetFile(context, MAGISK_RRO_ZIP, to)
 }
 
 fun extractMagiskZip(context: Context) {
@@ -121,9 +131,31 @@ fun extractMagiskZip(context: Context) {
     file.unzip(toFolder = File(magiskEmptyModuleExtractPath(context)))
 }
 
+fun copyAssetFile(context: Context, fileName: String, to: String) {
+    val assetManager: AssetManager = context.assets
+    val inputStream: InputStream?
+    val outputStream: OutputStream?
+    try {
+        inputStream = assetManager.open(fileName)
+        val outFile = File(to)
+        outputStream = FileOutputStream(outFile)
+        inputStream.copyTo(outputStream)
+        inputStream.close()
+        outputStream.flush()
+        outputStream.close()
+    } catch (e: IOException) {
+        Log.e("COPY_ASSET", "Failed to copy asset file: $MAGISK_EMPTY_ZIP", e)
+    }
+}
+
 fun copyRepackedFrameworkResApk(context: Context): File {
     val repacked = File(repackedFrameworkPath(context))
     return repacked.copyTo(target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"), overwrite = true)
+}
+
+fun copyRepackedRROApk(context: Context): File {
+    val repacked = File(repackedRROApkPath(context))
+    return repacked.copyTo(target = File(magiskRROSourceApkPath(context)), overwrite = true)
 }
 
 fun createModuleProp(context: Context) {

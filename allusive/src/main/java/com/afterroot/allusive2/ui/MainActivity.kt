@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.ui
 
 import android.content.Intent
@@ -127,12 +126,9 @@ class MainActivity : AppCompatActivity() {
             setInAnimation(this@MainActivity, R.anim.text_switcher_in)
             setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
         }
-        sharedViewModel.liveTitle.observe(
-            this,
-            {
-                updateTitle(it)
-            }
-        )
+        sharedViewModel.liveTitle.observe(this) {
+            updateTitle(it)
+        }
     }
 
     private fun setTitle(title: String?) {
@@ -323,6 +319,11 @@ class MainActivity : AppCompatActivity() {
                     fabApply.hide()
                     hideNavigation()
                     setTitle("Apply with Magisk")
+                }
+                R.id.magiskRROFragment -> {
+                    fabApply.hide()
+                    hideNavigation()
+                    setTitle("Apply with Magisk [RRO]")
                 }
             }
         }

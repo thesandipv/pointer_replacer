@@ -23,6 +23,7 @@ apply from: "$rootDir/gradle/apply-core.gradle"
 apply from: "$rootDir/gradle/common-config.gradle"
 apply from: "$rootDir/gradle/common-config-library.gradle"
 apply from: "$rootDir/gradle/create-zip.gradle"
+apply from: "$rootDir/gradle/build-rro-apk.gradle"
 apply from: "$rootDir/gradle/oss-licence.gradle"
 
 android {
@@ -32,6 +33,7 @@ android {
     }
 }
 dependencies {
+    implementation project(":base")
     implementation project(":data")
     implementation project(":ui:resources")
 
@@ -44,5 +46,7 @@ dependencies {
 
     implementation libs.koin.android
     implementation libs.koin.ext
-}
 
+    implementation libs.libsu.core
+    implementation libs.libsu.io
+}

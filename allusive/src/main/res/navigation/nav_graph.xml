@@ -67,6 +67,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/toMagiskRRO"
+            app:destination="@id/magiskRROFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -85,4 +92,7 @@
     <fragment
         android:id="@+id/magiskFragment"
         android:name="com.afterroot.allusive2.magisk.MagiskFragment" />
+    <fragment
+        android:id="@+id/magiskRROFragment"
+        android:name="com.afterroot.allusive2.magisk.MagiskRROFragment" />
 </navigation>
