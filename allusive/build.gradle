@@ -195,14 +195,14 @@ dependencies {
     implementation libs.google.gson
 
     implementation libs.commonsIo
-    compileOnly "de.robv.android.xposed:api:82"
+    compileOnly files("libs/api-82.jar")
 
     implementation libs.koin.android
     implementation libs.koin.ext
     testImplementation libs.koin.test
 
-    implementation 'com.airbnb.android:epoxy:4.6.4'
-    kapt 'com.airbnb.android:epoxy-processor:4.6.1'
+    implementation libs.epoxy.epoxy
+    kapt libs.epoxy.processor
 
     implementation libs.kotlin.coroutines.core
     implementation libs.kotlin.coroutines.android
@@ -214,6 +214,6 @@ dependencies {
 
     testImplementation libs.androidx.test.core
 
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.3'
-    implementation 'me.zhanghai.android.fastscroll:library:1.1.5'
+    implementation libs.okhttp.okhttp
+    implementation 'me.zhanghai.android.fastscroll:library:1.1.7'
 }

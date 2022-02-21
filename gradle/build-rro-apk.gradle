@@ -22,7 +22,6 @@ abstract class BuildRROApk extends DefaultTask {
 
 tasks.register("copyRROApk", Copy) {
     dependsOn ':allusive_rro:assembleDebug'
-    println "Copying allusive_rro-debug.apk to rro-module"
     from("$rootDir/allusive_rro/build/outputs/apk/debug/")
     into("$rootDir/ui/magisk/module/rro-module/system/vendor/overlay/")
     include("allusive_rro-debug.apk")
