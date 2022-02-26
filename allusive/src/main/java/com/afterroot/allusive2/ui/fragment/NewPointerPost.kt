@@ -14,6 +14,7 @@
  */
 package com.afterroot.allusive2.ui.fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -21,11 +22,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
@@ -34,13 +35,13 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
-import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.updateProgressText
+import com.afterroot.data.utils.FirebaseUtils
 import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -55,28 +56,30 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
+import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.find
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NewPointerPost : Fragment() {
 
+    @Inject lateinit var db: FirebaseFirestore
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+    @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentNewPointerPostBinding
     private lateinit var rewardedAd: RewardedAd
-    private val db: FirebaseFirestore by inject()
     private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
     private val pointerName: String get() = binding.editName.text.toString().trim()
-    private val remoteConfig: FirebaseRemoteConfig by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
-    private val storage: FirebaseStorage by inject()
+    private val sharedViewModel: MainSharedViewModel by viewModels()
     private var adLoaded: Boolean = false
     private var clickedUpload: Boolean = false
     private var isPointerImported = false
-    private val firebaseUtils: FirebaseUtils by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentNewPointerPostBinding.inflate(inflater, container, false)
@@ -103,6 +106,7 @@ class NewPointerPost : Fragment() {
         initFirebaseConfig()
     }
 
+    @SuppressLint("MissingPermission")
     private fun initFirebaseConfig() {
         remoteConfig.fetchAndActivate().addOnCompleteListener { result ->
             kotlin.runCatching {
@@ -248,7 +252,7 @@ class NewPointerPost : Fragment() {
                     uploadedBy = map,
                     time = Timestamp.now().toDate()
                 )
-                Log.d(TAG, "upload: $pointer")
+                Timber.tag(TAG).d("upload: %s", pointer)
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
                         sharedViewModel.displayMsg(getString(R.string.msg_pointer_upload_success))

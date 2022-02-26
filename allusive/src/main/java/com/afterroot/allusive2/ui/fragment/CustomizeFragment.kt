@@ -45,17 +45,19 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.visible
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.find
-import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Created by Sandip on 04-10-2017.
  */
+@AndroidEntryPoint
 class CustomizeFragment : Fragment() {
     private lateinit var typePath: String
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private var pointerType: Int = 0
     private var selectedColor: Int = 0
     private var typeAlpha: Int = 255

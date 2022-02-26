@@ -20,24 +20,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentEditProfileBinding
 import com.afterroot.allusive2.ui.SplashActivity
-import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EditProfileFragment : Fragment() {
     private lateinit var binding: FragmentEditProfileBinding
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private val sharedViewModel: MainSharedViewModel by viewModel()
+    private val sharedViewModel: MainSharedViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false)
@@ -45,8 +47,8 @@ class EditProfileFragment : Fragment() {
         return binding.root
     }
 
-    private val db: FirebaseFirestore by inject()
-    private val firebaseUtils: FirebaseUtils by inject()
+    @Inject lateinit var db: FirebaseFirestore
+    @Inject lateinit var firebaseUtils: FirebaseUtils
     private lateinit var user: FirebaseUser
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

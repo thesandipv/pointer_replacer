@@ -16,21 +16,26 @@ package com.afterroot.allusive2.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainSharedViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+class MainSharedViewModel @Inject constructor(val savedStateHandle: SavedStateHandle) : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
+    @Inject lateinit var firebaseFirestore: FirebaseFirestore
+    @Inject lateinit var settings: Settings
 
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {

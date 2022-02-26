@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.paging.LoadState
@@ -50,52 +51,50 @@ import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.repo.PointerPagingAdapter
-import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.allusive2.viewmodel.ViewModelState
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.afterroot.data.utils.FirebaseUtils
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.flow.collect
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var myDatabase: MyDatabase
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentPointerRepoBinding
+    private lateinit var fabApply: ExtendedFloatingActionButton
     private lateinit var pointersAdapter: PointersAdapter
-    private lateinit var pointersPagingAdapter: PointerPagingAdapter
     private lateinit var pointersList: List<Pointer>
+    private lateinit var pointersPagingAdapter: PointerPagingAdapter
     private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var targetPath: String
-    private lateinit var fabApply: ExtendedFloatingActionButton
-    private val firestore: FirebaseFirestore by inject()
-    private val myDatabase: MyDatabase by inject()
-    private val networkViewModel: NetworkViewModel by viewModel()
-    private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
-    private val storage: FirebaseStorage by inject()
+    private val networkViewModel: NetworkViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModels()
     private var filteredList: List<Pointer>? = null
-    private val firebaseUtils: FirebaseUtils by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -265,7 +264,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 if (isChecked) {
                     binding.repoSwipeRefresh.isEnabled = false
                     filteredList = pointersList.filter {
-                        it.uploadedBy?.containsKey(get<FirebaseAuth>().currentUser?.uid) ?: false
+                        it.uploadedBy?.containsKey(firebaseUtils.uid) ?: false
                     }
                     displayPointers(filteredList ?: pointersList)
                 } else {
@@ -296,7 +295,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             height = 128
                             width = 128
                         }
-                        val storageReference = get<FirebaseStorage>().reference
+                        val storageReference = storage.reference
                             .child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
                         val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                         background = context.getDrawableExt(R.drawable.transparent_grid)

@@ -14,6 +14,7 @@
  */
 package com.afterroot.allusive2.database
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Database
@@ -25,8 +26,11 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
-import org.koin.android.ext.koin.androidApplication
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -40,16 +44,18 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-val roomModule = module {
-    single {
-        Room.databaseBuilder(
-            androidApplication(),
-            MyDatabase::class.java,
-            "installed-pointers"
-        ).addMigrations(MIGRATION_1_2).build()
-    }
+@InstallIn(SingletonComponent::class)
+@Module
+object RoomModule {
+    @Provides
+    fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
+        context,
+        MyDatabase::class.java,
+        "installed-pointers"
+    ).addMigrations(MIGRATION_1_2).build()
 
-    single { get<MyDatabase>().pointerDao() }
+    @Provides
+    fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
 }
 
 @Dao

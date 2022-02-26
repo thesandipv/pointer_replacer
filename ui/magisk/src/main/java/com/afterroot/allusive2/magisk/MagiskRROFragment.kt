@@ -36,17 +36,19 @@ import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.Glide
 import com.topjohnwu.superuser.Shell
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MagiskRROFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

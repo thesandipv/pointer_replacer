@@ -20,6 +20,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'com.google.android.gms.oss-licenses-plugin'
+    id 'dagger.hilt.android.plugin'
 }
 
 kapt {
@@ -30,13 +31,14 @@ kapt {
 apply from: "$rootDir/gradle/oss-licence.gradle"
 apply from: "$rootDir/gradle/apply-core.gradle"
 
+hilt {
+    enableAggregatingTask = true
+}
+
 ext {
-//    major = 1
-//    minor = 9
-//    patch = 3
-//    minimumSdkVersion = 16
     ci = System.getenv("CI") == "true"
 }
+
 android {
     compileSdkVersion SDK.COMPILE
 
@@ -197,9 +199,8 @@ dependencies {
     implementation libs.commonsIo
     compileOnly files("libs/api-82.jar")
 
-    implementation libs.koin.android
-    implementation libs.koin.ext
-    testImplementation libs.koin.test
+    implementation libs.hilt.hilt
+    kapt libs.hilt.compiler
 
     implementation libs.epoxy.epoxy
     kapt libs.epoxy.processor

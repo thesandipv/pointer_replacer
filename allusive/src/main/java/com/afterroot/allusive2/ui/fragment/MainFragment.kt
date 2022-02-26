@@ -34,6 +34,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -83,27 +84,28 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
 import org.jetbrains.anko.toast
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var interstitialAd: InterstitialAd
-    private val myDatabase: MyDatabase by inject()
-    private val remoteConfig: FirebaseRemoteConfig by inject()
-    private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
-    private val storage: FirebaseStorage by inject()
+    @Inject lateinit var myDatabase: MyDatabase
+    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+    @Inject lateinit var settings: Settings
+    private val sharedViewModel: MainSharedViewModel by viewModels()
+    @Inject lateinit var storage: FirebaseStorage
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

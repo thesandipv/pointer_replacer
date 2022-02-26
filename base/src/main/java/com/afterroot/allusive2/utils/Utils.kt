@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@ package com.afterroot.allusive2.utils
 
 import android.content.Context
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.R
+import com.afterroot.allusive2.base.BuildConfig
+import com.afterroot.allusive2.base.R
 import com.afterroot.core.network.NetworkState
 
 /**

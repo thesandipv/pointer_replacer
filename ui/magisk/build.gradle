@@ -44,8 +44,7 @@ dependencies {
     implementation libs.androidx.lifecycle.livedata
     implementation libs.androidx.lifecycle.extensions
 
-    implementation libs.koin.android
-    implementation libs.koin.ext
+    implementation libs.hilt.hilt
 
     implementation libs.libsu.core
     implementation libs.libsu.io

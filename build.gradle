@@ -45,7 +45,7 @@ buildscript {
         classpath libs.firebase.pluginCrashlytics
         classpath libs.google.pluginOssLic
         classpath libs.androidx.navigation.pluginSafeArgs
-//        classpath libs.hilt.pluginGradle
+        classpath libs.hilt.pluginGradle
     }
 }
 

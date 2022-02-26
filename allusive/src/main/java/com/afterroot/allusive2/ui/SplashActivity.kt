@@ -18,6 +18,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.afollestad.materialdialogs.MaterialDialog
@@ -26,19 +27,25 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
+import com.afterroot.data.utils.FirebaseUtils
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.browse
-import org.koin.android.ext.android.get
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
     private val _tag = "SplashActivity"
-    private val networkViewModel: NetworkViewModel by viewModel()
+    private val networkViewModel: NetworkViewModel by viewModels()
+    private lateinit var settings: Settings
+    @Inject lateinit var firebaseAuth: FirebaseAuth
+    @Inject lateinit var firebaseUtils: FirebaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val theme = get<Settings>().theme
+        settings = Settings(this)
+        val theme = settings.theme
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
                 getString(R.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -55,7 +62,7 @@ class SplashActivity : AppCompatActivity() {
         super.onPostCreate(savedInstanceState)
         setUpNetworkObserver()
         when {
-            get<FirebaseAuth>().currentUser == null -> {
+            !firebaseUtils.isUserSignedIn -> {
                 tryLogin()
             }
             intent.extras != null -> {
@@ -79,6 +86,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun tryLogin() {
+        //TODO Replace with ResultContract
         startActivityForResult(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()

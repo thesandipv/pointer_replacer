@@ -33,16 +33,18 @@ import com.afterroot.allusive2.Result
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.visible
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MagiskFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
