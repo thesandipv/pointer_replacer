@@ -68,5 +68,4 @@ object AppModules {
 
     @Provides
     fun provideSettings(@ApplicationContext context: Context): Settings = Settings(context)
-
 }

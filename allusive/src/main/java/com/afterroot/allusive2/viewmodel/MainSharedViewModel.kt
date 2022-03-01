@@ -26,16 +26,26 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainSharedViewModel @Inject constructor(val savedStateHandle: SavedStateHandle) : ViewModel() {
+class MainSharedViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle,
+    private val remoteConfig: FirebaseRemoteConfig
+) : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
     @Inject lateinit var firebaseFirestore: FirebaseFirestore
     @Inject lateinit var settings: Settings
+
+    init {
+        remoteConfig.fetchAndActivate().addOnSuccessListener {
+            savedStateHandle["configLoaded"] = true
+        }
+    }
 
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {

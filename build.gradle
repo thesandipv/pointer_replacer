@@ -31,9 +31,6 @@ buildscript {
     ext.VERSION_CODE = SDK.MIN * 10000000 + version.MAJOR * 10000 + version.MINOR * 100 + version.PATCH
     ext.VERSION_NAME = "${version.MAJOR}.${version.MINOR}.${version.PATCH}"
 
-//    apply from: rootProject.file('gradle/deps.gradle')
-//    apply from: rootProject.file('gradle/test.gradle.kts')
-
     repositories {
         google()
         mavenCentral()

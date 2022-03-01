@@ -18,7 +18,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -54,6 +53,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.design.snackbar
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -201,21 +201,18 @@ class MainActivity : AppCompatActivity() {
                                     sharedViewModel.displayMsg("User not available. Creating User..")
                                     val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
                                     userRef.set(user).addOnCompleteListener { setUserTask ->
-                                        if (!setUserTask.isSuccessful) Log.e(
-                                            TAG,
-                                            "Can't create firebaseUser",
-                                            setUserTask.exception
-                                        )
+                                        if (!setUserTask.isSuccessful) Timber.tag(TAG)
+                                            .e(setUserTask.exception, "Can't create firebaseUser")
                                     }
                                 } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
                                     userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
                                 }
-                            } else Log.e(TAG, "Unknown Error", getUserTask.exception)
+                            } else Timber.tag(TAG).e(getUserTask.exception, "Unknown Error")
                         }
                     }
                 )
         } catch (e: Exception) {
-            Log.e(TAG, "addUserInfoInDB: $e")
+            Timber.tag(TAG).e(e, "addUserInfoInDB")
         }
     }
 

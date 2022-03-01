@@ -86,7 +86,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun tryLogin() {
-        //TODO Replace with ResultContract
+        // TODO Replace with ResultContract
         startActivityForResult(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()

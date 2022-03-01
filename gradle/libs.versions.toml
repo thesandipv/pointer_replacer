@@ -13,7 +13,7 @@ composeActivity = "1.4.0"
 composeNavigation = "2.4.0-rc01"
 composePaging = "1.0.0-alpha14"
 constraintLayout = "2.1.3"
-core = "0.3.4" # AfterROOT Core
+core = "0.4.0" # AfterROOT Core
 coreKtx = "1.8.0-alpha04"
 crshlyticsPlugin = "2.8.1"
 dagger = "2.41"
@@ -69,7 +69,7 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 depUpdates = { id = "com.github.ben-manes.versions", version.ref = "depUpdates" }
 
 [libraries]
-agp = "com.android.tools.build:gradle:7.1.1"
+agp = "com.android.tools.build:gradle:7.1.2"
 
 commonsCodec = "commons-codec:commons-codec:1.15"
 commonsIo = { module = "org.apache.commons:commons-io", version.ref = "commonsIo" }

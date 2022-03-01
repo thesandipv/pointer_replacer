@@ -66,11 +66,13 @@ import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
+import com.afterroot.core.data.model.VersionInfo
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.afterroot.core.onVersionGreaterThanEqualTo
+import com.afterroot.core.utils.VersionCheck
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -84,6 +86,7 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -104,6 +107,7 @@ class MainFragment : Fragment() {
     @Inject lateinit var myDatabase: MyDatabase
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
     @Inject lateinit var settings: Settings
+    @Inject lateinit var gson: Gson
     private val sharedViewModel: MainSharedViewModel by viewModels()
     @Inject lateinit var storage: FirebaseStorage
     private var targetPath: String? = null
@@ -120,6 +124,7 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
+        setUpVersionCheck()
         targetPath = requireContext().getPointerSaveDir()
 
         requireActivity().apply {
@@ -424,6 +429,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    // TODO
     private fun loadInterstitialAd() {
         val interstitialAdUnitId: String = whenBuildIs(
             debug = getString(R.string.ad_interstitial_1_id),
@@ -449,7 +455,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpAd() {
-        remoteConfig.fetchAndActivate().addOnCompleteListener {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+            if (!it) return@observe
             kotlin.runCatching {
                 val bannerAdUnitId: String = whenBuildIs(
                     debug = getString(R.string.ad_banner_unit_id),
@@ -464,6 +471,42 @@ class MainFragment : Fragment() {
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
+            }
+        }
+    }
+
+    private fun setUpVersionCheck() {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+            if (!it) return@observe
+            val versionJson = remoteConfig.getString("versions_allusive")
+            if (versionJson.isBlank()) return@observe
+            val versionChecker = VersionCheck(
+                gson.fromJson(versionJson, VersionInfo::class.java)
+                    .copy(currentVersion = BuildConfig.VERSION_CODE)
+            )
+            versionChecker.onVersionDisabled {
+                AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Version Obsolete")
+                    setMessage("This version is obsolete. You have to update to latest version.")
+                    setPositiveButton("Update") { _, _ ->
+                        // TODO
+                    }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                        requireActivity().finish()
+                    }
+                    setCancelable(false)
+                }.show()
+            }
+            versionChecker.onUpdateAvailable {
+                AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Update Available")
+                    setMessage("New Version Available. Please update to get latest features.")
+                    setPositiveButton("Update") { _, _ ->
+                        // TODO
+                    }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                    }
+                }.show()
             }
         }
     }
@@ -483,6 +526,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    // TODO Re-add
     /*private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
         val roomPointers = arrayListOf<RoomPointer>()
         fileNames.forEach { filename ->
