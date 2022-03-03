@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2016-2021 Sandip Vaghela
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~         http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/pref_title_pointer_settings">
+        <Preference
+            app:key="@string/key_maxPointerSize"
+            app:title="@string/text_max_pointer_size" />
+        <Preference
+            app:key="@string/key_maxPaddingSize"
+            app:title="@string/text_max_padding_size" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="@string/key_EnablePointerAlpha"
+            app:summary="@string/pref_summary_enable_alpha"
+            app:title="@string/pref_title_enable_alpha" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="App Settings">
+        <androidx.preference.ListPreference
+            app:defaultValue="@string/theme_device_default"
+            app:entries="@array/theme_mode"
+            app:entryValues="@array/theme_mode"
+            app:key="key_app_theme"
+            app:title="App Theme"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:defaultValue="false"
+            app:title="Enable Emulator on Firestore"
+            app:key="key_enable_emulator"/>
+        <Preference
+            app:title="Create Stub Pointers"
+            app:key="key_create_stub_pointers"/>
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/pref_category_support">
+        <Preference
+            app:key="@string/key_pref_donate"
+            app:summary="@string/pref_summary_donation"
+            app:title="@string/pref_title_donate_dev" />
+        <Preference
+            app:key="@string/key_watch_ads"
+            app:summary="@string/pref_summary_watch_ad"
+            app:title="@string/pref_title_watch_ad" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/title_activity_about">
+        <Preference
+            app:icon="@mipmap/ic_launcher"
+            app:key="@string/key_version"
+            app:title="@string/app_name" />
+        <Preference app:summary="@string/made_with_love" />
+        <Preference
+            app:key="@string/key_rate_on_g_play"
+            app:title="Rate on Play Store" />
+        <Preference android:title="@string/pref_title_privacy_policy">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_privacy_policy" />
+        </Preference>
+
+        <Preference
+            app:key="@string/key_licences"
+            app:summary="@string/pref_summary_licences"
+            app:title="@string/pref_title_licences" />
+        <Preference
+            app:summary="@string/pref_summary_xda"
+            app:title="@string/pref_title_xda_thread">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_xda_thread" />
+        </Preference>
+        <Preference
+            app:summary="@string/pref_summary_source_code"
+            app:title="@string/pref_title_source_code">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_source_code" />
+        </Preference>
+        <Preference
+            app:summary="@string/pref_summary_xposed_repo"
+            app:title="@string/pref_title_xposed_repo">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_prx" />
+        </Preference>
+        <Preference app:title="@string/pref_title_telegram_group">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/url_telegram" />
+        </Preference>
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

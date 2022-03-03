@@ -22,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants.RC_LOGIN
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
@@ -30,6 +31,7 @@ import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.browse
 import javax.inject.Inject
@@ -41,6 +43,7 @@ class SplashActivity : AppCompatActivity() {
     private val networkViewModel: NetworkViewModel by viewModels()
     private lateinit var settings: Settings
     @Inject lateinit var firebaseAuth: FirebaseAuth
+    @Inject lateinit var firestore: FirebaseFirestore
     @Inject lateinit var firebaseUtils: FirebaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,6 +85,11 @@ class SplashActivity : AppCompatActivity() {
             else -> {
                 launchDashboard()
             }
+        }
+
+        // Use Firebase emulators
+        if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
+            firestore.useEmulator("10.0.2.2", 8080)
         }
     }
 

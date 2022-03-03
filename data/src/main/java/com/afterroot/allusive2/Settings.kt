@@ -24,17 +24,23 @@ import com.afterroot.core.extensions.getPrefs
 class Settings(val context: Context) {
 
     private val preferences: SharedPreferences = context.getPrefs()
-    private fun putString(key: String, value: String?) = preferences.edit(true) {
+    fun putString(key: String, value: String?) = preferences.edit(true) {
         putString(key, value)
     }
 
-    private fun putInt(key: String, value: Int) = preferences.edit(true) {
+    fun getString(key: String, value: String?) = preferences.getString(key, value)
+
+    fun putInt(key: String, value: Int) = preferences.edit(true) {
         putInt(key, value)
     }
 
-    private fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
+    fun getInt(key: String, value: Int) = preferences.getInt(key, value)
+
+    fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
         putBoolean(key, value)
     }
+
+    fun getBoolean(key: String, value: Boolean) = preferences.getBoolean(key, value)
 
     var pointerPath
         get() = preferences.getString(context.getString(R.string.key_pointerPath), null)
@@ -138,6 +144,7 @@ class Settings(val context: Context) {
 
     var orderBy
         get() = preferences.getString(context.getString(R.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
+            ?: DatabaseFields.FIELD_TIME
         set(value) = putString(context.getString(R.string.key_repo_order_by), value)
 
     var safUri
