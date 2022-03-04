@@ -4,6 +4,6 @@
 [submodule "website"]
 	path = website
 	url = https://github.com/thesandipv/allusive-web.git
-[submodule "data_structures"]
-	path = data_structures
-	url = https://github.com/afterroot/data_structures.git
+[submodule "ards"]
+	path = ards
+	url = https://github.com/afterroot/ards.git
