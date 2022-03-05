@@ -88,8 +88,10 @@ class SplashActivity : AppCompatActivity() {
         }
 
         // Use Firebase emulators
-        if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
-            firestore.useEmulator("10.0.2.2", 8080)
+        runCatching {
+            if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
+                firestore.useEmulator("10.0.2.2", 8080)
+            }
         }
     }
 

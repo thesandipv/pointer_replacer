@@ -14,6 +14,7 @@
  */
 package com.afterroot.allusive2.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -145,7 +146,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             binding.repoSwipeRefresh.apply {
                 setOnRefreshListener {
                     try {
-                        loadPointers()
+                        // loadPointers()
+                        refreshData()
                     } catch (e: IllegalStateException) {
                         isRefreshing = false
                         e.printStackTrace()
@@ -158,8 +160,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     // Function for using new list adapter.
     private fun setUpAdapter() {
-        pointersAdapter = PointersAdapter(this)
-        pointersPagingAdapter = PointerPagingAdapter(this)
+        // pointersAdapter = PointersAdapter(this)
+        pointersPagingAdapter = PointerPagingAdapter(this, storage)
         binding.list.apply {
             val lm = LinearLayoutManager(requireContext())
             layoutManager = lm
@@ -178,17 +180,15 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         } else {
             lifecycleScope.launch {
                 pointersPagingAdapter.submitData(pagedData)
-                pointersPagingAdapter
             }
         }
     }
 
-    private fun loadPointers(orderBy: String = settings.orderBy!!) {
+    private fun loadPointers(orderBy: String = settings.orderBy) {
         val enablePaged = true
         if (enablePaged) {
             lifecycleScope.launch {
-                sharedViewModel.pointers.collect {
-//                    pointersPagingAdapter.submitData(it)
+                sharedViewModel.pointers.collectLatest {
                     displayPointers(pagedData = it)
                 }
             }
@@ -199,30 +199,30 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 }
             }
         } else {
-            sharedViewModel.getPointerSnapshot().observe(
-                viewLifecycleOwner,
-                { state ->
-                    when (state) {
-                        is ViewModelState.Loading -> {
-                            binding.repoSwipeRefresh.isRefreshing = true
+            sharedViewModel.getPointerSnapshot().observe(viewLifecycleOwner) { state ->
+                when (state) {
+                    is ViewModelState.Loading -> {
+                        binding.repoSwipeRefresh.isRefreshing = true
+                    }
+                    is ViewModelState.Loaded<*> -> {
+                        binding.repoSwipeRefresh.isRefreshing = false
+                        pointersSnapshot = state.data as QuerySnapshot
+                        val result: List<Pointer> = pointersSnapshot.toObjects()
+                        val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
+                        pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
+                            result.sortedByDescending { it.time }
+                        } else {
+                            result.sortedByDescending { it.downloads }
                         }
-                        is ViewModelState.Loaded<*> -> {
-                            binding.repoSwipeRefresh.isRefreshing = false
-                            pointersSnapshot = state.data as QuerySnapshot
-                            val result: List<Pointer> = pointersSnapshot.toObjects()
-                            val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
-                            pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
-                                result.sortedByDescending { it.time }
-                            } else {
-                                result.sortedByDescending { it.downloads }
-                            }
-                            displayPointers(pointersList)
-                        }
+                        displayPointers(pointersList)
                     }
                 }
-            )
-
+            }
         }
+    }
+
+    private fun refreshData() {
+        pointersPagingAdapter.refresh()
     }
 
     private fun setUpFilter() {
@@ -236,24 +236,28 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipSortByDate.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    displayPointers(
+                    /*displayPointers(
                         (filteredList ?: pointersList).sortedByDescending {
                             it.time
                         }
-                    )
+                    )*/
                     settings.orderBy = DatabaseFields.FIELD_TIME
+                    // loadPointers()
+                    refreshData()
                 }
             }
         }
         binding.filterChipSortByDownload.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    displayPointers(
+                    /*displayPointers(
                         (filteredList ?: pointersList).sortedByDescending {
                             it.downloads
                         }
-                    )
+                    )*/
                     settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
+                    // loadPointers()
+                    refreshData()
                 }
             }
         }
@@ -261,7 +265,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipShowUserUploaded.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
-                if (isChecked) {
+                // TODO
+                /*if (isChecked) {
                     binding.repoSwipeRefresh.isEnabled = false
                     filteredList = pointersList.filter {
                         it.uploadedBy?.containsKey(firebaseUtils.uid) ?: false
@@ -271,7 +276,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     filteredList = null
                     binding.repoSwipeRefresh.isEnabled = true
                     loadPointers()
-                }
+                }*/
             }
             setOnCloseIconClickListener {
                 isChecked = false
@@ -428,6 +433,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         showPointerInfoDialog(item)
     }
 
+    @SuppressLint("CheckResult")
     override fun onLongClick(position: Int, item: Pointer): Boolean {
         val result = kotlin.runCatching {
             if (!item.uploadedBy!!.containsKey(firebaseUtils.uid) || item.reasonCode != Reason.OK) {
@@ -475,10 +481,5 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             it.message?.let { it1 -> requireContext().toast(it1) }
         }
         return true
-    }
-
-    companion object {
-        @Suppress("unused")
-        private const val TAG = "PointersRepoFragment"
     }
 }

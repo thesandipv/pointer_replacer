@@ -33,13 +33,13 @@ import javax.inject.Inject
 @HiltViewModel
 class MainSharedViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val firebaseFirestore: FirebaseFirestore,
+    private val settings: Settings
 ) : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
-    @Inject lateinit var firebaseFirestore: FirebaseFirestore
-    @Inject lateinit var settings: Settings
 
     init {
         remoteConfig.fetchAndActivate().addOnSuccessListener {
@@ -50,7 +50,7 @@ class MainSharedViewModel @Inject constructor(
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
-            FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
+            firebaseFirestore.collection(DatabaseFields.COLLECTION_POINTERS)
                 .addSnapshotListener { querySnapshot, _ -> // TODO Remove Snapshot listener and replace with query.
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
@@ -61,7 +61,7 @@ class MainSharedViewModel @Inject constructor(
     }
 
     val pointers = Pager(PagingConfig(20)) {
-        FirestorePagingSource(get())
+        FirestorePagingSource(firebaseFirestore, settings)
     }.flow.cachedIn(viewModelScope)
 
     fun setTitle(title: String?) {

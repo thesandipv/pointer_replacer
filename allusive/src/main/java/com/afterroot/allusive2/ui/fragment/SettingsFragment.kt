@@ -103,8 +103,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
                     billingClient.consumeAsync(params) { result, _ ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            Log.d(TAG, "initBilling: Purchase Done and Consumed")
-                        } else Log.d(TAG, "initBilling: Purchase Done but not Consumed.")
+                            Timber.tag(TAG).d("initBilling: Purchase Done and Consumed")
+                        } else Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
                     }
                 }
             }.build()
