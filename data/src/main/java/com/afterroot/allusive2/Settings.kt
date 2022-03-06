@@ -20,8 +20,10 @@ import androidx.core.content.edit
 import com.afterroot.allusive2.data.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.core.extensions.getPrefs
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class Settings(val context: Context) {
+class Settings @Inject constructor(@ApplicationContext val context: Context) {
 
     private val preferences: SharedPreferences = context.getPrefs()
     fun putString(key: String, value: String?) = preferences.edit(true) {

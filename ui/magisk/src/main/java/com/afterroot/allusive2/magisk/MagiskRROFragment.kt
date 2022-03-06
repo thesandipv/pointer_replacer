@@ -17,8 +17,6 @@ package com.afterroot.allusive2.magisk
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +33,6 @@ import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.Glide
-import com.topjohnwu.superuser.Shell
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -148,37 +145,25 @@ class MagiskRROFragment : Fragment() {
                 binding.installModule.apply {
                     visible(true)
                     setOnClickListener {
-                        val list = mutableListOf<String>()
-                        if (Shell.su("magisk --install-module \"${module.path}\"").to(list).exec().isSuccess) {
-                            list.forEach {
-                                updateProgress(it)
+                        showRROExperimentalWarning(requireContext()) { response ->
+                            if (!response) return@showRROExperimentalWarning
+                            installModule(module.path) { isSuccess, output ->
+                                if (isSuccess) {
+                                    output.forEach {
+                                        updateProgress(it)
+                                    }
+                                    updateProgress(completed = true)
+                                    showRebootDialog(requireContext())
+                                } else {
+                                    updateProgress("- Module installation failed")
+                                    updateProgress(completed = true)
+                                }
                             }
-                            updateProgress(completed = true)
-                            showRebootDialog()
-                        } else {
-                            updateProgress("- Module installation failed")
-                            updateProgress(completed = true)
                         }
                     }
                 }
             }
             updateProgress(completed = true)
-        }
-    }
-
-    private fun showRebootDialog() {
-        MaterialDialog(requireActivity()).show {
-            title(res = R.string.reboot)
-            message(text = "Pointer Applied.")
-            positiveButton(res = R.string.reboot) {
-                try {
-                    reboot()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            negativeButton(android.R.string.cancel) {
-            }
         }
     }
 
@@ -192,13 +177,10 @@ class MagiskRROFragment : Fragment() {
 
         if (completed) {
             // Wait before sending result
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    progress.value = Result.Success
-                },
-                300
-            )
-
+            lifecycleScope.launch {
+                delay(300)
+                progress.value = Result.Success
+            }
             return
         }
         progress.value = Result.Running(stringBuilder.toString())

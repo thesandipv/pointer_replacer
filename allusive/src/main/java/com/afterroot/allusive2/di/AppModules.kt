@@ -14,16 +14,13 @@
  */
 package com.afterroot.allusive2.di
 
-import android.content.Context
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.base.CoroutineDispatchers
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Named
@@ -65,7 +62,4 @@ object AppModules {
     @Provides
     @Singleton
     fun provideGson(): Gson = GsonBuilder().create()
-
-    @Provides
-    fun provideSettings(@ApplicationContext context: Context): Settings = Settings(context)
 }

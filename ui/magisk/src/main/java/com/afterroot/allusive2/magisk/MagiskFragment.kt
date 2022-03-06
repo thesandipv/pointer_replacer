@@ -128,6 +128,23 @@ class MagiskFragment : Fragment() {
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
+                binding.installModule.apply {
+                    visible(true)
+                    setOnClickListener {
+                        installModule(module.path) { isSuccess, output ->
+                            if (isSuccess) {
+                                output.forEach {
+                                    updateProgress(it)
+                                }
+                                updateProgress(completed = true)
+                                showRebootDialog(requireContext())
+                            } else {
+                                updateProgress("- Module installation failed")
+                                updateProgress(completed = true)
+                            }
+                        }
+                    }
+                }
             }
             updateProgress(completed = true)
         }
@@ -201,7 +218,7 @@ class MagiskFragment : Fragment() {
         var result: File?
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
-            val path = frameworkExtractPath(requireContext()) // + "/assets" //TODO Remove "/assets"
+            val path = frameworkExtractPath(requireContext())
             result = zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
         }
         updateProgress("- Repack Successful")
