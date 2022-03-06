@@ -16,5 +16,7 @@ package com.afterroot.allusive2.data
 
 import com.afterroot.allusive2.database.DatabaseFields
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 fun FirebaseFirestore.pointers() = collection(DatabaseFields.COLLECTION_POINTERS)
+fun FirebaseStorage.pointers() = reference.child(DatabaseFields.COLLECTION_POINTERS)

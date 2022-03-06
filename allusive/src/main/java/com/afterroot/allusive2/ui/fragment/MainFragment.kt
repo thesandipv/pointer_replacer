@@ -58,6 +58,7 @@ import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
+import com.afterroot.allusive2.database.addLocalPointer
 import com.afterroot.allusive2.databinding.FragmentMainBinding
 import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.getMinPointerSize
@@ -533,10 +534,13 @@ class MainFragment : Fragment() {
 
     private fun generateRoomPointerFromFileName(fileNames: List<String>) {
         fileNames.forEach { filename ->
-            addLocalPointer(filename)
+            lifecycleScope.launch {
+                myDatabase.addLocalPointer(filename)
+            }
         }
     }
 
+/*
     private fun addLocalPointer(fileName: String) {
         val pointer = RoomPointer(
             file_name = fileName,
@@ -549,7 +553,9 @@ class MainFragment : Fragment() {
             addRoomPointer(pointer)
         }
     }
+*/
 
+/*
     private suspend fun addRoomPointer(roomPointer: RoomPointer) {
         if (roomPointer.file_name == null) {
             return
@@ -558,6 +564,7 @@ class MainFragment : Fragment() {
             myDatabase.pointerDao().add(roomPointer)
         }
     }
+*/
 
     private fun import() {
         val safUri = settings.safUri ?: ""

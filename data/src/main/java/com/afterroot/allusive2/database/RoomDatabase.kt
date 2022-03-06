@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -63,7 +64,7 @@ interface PointerDao {
     @Query("SELECT * FROM pointers ORDER BY pointer_name")
     fun getAll(): LiveData<List<RoomPointer>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(vararg pointer: RoomPointer)
 
     @Delete

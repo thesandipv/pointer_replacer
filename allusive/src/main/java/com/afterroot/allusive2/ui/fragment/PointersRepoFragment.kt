@@ -41,8 +41,9 @@ import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.Settings
-import com.afterroot.allusive2.adapter.PointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.data.mapper.toRoomPointer
+import com.afterroot.allusive2.data.pointers
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.DialogEditPointerBinding
@@ -50,11 +51,9 @@ import com.afterroot.allusive2.databinding.FragmentPointerInfoBinding
 import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.Pointer
-import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.allusive2.viewmodel.ViewModelState
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
@@ -63,14 +62,15 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
-import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
@@ -88,14 +88,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentPointerRepoBinding
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private lateinit var pointersAdapter: PointersAdapter
-    private lateinit var pointersList: List<Pointer>
     private lateinit var pointersPagingAdapter: PointerPagingAdapter
     private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var targetPath: String
     private val networkViewModel: NetworkViewModel by viewModels()
     private val sharedViewModel: MainSharedViewModel by viewModels()
-    private var filteredList: List<Pointer>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentPointerRepoBinding.inflate(inflater, container, false)
@@ -160,7 +157,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     // Function for using new list adapter.
     private fun setUpAdapter() {
-        // pointersAdapter = PointersAdapter(this)
         pointersPagingAdapter = PointerPagingAdapter(this, storage)
         binding.list.apply {
             val lm = LinearLayoutManager(requireContext())
@@ -173,50 +169,22 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         setUpFilter()
     }
 
-    private fun displayPointers(pointers: List<Pointer> = emptyList(), pagedData: PagingData<Pointer>? = null) {
-        if (pagedData == null) {
-            pointersList = pointers
-            pointersAdapter.submitList(pointers)
-        } else {
-            lifecycleScope.launch {
-                pointersPagingAdapter.submitData(pagedData)
-            }
+    private fun displayPointers(pagedData: PagingData<Pointer>) {
+        lifecycleScope.launch {
+            pointersPagingAdapter.submitData(pagedData)
         }
     }
 
-    private fun loadPointers(orderBy: String = settings.orderBy) {
-        val enablePaged = true
-        if (enablePaged) {
-            lifecycleScope.launch {
-                sharedViewModel.pointers.collectLatest {
-                    displayPointers(pagedData = it)
-                }
+    private fun loadPointers() {
+        lifecycleScope.launch {
+            sharedViewModel.pointers.collectLatest {
+                displayPointers(pagedData = it)
             }
+        }
 
-            lifecycleScope.launch {
-                pointersPagingAdapter.loadStateFlow.collectLatest {
-                    binding.repoSwipeRefresh.isRefreshing = it.refresh is LoadState.Loading || it.append is LoadState.Loading
-                }
-            }
-        } else {
-            sharedViewModel.getPointerSnapshot().observe(viewLifecycleOwner) { state ->
-                when (state) {
-                    is ViewModelState.Loading -> {
-                        binding.repoSwipeRefresh.isRefreshing = true
-                    }
-                    is ViewModelState.Loaded<*> -> {
-                        binding.repoSwipeRefresh.isRefreshing = false
-                        pointersSnapshot = state.data as QuerySnapshot
-                        val result: List<Pointer> = pointersSnapshot.toObjects()
-                        val currOrder = if (orderBy == settings.orderBy) orderBy else settings.orderBy
-                        pointersList = if (currOrder == DatabaseFields.FIELD_TIME) {
-                            result.sortedByDescending { it.time }
-                        } else {
-                            result.sortedByDescending { it.downloads }
-                        }
-                        displayPointers(pointersList)
-                    }
-                }
+        lifecycleScope.launch {
+            pointersPagingAdapter.loadStateFlow.collectLatest {
+                binding.repoSwipeRefresh.isRefreshing = it.refresh is LoadState.Loading || it.append is LoadState.Loading
             }
         }
     }
@@ -236,13 +204,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipSortByDate.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    /*displayPointers(
-                        (filteredList ?: pointersList).sortedByDescending {
-                            it.time
-                        }
-                    )*/
                     settings.orderBy = DatabaseFields.FIELD_TIME
-                    // loadPointers()
                     refreshData()
                 }
             }
@@ -250,13 +212,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         binding.filterChipSortByDownload.apply {
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    /*displayPointers(
-                        (filteredList ?: pointersList).sortedByDescending {
-                            it.downloads
-                        }
-                    )*/
                     settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
-                    // loadPointers()
                     refreshData()
                 }
             }
@@ -360,35 +316,19 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     private fun downloadPointer(pointer: Pointer) {
         val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
-        val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(pointer.filename!!)
+        val ref = storage.pointers().child(pointer.filename!!)
         ref.getFile(File("$targetPath${pointer.filename}"))
             .addOnSuccessListener {
                 sharedViewModel.displayMsg(getString(R.string.msg_pointer_downloaded))
-                if (!BuildConfig.DEBUG) {
-                    pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
-                        .addOnSuccessListener {
-                            val docId = it.documents.first().id
-                            firestore.collection(DatabaseFields.COLLECTION_POINTERS).document(docId).update(
-                                DatabaseFields.FIELD_DOWNLOADS,
-                                pointer.downloads + 1
-                            )
-                        }
-                }
-                var id = ""
-                var name = ""
-                pointer.uploadedBy!!.forEach {
-                    id = it.key
-                    name = it.value
-                }
-                val roomPointer = RoomPointer(
-                    file_name = pointer.filename,
-                    pointer_desc = pointer.description,
-                    pointer_name = pointer.name,
-                    uploader_id = id,
-                    uploader_name = name
-                )
                 lifecycleScope.launch {
-                    myDatabase.pointerDao().add(roomPointer)
+                    if (!BuildConfig.DEBUG) {
+                        val snapshot = firestore.pointers().whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename)
+                            .get(Source.CACHE).await()
+                        firestore.pointers().document(snapshot.documents.first().id)
+                            .update(DatabaseFields.FIELD_DOWNLOADS, FieldValue.increment(1))
+                    }
+
+                    myDatabase.pointerDao().add(pointer.toRoomPointer())
                 }
 
                 dialog.dismiss()

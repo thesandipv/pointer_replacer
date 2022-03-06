@@ -20,18 +20,18 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 fun Pointer.toRoomPointer(): RoomPointer {
-    var id = ""
-    var name = ""
+    var uploaderId = ""
+    var uploaderName = ""
     uploadedBy?.forEach {
-        id = it.key
-        name = it.value
+        uploaderId = it.key
+        uploaderName = it.value
     }
     return RoomPointer(
         file_name = filename,
         pointer_desc = description,
         pointer_name = name,
-        uploader_id = id,
-        uploader_name = name
+        uploader_id = uploaderId,
+        uploader_name = uploaderName
     )
 }
 
