@@ -46,6 +46,7 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.showStaticProgressDialog
+import com.afterroot.data.utils.FirebaseUtils
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -72,6 +73,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var interstitialAd: InterstitialAd
     @Inject lateinit var settings: Settings
     @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var firebaseUtils: FirebaseUtils
     private val sharedViewModel: MainSharedViewModel by viewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -362,7 +364,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         findPreference<Preference>("key_create_stub_pointers")?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                createStubPointers(firestore)
+                createStubPointers(firestore, firebaseUtils)
                 true
             }
         }

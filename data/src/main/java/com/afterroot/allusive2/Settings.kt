@@ -147,6 +147,10 @@ class Settings(val context: Context) {
             ?: DatabaseFields.FIELD_TIME
         set(value) = putString(context.getString(R.string.key_repo_order_by), value)
 
+    var filterUserPointers
+        get() = getBoolean(context.getString(R.string.key_filter_user_pointers), false)
+        set(value) = putBoolean(context.getString(R.string.key_filter_user_pointers), value)
+
     var safUri
         get() = preferences.getString(context.getString(R.string.key_saf_uri), null)
         set(value) = putString(context.getString(R.string.key_saf_uri), value)

@@ -19,7 +19,9 @@ import androidx.paging.PagingState
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.mapper.toPointer
 import com.afterroot.allusive2.data.mapper.toPointers
+import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.model.Pointer
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -27,7 +29,11 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
-class FirestorePagingSource(private val firestore: FirebaseFirestore, private val settings: Settings) :
+class FirestorePagingSource(
+    private val firestore: FirebaseFirestore,
+    private val settings: Settings,
+    private val firebaseUtils: FirebaseUtils
+) :
     PagingSource<QuerySnapshot, Pointer>() {
     override fun getRefreshKey(state: PagingState<QuerySnapshot, Pointer>): QuerySnapshot? {
         return null
@@ -35,8 +41,15 @@ class FirestorePagingSource(private val firestore: FirebaseFirestore, private va
 
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, Pointer> {
         return try {
-            val pointersQuery = firestore.pointers()
+            var pointersQuery = firestore.pointers()
                 .orderBy(settings.orderBy, Query.Direction.DESCENDING)
+
+            if (settings.filterUserPointers) {
+                pointersQuery = firestore.pointers()
+                    .orderBy("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}")
+                    // .orderBy(settings.orderBy, Query.Direction.DESCENDING)
+                    .whereNotEqualTo("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}", "")
+            }
 
             var currentPageSource = Source.CACHE
             var nextPageSource = Source.DEFAULT
@@ -95,6 +108,7 @@ class FirestorePagingSource(private val firestore: FirebaseFirestore, private va
                 nextKey = nextPage
             )
         } catch (e: Exception) {
+            Timber.e(e, "load: Error while loading")
             LoadResult.Error(e)
         }
     }

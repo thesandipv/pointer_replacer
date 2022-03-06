@@ -25,6 +25,7 @@ import androidx.paging.cachedIn
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ class MainSharedViewModel @Inject constructor(
     val savedStateHandle: SavedStateHandle,
     private val remoteConfig: FirebaseRemoteConfig,
     private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseUtils: FirebaseUtils,
     private val settings: Settings
 ) : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
@@ -61,7 +63,7 @@ class MainSharedViewModel @Inject constructor(
     }
 
     val pointers = Pager(PagingConfig(20)) {
-        FirestorePagingSource(firebaseFirestore, settings)
+        FirestorePagingSource(firebaseFirestore, settings, firebaseUtils)
     }.flow.cachedIn(viewModelScope)
 
     fun setTitle(title: String?) {

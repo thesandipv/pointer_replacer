@@ -68,6 +68,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -89,7 +90,6 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private lateinit var binding: FragmentPointerRepoBinding
     private lateinit var fabApply: ExtendedFloatingActionButton
     private lateinit var pointersPagingAdapter: PointerPagingAdapter
-    private lateinit var pointersSnapshot: QuerySnapshot
     private lateinit var targetPath: String
     private val networkViewModel: NetworkViewModel by viewModels()
     private val sharedViewModel: MainSharedViewModel by viewModels()
@@ -219,20 +219,15 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
 
         binding.filterChipShowUserUploaded.apply {
+            visible(false)
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
                 // TODO
-                /*if (isChecked) {
-                    binding.repoSwipeRefresh.isEnabled = false
-                    filteredList = pointersList.filter {
-                        it.uploadedBy?.containsKey(firebaseUtils.uid) ?: false
-                    }
-                    displayPointers(filteredList ?: pointersList)
-                } else {
-                    filteredList = null
-                    binding.repoSwipeRefresh.isEnabled = true
-                    loadPointers()
-                }*/
+                lifecycleScope.launch {
+                    settings.filterUserPointers = isChecked
+                    delay(200)
+                    refreshData()
+                }
             }
             setOnCloseIconClickListener {
                 isChecked = false
@@ -352,15 +347,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 val newTitle = binding.tiTitle.text.toString()
                 val newDesc = binding.tiDesc.text.toString()
                 if (oldTitle != newTitle || oldDesc != newDesc) {
-                    pointersSnapshot.query.whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename).get(Source.CACHE)
-                        .addOnSuccessListener {
-                            val docId = it.documents.first().id
-                            val updates = mapOf(
-                                Pair(DatabaseFields.FIELD_NAME, newTitle),
-                                Pair(DatabaseFields.FIELD_DESC, newDesc)
-                            )
-                            firestore.collection(DatabaseFields.COLLECTION_POINTERS).document(docId).update(updates)
+                    lifecycleScope.launch {
+                        val snapshot = firestore.pointers().whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename)
+                            .get(Source.CACHE).await()
+                        val docId = snapshot.documents.first().id
+                        val updates = mapOf(
+                            Pair(DatabaseFields.FIELD_NAME, newTitle),
+                            Pair(DatabaseFields.FIELD_DESC, newDesc)
+                        )
+                        firestore.pointers().document(docId).update(updates).addOnCompleteListener {
+                            refreshData()
                         }
+                    }
                 } else {
                     // No changes to save. dismiss dialog.
                     dismiss()
