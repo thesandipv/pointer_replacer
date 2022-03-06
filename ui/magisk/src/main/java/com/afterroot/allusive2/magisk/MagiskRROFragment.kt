@@ -76,11 +76,14 @@ class MagiskRROFragment : Fragment() {
         // Fake Update one time
         updateProgress()
 
-        binding.openMagisk.setOnClickListener {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
-            if (intent != null) {
-                startActivity(intent)
-            } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+        binding.openMagisk.apply {
+            visible(false)
+            setOnClickListener {
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                if (intent != null) {
+                    startActivity(intent)
+                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+            }
         }
 
         setPointerImage()
@@ -94,6 +97,7 @@ class MagiskRROFragment : Fragment() {
         val selectedPointerModule =
             File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_RRO_Magisk.zip"))
         if (selectedPointerModule.exists()) {
+            setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialDialog(requireContext()).show {
                 title(text = "Magisk module exist")
@@ -103,6 +107,7 @@ class MagiskRROFragment : Fragment() {
                         |- If you want to repack anyway click 'REPACK ANYWAY'""".trimMargin()
                 )
                 positiveButton(text = "REPACK ANYWAY") {
+                    setupInstallButton(selectedPointerModule.path, false)
                     createMagiskModule()
                 }
                 negativeButton(android.R.string.cancel) {
@@ -142,28 +147,32 @@ class MagiskRROFragment : Fragment() {
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
-                binding.installModule.apply {
-                    visible(true)
-                    setOnClickListener {
-                        showRROExperimentalWarning(requireContext()) { response ->
-                            if (!response) return@showRROExperimentalWarning
-                            installModule(module.path) { isSuccess, output ->
-                                if (isSuccess) {
-                                    output.forEach {
-                                        updateProgress(it)
-                                    }
-                                    updateProgress(completed = true)
-                                    showRebootDialog(requireContext())
-                                } else {
-                                    updateProgress("- Module installation failed")
-                                    updateProgress(completed = true)
-                                }
+                setupInstallButton(module.path)
+            }
+            updateProgress(completed = true)
+        }
+    }
+
+    private fun setupInstallButton(path: String, visible: Boolean = true) {
+        binding.installModule.apply {
+            visible(visible)
+            setOnClickListener {
+                showRROExperimentalWarning(requireContext()) { response ->
+                    if (!response) return@showRROExperimentalWarning
+                    installModule(path) { isSuccess, output ->
+                        if (isSuccess) {
+                            output.forEach {
+                                updateProgress(it)
                             }
+                            updateProgress(completed = true)
+                            showRebootDialog(requireContext())
+                        } else {
+                            updateProgress("- Module installation failed")
+                            updateProgress(completed = true)
                         }
                     }
                 }
             }
-            updateProgress(completed = true)
         }
     }
 

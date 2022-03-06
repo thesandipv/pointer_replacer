@@ -16,7 +16,6 @@ package com.afterroot.allusive2.magisk
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -75,22 +74,26 @@ class MagiskFragment : Fragment() {
         // Fake Update one time
         updateProgress()
 
-        binding.openMagisk.setOnClickListener {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
-            if (intent != null) {
-                startActivity(intent)
-            } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+        binding.openMagisk.apply {
+            visible(false)
+            setOnClickListener {
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                if (intent != null) {
+                    startActivity(intent)
+                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             updateProgress("- Android 11 and Up Not Supported")
             updateProgress(completed = true)
             return
-        }
+        }*/
 
         val selectedPointerModule =
             File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_Magisk.zip"))
         if (selectedPointerModule.exists()) {
+            setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialDialog(requireContext()).show {
                 title(text = "Magisk module exist")
@@ -100,6 +103,7 @@ class MagiskFragment : Fragment() {
                         |- If you want to repack anyway click 'Yes'""".trimMargin()
                 )
                 positiveButton(text = "Yes") {
+                    setupInstallButton(selectedPointerModule.path, false)
                     createMagiskModule()
                 }
                 negativeButton(android.R.string.cancel) {
@@ -128,25 +132,28 @@ class MagiskFragment : Fragment() {
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
-                binding.installModule.apply {
-                    visible(true)
-                    setOnClickListener {
-                        installModule(module.path) { isSuccess, output ->
-                            if (isSuccess) {
-                                output.forEach {
-                                    updateProgress(it)
-                                }
-                                updateProgress(completed = true)
-                                showRebootDialog(requireContext())
-                            } else {
-                                updateProgress("- Module installation failed")
-                                updateProgress(completed = true)
-                            }
+            }
+            updateProgress(completed = true)
+        }
+    }
+
+    private fun setupInstallButton(path: String, visible: Boolean = true) {
+        binding.installModule.apply {
+            visible(visible)
+            setOnClickListener {
+                installModule(path) { isSuccess, output ->
+                    if (isSuccess) {
+                        output.forEach {
+                            updateProgress(it)
                         }
+                        updateProgress(completed = true)
+                        showRebootDialog(requireContext())
+                    } else {
+                        updateProgress("- Module installation failed")
+                        updateProgress(completed = true)
                     }
                 }
             }
-            updateProgress(completed = true)
         }
     }
 
