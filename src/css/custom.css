@@ -5,6 +5,10 @@
  * work well for content-centric websites.
  */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #42a5f5;
@@ -17,7 +21,7 @@
   --ifm-code-font-size: 95%;
 }
 
-html[data-theme='dark'] {
+[data-theme='dark'] {
   --ifm-color-primary: #42a5f5;
   --ifm-color-primary-dark: #314047;
   --ifm-color-primary-darker: #2f3c43;
@@ -32,6 +36,10 @@ html[data-theme='dark'] {
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+[data-theme='dark'] .docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .video-container {

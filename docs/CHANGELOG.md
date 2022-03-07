@@ -1,10 +1,18 @@
+---
+id: allusive-releases
+title: Changelog
+description: Release History
+slug: /changes
+sidebar_position: 2
+---
+
 # Changelog
 
 ## v1.9.x
 
 ### v1.9.4 (05/05/2021)
 
-- Initial Support for Making *Magisk* Modules.
+- Initial Support for Making _Magisk_ Modules.
 
 #### How to create and apply the magisk module?
 
@@ -80,7 +88,7 @@ Open magisk manager and apply module from generated zip.
 ### v1.8.2 (07/09/2019)
 
 - Pointer Picker is now a detailed list. [1st time you should click 'Import Old Pointers']  
-More detail in Pointer Repo List
+  More detail in Pointer Repo List
 - Transparent grid behind pointers for better Handling of Transparent Pointers
 - Description is now optional while uploading new pointer
 
