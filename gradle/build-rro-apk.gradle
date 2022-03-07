@@ -1,0 +1,40 @@
+import org.gradle.work.Incremental
+import org.gradle.work.InputChanges
+
+abstract class BuildRROApk extends DefaultTask {
+    @Incremental
+    @InputDirectory
+    abstract DirectoryProperty getInputDir()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void execute(InputChanges inputChanges) {
+        Boolean isCreate = false
+
+        inputChanges.getFileChanges(inputDir).each { change ->
+            if (change.fileType == FileType.DIRECTORY) return
+            isCreate = true
+        }
+    }
+}
+
+tasks.register("copyRROApk", Copy) {
+    dependsOn ':allusive_rro:assembleDebug'
+    from("$rootDir/allusive_rro/build/outputs/apk/debug/")
+    into("$rootDir/ui/magisk/module/rro-module/system/vendor/overlay/")
+    include("allusive_rro-debug.apk")
+    rename('allusive_rro-debug.apk', 'allusive_rro.apk')
+}
+
+tasks.register('buildRROApk', BuildRROApk) {
+    //Task Meta data
+    group = BasePlugin.BUILD_GROUP
+    description = "Build RRO Apk"
+
+    dependsOn 'copyRROApk'
+
+    inputDir = file("$rootDir/allusive_rro/src")
+    outputDir = file("$rootDir/ui/magisk/module/rro-module/system/vendor/overlay")
+}

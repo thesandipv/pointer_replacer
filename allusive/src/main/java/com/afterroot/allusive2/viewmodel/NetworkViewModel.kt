@@ -12,39 +12,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.viewmodel
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.afterroot.core.network.NetworkState
 import com.afterroot.core.network.NetworkStateMonitor
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class NetworkViewModel(val networkStateMonitor: NetworkStateMonitor) : ViewModel() {
+@HiltViewModel
+class NetworkViewModel @Inject constructor(
+    private val networkStateMonitor: NetworkStateMonitor
+) : ViewModel() {
 
-    inline fun monitor(
+    fun monitor(
         lifecycleOwner: LifecycleOwner,
-        noinline doInitially: (() -> Unit)? = null,
-        crossinline onConnect: (state: NetworkState) -> Unit,
-        noinline onDisconnect: ((state: NetworkState) -> Unit)? = null
+        doInitially: (() -> Unit)? = null,
+        onConnect: (state: NetworkState) -> Unit,
+        onDisconnect: ((state: NetworkState) -> Unit)? = null
     ) {
         if (doInitially == null) {
             onConnect(NetworkState.CONNECTED) // Run [doWhenConnected] id [doInitially] is null
         } else {
             doInitially.invoke()
         }
-        networkStateMonitor.observe(
-            lifecycleOwner,
-            {
-                when (it) {
-                    NetworkState.CONNECTED -> {
-                        onConnect(NetworkState.CONNECTED)
-                    }
-                    else -> {
-                        onDisconnect?.invoke(it)
-                    }
+        networkStateMonitor.observe(lifecycleOwner) {
+            when (it) {
+                NetworkState.CONNECTED -> {
+                    onConnect(NetworkState.CONNECTED)
+                }
+                else -> {
+                    onDisconnect?.invoke(it)
                 }
             }
-        )
+        }
     }
 }

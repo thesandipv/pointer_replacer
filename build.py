@@ -25,6 +25,14 @@ def rm(file):
 
 if os.path.exists('ui/magisk/src/main/assets/empty-module.zip'):
     rm('ui/magisk/src/main/assets/empty-module.zip')
+
+if os.path.exists('ui/magisk/src/main/assets/rro-module.zip'):
+    rm('ui/magisk/src/main/assets/rro-module.zip')
+
 print('Creating empty-module.zip')
 shutil.make_archive('ui/magisk/src/main/assets/empty-module', 'zip', 'ui/magisk/module/empty-module')
 print('Created empty-module.zip')
+
+print('Creating rro-module.zip')
+shutil.make_archive('ui/magisk/src/main/assets/rro-module', 'zip', 'ui/magisk/module/rro-module')
+print('Created rro-module.zip')

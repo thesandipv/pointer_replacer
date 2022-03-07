@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.ui.fragment
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -44,17 +45,19 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.visible
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.find
-import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Created by Sandip on 04-10-2017.
  */
+@AndroidEntryPoint
 class CustomizeFragment : Fragment() {
     private lateinit var typePath: String
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private var pointerType: Int = 0
     private var selectedColor: Int = 0
     private var typeAlpha: Int = 255
@@ -119,6 +122,7 @@ class CustomizeFragment : Fragment() {
         setClickListeners()
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onStart() {
         super.onStart()
 
@@ -271,7 +275,7 @@ class CustomizeFragment : Fragment() {
 
                 MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                     title(R.string.choose_color)
-                    colorChooser(
+                    @Suppress("UNUSED_VARIABLE") var dialog = colorChooser(
                         ColorPalette.Primary,
                         ColorPalette.PrimarySub,
                         allowCustomArgb = true,

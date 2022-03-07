@@ -28,11 +28,13 @@ gradleEnterprise {
 enableFeaturePreview("VERSION_CATALOGS")
 
 include ':allusive'
+include ':allusive_rro'
 include ':base'
 include ':data'
 include ':ui:magisk'
 include ':ui:repo'
 include ':ui:resources'
+include ':ards:lib'
 
 //AfterROOT Core
 include ':core'

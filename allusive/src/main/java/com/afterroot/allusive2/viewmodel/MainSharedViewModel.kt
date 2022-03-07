@@ -12,31 +12,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainSharedViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+class MainSharedViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle,
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseUtils: FirebaseUtils,
+    private val settings: Settings
+) : ViewModel() {
     private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
 
+    init {
+        remoteConfig.fetchAndActivate().addOnSuccessListener {
+            savedStateHandle["configLoaded"] = true
+        }
+    }
+
     fun getPointerSnapshot(): LiveData<ViewModelState> {
         if (pointerSnapshot.value == null) {
             pointerSnapshot.postValue(ViewModelState.Loading)
-            FirebaseFirestore.getInstance().collection(DatabaseFields.COLLECTION_POINTERS)
+            firebaseFirestore.collection(DatabaseFields.COLLECTION_POINTERS)
                 .addSnapshotListener { querySnapshot, _ -> // TODO Remove Snapshot listener and replace with query.
                     if (querySnapshot != null) {
                         pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
@@ -47,7 +63,7 @@ class MainSharedViewModel : ViewModel(), KoinComponent {
     }
 
     val pointers = Pager(PagingConfig(20)) {
-        FirestorePagingSource(get())
+        FirestorePagingSource(firebaseFirestore, settings, firebaseUtils)
     }.flow.cachedIn(viewModelScope)
 
     fun setTitle(title: String?) {

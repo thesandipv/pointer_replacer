@@ -12,26 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2
 
 import androidx.annotation.Keep
 import androidx.multidex.MultiDexApplication
-import com.afterroot.allusive2.di.allModules
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import com.afterroot.allusive2.utils.whenBuildIs
+import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 
 @Suppress("unused")
 @Keep
+@HiltAndroidApp
 class MyApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
-        startKoin {
-            androidLogger(Level.ERROR)
-            androidContext(this@MyApplication)
-            modules(allModules)
+        whenBuildIs {
+            Timber.plant(Timber.DebugTree())
         }
     }
 }

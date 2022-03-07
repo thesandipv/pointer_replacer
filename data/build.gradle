@@ -23,7 +23,9 @@ apply from: "$rootDir/gradle/common-config-library.gradle"
 apply from: "$rootDir/gradle/oss-licence.gradle"
 
 dependencies {
+    implementation project(':base')
     implementation project(":ui:resources")
+    api project(':ards:lib')
 
     implementation libs.bundles.firebase
 
@@ -38,4 +40,14 @@ dependencies {
     api libs.androidx.room.room
     api libs.androidx.room.runtime
     kapt libs.androidx.room.compiler
+
+    api libs.okhttp.okhttp
+    api libs.okhttp.logging
+    api libs.retrofit.retrofit
+    api libs.retrofit.gson
+
+    implementation libs.hilt.hilt
+    kapt libs.hilt.compiler
+
+    implementation libs.materialdialogs.core
 }

@@ -19,7 +19,7 @@ buildscript {
     def version = [
             MAJOR: 1,
             MINOR: 10,
-            PATCH: 0,
+            PATCH: 1,
     ]
 
     ext.SDK = [
@@ -31,12 +31,8 @@ buildscript {
     ext.VERSION_CODE = SDK.MIN * 10000000 + version.MAJOR * 10000 + version.MINOR * 100 + version.PATCH
     ext.VERSION_NAME = "${version.MAJOR}.${version.MINOR}.${version.PATCH}"
 
-//    apply from: rootProject.file('gradle/deps.gradle')
-//    apply from: rootProject.file('gradle/test.gradle.kts')
-
     repositories {
         google()
-        maven { url "https://jitpack.io" }
         mavenCentral()
     }
     dependencies {
@@ -46,7 +42,7 @@ buildscript {
         classpath libs.firebase.pluginCrashlytics
         classpath libs.google.pluginOssLic
         classpath libs.androidx.navigation.pluginSafeArgs
-//        classpath libs.hilt.pluginGradle
+        classpath libs.hilt.pluginGradle
     }
 }
 
@@ -63,7 +59,6 @@ allprojects {
     }
     repositories {
         google()
-        jcenter()
         maven { url "https://jitpack.io" }
         mavenCentral()
         maven {
@@ -111,26 +106,6 @@ subprojects {
             ktlint(libs.versions.ktlint.get())
         }
     }
-}
-
-/**
- * Update dependencyUpdates task to reject versions which are more 'unstable' than our
- * current version.
- */
-try {
-    tasks.named("dependencyUpdates").configure {
-        rejectVersionIf {
-            def current = DependencyUpdates.versionToRelease(it.currentVersion)
-            // If we're using a SNAPSHOT, ignore since we must be doing so for a reason.
-            if (current == ReleaseType.SNAPSHOT) return true
-
-            // Otherwise we reject if the candidate is more 'unstable' than our version
-            def candidate = DependencyUpdates.versionToRelease(it.candidate.version)
-            return candidate.isLessStableThan(current)
-        }
-    }
-} catch (ignored) {
-
 }
 
 task clean2(type: Delete) {

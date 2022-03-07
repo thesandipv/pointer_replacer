@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.repo
 
 import android.content.Context
@@ -35,11 +34,10 @@ import com.afterroot.core.extensions.getDrawableExt
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 
-class PointerPagingAdapter(private val callbacks: ItemSelectedCallback<Pointer>) :
+class PointerPagingAdapter(private val callbacks: ItemSelectedCallback<Pointer>, private val firebaseStorage: FirebaseStorage) :
     PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
+
     companion object : DiffUtil.ItemCallback<Pointer>() {
         override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem.filename == newItem.filename
         override fun areContentsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem == newItem
@@ -47,7 +45,7 @@ class PointerPagingAdapter(private val callbacks: ItemSelectedCallback<Pointer>)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemPointerRepoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PointerVH(binding, callbacks)
+        return PointerVH(binding, callbacks, firebaseStorage)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -56,8 +54,12 @@ class PointerPagingAdapter(private val callbacks: ItemSelectedCallback<Pointer>)
     }
 }
 
-class PointerVH(binding: ItemPointerRepoBinding, private val callbacks: ItemSelectedCallback<Pointer>) :
-    RecyclerView.ViewHolder(binding.root), KoinComponent {
+class PointerVH(
+    binding: ItemPointerRepoBinding,
+    private val callbacks: ItemSelectedCallback<Pointer>,
+    private val storage: FirebaseStorage
+) :
+    RecyclerView.ViewHolder(binding.root) {
     val context: Context = binding.root.context
     private val itemName: AppCompatTextView = binding.infoPointerPackName
     private val itemThumb: AppCompatImageView = binding.infoPointerImage
@@ -67,7 +69,7 @@ class PointerVH(binding: ItemPointerRepoBinding, private val callbacks: ItemSele
     fun bind(pointer: Pointer) {
         when (pointer.reasonCode) {
             Reason.OK -> {
-                val storageReference = get<FirebaseStorage>().reference.child("pointers/${pointer.filename}")
+                val storageReference = storage.reference.child("pointers/${pointer.filename}")
                 itemName.text = pointer.name
                 pointer.uploadedBy?.forEach {
                     itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)

@@ -6,62 +6,100 @@ on:
     tags:
       - allusive_v*
       - run_ci_build
+    paths-ignore:
+      - '.idea/**'
   pull_request:
+    branches: [ main, dev ]
 
 jobs:
   build:
     name: Android Build
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
+      - uses: act10ns/slack@v1
+        with:
+          status: starting
+          channel: '#pointer-replacer'
+        if: always()
+
       - name: Check Out
+        id: check-out
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
 
+      - name: Get commit hash
+        id: commithash
+        shell: bash
+        run: |
+          sha=$( curl -u "u:${{github.token}}" https://api.github.com/repos/thesandipv/pointer_replacer/git/ref/heads/${{ github.head_ref }} | jq .object.sha | tr -d '"' )
+          if [ $sha == "null" ] || [ $sha == "" ]; then
+            if [ ${{ github.ref_type }} == "branch" ]; then
+              sha=$( curl -u "u:${{github.token}}" https://api.github.com/repos/thesandipv/pointer_replacer/git/ref/heads/${{ github.ref_name }} | jq .object.sha | tr -d '"' )
+            else
+              sha=$( curl -u "u:${{github.token}}" https://api.github.com/repos/thesandipv/pointer_replacer/git/ref/tags/${{ github.ref_name }} | jq .object.sha | tr -d '"' )
+            fi
+          fi
+          echo $sha
+          short_sha=${sha:0:7}
+          echo $short_sha
+          echo ::set-output name=sha::$sha
+          echo ::set-output name=sha_short::$short_sha
+
       - name: set up JDK
+        id: setup-jdk
         uses: actions/setup-java@v1
         with:
           java-version: 11
 
       - name: Set up Python 3
+        id: setup-python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
       - name: Grant execute permissions
+        id: grant-execute-permissions-for-scripts
         run: chmod +x release/decrypt.sh release/clean.sh
 
       - name: Decrypt Task
+        id: decrypt
         run: ./release/decrypt.sh
         env:
           ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
       - name: Grant execute permission for gradlew
+        id: grant-execute-permissions-for-gradle
         run: chmod +x gradlew
 
-      - name: Copy CI gradle.properties
-        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-
-      - name: Cache Gradle
-        uses: actions/cache@v2
-        continue-on-error: true # continue if the cache restore/upload fails
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
       - name: Build with Gradle
-        run: ./gradlew assemble bundle lintDebug testDebug --stacktrace
+        id: build
+        uses: gradle/gradle-build-action@v2
+#        run: ./gradlew assemble bundle lintDebug testDebug --stacktrace
         env:
+          CI: true
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
           GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
           SIGN_KEY_PW: ${{ secrets.SIGN_KEY_PW }}
           SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
+          COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
+        with:
+          arguments: :allusive:assemble :allusive:bundle :allusive:lintDebug :allusive:testDebug --stacktrace
+
+      - name: Run Tests in app module
+        uses: gradle/gradle-build-action@v2
+        id: run-tests
+        with:
+          arguments: :allusive:test
+        env:
+          COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
 
       - name: Publish to Play Store
+        id: publish-to-play-store
         if: startsWith(github.ref, 'refs/tags/allusive_v')
         uses: r0adkll/upload-google-play@v1
         with:
@@ -72,6 +110,7 @@ jobs:
           mappingFile: allusive/build/outputs/mapping/release/mapping.txt
 
       - name: Create release for tags
+        id: create-release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/allusive_v')
         with:
@@ -85,7 +124,16 @@ jobs:
         if: always()
         run: ./release/clean.sh
 
+      - name: Android App size difference
+        uses: microsoft/android-app-size-diff@v1.0.5
+        with:
+          baseAppPath: allusive/build/outputs/apk/release/allusive-release.apk
+          targetAppPath: allusive/build/outputs/apk/release/allusive-release.apk
+          summaryOutputPath: allusive/build/reports/apkSizeComparison.md
+          telemetryEnabled: false
+
       - name: Upload build outputs
+        id: upload-outputs
         if: always()
         uses: actions/upload-artifact@v1
         with:
@@ -93,8 +141,25 @@ jobs:
           path: allusive/build/outputs/apk/release/allusive-release.apk
 
       - name: Upload build reports
+        id: upload-reports
         if: always()
         uses: actions/upload-artifact@v1
         with:
           name: build-reports
           path: allusive/build/reports
+
+      - name: Upload to Slack
+        id: upload-to-slack
+        uses: adrey/slack-file-upload-action@1.0.5
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          path: allusive/build/outputs/apk/release/allusive-release.apk
+          channel: pointer-replacer
+          filename: Allusive-${{ steps.commithash.outputs.sha_short }}.apk
+
+      - uses: act10ns/slack@v1
+        if: always()
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#pointer-replacer'

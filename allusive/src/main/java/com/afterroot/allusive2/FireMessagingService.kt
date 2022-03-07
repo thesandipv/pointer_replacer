@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2
 
 import android.app.NotificationChannel
@@ -23,33 +22,35 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.ui.MainActivity
-import com.afterroot.allusive2.utils.FirebaseUtils
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FireMessagingService : FirebaseMessagingService() {
 
     private val _tag = "FireMessagingService"
-    private val firebaseUtils: FirebaseUtils by inject()
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    @Inject lateinit var firebaseFirestore: FirebaseFirestore
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.e(_tag, "NEW_TOKEN $token")
+        Timber.tag(_tag).e("NEW_TOKEN %s", token)
         updateToken(token)
     }
 
     private fun updateToken(token: String) {
         try {
             if (firebaseUtils.isUserSignedIn) {
-                get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS)
+                firebaseFirestore.collection(DatabaseFields.COLLECTION_USERS)
                     .document(firebaseUtils.uid!!)
                     .update(DatabaseFields.FIELD_FCM_ID, token)
             }

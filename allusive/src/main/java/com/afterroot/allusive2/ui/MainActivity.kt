@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
@@ -36,38 +36,41 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.model.User
-import com.afterroot.allusive2.utils.FirebaseUtils
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.animateProperty
 import com.afterroot.core.extensions.visible
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.design.snackbar
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var navigation: BottomNavigationView
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private val networkViewModel: NetworkViewModel by viewModel()
-    private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
-    private val firebaseUtils: FirebaseUtils by inject()
+    private val networkViewModel: NetworkViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by viewModels()
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var firebaseMessaging: FirebaseMessaging
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,11 +82,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (get<FirebaseAuth>().currentUser == null) { // If not logged in, go to login.
+        if (!firebaseUtils.isUserSignedIn) { // If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
     }
 
+    @SuppressLint("MissingPermission")
     private fun initialize() {
         if (settings.isFirstInstalled) {
             Bundle().apply {
@@ -93,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                 putString("AndroidVersion", Build.VERSION.RELEASE)
                 putString("AppVersion", BuildConfig.VERSION_CODE.toString())
                 putString("Package", BuildConfig.APPLICATION_ID)
-                FirebaseAnalytics.getInstance(this@MainActivity).logEvent("DeviceInfo2", this)
+                firebaseAnalytics.logEvent("DeviceInfo2", this)
             }
             settings.isFirstInstalled = false
         }
@@ -127,12 +131,9 @@ class MainActivity : AppCompatActivity() {
             setInAnimation(this@MainActivity, R.anim.text_switcher_in)
             setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
         }
-        sharedViewModel.liveTitle.observe(
-            this,
-            {
-                updateTitle(it)
-            }
-        )
+        sharedViewModel.liveTitle.observe(this) {
+            updateTitle(it)
+        }
     }
 
     private fun setTitle(title: String?) {
@@ -187,8 +188,8 @@ class MainActivity : AppCompatActivity() {
     private fun addUserInfoInDB() {
         try {
             val curUser = firebaseUtils.firebaseUser!!
-            val userRef = get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_USERS).document(curUser.uid)
-            get<FirebaseMessaging>().token
+            val userRef = firestore.collection(DatabaseFields.COLLECTION_USERS).document(curUser.uid)
+            firebaseMessaging.token
                 .addOnCompleteListener(
                     OnCompleteListener { tokenTask ->
                         if (!tokenTask.isSuccessful) {
@@ -200,21 +201,18 @@ class MainActivity : AppCompatActivity() {
                                     sharedViewModel.displayMsg("User not available. Creating User..")
                                     val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
                                     userRef.set(user).addOnCompleteListener { setUserTask ->
-                                        if (!setUserTask.isSuccessful) Log.e(
-                                            TAG,
-                                            "Can't create firebaseUser",
-                                            setUserTask.exception
-                                        )
+                                        if (!setUserTask.isSuccessful) Timber.tag(TAG)
+                                            .e(setUserTask.exception, "Can't create firebaseUser")
                                     }
                                 } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
                                     userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
                                 }
-                            } else Log.e(TAG, "Unknown Error", getUserTask.exception)
+                            } else Timber.tag(TAG).e(getUserTask.exception, "Unknown Error")
                         }
                     }
                 )
         } catch (e: Exception) {
-            Log.e(TAG, "addUserInfoInDB: $e")
+            Timber.tag(TAG).e(e, "addUserInfoInDB")
         }
     }
 
@@ -323,6 +321,11 @@ class MainActivity : AppCompatActivity() {
                     fabApply.hide()
                     hideNavigation()
                     setTitle("Apply with Magisk")
+                }
+                R.id.magiskRROFragment -> {
+                    fabApply.hide()
+                    hideNavigation()
+                    setTitle("Apply with Magisk [RRO]")
                 }
             }
         }

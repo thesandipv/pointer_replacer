@@ -68,13 +68,18 @@
     <string name="key_pointerPath" translatable="false">POINTER_PATH</string>
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
     <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
+    <string name="key_filter_user_pointers" translatable="false">pref_filter_user_pointers</string>
     <string name="key_rate_on_g_play" translatable="false">pref_rate_on_g_play</string>
     <string name="key_repo_order_by">repo_order_by</string>
     <string name="key_saf_uri">saf_uri</string>
     <string name="key_selectedMouseName" translatable="false">SELECTED_MOUSE_NAME</string>
     <string name="key_selectedMousePath" translatable="false">SELECTED_MOUSE_PATH</string>
+    <string name="key_appliedMouseSize" translatable="false">SELECTED_MOUSE_SIZE</string>
+    <string name="key_appliedMousePadding" translatable="false">SELECTED_MOUSE_PADDING</string>
     <string name="key_selectedPointerName" translatable="false">SELECTED_POINTER_NAME</string>
     <string name="key_selectedPointerPath" translatable="false">SELECTED_POINTER_PATH</string>
+    <string name="key_appliedPointerSize" translatable="false">SELECTED_POINTER_SIZE</string>
+    <string name="key_appliedPointerPadding" translatable="false">SELECTED_POINTER_PADDING</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="key_version" translatable="false">pref_version</string>
@@ -222,4 +227,8 @@
     <string name="msg_error_pointers_missing">Some Pointer(s) are missing. Please delete them and re-download</string>
     <string name="msg_missing_pointers_auto_downloaded">Missing Pointers automatically downloaded.</string>
     <string name="open_magisk_manager">Open Magisk Manager</string>
+    <string name="install_module">Install Magisk Module</string>
+    <string name="method_xposed">Xposed</string>
+    <string name="method_magisk_fw_res">Replace Pointer in framework-res.apk with Magisk</string>
+    <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
 </resources>

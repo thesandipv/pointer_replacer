@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2
 
 import android.content.Context
@@ -21,21 +20,29 @@ import androidx.core.content.edit
 import com.afterroot.allusive2.data.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.core.extensions.getPrefs
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class Settings(val context: Context) {
+class Settings @Inject constructor(@ApplicationContext val context: Context) {
 
     private val preferences: SharedPreferences = context.getPrefs()
-    private fun putString(key: String, value: String?) = preferences.edit(true) {
+    fun putString(key: String, value: String?) = preferences.edit(true) {
         putString(key, value)
     }
 
-    private fun putInt(key: String, value: Int) = preferences.edit(true) {
+    fun getString(key: String, value: String?) = preferences.getString(key, value)
+
+    fun putInt(key: String, value: Int) = preferences.edit(true) {
         putInt(key, value)
     }
 
-    private fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
+    fun getInt(key: String, value: Int) = preferences.getInt(key, value)
+
+    fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
         putBoolean(key, value)
     }
+
+    fun getBoolean(key: String, value: Boolean) = preferences.getBoolean(key, value)
 
     var pointerPath
         get() = preferences.getString(context.getString(R.string.key_pointerPath), null)
@@ -49,9 +56,25 @@ class Settings(val context: Context) {
         get() = preferences.getString(context.getString(R.string.key_selectedPointerPath), null)
         set(value) = putString(context.getString(R.string.key_selectedPointerPath), value)
 
+    var appliedPointerSize
+        get() = preferences.getInt(context.getString(R.string.key_appliedPointerSize), pointerSize)
+        set(value) = putInt(context.getString(R.string.key_appliedPointerSize), value)
+
+    var appliedPointerPadding
+        get() = preferences.getInt(context.getString(R.string.key_appliedPointerPadding), pointerPadding)
+        set(value) = putInt(context.getString(R.string.key_appliedPointerPadding), value)
+
     var selectedMousePath
         get() = preferences.getString(context.getString(R.string.key_selectedMousePath), null)
         set(value) = putString(context.getString(R.string.key_selectedMousePath), value)
+
+    var appliedMouseSize
+        get() = preferences.getInt(context.getString(R.string.key_appliedMouseSize), mouseSize)
+        set(value) = putInt(context.getString(R.string.key_appliedMouseSize), value)
+
+    var appliedMousePadding
+        get() = preferences.getInt(context.getString(R.string.key_appliedMousePadding), mousePadding)
+        set(value) = putInt(context.getString(R.string.key_appliedMousePadding), value)
 
     var selectedPointerName
         get() = preferences.getString(context.getString(R.string.key_selectedPointerName), null)
@@ -123,7 +146,12 @@ class Settings(val context: Context) {
 
     var orderBy
         get() = preferences.getString(context.getString(R.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
+            ?: DatabaseFields.FIELD_TIME
         set(value) = putString(context.getString(R.string.key_repo_order_by), value)
+
+    var filterUserPointers
+        get() = getBoolean(context.getString(R.string.key_filter_user_pointers), false)
+        set(value) = putBoolean(context.getString(R.string.key_filter_user_pointers), value)
 
     var safUri
         get() = preferences.getString(context.getString(R.string.key_saf_uri), null)
