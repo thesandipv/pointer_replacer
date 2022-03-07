@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,22 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afterroot.allusive2
+package com.afterroot.allusive2.data
 
-import androidx.annotation.Keep
-import androidx.multidex.MultiDexApplication
-import com.afterroot.allusive2.utils.whenBuildIs
-import dagger.hilt.android.HiltAndroidApp
-import timber.log.Timber
+import com.afterroot.allusive2.database.DatabaseFields
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
-@Suppress("unused")
-@Keep
-@HiltAndroidApp
-class MyApplication : MultiDexApplication() {
-    override fun onCreate() {
-        super.onCreate()
-        whenBuildIs {
-            Timber.plant(Timber.DebugTree())
-        }
-    }
-}
+fun FirebaseFirestore.pointers() = collection(DatabaseFields.COLLECTION_POINTERS)
+fun FirebaseStorage.pointers() = reference.child(DatabaseFields.COLLECTION_POINTERS)

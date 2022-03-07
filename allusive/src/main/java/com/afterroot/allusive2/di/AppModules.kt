@@ -14,98 +14,52 @@
  */
 package com.afterroot.allusive2.di
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Settings
-import com.afterroot.allusive2.database.roomModule
-import com.afterroot.allusive2.utils.FirebaseUtils
-import com.afterroot.allusive2.utils.whenBuildIs
-import com.afterroot.allusive2.viewmodel.MainSharedViewModel
-import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.core.network.NetworkStateMonitor
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
-import com.google.firebase.storage.FirebaseStorage
-import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.qualifier
-import org.koin.dsl.module
+import com.afterroot.allusive2.base.CoroutineDispatchers
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Named
+import javax.inject.Singleton
 
-val appModule = module {
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModules {
+    @Singleton
+    @Provides
+    fun provideDispatchers() = CoroutineDispatchers(
+        default = Dispatchers.Default,
+        io = Dispatchers.IO,
+        main = Dispatchers.Main
+    )
 
-    single(qualifier("version_code")) {
-        BuildConfig.VERSION_CODE
-    }
+    @Provides
+    @Named("feedback_email")
+    fun provideFeedbackEmail(): String = "afterhasroot@gmail.com"
 
-    single(qualifier("version_name")) {
-        BuildConfig.VERSION_NAME
-    }
+    @Provides
+    @Named("version_Code")
+    fun provideVersionCode(): Int = BuildConfig.VERSION_CODE
 
-    viewModel {
-        MainSharedViewModel()
-    }
+    @Provides
+    @Named("version_name")
+    fun provideVersionName(): String = BuildConfig.VERSION_NAME
+
+    @Provides
+    @Named("version_string")
+    fun provideVersionString() =
+        "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) - ${BuildConfig.COMMIT_ID}"
+
+    @Provides
+    @Named("feedback_body")
+    fun provideFeedbackBody(): String =
+        "" // getMailBodyForFeedback("", version = provideVersionName(), versionCode = provideVersionCode())
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder().create()
 }
-
-val firebaseModule = module {
-    single {
-        Firebase.firestore.apply {
-            firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = true
-            }
-        }
-    }
-
-    single { FirebaseStorage.getInstance() }
-
-    single { Firebase.auth }
-
-    single { Firebase.database }
-
-    single {
-        Firebase.remoteConfig.apply {
-            setConfigSettingsAsync(
-                remoteConfigSettings {
-                    fetchTimeoutInSeconds = whenBuildIs(debug = 0, release = 3600)
-                }
-            )
-        }
-    }
-
-    single { FirebaseMessaging.getInstance() }
-
-    single {
-        FirebaseUtils(get())
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-val networkModule = module {
-    single {
-        NetworkStateMonitor(get())
-    }
-
-    single {
-        androidContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
-
-    viewModel {
-        NetworkViewModel(get())
-    }
-}
-
-val settingsModule = module {
-    single {
-        Settings(androidContext())
-    }
-}
-
-val allModules = appModule + firebaseModule + roomModule + settingsModule + networkModule

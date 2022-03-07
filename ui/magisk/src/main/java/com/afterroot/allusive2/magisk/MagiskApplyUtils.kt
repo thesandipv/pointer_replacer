@@ -18,6 +18,8 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.util.Log
+import com.afollestad.materialdialogs.MaterialDialog
+import com.topjohnwu.superuser.Shell
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -162,4 +164,46 @@ fun createModuleProp(context: Context) {
     val properties = Properties()
     properties.load(FileReader(File(magiskEmptyModuleExtractPath(context) + "/module.prop")))
     properties.keys
+}
+
+fun showRebootDialog(context: Context) {
+    MaterialDialog(context).show {
+        title(res = R.string.reboot)
+        message(text = "Pointer Applied.")
+        positiveButton(res = R.string.reboot) {
+            try {
+                reboot()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        negativeButton(android.R.string.cancel) {
+        }
+    }
+}
+
+fun installModule(path: String, callback: (isSuccess: Boolean, output: List<String>) -> Unit) {
+    val list = mutableListOf<String>()
+    if (Shell.su("magisk --install-module \"${path}\"").to(list, list).exec().isSuccess) {
+        callback(true, list)
+    } else {
+        callback(false, list)
+    }
+}
+
+fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean) -> Unit) {
+    MaterialDialog(context).show {
+        title(text = "Declaration")
+        message(
+            text = "Applying Pointer by Creating RRO Layer is completely experimental. " +
+                "It's is not guaranteed that it'll work for you. By clicking Install, you understand that your device may stuck in bootloop. " +
+                "Also you are aware about methods of disabling magisk."
+        )
+        positiveButton(text = "Install") {
+            onResponse(true)
+        }
+        negativeButton(android.R.string.cancel) {
+            onResponse(false)
+        }
+    }
 }

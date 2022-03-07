@@ -24,6 +24,8 @@ apply from: "$rootDir/gradle/common-config-library.gradle"
 apply from: "$rootDir/gradle/oss-licence.gradle"
 
 dependencies {
+    implementation project(":ui:resources")
+
     api libs.glide.glide
     kapt libs.glide.compiler
 
@@ -31,4 +33,8 @@ dependencies {
 
     implementation libs.firebase.ui.firestore
     implementation libs.firebase.ui.storage
+
+    implementation libs.materialdialogs.core
+
+    api libs.timber
 }

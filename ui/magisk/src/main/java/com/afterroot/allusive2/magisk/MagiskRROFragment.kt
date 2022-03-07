@@ -17,8 +17,6 @@ package com.afterroot.allusive2.magisk
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,18 +33,19 @@ import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.Glide
-import com.topjohnwu.superuser.Shell
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MagiskRROFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -77,11 +76,14 @@ class MagiskRROFragment : Fragment() {
         // Fake Update one time
         updateProgress()
 
-        binding.openMagisk.setOnClickListener {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
-            if (intent != null) {
-                startActivity(intent)
-            } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+        binding.openMagisk.apply {
+            visible(false)
+            setOnClickListener {
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                if (intent != null) {
+                    startActivity(intent)
+                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+            }
         }
 
         setPointerImage()
@@ -95,6 +97,7 @@ class MagiskRROFragment : Fragment() {
         val selectedPointerModule =
             File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_RRO_Magisk.zip"))
         if (selectedPointerModule.exists()) {
+            setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialDialog(requireContext()).show {
                 title(text = "Magisk module exist")
@@ -104,6 +107,7 @@ class MagiskRROFragment : Fragment() {
                         |- If you want to repack anyway click 'REPACK ANYWAY'""".trimMargin()
                 )
                 positiveButton(text = "REPACK ANYWAY") {
+                    setupInstallButton(selectedPointerModule.path, false)
                     createMagiskModule()
                 }
                 negativeButton(android.R.string.cancel) {
@@ -143,39 +147,31 @@ class MagiskRROFragment : Fragment() {
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
-                binding.installModule.apply {
-                    visible(true)
-                    setOnClickListener {
-                        val list = mutableListOf<String>()
-                        if (Shell.su("magisk --install-module \"${module.path}\"").to(list).exec().isSuccess) {
-                            list.forEach {
+                setupInstallButton(module.path)
+            }
+            updateProgress(completed = true)
+        }
+    }
+
+    private fun setupInstallButton(path: String, visible: Boolean = true) {
+        binding.installModule.apply {
+            visible(visible)
+            setOnClickListener {
+                showRROExperimentalWarning(requireContext()) { response ->
+                    if (!response) return@showRROExperimentalWarning
+                    installModule(path) { isSuccess, output ->
+                        if (isSuccess) {
+                            output.forEach {
                                 updateProgress(it)
                             }
                             updateProgress(completed = true)
-                            showRebootDialog()
+                            showRebootDialog(requireContext())
                         } else {
                             updateProgress("- Module installation failed")
                             updateProgress(completed = true)
                         }
                     }
                 }
-            }
-            updateProgress(completed = true)
-        }
-    }
-
-    private fun showRebootDialog() {
-        MaterialDialog(requireActivity()).show {
-            title(res = R.string.reboot)
-            message(text = "Pointer Applied.")
-            positiveButton(res = R.string.reboot) {
-                try {
-                    reboot()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            negativeButton(android.R.string.cancel) {
             }
         }
     }
@@ -190,13 +186,10 @@ class MagiskRROFragment : Fragment() {
 
         if (completed) {
             // Wait before sending result
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    progress.value = Result.Success
-                },
-                300
-            )
-
+            lifecycleScope.launch {
+                delay(300)
+                progress.value = Result.Success
+            }
             return
         }
         progress.value = Result.Running(stringBuilder.toString())

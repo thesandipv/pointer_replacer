@@ -67,7 +67,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:divider="?android:attr/dividerHorizontal"
                 android:dividerPadding="8dp"
                 android:orientation="horizontal"
                 android:paddingStart="@dimen/activity_horizontal_margin"
@@ -79,6 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"
+                    android:paddingStart="0dp"
                     android:paddingEnd="16dp"
                     app:checkedChip="@id/filter_chip_sort_by_date"
                     app:singleLine="true"
@@ -103,7 +103,8 @@
                     android:id="@+id/repo_filter_chip_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/filter_chip_show_user_uploaded"

@@ -12,10 +12,27 @@
               <option name="patterns">
                 <list>
                   <Item>
-                    <option name="path" value=".github/workflows/android.yml" />
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*/**/.github/workflows/*.yml" />
+                    <option name="mappingKind" value="Pattern" />
                   </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="version_checker.config">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="version_checker" />
+              <option name="relativePathToSchema" value="data_structures/remote-config/pointer-replacer/config/schema/version_checker.config.json" />
+              <option name="schemaVersion" value="JSON Schema version 7" />
+              <option name="patterns">
+                <list>
                   <Item>
-                    <option name="path" value="website/.github/workflows/firebase-hosting-merge.yml" />
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*/**/versions_*.json" />
+                    <option name="mappingKind" value="Pattern" />
                   </Item>
                 </list>
               </option>

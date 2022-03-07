@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,19 +14,24 @@
  */
 package com.afterroot.allusive2.database
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
-import org.koin.android.ext.koin.androidApplication
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -40,16 +45,18 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-val roomModule = module {
-    single {
-        Room.databaseBuilder(
-            androidApplication(),
-            MyDatabase::class.java,
-            "installed-pointers"
-        ).addMigrations(MIGRATION_1_2).build()
-    }
+@InstallIn(SingletonComponent::class)
+@Module
+object RoomModule {
+    @Provides
+    fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
+        context,
+        MyDatabase::class.java,
+        "installed-pointers"
+    ).addMigrations(MIGRATION_1_2).build()
 
-    single { get<MyDatabase>().pointerDao() }
+    @Provides
+    fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
 }
 
 @Dao
@@ -57,7 +64,7 @@ interface PointerDao {
     @Query("SELECT * FROM pointers ORDER BY pointer_name")
     fun getAll(): LiveData<List<RoomPointer>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(vararg pointer: RoomPointer)
 
     @Delete

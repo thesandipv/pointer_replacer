@@ -21,15 +21,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
-import android.util.Log
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -39,10 +41,12 @@ import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.showStaticProgressDialog
+import com.afterroot.data.utils.FirebaseUtils
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -52,20 +56,25 @@ import com.android.billingclient.api.SkuDetailsParams
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import javax.inject.Inject
 
 @SuppressLint("ValidFragment")
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var billingClient: BillingClient
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private lateinit var interstitialAd: InterstitialAd
-    private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    private val sharedViewModel: MainSharedViewModel by viewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -85,6 +94,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         initBilling()
 //        setUpAds()
         setRateOnGPlay()
+        setDebugPreferences()
     }
 
     private fun initBilling() {
@@ -95,8 +105,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     val params = ConsumeParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
                     billingClient.consumeAsync(params) { result, _ ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            Log.d(TAG, "initBilling: Purchase Done and Consumed")
-                        } else Log.d(TAG, "initBilling: Purchase Done but not Consumed.")
+                            Timber.tag(TAG).d("initBilling: Purchase Done and Consumed")
+                        } else Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
                     }
                 }
             }.build()
@@ -340,7 +350,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }
                 }
             }
-        } else Log.d(TAG, "loadAllSku: Billing not ready")
+        } else Timber.tag(TAG).d("loadAllSku: Billing not ready")
+    }
+
+    private fun setDebugPreferences() {
+        if (!BuildConfig.DEBUG) return
+        findPreference<SwitchPreference>("key_enable_emulator")?.apply {
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { pref, newV ->
+                Toast.makeText(requireContext(), "App will close. You'll need to restart.", Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+                true
+            }
+        }
+        findPreference<Preference>("key_create_stub_pointers")?.apply {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                createStubPointers(firestore, firebaseUtils)
+                true
+            }
+        }
     }
 
     companion object {

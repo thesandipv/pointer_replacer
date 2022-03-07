@@ -16,7 +16,6 @@ package com.afterroot.allusive2.magisk
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -33,16 +32,18 @@ import com.afterroot.allusive2.Result
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.visible
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MagiskFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
-    private val settings: Settings by inject()
+    @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -73,22 +74,26 @@ class MagiskFragment : Fragment() {
         // Fake Update one time
         updateProgress()
 
-        binding.openMagisk.setOnClickListener {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
-            if (intent != null) {
-                startActivity(intent)
-            } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+        binding.openMagisk.apply {
+            visible(false)
+            setOnClickListener {
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                if (intent != null) {
+                    startActivity(intent)
+                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             updateProgress("- Android 11 and Up Not Supported")
             updateProgress(completed = true)
             return
-        }
+        }*/
 
         val selectedPointerModule =
             File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_Magisk.zip"))
         if (selectedPointerModule.exists()) {
+            setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialDialog(requireContext()).show {
                 title(text = "Magisk module exist")
@@ -98,6 +103,7 @@ class MagiskFragment : Fragment() {
                         |- If you want to repack anyway click 'Yes'""".trimMargin()
                 )
                 positiveButton(text = "Yes") {
+                    setupInstallButton(selectedPointerModule.path, false)
                     createMagiskModule()
                 }
                 negativeButton(android.R.string.cancel) {
@@ -128,6 +134,26 @@ class MagiskFragment : Fragment() {
                 updateProgress("- Magisk module saved at: ${module.path}")
             }
             updateProgress(completed = true)
+        }
+    }
+
+    private fun setupInstallButton(path: String, visible: Boolean = true) {
+        binding.installModule.apply {
+            visible(visible)
+            setOnClickListener {
+                installModule(path) { isSuccess, output ->
+                    if (isSuccess) {
+                        output.forEach {
+                            updateProgress(it)
+                        }
+                        updateProgress(completed = true)
+                        showRebootDialog(requireContext())
+                    } else {
+                        updateProgress("- Module installation failed")
+                        updateProgress(completed = true)
+                    }
+                }
+            }
         }
     }
 
@@ -199,7 +225,7 @@ class MagiskFragment : Fragment() {
         var result: File?
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
-            val path = frameworkExtractPath(requireContext()) // + "/assets" //TODO Remove "/assets"
+            val path = frameworkExtractPath(requireContext())
             result = zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
         }
         updateProgress("- Repack Successful")

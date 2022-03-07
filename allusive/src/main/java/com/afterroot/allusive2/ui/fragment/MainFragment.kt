@@ -20,7 +20,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
@@ -30,10 +29,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.net.toUri
 import androidx.core.view.setPadding
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -55,6 +58,7 @@ import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
+import com.afterroot.allusive2.database.addLocalPointer
 import com.afterroot.allusive2.databinding.FragmentMainBinding
 import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.getMinPointerSize
@@ -65,11 +69,13 @@ import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
+import com.afterroot.core.data.model.VersionInfo
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.afterroot.core.onVersionGreaterThanEqualTo
+import com.afterroot.core.utils.VersionCheck
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -81,29 +87,35 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
 import org.jetbrains.anko.toast
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var interstitialAd: InterstitialAd
-    private val myDatabase: MyDatabase by inject()
-    private val remoteConfig: FirebaseRemoteConfig by inject()
-    private val settings: Settings by inject()
-    private val sharedViewModel: MainSharedViewModel by viewModel()
-    private val storage: FirebaseStorage by inject()
+    @Inject lateinit var myDatabase: MyDatabase
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var gson: Gson
+    private val sharedViewModel: MainSharedViewModel by viewModels()
+    @Inject lateinit var storage: FirebaseStorage
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -118,6 +130,7 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
+        setUpVersionCheck()
         targetPath = requireContext().getPointerSaveDir()
 
         requireActivity().apply {
@@ -422,6 +435,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    // TODO
     private fun loadInterstitialAd() {
         val interstitialAdUnitId: String = whenBuildIs(
             debug = getString(R.string.ad_interstitial_1_id),
@@ -447,7 +461,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpAd() {
-        remoteConfig.fetchAndActivate().addOnCompleteListener {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+            if (!it) return@observe
             kotlin.runCatching {
                 val bannerAdUnitId: String = whenBuildIs(
                     debug = getString(R.string.ad_banner_unit_id),
@@ -462,6 +477,42 @@ class MainFragment : Fragment() {
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
+            }
+        }
+    }
+
+    private fun setUpVersionCheck() {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+            if (!it) return@observe
+            val versionJson = remoteConfig.getString("versions_allusive")
+            if (versionJson.isBlank()) return@observe
+            val versionChecker = VersionCheck(
+                gson.fromJson(versionJson, VersionInfo::class.java)
+                    .copy(currentVersion = BuildConfig.VERSION_CODE)
+            )
+            versionChecker.onVersionDisabled {
+                AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Version Obsolete")
+                    setMessage("This version is obsolete. You have to update to latest version.")
+                    setPositiveButton("Update") { _, _ ->
+                        // TODO
+                    }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                        requireActivity().finish()
+                    }
+                    setCancelable(false)
+                }.show()
+            }
+            versionChecker.onUpdateAvailable {
+                AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Update Available")
+                    setMessage("New Version Available. Please update to get latest features.")
+                    setPositiveButton("Update") { _, _ ->
+                        // TODO
+                    }
+                    setNegativeButton(android.R.string.cancel) { _, _ ->
+                    }
+                }.show()
             }
         }
     }
@@ -481,62 +532,110 @@ class MainFragment : Fragment() {
         }
     }
 
-    /*private suspend fun generateRoomPointerFromFileName(fileNames: List<String>) {
-        val roomPointers = arrayListOf<RoomPointer>()
+    private fun generateRoomPointerFromFileName(fileNames: List<String>) {
         fileNames.forEach { filename ->
-            get<FirebaseFirestore>().collection(DatabaseFields.COLLECTION_POINTERS)
-                .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get().addOnSuccessListener { snapshot ->
-                    if (!snapshot.isEmpty) { //Pointer available in repository
-                        val p = snapshot.documents[0].toObject(Pointer::class.java)!!
-                        var id = ""
-                        var name = ""
-                        p.uploadedBy!!.forEach {
-                            id = it.key
-                            name = it.value
-                        }
-                        val pointer = RoomPointer(
-                            file_name = p.filename,
-                            pointer_desc = p.description,
-                            pointer_name = p.name,
-                            uploader_id = id,
-                            uploader_name = name
-                        )
+            lifecycleScope.launch {
+                myDatabase.addLocalPointer(filename)
+            }
+        }
+    }
 
-                        roomPointers.add(pointer)
-                        lifecycleScope.launch {
-                            if (myDatabase.pointerDao().exists(filename).isEmpty()) {
-                                myDatabase.pointerDao().add(pointer)
-                            }
-                        }
-                    } else { //Pointer not available in repository
-                        val pointer = RoomPointer(
-                            file_name = filename,
-                            uploader_name = "You (Local)",
-                            uploader_id = "N/A",
-                            pointer_name = filename,
-                            pointer_desc = "N/A"
-                        )
-                        lifecycleScope.launch {
-                            if (myDatabase.pointerDao().exists(filename).isEmpty()) {
-                                myDatabase.pointerDao().add(pointer)
+/*
+    private fun addLocalPointer(fileName: String) {
+        val pointer = RoomPointer(
+            file_name = fileName,
+            uploader_name = "You (Local)",
+            uploader_id = "N/A",
+            pointer_name = fileName,
+            pointer_desc = "N/A"
+        )
+        lifecycleScope.launch {
+            addRoomPointer(pointer)
+        }
+    }
+*/
+
+/*
+    private suspend fun addRoomPointer(roomPointer: RoomPointer) {
+        if (roomPointer.file_name == null) {
+            return
+        }
+        if (myDatabase.pointerDao().exists(roomPointer.file_name!!).isEmpty()) {
+            myDatabase.pointerDao().add(roomPointer)
+        }
+    }
+*/
+
+    private fun import() {
+        val safUri = settings.safUri ?: ""
+        when {
+            settings.safUri == "" -> {
+                Timber.d("import: Pointer Folder Uri not found. Asking for permission.")
+                // runImport = true
+                askForPointerFolderLocation()
+            }
+            arePermissionsGranted(safUri) -> {
+                // DO WORK
+                val fileNames = arrayListOf<String>()
+                val pointerFolder = DocumentFile.fromTreeUri(requireContext(), settings.safUri!!.toUri())
+
+                pointerFolder?.listFiles()?.filterNotNull()?.forEach {
+                    it.name?.let { fileName ->
+                        if (fileName == ".nomedia") return
+                        fileNames.add(fileName)
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            requireContext().contentResolver.openInputStream(it.uri)?.use { fis ->
+                                val saveFile = File(requireContext().getPointerSaveDir(), fileName)
+                                FileOutputStream(saveFile).use { fos ->
+                                    fis.copyTo(fos)
+                                }
                             }
                         }
                     }
                 }
+                lifecycleScope.launch {
+                    generateRoomPointerFromFileName(fileNames)
+                }
+            }
+            else -> {
+                Timber.d("import: Pointer Folder Uri permission not stored. Asking for permission.")
+                // runImport = true
+                askForPointerFolderLocation()
+            }
         }
     }
 
-   private fun import() { //Remove this
-         val fileNames = arrayListOf<String>()
-         File(targetPath!!).listFiles()?.forEach {
-             if (it.name != ".nomedia") {
-                 fileNames.add(it.name)
-             }
-         }
-         lifecycleScope.launch {
-             generateRoomPointerFromFileName(fileNames)
-         }
-     }*/
+    private fun arePermissionsGranted(uriString: String): Boolean {
+        // list of all persisted permissions for our app
+        val list = requireActivity().contentResolver.persistedUriPermissions
+        for (i in list.indices) {
+            val persistedUriString = list[i].uri.toString()
+            if (persistedUriString == uriString && list[i].isWritePermission && list[i].isReadPermission) {
+                return true
+            }
+        }
+        return false
+    }
+
+    val openTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+        Timber.d("Selected Uri: %s", it.toString())
+        if (it == null) return@registerForActivityResult
+        val dir = DocumentFile.fromTreeUri(requireContext(), it)
+        if (dir?.findFile(".nomedia")?.exists() == false) {
+            dir.createFile("*/text", ".nomedia")
+        }
+        settings.safUri = it.toString()
+
+        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        requireActivity().contentResolver.takePersistableUriPermission(it, takeFlags)
+
+        Toast.makeText(requireContext(), "Selected: ${it.path}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun askForPointerFolderLocation() {
+        openTree.launch(null)
+    }
 
     private lateinit var pointerAdapter: LocalPointersAdapter
     private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
@@ -545,13 +644,13 @@ class MainFragment : Fragment() {
             customView(view = bottomSheetListBinding.root)
             title(text = title)
             noAutoDismiss()
-            /*positiveButton(text = "Import Your Pointers") { //Remove this
+            positiveButton(text = "Import Your Pointers") { // Remove this
                 try {
                     import()
                 } catch (e: IllegalStateException) {
                     e.printStackTrace()
                 }
-            }*/
+            }
         }
 
         pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
@@ -576,7 +675,8 @@ class MainFragment : Fragment() {
                     title(text = "${getString(R.string.text_delete)} ${item.pointer_name}")
                     message(res = R.string.text_delete_confirm)
                     positiveButton(res = R.string.text_yes) {
-                        if (File(targetPath + item.file_name).delete()) {
+                        val pointerFile = File(targetPath + item.file_name)
+                        if (!pointerFile.exists() || pointerFile.delete()) {
                             lifecycleScope.launch {
                                 myDatabase.pointerDao().delete(item)
                             }
@@ -606,8 +706,8 @@ class MainFragment : Fragment() {
                 it.forEach { pointer ->
                     val file = File(requireContext().getPointerSaveDir() + pointer.file_name!!)
                     if (!file.exists()) {
-                        Log.d(TAG, "Missing: ${pointer.file_name}")
-                        downloadPointer(pointer)
+                        Timber.tag(TAG).d("Missing: %s", pointer.file_name)
+                        // downloadPointer(pointer)
                     }
                 }
                 pointerAdapter.submitList(it)
@@ -620,9 +720,9 @@ class MainFragment : Fragment() {
                         requireActivity().findNavController(R.id.fragment_repo_nav)
                             .navigate(R.id.repoFragment)
                     }
-                    /*bs_button_import_pointers.setOnClickListener {
-                         import()
-                     }*/
+                    bsButtonImportPointers.setOnClickListener {
+                        import()
+                    }
                 }
             }
         }
