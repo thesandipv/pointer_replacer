@@ -10003,14 +10003,12 @@ __metadata:
     "@types/react-router-dom": ^5.1.7
     autoprefixer: ^10.4.2
     clsx: ^1.1.1
-    file-loader: ^6.2.0
     postcss: ^8.4.8
     prism-react-renderer: ^1.2.1
     react: ^17.0.1
     react-dom: ^17.0.1
     tailwindcss: ^3.0.23
     typescript: ^4.6.2
-    url-loader: ^4.1.1
   languageName: unknown
   linkType: soft
 
