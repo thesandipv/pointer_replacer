@@ -17,11 +17,11 @@
 
     <!--Toolbar-->
     <style name="Widget.MyTheme.Toolbar" parent="Widget.Material3.Toolbar.Surface">
-        <item name="actionMenuTextColor">@color/color_on_primary</item>
+        <item name="actionMenuTextColor">?attr/colorOnPrimarySurface</item>
     </style>
 
     <style name="SeekBarButtonStyle">
-        <item name="android:tint">@color/color_primary</item>
+        <item name="android:tint">?attr/colorPrimary</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
     </style>
 
@@ -38,6 +38,6 @@
     </style>
 
     <style name="TextAppearance.MyStyles.Title" parent="TextAppearance.FontUbuntu.Headline6">
-        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textColor">?attr/colorOnPrimarySurface</item>
     </style>
 </resources>

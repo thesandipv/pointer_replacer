@@ -26,8 +26,8 @@ import timber.log.Timber
 @HiltAndroidApp
 class MyApplication : MultiDexApplication() {
     override fun onCreate() {
-        super.onCreate()
         DynamicColors.applyToActivitiesIfAvailable(this)
+        super.onCreate()
         whenBuildIs {
             Timber.plant(Timber.DebugTree())
         }
