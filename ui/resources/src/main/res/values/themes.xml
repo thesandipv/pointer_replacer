@@ -27,39 +27,6 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="Base.MyTheme.Old" parent="Base.AppTheme.Old">
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryVariant">@color/color_primary_variant</item>
-        <item name="colorSecondary">@color/color_secondary</item>
-        <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
-
-        <item name="colorError">@color/color_error</item>
-
-        <item name="colorOnPrimary">@color/color_on_primary</item>
-        <item name="colorOnSecondary">@color/color_on_secondary</item>
-        <item name="colorOnBackground">@color/color_on_background</item>
-        <item name="colorOnSurface">@color/color_on_surface</item>
-        <item name="colorOnError">@color/color_on_error</item>
-
-        <item name="md_corner_radius">16dp</item>
-        <item name="md_color_button_text">@color/color_primary</item>
-        <item name="md_font_title">@font/ubuntu</item>
-
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Material3.Dialog.Alert</item>
-        <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
-    </style>
-
-    <style name="Base.AppTheme.Old" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">?colorPrimaryVariant</item>
-        <!-- <item name="android:navigationBarColor">?android:colorBackground</item>
-         <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>-->
-
-        <item name="colorPrimaryDark">?colorPrimaryVariant</item>
-        <item name="colorAccent">?colorSecondary</item>
-    </style>
-
     <style name="MyTheme.Main.ActionBar" parent="MyTheme.Main">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>

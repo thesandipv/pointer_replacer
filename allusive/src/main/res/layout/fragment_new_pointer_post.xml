@@ -89,7 +89,7 @@
                         android:drawablePadding="@dimen/padding_normal"
                         android:text="@string/text_pointer_upload_notes"
                         app:drawableStartCompat="@drawable/ic_info_round"
-                        app:drawableTint="@color/color_secondary"
+                        app:drawableTint="?attr/colorSecondary"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

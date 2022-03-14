@@ -148,7 +148,7 @@ class MainFragment : Fragment() {
                         .setTitle("Apply Pointer With")
                         .setItems(R.array.pointer_apply_modes) { _, which ->
                             when (which) {
-                                0 -> { //Xposed Method
+                                0 -> { // Xposed Method
                                     applyPointer()
                                 }
                                 1 -> { // Magisk - framework-res Method

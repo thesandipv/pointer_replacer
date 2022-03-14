@@ -54,7 +54,7 @@
             android:resource="@drawable/ic_launch_screen" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/color_secondary" />
+            android:resource="?attr/colorSecondary" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
