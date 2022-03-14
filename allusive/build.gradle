@@ -58,15 +58,6 @@ android {
         }
         multiDexEnabled true
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                        "room.schemaLocation": "$projectDir/schemas".toString(),
-                        "room.incremental"   : "true"
-                ]
-            }
-        }
-
         manifestPlaceholders = [
                 hostName  : "afterroot.web.app",
                 pathPrefix: "/apps/pointer-replacer/launch"
