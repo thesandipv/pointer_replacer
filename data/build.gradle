@@ -43,7 +43,7 @@ apply from: "$rootDir/gradle/oss-licence.gradle"
 dependencies {
     implementation project(':base')
     implementation project(":ui:resources")
-    api project(':ards:lib')
+    api project(':ards')
 
     implementation libs.bundles.firebase
 

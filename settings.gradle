@@ -32,9 +32,10 @@ include ':data'
 include ':ui:magisk'
 include ':ui:repo'
 include ':ui:resources'
-include ':ards:lib'
+include ':ards'
 
 //AfterROOT Core
 include ':core'
 project(':core').projectDir = file('core/core')
+project(':ards').projectDir = file('ards/lib')
 
