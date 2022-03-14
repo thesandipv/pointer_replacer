@@ -132,6 +132,7 @@ class MagiskFragment : Fragment() {
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
                 updateProgress("- Magisk module saved at: ${module.path}")
+                setupInstallButton(module.path)
             }
             updateProgress(completed = true)
         }
