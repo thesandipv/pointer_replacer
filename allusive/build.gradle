@@ -119,6 +119,7 @@ android {
         exclude 'fabric/*.properties'
         exclude 'META-INF/*.properties'
         exclude "DebugProbesKt.bin" //Exclude coroutines debug file
+        exclude 'META-INF/DEPENDENCIES'
     }
 
     sourceSets {
