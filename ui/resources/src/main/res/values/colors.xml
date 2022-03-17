@@ -101,4 +101,6 @@
 
     <color name="seed">#1E88E5</color>
     <color name="error">#BA1B1B</color>
+
+    <color name="firebase_notification_color">?attr/colorSecondary</color>
 </resources>
