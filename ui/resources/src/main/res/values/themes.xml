@@ -19,6 +19,11 @@
         <item name="android:fontFamily">@font/ubuntu</item>
         <item name="shapeAppearanceSmallComponent">@style/MyStyle.ShapeAppearance.SmallComponents</item>
         <item name="shapeAppearanceMediumComponent">@style/MyStyle.ShapeAppearance.MediumComponents</item>
+
+        <item name="md_corner_radius">@dimen/m3_dialog_corner_radius</item>
+        <item name="md_color_button_text">?attr/colorPrimary</item>
+        <item name="md_font_title">@font/ubuntu</item>
+        <item name="md_background_color">?attr/colorSurface</item>
     </style>
 
     <style name="MyTheme.Main.Launch" parent="Theme.Allusive.Dark">
