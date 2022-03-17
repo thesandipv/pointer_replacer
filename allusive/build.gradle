@@ -137,6 +137,11 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude group: 'org.apache.httpcomponents'
+    }
+}
 
 dependencies {
     implementation project(":base")
