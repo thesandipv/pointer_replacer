@@ -126,6 +126,7 @@
             app:layout_constraintTop_toBottomOf="@+id/filter_scroll_view">
 
             <androidx.recyclerview.widget.RecyclerView
+                android:background="?attr/colorSurface"
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
