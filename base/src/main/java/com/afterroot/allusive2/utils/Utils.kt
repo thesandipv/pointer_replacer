@@ -15,37 +15,37 @@
 package com.afterroot.allusive2.utils
 
 import android.content.Context
-import com.afollestad.materialdialogs.MaterialDialog
+import androidx.appcompat.app.AlertDialog
 import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.allusive2.base.R
 import com.afterroot.core.network.NetworkState
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**
  * Top Level Misc Functions
  * */
-
+/**
+ * @return [AlertDialog] based on [NetworkState]
+ */
 fun Context.showNetworkDialog(
     state: NetworkState,
     positive: () -> Unit,
     negative: () -> Unit,
     isShowHide: Boolean = false
-) =
-    MaterialDialog(this).show {
-        title(text = if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected")
-        cancelable(false)
-        message(R.string.dialog_msg_no_network)
-        negativeButton(text = "Exit") {
-            negative()
-        }
-        positiveButton(text = "Retry") {
-            positive()
-        }
+): AlertDialog {
+    val dialog = MaterialAlertDialogBuilder(this).apply {
+        setTitle(if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected")
+        setCancelable(false)
+        setMessage(R.string.dialog_msg_no_network)
+        setNegativeButton("Exit") { _, _ -> negative() }
         if (isShowHide) {
-            positiveButton(text = "Hide") {
-                dismiss()
-            }
+            setPositiveButton("Hide") { dialog, _ -> dialog.dismiss() }
+        } else {
+            setPositiveButton("Retry") { _, _ -> positive() }
         }
     }
+    return dialog.show()
+}
 
 /**
  * Helper Function for getting different values for Debug and Release builds

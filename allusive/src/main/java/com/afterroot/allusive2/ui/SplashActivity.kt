@@ -19,9 +19,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
@@ -125,7 +125,7 @@ class SplashActivity : AppCompatActivity() {
         finish()
     }
 
-    private var dialog: MaterialDialog? = null
+    private var dialog: AlertDialog? = null
     private fun setUpNetworkObserver() {
         networkViewModel.monitor(
             this,
