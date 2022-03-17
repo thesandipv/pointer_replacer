@@ -23,13 +23,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Constants.RC_LOGIN
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,9 +95,18 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
+    private val resultLauncher = registerForActivityResult(FirebaseAuthUIActivityResultContract()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            launchDashboard()
+        } else {
+            Toast.makeText(this, getString(R.string.msg_login_failed), Toast.LENGTH_SHORT).show()
+            tryLogin()
+        }
+    }
+
     private fun tryLogin() {
         // TODO Replace with ResultContract
-        startActivityForResult(
+        resultLauncher.launch(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setLogo(R.drawable.ic_launch_screen)
@@ -107,22 +116,8 @@ class SplashActivity : AppCompatActivity() {
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
                         AuthUI.IdpConfig.GoogleBuilder().build()
                     )
-                ).build(),
-            RC_LOGIN
+                ).build()
         )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_LOGIN) {
-            if (resultCode == Activity.RESULT_OK) {
-                launchDashboard()
-            } else {
-                Toast.makeText(this, getString(R.string.msg_login_failed), Toast.LENGTH_SHORT).show()
-                tryLogin()
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 
     private fun launchDashboard() {
