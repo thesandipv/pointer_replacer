@@ -1,6 +1,7 @@
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9d283fa0bdb144128da5c58ac3b62775)](https://app.codacy.com/manual/sandipv22/pointer_replacer?utm_source=github.com&utm_medium=referral&utm_content=sandipv22/pointer_replacer&utm_campaign=Badge_Grade_Dashboard)
-![Android CI](https://github.com/thesandipv/pointer_replacer/workflows/Android%20CI/badge.svg)
+![AfterROOT OSS](https://img.shields.io/badge/AfterROOT-Open%20Source-blue)
+![Android CI](https://github.com/thesandipv/pointer_replacer/actions/workflows/android.yml/badge.svg)
+![Kotlin Code Style Check](https://github.com/thesandipv/pointer_replacer/actions/workflows/kotlin-code-style.yml/badge.svg)
 
 This module replaces pointer_spot_touch drawable in framework-res.apk.
 In short it replaces a dot appears when user touch the screen [Require Show Touches to be enabled in Developer Options.]
@@ -17,7 +18,4 @@ In short it replaces a dot appears when user touch the screen [Require Show Touc
 3. Tap on Import Pointer.
 4. Select any image to import it as pointer.
 
-**Pointer Packs:**
-
-Pokemon Pointers - You can install this pack from Install/Manage Pointer screen.
-(Note: Pointers Included in this pack are downloaded from [http://iconarchive.com](http://www.iconarchive.com/show/pokemon-icons-by-hektakun.1.html)
+**Pointer Repository:**
