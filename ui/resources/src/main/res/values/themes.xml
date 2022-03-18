@@ -26,6 +26,10 @@
         <item name="md_background_color">?attr/colorSurface</item>
     </style>
 
+    <style name="MyTheme.Main.FirebaseUI" parent="MyTheme.Main.ActionBar">
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
+    </style>
+
     <style name="MyTheme.Main.Launch" parent="Theme.Allusive.Dark">
         <item name="android:windowBackground">@drawable/launch_screen</item>
         <item name="android:windowTranslucentStatus">true</item>

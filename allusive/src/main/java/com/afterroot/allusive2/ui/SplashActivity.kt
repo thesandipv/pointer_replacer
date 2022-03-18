@@ -28,6 +28,7 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.FirebaseAuth
@@ -105,12 +106,19 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun tryLogin() {
-        // TODO Replace with ResultContract
+        val pickerLayout = AuthMethodPickerLayout.Builder(R.layout.layout_custom_auth)
+            .setGoogleButtonId(R.id.button_auth_sign_in_google)
+            .setEmailButtonId(R.id.button_auth_sign_in_email)
+            .setTosAndPrivacyPolicyId(R.id.text_top_pp)
+            .build()
+
         resultLauncher.launch(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setLogo(R.drawable.ic_launch_screen)
-                .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
+                .setAuthMethodPickerLayout(pickerLayout)
+                .setTheme(R.style.MyTheme_Main_FirebaseUI)
+                .setLogo(R.drawable.ic_login_screen)
+                .setTosAndPrivacyPolicyUrls(getString(R.string.url_privacy_policy), getString(R.string.url_privacy_policy))
                 .setAvailableProviders(
                     listOf(
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),

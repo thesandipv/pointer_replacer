@@ -168,6 +168,7 @@ dependencies {
     implementation libs.androidx.supportV13
     implementation libs.androidx.supportV4
     implementation libs.androidx.vectorDrawable
+    implementation libs.androidx.work
 
     implementation libs.androidx.room.room
     implementation libs.androidx.room.runtime

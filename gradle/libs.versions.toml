@@ -35,7 +35,7 @@ firebaseUi = "8.0.0"
 fragmentKtx = "1.5.0-alpha03"
 glide = "4.13.1"
 googleMaterial = "1.6.0-alpha03"
-googleAuth = "20.0.0"
+googleAuth = "20.1.0"
 googleAds = "20.6.0"
 gson = "2.9.0"
 hilt = "2.41"
@@ -63,6 +63,7 @@ spotless = "6.3.0"
 startUp = "1.1.0"
 transition = "1.4.1"
 vectorDrawable = "1.2.0-alpha02"
+work = "2.7.1"
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
@@ -112,6 +113,7 @@ androidx-supportV13 = { module = "androidx.legacy:legacy-support-v13", version.r
 androidx-supportV4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-transition = { module = "androidx.transition:transition-ktx", version.ref = "transition" }
 androidx-vectorDrawable = { module = "androidx.vectordrawable:vectordrawable", version.ref = "vectorDrawable" }
+androidx-work = {module = "androidx.work:work-runtime", version.ref = "work"}
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "composeActivity" }
 
@@ -227,6 +229,7 @@ firebase = [
     "firebase-ads",
     "firebase-analytics",
     "firebase-auth",
+    "google-auth",
     "firebase-config",
     "firebase-core",
     "firebase-crashlytics",
