@@ -15,53 +15,77 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="MyTheme.Main" parent="Base.MyTheme">
+    <style name="MyTheme.Main" parent="Theme.Allusive.DayNight">
         <item name="android:fontFamily">@font/ubuntu</item>
         <item name="shapeAppearanceSmallComponent">@style/MyStyle.ShapeAppearance.SmallComponents</item>
         <item name="shapeAppearanceMediumComponent">@style/MyStyle.ShapeAppearance.MediumComponents</item>
-    </style>
 
-    <style name="MyTheme.Main.Launch">
-        <item name="android:windowBackground">@drawable/launch_screen</item>
-        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
-        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">true</item>
-    </style>
-
-    <style name="Base.MyTheme" parent="Base.AppTheme">
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryVariant">@color/color_primary_variant</item>
-        <item name="colorSecondary">@color/color_secondary</item>
-        <item name="colorSecondaryVariant">@color/color_secondary_variant</item>
-
-        <item name="colorError">@color/color_error</item>
-
-        <item name="colorOnPrimary">@color/color_on_primary</item>
-        <item name="colorOnSecondary">@color/color_on_secondary</item>
-        <item name="colorOnBackground">@color/color_on_background</item>
-        <item name="colorOnSurface">@color/color_on_surface</item>
-        <item name="colorOnError">@color/color_on_error</item>
-
-        <item name="md_corner_radius">16dp</item>
-        <item name="md_color_button_text">@color/color_primary</item>
+        <item name="md_corner_radius">@dimen/m3_dialog_corner_radius</item>
+        <item name="md_color_button_text">?attr/colorPrimary</item>
         <item name="md_font_title">@font/ubuntu</item>
-
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
-        <item name="toolbarStyle">@style/Widget.MyTheme.Toolbar</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="md_background_color">?attr/colorSurface</item>
     </style>
 
-    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">?colorPrimaryVariant</item>
-        <!-- <item name="android:navigationBarColor">?android:colorBackground</item>
-         <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>-->
+    <style name="MyTheme.Main.FirebaseUI" parent="MyTheme.Main.ActionBar">
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
+    </style>
 
-        <item name="colorPrimaryDark">?colorPrimaryVariant</item>
-        <item name="colorAccent">?colorSecondary</item>
+    <style name="MyTheme.Main.Launch" parent="Theme.Allusive.Dark">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="MyTheme.Main.ActionBar" parent="MyTheme.Main">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>
     </style>
+
+    <style name="Theme.Allusive.DayNight" parent="Theme.Allusive" />
+
+    <style name="Theme.Allusive" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+
+        <item name="colorPrimaryInverse">@color/md_theme_light_primaryInverse</item>
+
+        <item name="scrimBackground">@color/white_50_alpha_060</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/nav_bar</item>
+
+        <item name="android:windowBackground">?android:colorBackground</item>
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+
+        <item name="materialCardViewStyle">@style/Widget.Material3.CardView.Filled</item>
+    </style>
+
 </resources>

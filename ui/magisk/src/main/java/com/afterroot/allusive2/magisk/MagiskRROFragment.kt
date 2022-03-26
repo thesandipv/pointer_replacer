@@ -26,13 +26,13 @@ import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.Result
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -99,20 +99,20 @@ class MagiskRROFragment : Fragment() {
         if (selectedPointerModule.exists()) {
             setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
-            MaterialDialog(requireContext()).show {
-                title(text = "Magisk module exist")
-                message(
-                    text = """- Magisk module already exist at: ${selectedPointerModule.path}
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Magisk module exist")
+                .setMessage(
+                    """- Magisk module already exist at: ${selectedPointerModule.path}
                         |- If you changed pointer size click 'REPACK ANYWAY' to repack Magisk Module.
                         |- If you want to repack anyway click 'REPACK ANYWAY'""".trimMargin()
                 )
-                positiveButton(text = "REPACK ANYWAY") {
+                .setPositiveButton("REPACK ANYWAY") { _, _ ->
                     setupInstallButton(selectedPointerModule.path, false)
                     createMagiskModule()
                 }
-                negativeButton(android.R.string.cancel) {
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
                 }
-            }
+                .show()
             updateProgress(completed = true)
             return
         }

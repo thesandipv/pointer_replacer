@@ -31,12 +31,16 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
 import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.extensions.getTintedDrawable
+import com.afterroot.core.utils.getMaterialColor
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
 
-class PointerPagingAdapter(private val callbacks: ItemSelectedCallback<Pointer>, private val firebaseStorage: FirebaseStorage) :
-    PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
+class PointerPagingAdapter(
+    private val callbacks: ItemSelectedCallback<Pointer>,
+    private val firebaseStorage: FirebaseStorage
+) : PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
 
     companion object : DiffUtil.ItemCallback<Pointer>() {
         override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem.filename == newItem.filename
@@ -58,8 +62,7 @@ class PointerVH(
     binding: ItemPointerRepoBinding,
     private val callbacks: ItemSelectedCallback<Pointer>,
     private val storage: FirebaseStorage
-) :
-    RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.ViewHolder(binding.root) {
     val context: Context = binding.root.context
     private val itemName: AppCompatTextView = binding.infoPointerPackName
     private val itemThumb: AppCompatImageView = binding.infoPointerImage
@@ -100,7 +103,12 @@ class PointerVH(
                         width = context.getMinPointerSize()
                     }
                     background = null
-                    setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                    setImageDrawable(
+                        context.getTintedDrawable(
+                            R.drawable.ic_removed,
+                            getMaterialColor(R.attr.colorError)
+                        )
+                    )
                 }
                 itemName.text = pointer.name
                 infoMeta.text = null
@@ -111,10 +119,10 @@ class PointerVH(
         with(super.itemView) {
             tag = pointer
             setOnClickListener {
-                callbacks.onClick(adapterPosition, itemView, pointer)
+                callbacks.onClick(absoluteAdapterPosition, itemView, pointer)
             }
             setOnLongClickListener {
-                return@setOnLongClickListener callbacks.onLongClick(adapterPosition, pointer)
+                return@setOnLongClickListener callbacks.onLongClick(absoluteAdapterPosition, pointer)
             }
         }
     }

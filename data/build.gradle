@@ -18,6 +18,24 @@ plugins {
     id 'kotlin-kapt'
 }
 
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+}
+
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental"   : "true"
+                ]
+            }
+        }
+    }
+}
+
 apply from: "$rootDir/gradle/common-config.gradle"
 apply from: "$rootDir/gradle/common-config-library.gradle"
 apply from: "$rootDir/gradle/oss-licence.gradle"
@@ -25,7 +43,7 @@ apply from: "$rootDir/gradle/oss-licence.gradle"
 dependencies {
     implementation project(':base')
     implementation project(":ui:resources")
-    api project(':ards:lib')
+    api project(':ards')
 
     implementation libs.bundles.firebase
 

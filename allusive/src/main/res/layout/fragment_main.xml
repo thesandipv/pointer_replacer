@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             tools:ignore="ContentDescription">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_current_pointer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -162,9 +162,9 @@
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_current_mouse"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -294,7 +294,7 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/ad_container"

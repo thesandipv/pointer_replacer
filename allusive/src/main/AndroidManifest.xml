@@ -54,7 +54,7 @@
             android:resource="@drawable/ic_launch_screen" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/color_secondary" />
+            android:resource="@color/firebase_notification_color" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -106,7 +106,7 @@
 
         <service
             android:name="com.afterroot.allusive2.FireMessagingService"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

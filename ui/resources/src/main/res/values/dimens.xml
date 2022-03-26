@@ -22,7 +22,7 @@
 
     <dimen name="card_radius">16dp</dimen>
 
-    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="bottom_nav_height">80dp</dimen>
     <dimen name="margin_ref_to_fab">88dp</dimen>
 
     <dimen name="padding_horizontal">16dp</dimen>
@@ -34,4 +34,6 @@
     <dimen name="padding_vertical_half">8dp</dimen>
 
     <dimen name="pointer_info_horizontal_margin">24dp</dimen>
+
+    <dimen name="m3_dialog_corner_radius">28dp</dimen>
 </resources>

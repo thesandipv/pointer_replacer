@@ -19,6 +19,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
@@ -29,7 +30,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var dialog: MaterialDialog? = null
+    private var dialog: AlertDialog? = null
     private fun setUpNetworkObserver() {
         networkViewModel.monitor(
             this,

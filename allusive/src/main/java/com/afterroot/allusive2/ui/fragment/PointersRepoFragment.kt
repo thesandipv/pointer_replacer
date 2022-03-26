@@ -57,6 +57,7 @@ import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
+import com.afterroot.core.utils.getMaterialColor
 import com.afterroot.data.utils.FirebaseUtils
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
@@ -150,7 +151,9 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         e.printStackTrace()
                     }
                 }
-                setColorSchemeResources(R.color.color_primary, R.color.color_secondary)
+
+                setBackgroundColor(getMaterialColor(R.attr.colorSurfaceVariant))
+                setColorSchemeColors(getMaterialColor(R.attr.colorPrimary), getMaterialColor(R.attr.colorSecondary))
             }
         }
     }
@@ -296,7 +299,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             width = 128
                         }
                         background = null
-                        setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, R.color.color_error))
+                        setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, getMaterialColor(R.attr.colorError)))
                     }
                     binding.apply {
                         this.pointer = pointer

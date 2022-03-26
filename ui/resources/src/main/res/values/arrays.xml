@@ -13,11 +13,15 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <array name="theme_mode">
         <item>@string/theme_device_default</item>
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
         <item>@string/theme_battery</item>
+    </array>
+    <array name="pointer_apply_modes" tools:ignore="InconsistentArrays">
+        <item>@string/method_xposed</item>
+        <item>@string/method_magisk_fw_res</item>
     </array>
 </resources>

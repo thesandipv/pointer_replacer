@@ -19,17 +19,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Constants.RC_LOGIN
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,34 +96,36 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
+    private val resultLauncher = registerForActivityResult(FirebaseAuthUIActivityResultContract()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            launchDashboard()
+        } else {
+            Toast.makeText(this, getString(R.string.msg_login_failed), Toast.LENGTH_SHORT).show()
+            tryLogin()
+        }
+    }
+
     private fun tryLogin() {
-        // TODO Replace with ResultContract
-        startActivityForResult(
+        val pickerLayout = AuthMethodPickerLayout.Builder(R.layout.layout_custom_auth)
+            .setGoogleButtonId(R.id.button_auth_sign_in_google)
+            .setEmailButtonId(R.id.button_auth_sign_in_email)
+            .setTosAndPrivacyPolicyId(R.id.text_top_pp)
+            .build()
+
+        resultLauncher.launch(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setLogo(R.drawable.ic_launch_screen)
-                .setTosAndPrivacyPolicyUrls("", getString(R.string.url_privacy_policy))
+                .setAuthMethodPickerLayout(pickerLayout)
+                .setTheme(R.style.MyTheme_Main_FirebaseUI)
+                .setLogo(R.drawable.ic_login_screen)
+                .setTosAndPrivacyPolicyUrls(getString(R.string.url_privacy_policy), getString(R.string.url_privacy_policy))
                 .setAvailableProviders(
                     listOf(
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
                         AuthUI.IdpConfig.GoogleBuilder().build()
                     )
-                ).build(),
-            RC_LOGIN
+                ).build()
         )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_LOGIN) {
-            if (resultCode == Activity.RESULT_OK) {
-                launchDashboard()
-            } else {
-                Toast.makeText(this, getString(R.string.msg_login_failed), Toast.LENGTH_SHORT).show()
-                tryLogin()
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 
     private fun launchDashboard() {
@@ -130,7 +133,7 @@ class SplashActivity : AppCompatActivity() {
         finish()
     }
 
-    private var dialog: MaterialDialog? = null
+    private var dialog: AlertDialog? = null
     private fun setUpNetworkObserver() {
         networkViewModel.monitor(
             this,

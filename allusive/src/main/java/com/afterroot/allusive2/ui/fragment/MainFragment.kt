@@ -18,7 +18,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -47,7 +46,6 @@ import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
@@ -74,7 +72,6 @@ import com.afterroot.core.extensions.getAsBitmap
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
-import com.afterroot.core.onVersionGreaterThanEqualTo
 import com.afterroot.core.utils.VersionCheck
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
@@ -84,6 +81,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
@@ -144,65 +142,52 @@ class MainFragment : Fragment() {
                 )
             }
             findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
+                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
                 setOnClickListener {
-                    // TODO Replace with Alert Dialog
-                    MaterialDialog(requireContext()).show {
-                        title(text = "Apply Pointer With")
-                        val availableMethods = mutableListOf<String>(
-                            getString(R.string.method_xposed),
-                            getString(R.string.method_magisk_fw_res)
-                        )
-                        onVersionGreaterThanEqualTo(
-                            Build.VERSION_CODES.R,
-                            trueFun = {
-                                availableMethods.add(getString(R.string.method_magisk_rro))
-                            }
-                        )
-                        @Suppress("UNUSED_VARIABLE") val dialog =
-                            listItems(items = availableMethods) { _, _, text ->
-                                when (text) {
-                                    getString(R.string.method_xposed) -> {
-                                        applyPointer()
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Apply Pointer With")
+                        .setItems(R.array.pointer_apply_modes) { _, which ->
+                            when (which) {
+                                0 -> { // Xposed Method
+                                    applyPointer()
+                                }
+                                1 -> { // Magisk - framework-res Method
+                                    if (!isPointerSelected()) {
+                                        sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
+                                        return@setItems
                                     }
-                                    getString(R.string.method_magisk_fw_res) -> {
-                                        if (!isPointerSelected()) {
-                                            sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
-                                            return@listItems
-                                        }
-                                        if (!isMouseSelected()) {
-                                            sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
-                                            return@listItems
-                                        }
-                                        val filesDir = requireContext().getPointerSaveRootDir()
-                                        val pointerPath = "$filesDir/pointer.png"
-                                        val mousePath = "$filesDir/mouse.png"
-                                        settings.pointerPath = pointerPath
-                                        settings.mousePath = mousePath
-                                        createFileFromView(binding.selectedPointer, pointerPath)
-                                        createFileFromView(binding.selectedMouse, mousePath)
+                                    if (!isMouseSelected()) {
+                                        sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
+                                        return@setItems
+                                    }
+                                    val filesDir = requireContext().getPointerSaveRootDir()
+                                    val pointerPath = "$filesDir/pointer.png"
+                                    val mousePath = "$filesDir/mouse.png"
+                                    settings.pointerPath = pointerPath
+                                    settings.mousePath = mousePath
+                                    createFileFromView(binding.selectedPointer, pointerPath)
+                                    createFileFromView(binding.selectedMouse, mousePath)
 
-                                        binding.textNoPointerApplied.visible(false)
-                                        binding.textNoMouseApplied.visible(false)
-                                        binding.currentPointer.apply {
-                                            visible(true)
-                                            setImageDrawable(Drawable.createFromPath(pointerPath))
-                                        }
-                                        binding.currentMouse.apply {
-                                            visible(true)
-                                            setImageDrawable(Drawable.createFromPath(mousePath))
-                                        }
-                                        requireActivity().findNavController(R.id.fragment_repo_nav)
-                                            .navigate(R.id.magiskFragment)
+                                    binding.textNoPointerApplied.visible(false)
+                                    binding.textNoMouseApplied.visible(false)
+                                    binding.currentPointer.apply {
+                                        visible(true)
+                                        setImageDrawable(Drawable.createFromPath(pointerPath))
                                     }
-                                    getString(R.string.method_magisk_rro) -> {
-                                        requireActivity().findNavController(R.id.fragment_repo_nav)
-                                            .navigate(R.id.magiskRROFragment)
+                                    binding.currentMouse.apply {
+                                        visible(true)
+                                        setImageDrawable(Drawable.createFromPath(mousePath))
                                     }
+                                    requireActivity().findNavController(R.id.fragment_repo_nav)
+                                        .navigate(R.id.magiskFragment)
+                                }
+                                2 -> { // Magisk - RRO Method
+                                    requireActivity().findNavController(R.id.fragment_repo_nav)
+                                        .navigate(R.id.magiskRROFragment)
                                 }
                             }
-                    }
+                        }.show()
                 }
-                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
             }
             setUpAd()
 

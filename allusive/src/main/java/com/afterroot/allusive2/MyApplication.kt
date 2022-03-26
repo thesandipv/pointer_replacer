@@ -17,6 +17,7 @@ package com.afterroot.allusive2
 import androidx.annotation.Keep
 import androidx.multidex.MultiDexApplication
 import com.afterroot.allusive2.utils.whenBuildIs
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -25,6 +26,7 @@ import timber.log.Timber
 @HiltAndroidApp
 class MyApplication : MultiDexApplication() {
     override fun onCreate() {
+        DynamicColors.applyToActivitiesIfAvailable(this)
         super.onCreate()
         whenBuildIs {
             Timber.plant(Timber.DebugTree())

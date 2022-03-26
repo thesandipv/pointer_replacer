@@ -45,6 +45,8 @@ dependencies {
     implementation libs.androidx.lifecycle.livedata
     implementation libs.androidx.lifecycle.extensions
 
+    implementation libs.google.material
+
     implementation libs.hilt.hilt
     kapt libs.hilt.compiler
 

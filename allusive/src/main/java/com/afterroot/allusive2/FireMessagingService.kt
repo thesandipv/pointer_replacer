@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.ui.MainActivity
+import com.afterroot.core.utils.getMaterialColor
 import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -94,7 +95,7 @@ class FireMessagingService : FirebaseMessagingService() {
             .setContentTitle(title ?: getString(R.string.app_name))
             .setContentText(message)
             .setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, R.color.color_secondary))
+            .setColor(ContextCompat.getColor(this, getMaterialColor(R.attr.colorSecondary)))
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
 

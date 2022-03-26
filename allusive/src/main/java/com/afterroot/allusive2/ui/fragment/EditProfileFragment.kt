@@ -27,6 +27,7 @@ import com.afterroot.allusive2.databinding.FragmentEditProfileBinding
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.core.utils.getMaterialColor
 import com.afterroot.data.utils.FirebaseUtils
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.auth.FirebaseUser
@@ -78,7 +79,7 @@ class EditProfileFragment : Fragment() {
                         }
                     } else sharedViewModel.displayMsg(getString(R.string.msg_no_changes))
                 }
-                icon = requireContext().getDrawableExt(R.drawable.ic_action_save, R.color.color_on_secondary)
+                icon = requireContext().getDrawableExt(R.drawable.ic_action_save, getMaterialColor(R.attr.colorOnSecondary))
             }
         } else {
             startActivity(Intent(this.context, SplashActivity::class.java))

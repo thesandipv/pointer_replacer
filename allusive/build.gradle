@@ -58,15 +58,6 @@ android {
         }
         multiDexEnabled true
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                        "room.schemaLocation": "$projectDir/schemas".toString(),
-                        "room.incremental"   : "true"
-                ]
-            }
-        }
-
         manifestPlaceholders = [
                 hostName  : "afterroot.web.app",
                 pathPrefix: "/apps/pointer-replacer/launch"
@@ -128,6 +119,7 @@ android {
         exclude 'fabric/*.properties'
         exclude 'META-INF/*.properties'
         exclude "DebugProbesKt.bin" //Exclude coroutines debug file
+        exclude 'META-INF/DEPENDENCIES'
     }
 
     sourceSets {
@@ -145,6 +137,11 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude group: 'org.apache.httpcomponents'
+    }
+}
 
 dependencies {
     implementation project(":base")
@@ -171,6 +168,7 @@ dependencies {
     implementation libs.androidx.supportV13
     implementation libs.androidx.supportV4
     implementation libs.androidx.vectorDrawable
+    implementation libs.androidx.work
 
     implementation libs.androidx.room.room
     implementation libs.androidx.room.runtime
