@@ -74,9 +74,11 @@ import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.core.extensions.visible
 import com.afterroot.core.utils.VersionCheck
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -105,15 +107,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var binding: FragmentMainBinding
-    private lateinit var interstitialAd: InterstitialAd
-    @Inject lateinit var myDatabase: MyDatabase
     @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var gson: Gson
+    @Inject lateinit var myDatabase: MyDatabase
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
     @Inject lateinit var settings: Settings
-    @Inject lateinit var gson: Gson
-    private val sharedViewModel: MainSharedViewModel by viewModels()
     @Inject lateinit var storage: FirebaseStorage
+    private lateinit var binding: FragmentMainBinding
+    private val sharedViewModel: MainSharedViewModel by viewModels()
+    private var interstitialAd: InterstitialAd? = null
+    private var isAdLoading = false
     private var targetPath: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -190,6 +193,7 @@ class MainFragment : Fragment() {
                 }
             }
             setUpAd()
+            loadInterstitialAd()
 
             loadCurrentPointers()
 
@@ -361,32 +365,21 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun showInterstitialAd() { // TODO Rewrite logic
-/*
-        interstitialAd.apply {
-            if (isLoaded) show(requireActivity()) else {
-                //TODO test SnackBarMsg data class
-                requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
-                    message = getString(R.string.text_pointer_applied),
-                    actionText = getString(R.string.reboot)
-                ) {
-                    showRebootDialog()
-                }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
-            }
-            adListener = object : AdListener() {
-                override fun onAdClosed() {
-                    super.onAdClosed()
-                    interstitialAd.loadAd(AdRequest.Builder().build())
-                    requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
-                        message = getString(R.string.text_pointer_applied),
-                        actionText = getString(R.string.reboot)
-                    ) {
-                        showRebootDialog()
-                    }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
+    private fun showInterstitialAd() {
+        interstitialAd?.let {
+            it.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    interstitialAd = null
+                    loadInterstitialAd()
+                    showPointerAppliedMessage()
+                }
+
+                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                    interstitialAd = null
                 }
             }
+            it.show(requireActivity())
         }
-*/
     }
 
     fun showPointerAppliedMessage() {
@@ -399,17 +392,20 @@ class MainFragment : Fragment() {
     }
 
     private fun showRebootDialog() {
-        MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-            title(res = R.string.reboot)
-            message(res = R.string.text_reboot_confirm)
-            positiveButton(res = R.string.reboot) {
+        MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.reboot)
+            setMessage(R.string.text_reboot_confirm)
+            setPositiveButton(R.string.reboot) { _, _ ->
                 try {
                     reboot()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
-            negativeButton(res = R.string.text_soft_reboot) {
+            setNegativeButton("Later") { dialog, _ ->
+                dialog.cancel()
+            }
+            setNeutralButton(R.string.text_soft_reboot) { _, _ ->
                 try { // Also try "killall zygote"
                     val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                     process.waitFor()
@@ -420,7 +416,6 @@ class MainFragment : Fragment() {
         }
     }
 
-    // TODO
     private fun loadInterstitialAd() {
         val interstitialAdUnitId: String = whenBuildIs(
             debug = getString(R.string.ad_interstitial_1_id),
@@ -433,12 +428,14 @@ class MainFragment : Fragment() {
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
-                    super.onAdLoaded(ad)
                     interstitialAd = ad
-                    interstitialAd.show(requireActivity())
+                    isAdLoading = false
+                    // interstitialAd.show(requireActivity())
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    interstitialAd = null
+                    isAdLoading = false
                     super.onAdFailedToLoad(loadAdError)
                 }
             }
@@ -456,7 +453,6 @@ class MainFragment : Fragment() {
 
                 val adView = AdView(requireContext())
                 adView.apply {
-                    // TODO Verify ad unit ids
                     adSize = AdSize.BANNER
                     adUnitId = bannerAdUnitId
                     binding.adContainer.addView(this)
@@ -602,7 +598,7 @@ class MainFragment : Fragment() {
         return false
     }
 
-    val openTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+    private val openTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
         Timber.d("Selected Uri: %s", it.toString())
         if (it == null) return@registerForActivityResult
         val dir = DocumentFile.fromTreeUri(requireContext(), it)
@@ -749,7 +745,7 @@ class MainFragment : Fragment() {
     }
 
     private fun signOutDialog(): AlertDialog.Builder {
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_title_sign_out))
             .setMessage(getString(R.string.dialog_msg_sign_out))
             .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
@@ -758,8 +754,7 @@ class MainFragment : Fragment() {
                         requireContext(),
                         getString(R.string.dialog_sign_out_result_success),
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    ).show()
                     startActivity(Intent(requireContext(), SplashActivity::class.java))
                 }
             }
