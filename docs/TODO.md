@@ -6,8 +6,6 @@ slug: /todo
 sidebar_position: 3
 ---
 
-## TODO
-
 Format is (Status) (ADD|FIX|IMP) - (Description) (`commitHash|pullRequestId|issueId`)
 
 ### GitHub Cli
