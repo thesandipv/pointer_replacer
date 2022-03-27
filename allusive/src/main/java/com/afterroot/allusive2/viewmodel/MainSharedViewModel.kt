@@ -24,7 +24,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
-import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -39,7 +38,6 @@ class MainSharedViewModel @Inject constructor(
     private val firebaseUtils: FirebaseUtils,
     private val settings: Settings
 ) : ViewModel() {
-    private var pointerSnapshot = MutableLiveData<ViewModelState>()
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
 
@@ -47,19 +45,6 @@ class MainSharedViewModel @Inject constructor(
         remoteConfig.fetchAndActivate().addOnSuccessListener {
             savedStateHandle["configLoaded"] = true
         }
-    }
-
-    fun getPointerSnapshot(): LiveData<ViewModelState> {
-        if (pointerSnapshot.value == null) {
-            pointerSnapshot.postValue(ViewModelState.Loading)
-            firebaseFirestore.collection(DatabaseFields.COLLECTION_POINTERS)
-                .addSnapshotListener { querySnapshot, _ -> // TODO Remove Snapshot listener and replace with query.
-                    if (querySnapshot != null) {
-                        pointerSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
-                    }
-                }
-        }
-        return pointerSnapshot
     }
 
     val pointers = Pager(PagingConfig(20)) {
