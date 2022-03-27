@@ -15,8 +15,6 @@
 package com.afterroot.allusive2.ui.fragment
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -25,12 +23,12 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
-import com.afterroot.allusive2.Constants.RC_PICK_IMAGE
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
@@ -89,18 +87,7 @@ class NewPointerPost : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.actionUpload.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/png"
-            }
-            val pickIntent =
-                Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-                    type = "image/png"
-                }
-            val chooserIntent = Intent.createChooser(intent, "Choose Pointer Image").apply {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-            }
-            // FIXME update method https://developer.android.com/training/basics/intents/result#kotlin
-            startActivityForResult(chooserIntent, RC_PICK_IMAGE)
+            actionGetUploadPointer.launch("image/png")
         }
 
         initFirebaseConfig()
@@ -217,15 +204,10 @@ class NewPointerPost : Fragment() {
         }
     }
 
-    // Handle retrieved image uri
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
-            isPointerImported = true
-            data?.data?.also { uri ->
-                Glide.with(this).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
-                binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
-            }
+    private val actionGetUploadPointer = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            Glide.with(this).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
+            binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
         }
     }
 
