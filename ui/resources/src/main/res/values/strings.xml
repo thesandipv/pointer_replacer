@@ -47,7 +47,7 @@
     <string name="import_pointer">Import Pointer</string>
     <string name="input_hint_desc">Description (optional)</string>
     <string name="input_hint_email">Email</string>
-    <string name="input_hint_max_padding_size">Enter Max Padding Size</string>
+    <string name="input_hint_max_padding_size">Enter Max Scale Size</string>
     <string name="input_hint_name">Name</string>
     <string name="install_manage_pointers">Install Pointers</string>
     <string name="key_app_info" translatable="false">key_app_info</string>
@@ -144,14 +144,14 @@
     <string name="prompt_button_enable">ENABLE</string>
     <string name="reboot">Reboot</string>
     <string name="reset_color">Reset Color</string>
-    <string name="reset_size">Reset Size &amp; Padding</string>
+    <string name="reset_size">Reset Size &amp; Scale</string>
     <string name="str_format_uploaded_by">by %s</string>
     <string name="str_format_value_error">Value must be greater than %1$d</string>
     <string name="str_format_version">v%1$s (%2$d) - %3$s</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
-    <string name="text_action_customize">Customize</string>
+    <string name="text_action_customize">Change Size</string>
     <string name="text_action_exit">Exit</string>
     <string name="text_action_grant">Grant</string>
     <string name="text_action_post">Post</string>
@@ -176,13 +176,13 @@
     <string name="text_edit">Edit</string>
     <string name="text_installed">Installed</string>
     <string name="text_logout">Logout</string>
-    <string name="text_max_padding_size">Max Padding Size</string>
+    <string name="text_max_padding_size">Max Scale Size</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
     <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
     <string name="text_no">No</string>
     <string name="text_not_installed">Not Installed</string>
     <string name="text_or">OR</string>
-    <string name="text_padding">Padding</string>
+    <string name="text_padding">Scale</string>
     <string name="text_please_wait">Please Wait..</string>
     <string name="text_pointer_applied">Pointer Applied</string>
     <string name="text_pointer_exists">Pointer already exists!</string>

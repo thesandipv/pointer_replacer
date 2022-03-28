@@ -356,7 +356,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun setDebugPreferences() {
         if (!BuildConfig.DEBUG) return
         findPreference<SwitchPreference>("key_enable_emulator")?.apply {
-            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { pref, newV ->
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
                 Toast.makeText(requireContext(), "App will close. You'll need to restart.", Toast.LENGTH_SHORT).show()
                 requireActivity().finish()
                 true
