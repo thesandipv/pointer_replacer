@@ -63,7 +63,9 @@ fun zip(sourceFolder: File, exportPath: String): File {
     runCatching {
         populateFilesList(sourceFolder)
         val fos = FileOutputStream(exportPath)
-        val zos = ZipOutputStream(fos)
+        val zos = ZipOutputStream(fos).apply {
+            setLevel(0)
+        }
         for (filePath in filesListInDir) {
             val ze = ZipEntry(filePath.substring(sourceFolder.absolutePath.length + 1, filePath.length))
             zos.putNextEntry(ze)
