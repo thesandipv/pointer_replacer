@@ -182,13 +182,8 @@ fun showRebootDialog(context: Context) {
     }
 }
 
-fun installModule(path: String, callback: (isSuccess: Boolean, output: List<String>) -> Unit) {
-    val list = mutableListOf<String>()
-    if (Shell.su("magisk --install-module \"${path}\"").to(list, list).exec().isSuccess) {
-        callback(true, list)
-    } else {
-        callback(false, list)
-    }
+fun installModule(path: String, callback: Shell.ResultCallback) {
+    Shell.su("magisk --install-module \"${path}\"").submit(callback)
 }
 
 fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean) -> Unit) {

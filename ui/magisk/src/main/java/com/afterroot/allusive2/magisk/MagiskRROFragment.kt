@@ -159,11 +159,14 @@ class MagiskRROFragment : Fragment() {
             setOnClickListener {
                 showRROExperimentalWarning(requireContext()) { response ->
                     if (!response) return@showRROExperimentalWarning
-                    installModule(path) { isSuccess, output ->
-                        if (isSuccess) {
-                            output.forEach {
-                                updateProgress(it)
-                            }
+                    installModule(path) {
+                        it.out.forEach { output ->
+                            updateProgress(output)
+                        }
+                        it.err.forEach { error ->
+                            updateProgress(error)
+                        }
+                        if (it.isSuccess) {
                             updateProgress(completed = true)
                             showRebootDialog(requireContext())
                         } else {

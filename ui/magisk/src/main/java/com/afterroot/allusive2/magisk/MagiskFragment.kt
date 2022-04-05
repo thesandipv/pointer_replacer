@@ -142,11 +142,14 @@ class MagiskFragment : Fragment() {
         binding.installModule.apply {
             visible(visible)
             setOnClickListener {
-                installModule(path) { isSuccess, output ->
-                    if (isSuccess) {
-                        output.forEach {
-                            updateProgress(it)
-                        }
+                installModule(path) {
+                    it.out.forEach { output ->
+                        updateProgress(output)
+                    }
+                    it.err.forEach { error ->
+                        updateProgress(error)
+                    }
+                    if (it.isSuccess) {
                         updateProgress(completed = true)
                         showRebootDialog(requireContext())
                     } else {
@@ -154,6 +157,7 @@ class MagiskFragment : Fragment() {
                         updateProgress(completed = true)
                     }
                 }
+
             }
         }
     }
