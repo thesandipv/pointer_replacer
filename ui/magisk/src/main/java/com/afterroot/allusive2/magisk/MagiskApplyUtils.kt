@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.afollestad.materialdialogs.MaterialDialog
 import com.topjohnwu.superuser.Shell
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -44,8 +45,8 @@ const val MAGISK_PACKAGE = "com.topjohnwu.magisk"
 const val MAGISK_RRO_ZIP = "rro-module.zip"
 fun magiskRROModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/rro-module.zip"
 fun magiskRROModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/rro-module"
-fun magiskRROSourceApkPath(context: Context) =
-    "${magiskRROModuleExtractPath(context)}/system/vendor/overlay/allusive_rro.apk"
+fun magiskRROSourceApkPath(context: Context, fileName: String) =
+    "${magiskRROModuleExtractPath(context)}/system/vendor/overlay/${fileName}"
 
 fun magiskRROApkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro.apk"
 fun magiskRROApkExtractPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro"
@@ -97,6 +98,8 @@ fun variantsToReplace(context: Context): List<Variant> {
     return list
 }
 
+val ALL_VARIANTS = listOf(Variant.MDPI, Variant.HDPI, Variant.XHDPI)
+
 fun variantsToReplace(targetPath: String): List<Variant> {
     if (!File(targetPath).exists()) return emptyList()
 
@@ -115,6 +118,9 @@ fun Bitmap.saveAs(path: String): File {
         this.compress(Bitmap.CompressFormat.PNG, 100, fos)
         fos.flush()
         fos.close()
+    }.onFailure {
+        Timber.e("saveAs: ${it.cause}")
+        it.printStackTrace()
     }
     return file
 }
@@ -155,9 +161,9 @@ fun copyRepackedFrameworkResApk(context: Context): File {
     return repacked.copyTo(target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"), overwrite = true)
 }
 
-fun copyRepackedRROApk(context: Context): File {
+fun copyRepackedRROApk(context: Context, repackName: String): File {
     val repacked = File(repackedRROApkPath(context))
-    return repacked.copyTo(target = File(magiskRROSourceApkPath(context)), overwrite = true)
+    return repacked.copyTo(target = File(magiskRROSourceApkPath(context, repackName)), overwrite = true)
 }
 
 fun createModuleProp(context: Context) {

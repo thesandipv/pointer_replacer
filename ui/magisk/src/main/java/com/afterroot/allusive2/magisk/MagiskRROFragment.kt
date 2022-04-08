@@ -38,7 +38,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -108,7 +110,8 @@ class MagiskRROFragment : Fragment() {
                 )
                 .setPositiveButton("REPACK ANYWAY") { _, _ ->
                     setupInstallButton(selectedPointerModule.path, false)
-                    createMagiskModule()
+                    // createMagiskModule()
+                    listRROApks()
                 }
                 .setNegativeButton(android.R.string.cancel) { _, _ ->
                 }
@@ -116,7 +119,8 @@ class MagiskRROFragment : Fragment() {
             updateProgress(completed = true)
             return
         }
-        createMagiskModule()
+        listRROApks()
+        // createMagiskModule()
     }
 
     private fun setPointerImage() {
@@ -135,14 +139,14 @@ class MagiskRROFragment : Fragment() {
         }
     }
 
-    private fun createMagiskModule() {
+    private fun createMagiskModule(rroApk: File) {
         lifecycleScope.launch {
             copyAndExtractMagiskRROModuleZip()
-            extractAllusiveRROApk()
+            copySelectedRROFile(rroApk)
             delay(500)
-            createAndReplacePointerFiles(variantsToReplace(magiskRROApkExtractPath(requireContext())))
+            createAndReplacePointerFiles(ALL_VARIANTS)
             repackAllusiveRROApk()
-            copyRepackedRROApk()
+            copyRepackedRROApk(rroApk.name)
 
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
@@ -220,14 +224,40 @@ class MagiskRROFragment : Fragment() {
         }
     }
 
-    /**
-     * DONE
-     */
-    private suspend fun extractAllusiveRROApk() {
-        updateProgress("- Copying allusive_rro.apk from extracted module")
+    private fun listRROApks() {
+        val files = File("system/vendor/overlay").listFiles()
+        var initialSelectionIndex = 0
+
+        if (files == null) {
+            Timber.d("listRROApks: no overlay files found.")
+            return
+        }
+
+        Timber.d("listRROApks: ${files.size}")
+        val fileNames = Array(files.size) {
+            files[it].name
+        }
+
+        files.forEachIndexed { index, file ->
+            if (file.name == "framework-res__auto_generated_rro_vendor.apk") {
+                initialSelectionIndex = index
+            }
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Select app to modify")
+            .setSingleChoiceItems(
+                fileNames,
+                initialSelectionIndex
+            ) { dialog, which ->
+                createMagiskModule(files[which])
+                dialog.dismiss()
+            }.show()
+    }
+
+    private suspend fun copySelectedRROFile(rroApk: File) {
         withContext(Dispatchers.IO) {
-            val rroApk = File(magiskRROSourceApkPath(requireContext()))
-            withContext(Dispatchers.Main) { updateProgress("- Extracting allusive_rro.apk") }
+            withContext(Dispatchers.Main) { updateProgress("- Extracting ${rroApk.name}") }
 
             rroApk.unzip(toFolder = File(magiskRROApkExtractPath(requireContext())))
 
@@ -239,6 +269,14 @@ class MagiskRROFragment : Fragment() {
      * DONE
      */
     private suspend fun createAndReplacePointerFiles(variants: List<Variant>) {
+        val mdpiPointer = "${magiskRROApkExtractPath(requireContext())}$POINTER_MDPI"
+        val hdpiPointer = "${magiskRROApkExtractPath(requireContext())}$POINTER_HDPI"
+        val xhdpiPointer = "${magiskRROApkExtractPath(requireContext())}$POINTER_XHDPI"
+        withContext(Dispatchers.IO) {
+            File(mdpiPointer).parentFile?.mkdirs() ?: throw IOException("Failed to create directory")
+            File(hdpiPointer).parentFile?.mkdirs() ?: throw IOException("Failed to create directory")
+            File(xhdpiPointer).parentFile?.mkdirs() ?: throw IOException("Failed to create directory")
+        }
         withContext(Dispatchers.Main) {
             updateProgress("- Selected Pointer: ${settings.selectedPointerName}")
 
@@ -248,19 +286,19 @@ class MagiskRROFragment : Fragment() {
                 when (variant) {
                     Variant.MDPI -> {
                         val scaled = bmp.scale(VariantSizes.MDPI, VariantSizes.MDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_MDPI").apply {
+                        scaled.saveAs(mdpiPointer).apply {
                             if (this.exists()) updateProgress("- Replaced MDPI pointer_spot_touch.png")
                         }
                     }
                     Variant.HDPI -> {
                         val scaled = bmp.scale(VariantSizes.HDPI, VariantSizes.HDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_HDPI").apply {
+                        scaled.saveAs(hdpiPointer).apply {
                             if (this.exists()) updateProgress("- Replaced HDPI pointer_spot_touch.png")
                         }
                     }
                     Variant.XHDPI -> {
                         val scaled = bmp.scale(VariantSizes.XHDPI, VariantSizes.XHDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_XHDPI").apply {
+                        scaled.saveAs(xhdpiPointer).apply {
                             if (this.exists()) updateProgress("- Replaced XHDPI pointer_spot_touch.png")
                         }
                     }
@@ -327,12 +365,12 @@ class MagiskRROFragment : Fragment() {
     /**
      * DONE
      */
-    private suspend fun copyRepackedRROApk(): File {
-        updateProgress("- Copying repacked allusive_rro.apk")
+    private suspend fun copyRepackedRROApk(repackName: String): File {
+        updateProgress("- Copying repacked $repackName")
         val result = withContext(Dispatchers.IO) {
-            copyRepackedRROApk(requireContext())
+            copyRepackedRROApk(requireContext(), repackName)
         }
-        updateProgress("- Done copying repacked allusive_rro.apk.apk")
+        updateProgress("- Done copying repacked $repackName")
         return result
     }
 }
