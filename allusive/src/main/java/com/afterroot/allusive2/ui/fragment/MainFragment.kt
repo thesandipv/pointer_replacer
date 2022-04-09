@@ -181,12 +181,16 @@ class MainFragment : Fragment() {
                                         visible(true)
                                         setImageDrawable(Drawable.createFromPath(mousePath))
                                     }
-                                    requireActivity().findNavController(R.id.fragment_repo_nav)
-                                        .navigate(R.id.magiskFragment)
+                                    showInterstitialAd {
+                                        requireActivity().findNavController(R.id.fragment_repo_nav)
+                                            .navigate(R.id.magiskFragment)
+                                    }
                                 }
                                 2 -> { // Magisk - RRO Method
-                                    requireActivity().findNavController(R.id.fragment_repo_nav)
-                                        .navigate(R.id.magiskRROFragment)
+                                    showInterstitialAd {
+                                        requireActivity().findNavController(R.id.fragment_repo_nav)
+                                            .navigate(R.id.magiskRROFragment)
+                                    }
                                 }
                             }
                         }.show()
@@ -357,25 +361,30 @@ class MainFragment : Fragment() {
                 val reviewInfo = it.result
                 val flow = reviewManager.launchReviewFlow(requireActivity(), reviewInfo)
                 flow.addOnCompleteListener {
-                    showInterstitialAd()
+                    showInterstitialAd {
+                        showPointerAppliedMessage()
+                    }
                 }
             } else {
-                showInterstitialAd()
+                showInterstitialAd {
+                    showPointerAppliedMessage()
+                }
             }
         }
     }
 
-    private fun showInterstitialAd() {
+    private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
         interstitialAd?.let {
             it.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     interstitialAd = null
                     loadInterstitialAd()
-                    showPointerAppliedMessage()
+                    onAdDismiss()
                 }
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     interstitialAd = null
+                    onAdDismiss()
                 }
             }
             it.show(requireActivity())
