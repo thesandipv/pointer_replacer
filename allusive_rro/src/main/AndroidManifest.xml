@@ -17,7 +17,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.afterroot.allusive_rro">
 
-    <application android:hasCode="false"
+    <application
+        android:extractNativeLibs="false"
+        android:hasCode="false"
+        android:usesNonSdkApi="true"
         tools:ignore="MissingApplicationIcon" />
 
     <!--<overlay
@@ -26,6 +29,6 @@
         android:targetPackage="android" />-->
     <overlay
         android:isStatic="true"
-        android:priority="0"
+        android:priority="500"
         android:targetPackage="android" />
 </manifest>
