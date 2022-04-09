@@ -24,6 +24,11 @@ tasks.register("copyRROApk", Copy) {
     dependsOn ':allusive_rro:assembleDebug'
     from("$rootDir/allusive_rro/build/outputs/apk/debug/")
     into("$rootDir/ui/magisk/module/rro-module/system/vendor/overlay/")
+    if (!file("$rootDir/allusive_rro/build/outputs/apk/debug/allusive_rro-debug.apk").exists()) {
+        doLast {
+            throw GradleException("RRO apk not found")
+        }
+    }
     include("allusive_rro-debug.apk")
     rename('allusive_rro-debug.apk', 'allusive_rro.apk')
 }
