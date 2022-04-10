@@ -151,7 +151,7 @@
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
-    <string name="text_action_customize">Change Size</string>
+    <string name="text_action_customize">Change Size / Color</string>
     <string name="text_action_exit">Exit</string>
     <string name="text_action_grant">Grant</string>
     <string name="text_action_post">Post</string>
