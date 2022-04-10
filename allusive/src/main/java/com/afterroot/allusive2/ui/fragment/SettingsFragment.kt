@@ -18,9 +18,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.InputType
+import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -28,6 +27,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -37,7 +37,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
@@ -53,14 +52,19 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.SkuDetailsParams
-import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.android.billingclient.api.querySkuDetails
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -69,8 +73,7 @@ import javax.inject.Inject
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var billingClient: BillingClient
-    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
-    private lateinit var interstitialAd: InterstitialAd
+    @Inject lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     @Inject lateinit var settings: Settings
     @Inject lateinit var firestore: FirebaseFirestore
     @Inject lateinit var firebaseUtils: FirebaseUtils
@@ -112,27 +115,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun initFirebaseConfig() {
-        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        firebaseRemoteConfig.let { config ->
-            FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(if (BuildConfig.DEBUG) 0 else 3600)
-                .build().apply {
-                    config.setConfigSettingsAsync(this)
-                }
-
-            config.fetch(config.info.configSettings.minimumFetchIntervalInSeconds)
-                .addOnCompleteListener(requireActivity()) { result ->
-                    try {
-                        if (result.isSuccessful) {
-                            firebaseRemoteConfig.activate()
-                            setDonatePref(true)
-                        } else {
-                            setDonatePref(false)
-                        }
-                    } catch (ignored: IllegalStateException) {
-                        // if user changed context before completing.
-                    }
-                }
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+            if (!it) return@observe
+            setDonatePref(it)
         }
     }
 
@@ -183,6 +168,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun setMaxPointerPaddingPref() {
         findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
             summary = settings.maxPointerPadding.toString()
@@ -211,6 +197,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun setMaxPointerSizePref() {
         findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
             summary = settings.maxPointerSize.toString()
@@ -276,34 +263,41 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun loadAllSku() {
-        val skuModel = Gson().fromJson(firebaseRemoteConfig.getString("pr_sku_list"), SkuModel::class.java)
-        if (billingClient.isReady) {
-            val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
-            billingClient.querySkuDetailsAsync(params) { billingResult, skuDetailsList ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && skuDetailsList?.isNotEmpty()!!) {
-                    Handler(Looper.getMainLooper()).postDelayed(
-                        {
-                            loadingDialog.dismiss()
-                        },
-                        100
-                    )
+        if (!billingClient.isReady) {
+            Timber.tag(TAG).d("loadAllSku: Billing not ready")
+            return
+        }
 
-                    val list = ArrayList<String>()
-                    for (skuDetails in skuDetailsList) {
-                        list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
-                    }
-                    MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-                        listItems(items = list) { _, index, _ ->
-                            val billingFlowParams =
-                                BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[index]).build()
-                            billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
-                        }
-                        title(R.string.pref_title_donate_dev)
-                        negativeButton(android.R.string.cancel)
-                    }
-                }
+        lifecycleScope.launch {
+            val skuModel = Gson().fromJson(firebaseRemoteConfig.getString("pr_sku_list"), SkuModel::class.java)
+            val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
+
+            val queryResult = billingClient.querySkuDetails(params)
+            val billingResult = queryResult.billingResult
+            val skuDetailsList = queryResult.skuDetailsList
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK && skuDetailsList == null) {
+                this.cancel()
+                return@launch
             }
-        } else Timber.tag(TAG).d("loadAllSku: Billing not ready")
+            val list = ArrayList<String>()
+            for (skuDetails in skuDetailsList!!) {
+                list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
+            }
+
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, list)
+            withContext(Dispatchers.Main) {
+                delay(100)
+                loadingDialog.dismiss()
+                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.pref_title_donate_dev))
+                    .setAdapter(adapter) { _, which ->
+                        val billingFlowParams =
+                            BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[which]).build()
+                        billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
+                    }.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
+                        dialog.dismiss()
+                    }.show()
+            }
+        }
     }
 
     private fun setDebugPreferences() {
