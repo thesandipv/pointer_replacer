@@ -44,6 +44,7 @@
             app:title="@string/pref_title_donate_dev" />
         <Preference
             app:key="@string/key_watch_ads"
+            app:isPreferenceVisible="false"
             app:summary="@string/pref_summary_watch_ad"
             app:title="@string/pref_title_watch_ad" />
     </PreferenceCategory>

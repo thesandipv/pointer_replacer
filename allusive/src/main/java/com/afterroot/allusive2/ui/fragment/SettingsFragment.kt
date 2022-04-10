@@ -92,7 +92,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setVersionPref()
         setDonatePref(false)
         initBilling()
-//        setUpAds()
         setRateOnGPlay()
         setDebugPreferences()
     }
@@ -240,52 +239,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
     }
-
-/*
-    private fun setUpAds() {
-        interstitialAd = InterstitialAd(this.requireActivity())
-        interstitialAd.apply {
-            adUnitId = if (BuildConfig.DEBUG) {
-                getString(R.string.ad_interstitial_1_id)
-            } else firebaseRemoteConfig.getString("ad_interstitial_1_id")
-            loadAd(AdRequest.Builder().build())
-        }
-
-        val watchAds =
-            preferenceScreen.findPreference<Preference>(getString(R.string.key_watch_ads))!!
-        watchAds.apply {
-            onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                if (interstitialAd.isLoaded) {
-                    interstitialAd.show()
-                } else {
-                    sharedViewModel.displayMsg(getString(R.string.msg_ad_not_loaded))
-                }
-                true
-            }
-            summary = getString(R.string.msg_ad_loading)
-            isEnabled = false
-        }
-
-        interstitialAd.adListener = object : AdListener() {
-            override fun onAdClosed() {
-                super.onAdClosed()
-                watchAds.apply {
-                    summary = getString(R.string.msg_ad_loading)
-                    isEnabled = false
-                }
-                interstitialAd.loadAd(AdRequest.Builder().build())
-            }
-
-            override fun onAdLoaded() {
-                super.onAdLoaded()
-                watchAds.apply {
-                    summary = getString(R.string.msg_ad_loaded)
-                    isEnabled = true
-                }
-            }
-        }
-    }
-*/
 
     private fun setRateOnGPlay() {
         preferenceScreen.findPreference<Preference>(getString(R.string.key_rate_on_g_play))!!.onPreferenceClickListener =
