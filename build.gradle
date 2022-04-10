@@ -18,8 +18,8 @@
 buildscript {
     def version = [
             MAJOR: 1,
-            MINOR: 10,
-            PATCH: 1,
+            MINOR: 11,
+            PATCH: 0,
     ]
 
     ext.SDK = [
