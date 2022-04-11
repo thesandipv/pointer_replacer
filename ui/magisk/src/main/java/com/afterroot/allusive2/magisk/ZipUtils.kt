@@ -19,6 +19,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.util.zip.CRC32
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -63,11 +64,16 @@ fun zip(sourceFolder: File, exportPath: String): File {
     runCatching {
         populateFilesList(sourceFolder)
         val fos = FileOutputStream(exportPath)
-        val zos = ZipOutputStream(fos).apply {
-            setLevel(0)
-        }
+        val zos = ZipOutputStream(fos)
         for (filePath in filesListInDir) {
             val ze = ZipEntry(filePath.substring(sourceFolder.absolutePath.length + 1, filePath.length))
+            if (filePath.endsWith(".png") || filePath.endsWith("resources.arsc")) {
+                ze.apply {
+                    method = ZipEntry.STORED
+                    crc = crc32(filePath)
+                    size = File(filePath).length()
+                }
+            }
             zos.putNextEntry(ze)
             val fis = FileInputStream(filePath)
             fis.copyTo(zos)
@@ -80,6 +86,21 @@ fun zip(sourceFolder: File, exportPath: String): File {
         it.printStackTrace()
     }
     return File(exportPath)
+}
+
+//calculate CRC32 of file
+fun crc32(filePath: String): Long {
+    val crc = CRC32()
+    val fis = FileInputStream(filePath)
+    val buffer = ByteArray(1024)
+    var read: Int
+    while (true) {
+        read = fis.read(buffer)
+        if (read == -1) break
+        crc.update(buffer, 0, read)
+    }
+    fis.close()
+    return crc.value
 }
 
 @Throws(IOException::class)
