@@ -52,4 +52,6 @@ dependencies {
 
     implementation libs.libsu.core
     implementation libs.libsu.io
+
+    implementation 'com.github.omicronapps:7-Zip-JBinding-4Android:Release-16.02-2.02'
 }

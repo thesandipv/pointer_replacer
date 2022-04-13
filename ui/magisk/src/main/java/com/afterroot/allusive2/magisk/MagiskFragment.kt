@@ -231,7 +231,10 @@ class MagiskFragment : Fragment() {
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
             val path = frameworkExtractPath(requireContext())
-            result = zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
+            File(FRAMEWORK_APK).copyTo(File(repackedFrameworkPath(requireContext())), overwrite = true)
+            val updater = UpdateArchive(requireContext())
+            result = updater.compress(FRAMEWORK_APK, repackedFrameworkPath(requireContext()))
+            //zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
         }
         updateProgress("- Repack Successful")
         return result
