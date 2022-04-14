@@ -36,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.lingala.zip4j.ZipFile
 import java.io.File
 import javax.inject.Inject
 
@@ -117,14 +118,14 @@ class MagiskFragment : Fragment() {
 
     private fun createMagiskModule() {
         lifecycleScope.launch {
-            val extracted = File(frameworkExtractPath(requireContext()))
+            /*val extracted = File(frameworkExtractPath(requireContext()))
             if (!extracted.exists()) {
                 copyAndExtractFrameworkResApk()
             } else {
                 updateProgress("- Using already extracted framework-res.apk")
-            }
+            }*/
 
-            createAndReplacePointerFiles(variantsToReplace(requireContext()))
+            createAndReplacePointerFiles(ALL_VARIANTS)
             repackFrameworkResApk()
             copyMagiskModuleZip()
             extractMagiskModuleZip()
@@ -197,6 +198,9 @@ class MagiskFragment : Fragment() {
     }
 
     private fun createAndReplacePointerFiles(variants: List<Variant>) {
+        val pointersDir = File(pointerSavePath(requireContext()))
+        if (!pointersDir.exists()) pointersDir.mkdirs()
+
         val selectedPointer = settings.pointerPath ?: return
         updateProgress("- Selected Pointer: ${settings.selectedPointerName}")
 
@@ -206,19 +210,19 @@ class MagiskFragment : Fragment() {
             when (variant) {
                 Variant.MDPI -> {
                     val scaled = bmp.scale(VariantSizes.MDPI, VariantSizes.MDPI)
-                    scaled.saveAs("${frameworkExtractPath(requireContext())}$POINTER_MDPI").apply {
+                    scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_MDPI").apply {
                         if (this.exists()) updateProgress("- Replaced MDPI pointer_spot_touch.png")
                     }
                 }
                 Variant.HDPI -> {
                     val scaled = bmp.scale(VariantSizes.HDPI, VariantSizes.HDPI)
-                    scaled.saveAs("${frameworkExtractPath(requireContext())}$POINTER_HDPI").apply {
+                    scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_HDPI").apply {
                         if (this.exists()) updateProgress("- Replaced HDPI pointer_spot_touch.png")
                     }
                 }
                 Variant.XHDPI -> {
                     val scaled = bmp.scale(VariantSizes.XHDPI, VariantSizes.XHDPI)
-                    scaled.saveAs("${frameworkExtractPath(requireContext())}$POINTER_XHDPI").apply {
+                    scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_XHDPI").apply {
                         if (this.exists()) updateProgress("- Replaced XHDPI pointer_spot_touch.png")
                     }
                 }
@@ -230,8 +234,11 @@ class MagiskFragment : Fragment() {
         var result: File?
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
-            val path = frameworkExtractPath(requireContext())
-            result = zip(sourceFolder = File(path), exportPath = repackedFrameworkPath(requireContext()))
+            File(FRAMEWORK_APK).copyTo(File(repackedFrameworkPath(requireContext())), overwrite = true)
+            ZipFile(File(repackedFrameworkPath(requireContext())))
+                .addFolder(File("${pointerSavePath(requireContext())}/res"))
+
+            result = File(repackedFrameworkPath(requireContext()))
         }
         updateProgress("- Repack Successful")
         return result

@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.afollestad.materialdialogs.MaterialDialog
 import com.topjohnwu.superuser.Shell
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -31,6 +32,7 @@ import java.util.Properties
 const val FRAMEWORK_APK = "/system/framework/framework-res.apk"
 fun frameworkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/framework.apk"
 fun frameworkExtractPath(context: Context) = "${context.externalCacheDir?.path}/framework"
+fun pointerSavePath(context: Context) = "${context.externalCacheDir?.path}/pointers"
 fun repackedFrameworkPath(context: Context) = "${context.externalCacheDir?.path}/repacked.apk"
 fun repackedMagiskModulePath(context: Context, name: String) = "${context.getExternalFilesDir(null)?.path}/$name"
 fun magiskEmptyModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/empty-module.zip"
@@ -86,6 +88,8 @@ object VariantSizes {
     const val XHDPI = 66
 }
 
+val ALL_VARIANTS = listOf(Variant.MDPI, Variant.HDPI, Variant.XHDPI)
+
 fun variantsToReplace(context: Context): List<Variant> {
     val targetPath = frameworkExtractPath(context)
     if (!File(targetPath).exists()) return emptyList()
@@ -109,12 +113,16 @@ fun variantsToReplace(targetPath: String): List<Variant> {
 
 fun Bitmap.saveAs(path: String): File {
     val file = File(path)
+    file.parentFile?.mkdirs()
     if (file.exists()) file.delete()
     kotlin.runCatching {
         val fos = FileOutputStream(file)
         this.compress(Bitmap.CompressFormat.PNG, 100, fos)
         fos.flush()
         fos.close()
+    }.onFailure {
+        Timber.e("saveAs: ${it.cause}")
+        it.printStackTrace()
     }
     return file
 }
