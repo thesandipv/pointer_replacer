@@ -28,6 +28,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Properties
+import com.afterroot.allusive2.resources.R as CommonR
 
 const val FRAMEWORK_APK = "/system/framework/framework-res.apk"
 fun frameworkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/framework.apk"
@@ -176,9 +177,9 @@ fun createModuleProp(context: Context) {
 
 fun showRebootDialog(context: Context) {
     MaterialDialog(context).show {
-        title(res = R.string.reboot)
+        title(res = CommonR.string.reboot)
         message(text = "Pointer Applied.")
-        positiveButton(res = R.string.reboot) {
+        positiveButton(res = CommonR.string.reboot) {
             try {
                 reboot()
             } catch (e: Exception) {

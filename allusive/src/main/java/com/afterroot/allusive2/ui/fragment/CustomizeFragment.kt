@@ -50,6 +50,7 @@ import org.jetbrains.anko.find
 import java.io.File
 import java.util.Locale
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 /**
  * Created by Sandip on 04-10-2017.
@@ -115,7 +116,8 @@ class CustomizeFragment : Fragment() {
                 }
                 requireActivity().find<FragmentContainerView>(R.id.fragment_repo_nav).findNavController().navigateUp()
             }
-            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
+            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
         }
 
         setSeekBars()
@@ -127,9 +129,9 @@ class CustomizeFragment : Fragment() {
         super.onStart()
 
         if (pointerType == POINTER_TOUCH) {
-            binding.imageCustomizePointer.transitionName = getString(R.string.main_fragment_transition)
+            binding.imageCustomizePointer.transitionName = getString(CommonR.string.main_fragment_transition)
         } else {
-            binding.imageCustomizePointer.transitionName = getString(R.string.transition_mouse)
+            binding.imageCustomizePointer.transitionName = getString(CommonR.string.transition_mouse)
         }
         TransitionSet()
             .addTransition(ChangeBounds())
@@ -168,15 +170,15 @@ class CustomizeFragment : Fragment() {
             // pointer size
             seekBarSize.max = maxSize - minSize
             seekBarSize.progress = pointerSize - minSize
-            textSize.text = String.format(formatTextSize, getString(R.string.text_size), pointerSize, pointerSize)
+            textSize.text = String.format(formatTextSize, getString(CommonR.string.text_size), pointerSize, pointerSize)
 
             // pointer padding
             seekBarPadding.max = maxPadding
             seekBarPadding.progress = padding
-            textPadding.text = String.format(formatPadding, getString(R.string.text_padding), padding)
+            textPadding.text = String.format(formatPadding, getString(CommonR.string.text_padding), padding)
 
             // pointer alpha
-            textAlpha.text = String.format(formatPadding, getString(R.string.text_alpha), alpha)
+            textAlpha.text = String.format(formatPadding, getString(CommonR.string.text_alpha), alpha)
             seekBarAlpha.progress = alpha
 
             var currentSize: Int = seekBarSize.progress + minSize
@@ -186,7 +188,7 @@ class CustomizeFragment : Fragment() {
                 override fun onProgressChanged(seekBar: SeekBar?, newProgress: Int, fromUser: Boolean) {
                     currentSize = minSize + newProgress
                     textSize.text =
-                        String.format(Locale.US, formatTextSize, getString(R.string.text_size), currentSize, currentSize)
+                        String.format(Locale.US, formatTextSize, getString(CommonR.string.text_size), currentSize, currentSize)
                     setLayoutSize(currentSize)
                 }
 
@@ -201,7 +203,8 @@ class CustomizeFragment : Fragment() {
             seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 var imagePadding: Int = 0
                 override fun onProgressChanged(seekBar: SeekBar, newPadding: Int, fromUser: Boolean) {
-                    textPadding.text = String.format(Locale.US, formatPadding, getString(R.string.text_padding), newPadding)
+                    textPadding.text =
+                        String.format(Locale.US, formatPadding, getString(CommonR.string.text_padding), newPadding)
                     setLayoutPadding(newPadding)
                     imagePadding = newPadding
                 }
@@ -216,7 +219,7 @@ class CustomizeFragment : Fragment() {
 
             seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                    textAlpha.text = String.format(Locale.US, formatPadding, getString(R.string.text_alpha), value)
+                    textAlpha.text = String.format(Locale.US, formatPadding, getString(CommonR.string.text_alpha), value)
                     imageCustomizePointer.imageAlpha = value
                 }
 
@@ -274,7 +277,7 @@ class CustomizeFragment : Fragment() {
                 val tmpColor = if (pointerType == POINTER_TOUCH) settings.pointerTmpColor else settings.mouseTmpColor
 
                 MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-                    title(R.string.choose_color)
+                    title(CommonR.string.choose_color)
                     @Suppress("UNUSED_VARIABLE") var dialog = colorChooser(
                         ColorPalette.Primary,
                         ColorPalette.PrimarySub,

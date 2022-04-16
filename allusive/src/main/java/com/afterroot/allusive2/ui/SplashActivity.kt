@@ -36,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.browse
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -52,10 +53,10 @@ class SplashActivity : AppCompatActivity() {
         val theme = settings.theme
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
-                getString(R.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                getString(R.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                getString(R.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
-                getString(R.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
+                getString(CommonR.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
+                getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
         )
@@ -100,7 +101,7 @@ class SplashActivity : AppCompatActivity() {
         if (it.resultCode == Activity.RESULT_OK) {
             launchDashboard()
         } else {
-            Toast.makeText(this, getString(R.string.msg_login_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(CommonR.string.msg_login_failed), Toast.LENGTH_SHORT).show()
             tryLogin()
         }
     }
@@ -116,9 +117,9 @@ class SplashActivity : AppCompatActivity() {
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAuthMethodPickerLayout(pickerLayout)
-                .setTheme(R.style.MyTheme_Main_FirebaseUI)
-                .setLogo(R.drawable.ic_login_screen)
-                .setTosAndPrivacyPolicyUrls(getString(R.string.url_privacy_policy), getString(R.string.url_privacy_policy))
+                .setTheme(CommonR.style.MyTheme_Main_FirebaseUI)
+                .setLogo(CommonR.drawable.ic_login_screen)
+                .setTosAndPrivacyPolicyUrls(getString(CommonR.string.url_privacy_policy), getString(CommonR.string.url_privacy_policy))
                 .setAvailableProviders(
                     listOf(
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),

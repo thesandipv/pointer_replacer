@@ -56,6 +56,7 @@ import org.jetbrains.anko.design.snackbar
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -128,8 +129,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpTitleObserver() {
         binding.titleBarTitleSwitcher.apply {
-            setInAnimation(this@MainActivity, R.anim.text_switcher_in)
-            setOutAnimation(this@MainActivity, R.anim.text_switcher_out)
+            setInAnimation(this@MainActivity, CommonR.anim.text_switcher_in)
+            setOutAnimation(this@MainActivity, CommonR.anim.text_switcher_out)
         }
         sharedViewModel.liveTitle.observe(this) {
             updateTitle(it)
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createPointerFolder() {
-        val targetPath = "${filesDir.path}${getString(R.string.pointer_folder_path_new)}"
+        val targetPath = "${filesDir.path}${getString(CommonR.string.pointer_folder_path_new)}"
         val pointersFolder = File(targetPath)
         val dotNoMedia = File("$targetPath/.nomedia")
         if (!pointersFolder.exists()) {
@@ -278,44 +279,44 @@ class MainActivity : AppCompatActivity() {
                 R.id.mainFragment -> {
                     fabApply.apply {
                         if (!isShown) show()
-                        text = getString(R.string.text_action_apply)
+                        text = getString(CommonR.string.text_action_apply)
                     }
-                    setTitle(getString(R.string.title_home))
+                    setTitle(getString(CommonR.string.title_home))
                 }
                 R.id.repoFragment -> {
                     fabApply.apply {
                         if (!isShown) show()
-                        text = getString(R.string.text_action_post)
+                        text = getString(CommonR.string.text_action_post)
                     }
-                    setTitle(getString(R.string.title_dashboard))
+                    setTitle(getString(CommonR.string.title_dashboard))
                 }
                 R.id.settingsFragment -> {
                     fabApply.hide()
-                    setTitle(getString(R.string.title_settings))
+                    setTitle(getString(CommonR.string.title_settings))
                 }
                 R.id.editProfileFragment -> {
                     fabApply.apply {
                         if (!isShown) show()
-                        text = getString(R.string.text_action_save)
+                        text = getString(CommonR.string.text_action_save)
                     }
                     hideNavigation()
-                    setTitle(getString(R.string.title_edit_profile))
+                    setTitle(getString(CommonR.string.title_edit_profile))
                 }
                 R.id.newPostFragment -> {
                     fabApply.apply {
                         if (!isShown) show()
-                        text = getString(R.string.text_action_upload)
+                        text = getString(CommonR.string.text_action_upload)
                     }
                     hideNavigation()
-                    setTitle(getString(R.string.title_new_pointer))
+                    setTitle(getString(CommonR.string.title_new_pointer))
                 }
                 R.id.customizeFragment -> {
                     fabApply.apply {
                         if (!isShown) show()
-                        text = getString(R.string.text_action_apply)
+                        text = getString(CommonR.string.text_action_apply)
                     }
                     hideNavigation()
-                    setTitle(getString(R.string.title_customizer_pointer))
+                    setTitle(getString(CommonR.string.title_customizer_pointer))
                 }
                 R.id.magiskFragment -> {
                     fabApply.hide()

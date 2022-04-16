@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.allusive2.GlideApp
-import com.afterroot.allusive2.R
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
@@ -34,6 +33,7 @@ import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
 import com.afterroot.core.extensions.getDrawableExt
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.afterroot.allusive2.resources.R as CommonR
 
 /**
  * New list adapter for Pointer Choose screen.
@@ -45,6 +45,7 @@ class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPoint
         override fun areContentsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
             oldItem.hashCode() == newItem.hashCode()
     }) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemPointerRepoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PointerVH(binding, callbacks)
@@ -65,7 +66,7 @@ class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPoint
         fun bind(pointer: RoomPointer) {
             itemName.text = pointer.pointer_name
             itemUploader.text =
-                String.format(context.getString(R.string.str_format_uploaded_by), pointer.uploader_name)
+                String.format(context.getString(CommonR.string.str_format_uploaded_by), pointer.uploader_name)
             itemThumb.apply {
                 updateLayoutParams<ConstraintLayout.LayoutParams> {
                     height = context.getMinPointerSize()
@@ -77,7 +78,7 @@ class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPoint
                     .override(context.getMinPointerSize(), context.getMinPointerSize())
                     .transition(DrawableTransitionOptions.withCrossFade(factory))
                     .into(this)
-                background = context.getDrawableExt(R.drawable.transparent_grid)
+                background = context.getDrawableExt(CommonR.drawable.transparent_grid)
             }
 
             with(super.itemView) {

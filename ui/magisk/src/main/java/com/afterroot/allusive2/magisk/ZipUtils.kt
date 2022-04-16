@@ -88,7 +88,7 @@ fun zip(sourceFolder: File, exportPath: String): File {
     return File(exportPath)
 }
 
-//calculate CRC32 of file
+// calculate CRC32 of file
 fun crc32(filePath: String): Long {
     val crc = CRC32()
     val fis = FileInputStream(filePath)

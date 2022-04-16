@@ -79,6 +79,7 @@ import org.jetbrains.anko.toast
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
@@ -138,7 +139,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 setOnClickListener {
                     requireActivity().findNavController(R.id.fragment_repo_nav).navigate(R.id.repo_to_new_pointer)
                 }
-                icon = requireContext().getDrawableExt(R.drawable.ic_add)
+                icon = requireContext().getDrawableExt(CommonR.drawable.ic_add)
             }
 
             binding.repoSwipeRefresh.apply {
@@ -152,8 +153,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     }
                 }
 
-                setBackgroundColor(getMaterialColor(R.attr.colorSurfaceVariant))
-                setColorSchemeColors(getMaterialColor(R.attr.colorPrimary), getMaterialColor(R.attr.colorSecondary))
+                setBackgroundColor(getMaterialColor(com.google.android.material.R.attr.colorSurfaceVariant))
+                setColorSchemeColors(
+                    getMaterialColor(com.google.android.material.R.attr.colorPrimary),
+                    getMaterialColor(com.google.android.material.R.attr.colorSecondary)
+                )
             }
         }
     }
@@ -257,7 +261,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         val storageReference = storage.reference
                             .child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
                         val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                        background = context.getDrawableExt(R.drawable.transparent_grid)
+                        background = context.getDrawableExt(CommonR.drawable.transparent_grid)
                         GlideApp.with(context)
                             .load(storageReference)
                             .override(128, 128)
@@ -267,11 +271,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     binding.infoActionPack.apply {
                         lifecycleScope.launch {
                             if (myDatabase.pointerDao().exists(pointer.filename!!).isNotEmpty()) {
-                                text = getString(R.string.text_installed)
+                                text = getString(CommonR.string.text_installed)
                                 setOnClickListener(null)
                                 isEnabled = false
                             } else {
-                                text = getString(R.string.text_download)
+                                text = getString(CommonR.string.text_download)
                                 setOnClickListener {
                                     downloadPointer(pointer)
                                     dialog.dismiss()
@@ -281,15 +285,15 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         }
                     }
                     val downloads = resources.getQuantityString(
-                        R.plurals.str_format_download_count,
+                        CommonR.plurals.str_format_download_count,
                         pointer.downloads,
                         pointer.downloads
                     )
                     val date = SimpleDateFormat.getDateInstance().format(pointer.time)
                     binding.downloadsText =
-                        String.format(getString(R.string.format_text_downloads_and_date), downloads, date)
+                        String.format(getString(CommonR.string.format_text_downloads_and_date), downloads, date)
                     pointer.uploadedBy?.forEach {
-                        binding.uploadedBy = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
+                        binding.uploadedBy = String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
                     }
                 }
                 else -> {
@@ -299,7 +303,12 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             width = 128
                         }
                         background = null
-                        setImageDrawable(context.getDrawableExt(R.drawable.ic_removed, getMaterialColor(R.attr.colorError)))
+                        setImageDrawable(
+                            context.getDrawableExt(
+                                CommonR.drawable.ic_removed,
+                                getMaterialColor(com.google.android.material.R.attr.colorError)
+                            )
+                        )
                     }
                     binding.apply {
                         this.pointer = pointer
@@ -313,11 +322,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     }
 
     private fun downloadPointer(pointer: Pointer) {
-        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading))
+        val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_downloading))
         val ref = storage.pointers().child(pointer.filename!!)
         ref.getFile(File("$targetPath${pointer.filename}"))
             .addOnSuccessListener {
-                sharedViewModel.displayMsg(getString(R.string.msg_pointer_downloaded))
+                sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_downloaded))
                 lifecycleScope.launch {
                     if (!BuildConfig.DEBUG) {
                         val snapshot = firestore.pointers().whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename)
@@ -331,7 +340,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
                 dialog.dismiss()
             }.addOnFailureListener {
-                sharedViewModel.displayMsg(getString(R.string.msg_error))
+                sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
                 dialog.dismiss()
             }
     }
@@ -346,7 +355,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             val oldDesc = pointer.description
             binding.tiTitle.setText(oldTitle)
             binding.tiDesc.setText(oldDesc)
-            positiveButton(res = R.string.text_action_save) {
+            positiveButton(res = CommonR.string.text_action_save) {
                 val newTitle = binding.tiTitle.text.toString()
                 val newDesc = binding.tiDesc.text.toString()
                 if (oldTitle != newTitle || oldDesc != newDesc) {
@@ -380,18 +389,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             if (!item.uploadedBy!!.containsKey(firebaseUtils.uid) || item.reasonCode != Reason.OK) {
                 return false
             }
-            val list = mutableListOf(getString(R.string.text_edit), getString(R.string.text_delete))
+            val list = mutableListOf(getString(CommonR.string.text_edit), getString(CommonR.string.text_delete))
             MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 cornerRadius(16f)
                 listItems(items = list) { _, _, text ->
                     when (text) {
-                        getString(R.string.text_edit) -> {
+                        getString(CommonR.string.text_edit) -> {
                             showEditPointerDialog(item)
                         }
-                        getString(R.string.text_delete) -> {
+                        getString(CommonR.string.text_delete) -> {
                             MaterialDialog(context).show {
-                                message(text = getString(R.string.dialog_delete_confirm))
-                                positiveButton(R.string.text_delete) {
+                                message(text = getString(CommonR.string.dialog_delete_confirm))
+                                positiveButton(CommonR.string.text_delete) {
                                     val filename = item.filename
                                     firestore.collection(DatabaseFields.COLLECTION_POINTERS)
                                         .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
@@ -404,7 +413,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                                     storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
                                                         .child(filename!!)
                                                         .delete()
-                                                    context.toast(R.string.msg_delete_success)
+                                                    context.toast(CommonR.string.msg_delete_success)
                                                 }
                                             }
                                         }

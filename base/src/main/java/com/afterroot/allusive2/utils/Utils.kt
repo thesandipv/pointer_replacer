@@ -17,7 +17,6 @@ package com.afterroot.allusive2.utils
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.afterroot.allusive2.base.BuildConfig
-import com.afterroot.allusive2.base.R
 import com.afterroot.core.network.NetworkState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -36,7 +35,7 @@ fun Context.showNetworkDialog(
     val dialog = MaterialAlertDialogBuilder(this).apply {
         setTitle(if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected")
         setCancelable(false)
-        setMessage(R.string.dialog_msg_no_network)
+        setMessage(com.afterroot.allusive2.resources.R.string.dialog_msg_no_network)
         setNegativeButton("Exit") { _, _ -> negative() }
         if (isShowHide) {
             setPositiveButton("Hide") { dialog, _ -> dialog.dismiss() }

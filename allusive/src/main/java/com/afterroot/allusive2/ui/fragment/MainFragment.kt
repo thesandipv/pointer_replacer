@@ -103,6 +103,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -141,26 +142,26 @@ class MainFragment : Fragment() {
             binding.layoutNewMouse.setOnClickListener {
                 showListPointerChooser(
                     pointerType = POINTER_MOUSE,
-                    title = getString(R.string.dialog_title_select_mouse_pointer)
+                    title = getString(CommonR.string.dialog_title_select_mouse_pointer)
                 )
             }
             findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
-                icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+                icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
                 setOnClickListener {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Apply Pointer With")
-                        .setItems(R.array.pointer_apply_modes) { _, which ->
+                        .setItems(CommonR.array.pointer_apply_modes) { _, which ->
                             when (which) {
                                 0 -> { // Xposed Method
                                     applyPointer()
                                 }
                                 1 -> { // Magisk - framework-res Method
                                     if (!isPointerSelected()) {
-                                        sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
+                                        sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
                                         return@setItems
                                     }
                                     if (!isMouseSelected()) {
-                                        sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
+                                        sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
                                         return@setItems
                                     }
                                     val filesDir = requireContext().getPointerSaveRootDir()
@@ -203,25 +204,25 @@ class MainFragment : Fragment() {
 
             binding.actionCustomize.setOnClickListener {
                 if (!isPointerSelected()) {
-                    sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
+                    sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_TOUCH)
                     }
                     val extras =
-                        FragmentNavigatorExtras(binding.selectedPointer to getString(R.string.main_fragment_transition))
+                        FragmentNavigatorExtras(binding.selectedPointer to getString(CommonR.string.main_fragment_transition))
                     findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
             }
 
             binding.actionCustomizeMouse.setOnClickListener {
                 if (!isMouseSelected()) {
-                    sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
+                    sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
                 } else {
                     val bundle = Bundle().apply {
                         putInt("TYPE", POINTER_MOUSE)
                     }
-                    val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(R.string.transition_mouse))
+                    val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(CommonR.string.transition_mouse))
                     findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
                 }
             }
@@ -321,11 +322,11 @@ class MainFragment : Fragment() {
     @Throws(IOException::class)
     private fun applyPointer() {
         if (!isPointerSelected()) {
-            sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_selected))
+            sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
             return
         }
         if (!isMouseSelected()) {
-            sharedViewModel.displayMsg(getString(R.string.msg_mouse_not_selected))
+            sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
             return
         }
         val filesDir = requireContext().getPointerSaveRootDir()
@@ -393,8 +394,8 @@ class MainFragment : Fragment() {
 
     fun showPointerAppliedMessage() {
         requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
-            message = getString(R.string.text_pointer_applied),
-            actionText = getString(R.string.reboot)
+            message = getString(CommonR.string.text_pointer_applied),
+            actionText = getString(CommonR.string.reboot)
         ) {
             showRebootDialog()
         }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
@@ -402,9 +403,9 @@ class MainFragment : Fragment() {
 
     private fun showRebootDialog() {
         MaterialAlertDialogBuilder(requireActivity()).apply {
-            setTitle(R.string.reboot)
-            setMessage(R.string.text_reboot_confirm)
-            setPositiveButton(R.string.reboot) { _, _ ->
+            setTitle(CommonR.string.reboot)
+            setMessage(CommonR.string.text_reboot_confirm)
+            setPositiveButton(CommonR.string.reboot) { _, _ ->
                 try {
                     reboot()
                 } catch (e: Exception) {
@@ -414,7 +415,7 @@ class MainFragment : Fragment() {
             setNegativeButton("Later") { dialog, _ ->
                 dialog.cancel()
             }
-            setNeutralButton(R.string.text_soft_reboot) { _, _ ->
+            setNeutralButton(CommonR.string.text_soft_reboot) { _, _ ->
                 try { // Also try "killall zygote"
                     val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
                     process.waitFor()
@@ -427,7 +428,7 @@ class MainFragment : Fragment() {
 
     private fun loadInterstitialAd() {
         val interstitialAdUnitId: String = whenBuildIs(
-            debug = getString(R.string.ad_interstitial_1_id),
+            debug = getString(CommonR.string.ad_interstitial_1_id),
             release = remoteConfig.getString("ad_interstitial_1_id")
         )
 
@@ -456,7 +457,7 @@ class MainFragment : Fragment() {
             if (!it) return@observe
             kotlin.runCatching {
                 val bannerAdUnitId: String = whenBuildIs(
-                    debug = getString(R.string.ad_banner_unit_id),
+                    debug = getString(CommonR.string.ad_banner_unit_id),
                     release = remoteConfig.getString("ad_main_unit_id")
                 )
 
@@ -628,7 +629,7 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var pointerAdapter: LocalPointersAdapter
-    private fun showListPointerChooser(title: String = getString(R.string.dialog_title_select_pointer), pointerType: Int) {
+    private fun showListPointerChooser(title: String = getString(CommonR.string.dialog_title_select_pointer), pointerType: Int) {
         val bottomSheetListBinding = LayoutListBottomsheetBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(view = bottomSheetListBinding.root)
@@ -662,21 +663,21 @@ class MainFragment : Fragment() {
 
             override fun onLongClick(position: Int, item: RoomPointer): Boolean {
                 MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-                    title(text = "${getString(R.string.text_delete)} ${item.pointer_name}")
-                    message(res = R.string.text_delete_confirm)
-                    positiveButton(res = R.string.text_yes) {
+                    title(text = "${getString(CommonR.string.text_delete)} ${item.pointer_name}")
+                    message(res = CommonR.string.text_delete_confirm)
+                    positiveButton(res = CommonR.string.text_yes) {
                         val pointerFile = File(targetPath + item.file_name)
                         if (!pointerFile.exists() || pointerFile.delete()) {
                             lifecycleScope.launch {
                                 myDatabase.pointerDao().delete(item)
                             }
-                            Toast.makeText(context, getString(R.string.msg_delete_success), Toast.LENGTH_SHORT)
+                            Toast.makeText(context, getString(CommonR.string.msg_delete_success), Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                            Toast.makeText(context, getString(R.string.msg_delete_failed), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(CommonR.string.msg_delete_failed), Toast.LENGTH_SHORT).show()
                         }
                     }
-                    negativeButton(res = R.string.text_no)
+                    negativeButton(res = CommonR.string.text_no)
                 }
                 return true
             }
@@ -719,15 +720,15 @@ class MainFragment : Fragment() {
     }
 
     private fun downloadPointer(roomPointer: RoomPointer) {
-        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_downloading_missing))
+        val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_downloading_missing))
         lifecycleScope.launch(Dispatchers.IO) {
             val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
             ref.getFile(File("$targetPath${roomPointer.file_name}"))
                 .addOnSuccessListener {
-                    requireContext().toast(getString(R.string.msg_missing_pointers_auto_downloaded))
+                    requireContext().toast(getString(CommonR.string.msg_missing_pointers_auto_downloaded))
                     dialog.dismiss()
                 }.addOnFailureListener {
-                    requireContext().toast(getString(R.string.msg_error_pointers_missing))
+                    requireContext().toast(getString(CommonR.string.msg_error_pointers_missing))
                     dialog.dismiss()
                 }
         }
@@ -755,13 +756,13 @@ class MainFragment : Fragment() {
 
     private fun signOutDialog(): AlertDialog.Builder {
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.dialog_title_sign_out))
-            .setMessage(getString(R.string.dialog_msg_sign_out))
-            .setPositiveButton(R.string.dialog_title_sign_out) { _, _ ->
+            .setTitle(getString(CommonR.string.dialog_title_sign_out))
+            .setMessage(getString(CommonR.string.dialog_msg_sign_out))
+            .setPositiveButton(CommonR.string.dialog_title_sign_out) { _, _ ->
                 AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.dialog_sign_out_result_success),
+                        getString(CommonR.string.dialog_sign_out_result_success),
                         Toast.LENGTH_SHORT
                     ).show()
                     startActivity(Intent(requireContext(), SplashActivity::class.java))

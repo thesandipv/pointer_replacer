@@ -62,6 +62,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class NewPointerPost : Fragment() {
@@ -102,7 +103,7 @@ class NewPointerPost : Fragment() {
                 adView.apply {
                     adSize = AdSize.BANNER
                     adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
-                        getString(R.string.ad_banner_new_pointer)
+                        getString(CommonR.string.ad_banner_new_pointer)
                     } else remoteConfig.getString("ad_banner_new_pointer")
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
@@ -116,8 +117,8 @@ class NewPointerPost : Fragment() {
                                 if (verifyData()) {
                                     clickedUpload = true
                                     MaterialDialog(requireContext()).show {
-                                        title(R.string.text_action_upload)
-                                        message(R.string.dialog_msg_rewarded_ad)
+                                        title(CommonR.string.text_action_upload)
+                                        message(CommonR.string.dialog_msg_rewarded_ad)
                                         positiveButton(android.R.string.ok) {
 /*
                                             if (rewardedAd.isLoaded) {
@@ -131,7 +132,7 @@ class NewPointerPost : Fragment() {
                                     }
                                 }
                             }
-                            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+                            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
                         }
                     } else {
                         setFabAsDirectUpload()
@@ -150,7 +151,7 @@ class NewPointerPost : Fragment() {
                     upload(saveTmpPointer())
                 }
             }
-            icon = requireContext().getDrawableExt(R.drawable.ic_action_apply)
+            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
         }
     }
 
@@ -177,7 +178,7 @@ class NewPointerPost : Fragment() {
 
     private fun createAndLoadRewardedAd() {
         val adUnitId = whenBuildIs(
-            debug = getString(R.string.ad_rewarded_1_id),
+            debug = getString(CommonR.string.ad_rewarded_1_id),
             release = remoteConfig.getString("ad_rewarded_1_id")
         )
         val adLoadCallback = object : RewardedAdLoadCallback() {
@@ -207,12 +208,12 @@ class NewPointerPost : Fragment() {
     private val actionGetUploadPointer = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             Glide.with(this).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
-            binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
+            binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
         }
     }
 
     private fun upload(file: File) {
-        val dialog = requireContext().showStaticProgressDialog(getString(R.string.text_progress_init))
+        val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_init))
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
@@ -221,12 +222,12 @@ class NewPointerPost : Fragment() {
 
         uploadTask.addOnProgressListener {
             val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
-            dialog.updateProgressText(String.format("%s..%s", getString(R.string.text_progress_uploading), progress))
+            dialog.updateProgressText(String.format("%s..%s", getString(CommonR.string.text_progress_uploading), progress))
         }.addOnCompleteListener { task ->
             val map = hashMapOf<String, String>()
             map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
             if (task.isSuccessful) {
-                dialog.updateProgressText(getString(R.string.text_progress_finishing_up))
+                dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
                 val pointer = Pointer(
                     name = pointerName,
                     filename = fileUri.lastPathSegment!!,
@@ -237,17 +238,17 @@ class NewPointerPost : Fragment() {
                 Timber.tag(TAG).d("upload: %s", pointer)
                 db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
-                        sharedViewModel.displayMsg(getString(R.string.msg_pointer_upload_success))
+                        sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_upload_success))
                         dialog.dismiss()
                         findNavController().navigateUp()
                     }
                 }.addOnFailureListener {
-                    sharedViewModel.displayMsg(getString(R.string.msg_error))
+                    sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
                 }
             }
         }.addOnFailureListener {
-            binding.pointerThumb.background = context?.getDrawableExt(R.drawable.transparent_grid)
-            sharedViewModel.displayMsg(getString(R.string.msg_error))
+            binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
+            sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
         }
     }
 
@@ -289,7 +290,7 @@ class NewPointerPost : Fragment() {
             }
 
             if (!isPointerImported) {
-                sharedViewModel.displayMsg(getString(R.string.msg_pointer_not_imported))
+                sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_imported))
                 isOK = false
             }
         }
@@ -299,7 +300,7 @@ class NewPointerPost : Fragment() {
     private fun setError(inputLayoutView: TextInputLayout) {
         inputLayoutView.apply {
             isErrorEnabled = true
-            error = String.format(getString(R.string.format_text_empty_error), inputLayoutView.hint)
+            error = String.format(getString(CommonR.string.format_text_empty_error), inputLayoutView.hint)
         }
     }
 

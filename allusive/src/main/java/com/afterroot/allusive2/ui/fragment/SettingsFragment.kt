@@ -67,6 +67,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @SuppressLint("ValidFragment")
 @AndroidEntryPoint
@@ -122,7 +123,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setDonatePref(isEnable: Boolean) {
-        findPreference<Preference>(getString(R.string.key_pref_donate))?.apply {
+        findPreference<Preference>(getString(CommonR.string.key_pref_donate))?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 setUpBilling()
                 return@OnPreferenceClickListener true
@@ -135,7 +136,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("pref_version")?.apply {
             summary =
                 String.format(
-                    getString(R.string.str_format_version),
+                    getString(CommonR.string.str_format_version),
                     BuildConfig.VERSION_NAME,
                     BuildConfig.VERSION_CODE,
                     BuildConfig.COMMIT_ID
@@ -157,10 +158,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<ListPreference>("key_app_theme")?.setOnPreferenceChangeListener { _, newValue ->
             AppCompatDelegate.setDefaultNightMode(
                 when (newValue) {
-                    getString(R.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    getString(R.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                    getString(R.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
-                    getString(R.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
+                    getString(CommonR.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                    getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
+                    getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
             )
@@ -170,13 +171,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     @SuppressLint("CheckResult")
     private fun setMaxPointerPaddingPref() {
-        findPreference<Preference>(getString(R.string.key_maxPaddingSize))!!.apply {
+        findPreference<Preference>(getString(CommonR.string.key_maxPaddingSize))!!.apply {
             summary = settings.maxPointerPadding.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-                    title(res = R.string.text_max_padding_size)
+                    title(res = CommonR.string.text_max_padding_size)
                     input(
-                        hint = getString(R.string.input_hint_max_padding_size),
+                        hint = getString(CommonR.string.input_hint_max_padding_size),
                         prefill = settings.maxPointerPadding.toString(),
                         allowEmpty = false, maxLength = 3,
                         inputType = InputType.TYPE_CLASS_NUMBER
@@ -185,7 +186,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             settings.maxPointerPadding = input.toString().toInt()
                             this@apply.summary = input
                         } else {
-                            sharedViewModel.displayMsg(String.format(getString(R.string.str_format_value_error), 0))
+                            sharedViewModel.displayMsg(String.format(getString(CommonR.string.str_format_value_error), 0))
                         }
                     }
                     (getInputLayout().getChildAt(0) as FrameLayout).updateLayoutParams<LinearLayout.LayoutParams> {
@@ -199,13 +200,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     @SuppressLint("CheckResult")
     private fun setMaxPointerSizePref() {
-        findPreference<Preference>(getString(R.string.key_maxPointerSize))!!.apply {
+        findPreference<Preference>(getString(CommonR.string.key_maxPointerSize))!!.apply {
             summary = settings.maxPointerSize.toString()
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-                    title(res = R.string.text_max_pointer_size)
+                    title(res = CommonR.string.text_max_pointer_size)
                     input(
-                        hintRes = R.string.text_max_pointer_size,
+                        hintRes = CommonR.string.text_max_pointer_size,
                         prefill = settings.maxPointerSize.toString(),
                         inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
                     ) { _, input ->
@@ -214,7 +215,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             this@apply.summary = input
                         } else {
                             sharedViewModel.displayMsg(
-                                String.format(getString(R.string.str_format_value_error), context.getMinPointerSize())
+                                String.format(getString(CommonR.string.str_format_value_error), context.getMinPointerSize())
                             )
                         }
                     }
@@ -228,17 +229,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setRateOnGPlay() {
-        preferenceScreen.findPreference<Preference>(getString(R.string.key_rate_on_g_play))!!.onPreferenceClickListener =
+        preferenceScreen.findPreference<Preference>(getString(CommonR.string.key_rate_on_g_play))!!.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
                 Bundle().apply {
                     putString(
                         FirebaseAnalytics.Param.ITEM_NAME,
-                        getString(R.string.key_rate_on_g_play)
+                        getString(CommonR.string.key_rate_on_g_play)
                     )
                     FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
                 }
                 Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse(getString(R.string.url_play_store_app_page))
+                    data = Uri.parse(getString(CommonR.string.url_play_store_app_page))
                     startActivity(this)
                 }
                 true
@@ -247,7 +248,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var loadingDialog: MaterialDialog
     private fun setUpBilling() {
-        loadingDialog = requireContext().showStaticProgressDialog(getString(R.string.text_please_wait))
+        loadingDialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_please_wait))
         loadingDialog.show()
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
@@ -288,7 +289,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             withContext(Dispatchers.Main) {
                 delay(100)
                 loadingDialog.dismiss()
-                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.pref_title_donate_dev))
+                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(CommonR.string.pref_title_donate_dev))
                     .setAdapter(adapter) { _, which ->
                         val billingFlowParams =
                             BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[which]).build()

@@ -36,6 +36,7 @@ import com.afterroot.core.utils.getMaterialColor
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
+import com.afterroot.allusive2.resources.R as CommonR
 
 class PointerPagingAdapter(
     private val callbacks: ItemSelectedCallback<Pointer>,
@@ -75,7 +76,7 @@ class PointerVH(
                 val storageReference = storage.reference.child("pointers/${pointer.filename}")
                 itemName.text = pointer.name
                 pointer.uploadedBy?.forEach {
-                    itemUploader.text = String.format(context.getString(R.string.str_format_uploaded_by), it.value)
+                    itemUploader.text = String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
                 }
                 itemThumb.apply {
                     updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -88,10 +89,10 @@ class PointerVH(
                         .override(context.getMinPointerSize(), context.getMinPointerSize())
                         .transition(DrawableTransitionOptions.withCrossFade(factory))
                         .into(this)
-                    background = context.getDrawableExt(R.drawable.transparent_grid)
+                    background = context.getDrawableExt(CommonR.drawable.transparent_grid)
                 }
                 infoMeta.text = context.resources.getQuantityString(
-                    R.plurals.str_format_download_count,
+                    CommonR.plurals.str_format_download_count,
                     pointer.downloads,
                     pointer.downloads
                 )
@@ -105,8 +106,8 @@ class PointerVH(
                     background = null
                     setImageDrawable(
                         context.getTintedDrawable(
-                            R.drawable.ic_removed,
-                            getMaterialColor(R.attr.colorError)
+                            CommonR.drawable.ic_removed,
+                            getMaterialColor(com.google.android.material.R.attr.colorError)
                         )
                     )
                 }

@@ -158,7 +158,6 @@ class MagiskFragment : Fragment() {
                         updateProgress(completed = true)
                     }
                 }
-
             }
         }
     }

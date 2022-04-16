@@ -15,7 +15,6 @@
 package com.afterroot.allusive2
 
 import android.content.Context
-import com.afterroot.allusive2.data.R
 
 object Constants {
     const val POINTER_MOUSE = 2
@@ -36,10 +35,10 @@ object Reason {
     const val NOTICE = 4
 }
 
-fun Context.getMinPointerSize(): Int = this.resources.getInteger(R.integer.min_pointer_size)
+fun Context.getMinPointerSize(): Int = this.resources.getInteger(com.afterroot.allusive2.resources.R.integer.min_pointer_size)
 
 fun Context.getMinPointerSizePx(): Int = (this.getMinPointerSize() * this.resources.displayMetrics.density.toInt()) / 160
 
-fun Context.getPointerSaveDir(): String = getPointerSaveRootDir() + getString(R.string.pointer_folder_path_new)
+fun Context.getPointerSaveDir(): String = getPointerSaveRootDir() + getString(com.afterroot.allusive2.resources.R.string.pointer_folder_path_new)
 
 fun Context.getPointerSaveRootDir(): String = filesDir.path

@@ -34,6 +34,8 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @AndroidEntryPoint
 class FireMessagingService : FirebaseMessagingService() {
@@ -66,7 +68,7 @@ class FireMessagingService : FirebaseMessagingService() {
                 message = remoteMessage.notification!!.body!!,
                 url = remoteMessage.data["link"],
                 channelId = remoteMessage.notification!!.channelId,
-                channelName = remoteMessage.data["cname"] ?: getString(R.string.fcm_channel_default),
+                channelName = remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
                 title = remoteMessage.notification?.title
             )
         }
@@ -75,9 +77,9 @@ class FireMessagingService : FirebaseMessagingService() {
     private fun sendNotification(
         message: String,
         url: String? = "",
-        channelId: String? = getString(R.string.fcm_channel_id),
-        channelName: String? = getString(R.string.fcm_channel_default),
-        title: String? = getString(R.string.app_name)
+        channelId: String? = getString(CommonR.string.fcm_channel_id),
+        channelName: String? = getString(CommonR.string.fcm_channel_default),
+        title: String? = getString(CommonR.string.app_name)
     ) {
         val intent: Intent
         if (url!!.isEmpty()) {
@@ -90,12 +92,12 @@ class FireMessagingService : FirebaseMessagingService() {
         }
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, channelId ?: getString(R.string.fcm_channel_id))
-            .setSmallIcon(R.drawable.ic_launch_screen)
-            .setContentTitle(title ?: getString(R.string.app_name))
+        val notificationBuilder = NotificationCompat.Builder(this, channelId ?: getString(CommonR.string.fcm_channel_id))
+            .setSmallIcon(CommonR.drawable.ic_launch_screen)
+            .setContentTitle(title ?: getString(CommonR.string.app_name))
             .setContentText(message)
             .setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, getMaterialColor(R.attr.colorSecondary)))
+            .setColor(ContextCompat.getColor(this, getMaterialColor(MaterialR.attr.colorSecondary)))
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
 
@@ -103,8 +105,8 @@ class FireMessagingService : FirebaseMessagingService() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId ?: getString(R.string.fcm_channel_id),
-                channelName ?: getString(R.string.fcm_channel_default),
+                channelId ?: getString(CommonR.string.fcm_channel_id),
+                channelName ?: getString(CommonR.string.fcm_channel_default),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)
