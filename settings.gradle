@@ -35,7 +35,7 @@ include ':ui:resources'
 include ':ards'
 
 //AfterROOT Core
-include ':core'
-project(':core').projectDir = file('core/core')
+include ':utils'
+project(':utils').projectDir = file('core/utils')
 project(':ards').projectDir = file('ards/lib')
 
