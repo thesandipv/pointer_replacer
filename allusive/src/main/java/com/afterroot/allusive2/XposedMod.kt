@@ -40,7 +40,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
         mousePointer = Drawable.createFromPath(mousePath)
         XposedBridge.log("Loaded Pointer from " + pointerPath!!)
         XposedBridge.log("Loaded Mouse Pointer from " + mousePath!!)
-        XposedBridge.log(Throwable())
+        // XposedBridge.log(Throwable())
     }
 
     @Throws(Throwable::class)
@@ -51,7 +51,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
                 @Throws(Throwable::class)
                 override fun newDrawable(xResources: XResources, i: Int): Drawable? {
                     XposedBridge.log("Created Pointer Drawable")
-                    XposedBridge.log(Throwable())
+                    // XposedBridge.log(Throwable())
                     return drawable
                 }
             }
@@ -63,7 +63,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
                 @Throws(Throwable::class)
                 override fun newDrawable(res: XResources?, id: Int): Drawable? {
                     XposedBridge.log("Created Mouse Pointer Drawable")
-                    XposedBridge.log(Throwable())
+                    // XposedBridge.log(Throwable())
                     return mousePointer
                 }
             }
