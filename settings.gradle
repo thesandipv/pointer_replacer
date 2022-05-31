@@ -26,7 +26,7 @@ gradleEnterprise {
 }
 
 include ':allusive'
-include ':allusive_rro'
+include ':arro'
 include ':base'
 include ':data'
 include ':ui:magisk'
@@ -38,4 +38,5 @@ include ':ards'
 include ':utils'
 project(':utils').projectDir = file('core/utils')
 project(':ards').projectDir = file('ards/lib')
+project(':arro').projectDir = file('arro/app')
 
