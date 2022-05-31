@@ -221,5 +221,5 @@ dependencies {
     testImplementation libs.androidx.test.core
 
     implementation libs.okhttp.okhttp
-    implementation 'me.zhanghai.android.fastscroll:library:1.1.7'
+    implementation 'me.zhanghai.android.fastscroll:library:1.1.8'
 }

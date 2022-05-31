@@ -101,7 +101,7 @@ class NewPointerPost : Fragment() {
                 // Load Banner Ad
                 val adView = AdView(requireContext())
                 adView.apply {
-                    adSize = AdSize.BANNER
+                    setAdSize(AdSize.BANNER)
                     adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
                         getString(CommonR.string.ad_banner_new_pointer)
                     } else remoteConfig.getString("ad_banner_new_pointer")

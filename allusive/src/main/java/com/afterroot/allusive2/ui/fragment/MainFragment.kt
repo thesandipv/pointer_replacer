@@ -463,7 +463,7 @@ class MainFragment : Fragment() {
 
                 val adView = AdView(requireContext())
                 adView.apply {
-                    adSize = AdSize.BANNER
+                    setAdSize(AdSize.BANNER)
                     adUnitId = bannerAdUnitId
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
