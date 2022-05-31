@@ -17,6 +17,7 @@ package com.afterroot.allusive2.repo
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +33,7 @@ import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
 import com.afterroot.core.extensions.getDrawableExt
 import com.afterroot.core.extensions.getTintedDrawable
+import com.afterroot.core.extensions.visible
 import com.afterroot.core.utils.getMaterialColor
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
@@ -69,6 +71,7 @@ class PointerVH(
     private val itemThumb: AppCompatImageView = binding.infoPointerImage
     private val itemUploader: AppCompatTextView = binding.infoUsername
     private val infoMeta: AppCompatTextView = binding.infoMeta
+    private val metaRRO: ImageView = binding.metaRro
 
     fun bind(pointer: Pointer) {
         when (pointer.reasonCode) {
@@ -96,6 +99,7 @@ class PointerVH(
                     pointer.downloads,
                     pointer.downloads
                 )
+                metaRRO.visible(pointer.hasRRO)
             }
             else -> {
                 itemThumb.apply {

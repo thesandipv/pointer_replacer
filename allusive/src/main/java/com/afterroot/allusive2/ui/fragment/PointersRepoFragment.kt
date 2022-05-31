@@ -80,6 +80,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import com.afterroot.allusive2.resources.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @AndroidEntryPoint
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
@@ -153,10 +154,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     }
                 }
 
-                setBackgroundColor(getMaterialColor(com.google.android.material.R.attr.colorSurfaceVariant))
+                setBackgroundColor(getMaterialColor(MaterialR.attr.colorSurfaceVariant))
                 setColorSchemeColors(
-                    getMaterialColor(com.google.android.material.R.attr.colorPrimary),
-                    getMaterialColor(com.google.android.material.R.attr.colorSecondary)
+                    getMaterialColor(MaterialR.attr.colorPrimary),
+                    getMaterialColor(MaterialR.attr.colorSecondary)
                 )
             }
         }
@@ -207,6 +208,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 DatabaseFields.FIELD_DOWNLOADS -> this.check(R.id.filter_chip_sort_by_download)
             }
         }
+        binding.repoFilterChipGroup.apply {
+            if (settings.filterRRO) {
+                this.check(R.id.filter_chip_show_only_rro)
+            }
+        }
 
         binding.filterChipSortByDate.apply {
             setOnCheckedChangeListener { _, isChecked ->
@@ -232,6 +238,20 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 // TODO
                 lifecycleScope.launch {
                     settings.filterUserPointers = isChecked
+                    delay(200)
+                    refreshData()
+                }
+            }
+            setOnCloseIconClickListener {
+                isChecked = false
+            }
+        }
+
+        binding.filterChipShowOnlyRro.apply {
+            setOnCheckedChangeListener{ _, isChecked ->
+                isCloseIconVisible = isChecked
+                lifecycleScope.launch {
+                    settings.filterRRO = isChecked
                     delay(200)
                     refreshData()
                 }
@@ -284,6 +304,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             }
                         }
                     }
+                    binding.infoActionInstallRro.apply {
+                        if (!pointer.hasRRO) {
+                            visible(false)
+                            return
+                        }
+                        visible(true)
+                        text = getString(CommonR.string.text_install_rro)
+                        setOnClickListener {
+                            //TODO Add install logic
+                            dialog.dismiss()
+                        }
+                    }
                     val downloads = resources.getQuantityString(
                         CommonR.plurals.str_format_download_count,
                         pointer.downloads,
@@ -306,7 +338,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         setImageDrawable(
                             context.getDrawableExt(
                                 CommonR.drawable.ic_removed,
-                                getMaterialColor(com.google.android.material.R.attr.colorError)
+                                getMaterialColor(MaterialR.attr.colorError)
                             )
                         )
                     }

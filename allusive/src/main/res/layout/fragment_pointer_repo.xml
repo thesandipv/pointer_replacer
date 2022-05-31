@@ -112,7 +112,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/text_chip_uploaded_by_you" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/filter_chip_show_only_rro"
+                        style="@style/MyStyle.FilterChip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_chip_rro" />
                 </com.google.android.material.chip.ChipGroup>
+
+
             </LinearLayout>
         </HorizontalScrollView>
 
@@ -126,10 +135,10 @@
             app:layout_constraintTop_toBottomOf="@+id/filter_scroll_view">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:background="?attr/colorSurface"
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="?attr/colorSurface"
                 android:layoutAnimation="@anim/layout_anim_fall_down"
                 tools:listitem="@layout/item_pointer_repo" />
 

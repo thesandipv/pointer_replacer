@@ -153,6 +153,10 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
         get() = getBoolean(context.getString(CommonR.string.key_filter_user_pointers), false)
         set(value) = putBoolean(context.getString(CommonR.string.key_filter_user_pointers), value)
 
+    var filterRRO
+        get() = getBoolean(context.getString(CommonR.string.key_filter_rro), false)
+        set(value) = putBoolean(context.getString(CommonR.string.key_filter_rro), value)
+
     var safUri
         get() = preferences.getString(context.getString(CommonR.string.key_saf_uri), null)
         set(value) = putString(context.getString(CommonR.string.key_saf_uri), value)

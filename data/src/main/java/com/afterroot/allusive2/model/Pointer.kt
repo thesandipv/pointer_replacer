@@ -33,5 +33,6 @@ data class Pointer(
     /**
      * Use constants from [Reason]
      * */
-    var reasonCode: Int = Reason.OK
+    var reasonCode: Int = Reason.OK,
+    var hasRRO: Boolean = false,
 ) : Serializable

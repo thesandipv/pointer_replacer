@@ -69,6 +69,7 @@
     <string name="key_pointerSize" translatable="false">POINTER_SIZE</string>
     <string name="key_pref_donate" translatable="false">pref_donate_dev</string>
     <string name="key_filter_user_pointers" translatable="false">pref_filter_user_pointers</string>
+    <string name="key_filter_rro" translatable="false">pref_filter_rro</string>
     <string name="key_rate_on_g_play" translatable="false">pref_rate_on_g_play</string>
     <string name="key_repo_order_by">repo_order_by</string>
     <string name="key_saf_uri">saf_uri</string>
@@ -231,4 +232,6 @@
     <string name="method_xposed">Xposed</string>
     <string name="method_magisk_fw_res">Replace Pointer in framework-res.apk with Magisk</string>
     <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
+    <string name="text_install_rro">Install RRO</string>
+    <string name="text_chip_rro">RRO</string>
 </resources>

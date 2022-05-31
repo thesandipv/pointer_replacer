@@ -33,8 +33,7 @@ class FirestorePagingSource(
     private val firestore: FirebaseFirestore,
     private val settings: Settings,
     private val firebaseUtils: FirebaseUtils
-) :
-    PagingSource<QuerySnapshot, Pointer>() {
+) : PagingSource<QuerySnapshot, Pointer>() {
     override fun getRefreshKey(state: PagingState<QuerySnapshot, Pointer>): QuerySnapshot? {
         return null
     }
@@ -51,7 +50,13 @@ class FirestorePagingSource(
                     .whereNotEqualTo("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}", "")
             }
 
-            var currentPageSource = Source.CACHE
+            if (settings.filterRRO) {
+                pointersQuery = pointersQuery.whereEqualTo(DatabaseFields.FIELD_HAS_RRO, true)
+            }
+
+            var currentPageSource = if (settings.orderBy == DatabaseFields.FIELD_DOWNLOADS || settings.filterRRO) {
+                Source.DEFAULT
+            } else Source.CACHE
             var nextPageSource = Source.DEFAULT
 
             val cachedPointerSnapshot = pointersQuery.limit(3).get(Source.CACHE).await()
@@ -77,7 +82,7 @@ class FirestorePagingSource(
 
             if (currentPage.isEmpty || currentPage.size() < 15) {
                 Timber.d("load: Cache is empty. Getting data from Server.")
-                currentPage = params.key ?: pointersQuery.get().await()
+                currentPage = params.key ?: pointersQuery.limit(20).get().await()
             }
 
             val nextPageQuery = pointersQuery
