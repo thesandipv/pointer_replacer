@@ -19,6 +19,7 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.util.Log
 import com.afollestad.materialdialogs.MaterialDialog
+import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 import java.io.File
@@ -191,8 +192,13 @@ fun showRebootDialog(context: Context) {
     }
 }
 
-fun installModule(path: String, callback: Shell.ResultCallback) {
-    Shell.su("magisk --install-module \"${path}\"").submit(callback)
+fun installModule(path: String, callback: Shell.ResultCallback, onElementAdd: (String?) -> Unit) {
+    val callbackList: CallbackList<String> = object : CallbackList<String>() {
+        override fun onAddElement(e: String?) {
+            onElementAdd(e)
+        }
+    }
+    Shell.su("magisk --install-module \"${path}\"").to(callbackList).submit(callback)
 }
 
 fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean) -> Unit) {

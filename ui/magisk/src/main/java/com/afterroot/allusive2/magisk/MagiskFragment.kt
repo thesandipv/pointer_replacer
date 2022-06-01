@@ -143,21 +143,23 @@ class MagiskFragment : Fragment() {
         binding.installModule.apply {
             visible(visible)
             setOnClickListener {
-                installModule(path) {
-                    it.out.forEach { output ->
-                        updateProgress(output)
-                    }
-                    it.err.forEach { error ->
-                        updateProgress(error)
-                    }
-                    if (it.isSuccess) {
-                        updateProgress(completed = true)
-                        showRebootDialog(requireContext())
-                    } else {
-                        updateProgress("- Module installation failed")
-                        updateProgress(completed = true)
-                    }
-                }
+                installModule(
+                    path = path,
+                    callback = {
+                        it.err.forEach { error ->
+                            updateProgress("Error: $error")
+                        }
+                        if (it.isSuccess) {
+                            updateProgress(completed = true)
+                            showRebootDialog(requireContext())
+                        } else {
+                            updateProgress("- Module installation failed")
+                            updateProgress(completed = true)
+                        }
+                    },
+                    onElementAdd = { element ->
+                        element?.let { it -> updateProgress(it) }
+                    })
             }
         }
     }
