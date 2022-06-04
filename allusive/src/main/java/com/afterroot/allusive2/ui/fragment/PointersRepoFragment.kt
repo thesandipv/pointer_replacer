@@ -62,10 +62,8 @@ import com.afterroot.data.utils.FirebaseUtils
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
@@ -333,7 +331,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
                     }
                     binding.infoPointerId.text =
-                        getString(CommonR.string.format_text_info_pointer_id, pointer.docId.toString(), pointer.filename?.substringBeforeLast("."))
+                        getString(
+                            CommonR.string.format_text_info_pointer_id,
+                            pointer.docId.toString(),
+                            pointer.filename?.substringBeforeLast(".")
+                        )
                 }
                 else -> {
                     binding.infoPointerImage.apply {
@@ -418,6 +420,28 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
     }
 
+    private fun showDeleteDialog(pointer: Pointer, position: Int) {
+        MaterialDialog(requireContext()).show {
+            message(text = getString(CommonR.string.dialog_delete_confirm))
+            positiveButton(CommonR.string.text_delete) {
+                lifecycleScope.launch {
+                    pointer.docId?.let {
+                        firestore.pointers().document(it).delete().await()
+                        binding.list.scrollToPosition(position)
+                        // delete pointer from storage bucket
+                        storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
+                            .child(pointer.filename!!)
+                            .delete()
+                        context.toast(CommonR.string.msg_delete_success)
+                    }
+                }
+            }
+            negativeButton(android.R.string.cancel) {
+                it.dismiss()
+            }
+        }
+    }
+
     override fun onClick(position: Int, view: View?, item: Pointer) {
         showPointerInfoDialog(item)
     }
@@ -437,30 +461,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             showEditPointerDialog(item)
                         }
                         getString(CommonR.string.text_delete) -> {
-                            MaterialDialog(context).show {
-                                message(text = getString(CommonR.string.dialog_delete_confirm))
-                                positiveButton(CommonR.string.text_delete) {
-                                    val filename = item.filename
-                                    firestore.collection(DatabaseFields.COLLECTION_POINTERS)
-                                        .whereEqualTo(DatabaseFields.FIELD_FILENAME, filename).get()
-                                        .addOnSuccessListener { querySnapshot: QuerySnapshot? ->
-                                            querySnapshot!!.documents.forEach { docSnapshot: DocumentSnapshot? ->
-                                                docSnapshot!!.reference.delete().addOnSuccessListener {
-                                                    // go to last position after deleting pointer
-                                                    binding.list.scrollToPosition(position)
-                                                    // delete pointer from storage bucket
-                                                    storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
-                                                        .child(filename!!)
-                                                        .delete()
-                                                    context.toast(CommonR.string.msg_delete_success)
-                                                }
-                                            }
-                                        }
-                                }
-                                negativeButton(android.R.string.cancel) {
-                                    it.dismiss()
-                                }
-                            }
+                            showDeleteDialog(item, position)
                         }
                     }
                 }
