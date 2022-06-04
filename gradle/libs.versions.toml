@@ -15,7 +15,7 @@ composePaging = "1.0.0-alpha14"
 constraintLayout = "2.1.4"
 ar-utils = "0.4.2" # AfterROOT Core
 coreKtx = "1.8.0-alpha04"
-coreSplash= "1.0.0-rc01"
+coreSplash = "1.0.0-rc01"
 crshlyticsPlugin = "2.9.0"
 dagger = "2.42"
 depUpdates = "0.42.0"
@@ -79,7 +79,7 @@ commonsLang = "org.apache.commons:commons-lang3:3.12.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "com.dropbox.mobile.store:store4:4.0.4-KT15"
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-timber = { module = "com.jakewharton.timber:timber" , version = "5.0.1"}
+timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 
 afterroot-utils = { module = "com.afterroot:utils", version.ref = "ar-utils" }
 
@@ -115,7 +115,7 @@ androidx-supportV13 = { module = "androidx.legacy:legacy-support-v13", version.r
 androidx-supportV4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-transition = { module = "androidx.transition:transition-ktx", version.ref = "transition" }
 androidx-vectorDrawable = { module = "androidx.vectordrawable:vectordrawable", version.ref = "vectorDrawable" }
-androidx-work = {module = "androidx.work:work-runtime", version.ref = "work"}
+androidx-work = { module = "androidx.work:work-runtime", version.ref = "work" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "composeActivity" }
 
@@ -127,7 +127,7 @@ androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-
 
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
-androidx-navigation-pluginSafeArgs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version = "2.3.5" }
+androidx-navigation-pluginSafeArgs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version = "2.4.2" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 
 androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
@@ -263,4 +263,9 @@ lifecycle = [
     "androidx-lifecycle-extensions",
     "androidx-lifecycle-livedata",
     "androidx-lifecycle-viewmodel"
+]
+coroutines = [
+    "kotlin-coroutines-core",
+    "kotlin-coroutines-android",
+    "kotlin-coroutines-play"
 ]
