@@ -40,6 +40,7 @@
     <string name="fcm_channel_default">Updates</string>
     <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
     <string name="format_text_empty_error">%1$s can not be empty</string>
+    <string name="format_text_info_pointer_id">ID:%1$s\nPointer:%2$s</string>
     <string name="format_text_downloads_and_date">"%1\$s • Uploaded %2\$s"</string>
     <string name="help">Help</string>
     <string name="helper_text_desc">Provide short info about pointer.</string>

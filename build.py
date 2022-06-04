@@ -13,26 +13,29 @@
 
 import shutil
 import os
+import glob
 
 
 def rm(file):
-    try:
-        os.remove(file)
-        print(f'Removed {file}')
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
+    if os.path.exists(file):
+        try:
+            os.remove(file)
+            print("Removed: " + file)
+        except:
+            print("Error while deleting file : ", file)
 
-if os.path.exists('ui/magisk/src/main/assets/empty-module.zip'):
-    rm('ui/magisk/src/main/assets/empty-module.zip')
 
-if os.path.exists('ui/magisk/src/main/assets/rro-module.zip'):
-    rm('ui/magisk/src/main/assets/rro-module.zip')
+def createZip(input, output):
+    shutil.make_archive(output, 'zip', input)
+    print("Created: " + output + ".zip")
 
-print('Creating empty-module.zip')
-shutil.make_archive('ui/magisk/src/main/assets/empty-module', 'zip', 'ui/magisk/module/empty-module')
-print('Created empty-module.zip')
 
-# print('Creating rro-module.zip')
-# shutil.make_archive('ui/magisk/src/main/assets/rro-module', 'zip', 'ui/magisk/module/rro-module')
-# print('Created rro-module.zip')
+for file in glob.glob('ui/magisk/src/main/assets/*-module*.zip'):
+    rm(file)
+
+
+createZip(input='ui/magisk/module/empty-module',
+          output='ui/magisk/src/main/assets/empty-module')
+
+createZip(input='ui/magisk/module/rro-module',
+          output='ui/magisk/src/main/assets/rro-module-2')

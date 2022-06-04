@@ -49,9 +49,7 @@ dependencies {
 
     implementation libs.androidx.paging
 
-    implementation libs.kotlin.coroutines.core
-    implementation libs.kotlin.coroutines.android
-    implementation libs.kotlin.coroutines.play
+    implementation libs.bundles.coroutines
 
     implementation libs.androidx.preference
 

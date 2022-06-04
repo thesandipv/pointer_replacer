@@ -248,7 +248,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
 
         binding.filterChipShowOnlyRro.apply {
-            setOnCheckedChangeListener{ _, isChecked ->
+            setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
                 lifecycleScope.launch {
                     settings.filterRRO = isChecked
@@ -305,14 +305,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         }
                     }
                     binding.infoActionInstallRro.apply {
-                        if (!pointer.hasRRO) {
+                        if (!pointer.hasRRO || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                             visible(false)
                             return
                         }
                         visible(true)
                         text = getString(CommonR.string.text_install_rro)
                         setOnClickListener {
-                            //TODO Add install logic
+                            val directions = PointersRepoFragmentDirections.repoToRroInstall(
+                                pointer.docId.toString(),
+                                pointer.filename.toString()
+                            )
+                            requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
                             dialog.dismiss()
                         }
                     }
@@ -325,8 +329,11 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     binding.downloadsText =
                         String.format(getString(CommonR.string.format_text_downloads_and_date), downloads, date)
                     pointer.uploadedBy?.forEach {
-                        binding.uploadedBy = String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
+                        binding.uploadedBy =
+                            String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
                     }
+                    binding.infoPointerId.text =
+                        getString(CommonR.string.format_text_info_pointer_id, pointer.docId.toString(), pointer.filename?.substringBeforeLast("."))
                 }
                 else -> {
                     binding.infoPointerImage.apply {
@@ -361,10 +368,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_downloaded))
                 lifecycleScope.launch {
                     if (!BuildConfig.DEBUG) {
-                        val snapshot = firestore.pointers().whereEqualTo(DatabaseFields.FIELD_FILENAME, pointer.filename)
-                            .get(Source.CACHE).await()
-                        firestore.pointers().document(snapshot.documents.first().id)
-                            .update(DatabaseFields.FIELD_DOWNLOADS, FieldValue.increment(1))
+                        pointer.docId?.let { it1 ->
+                            firestore.pointers().document(it1)
+                                .update(DatabaseFields.FIELD_DOWNLOADS, FieldValue.increment(1))
+                        }
                     }
 
                     myDatabase.pointerDao().add(pointer.toRoomPointer())

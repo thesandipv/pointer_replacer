@@ -108,7 +108,7 @@ class FirestorePagingSource(
             val nextPage = nextPageQuery.get(nextPageSource).await()
 
             LoadResult.Page(
-                data = currentPage.toPointers(),
+                data = currentPage.toPointers().filterNotNull(),
                 prevKey = null,
                 nextKey = nextPage
             )

@@ -14,30 +14,36 @@
  */
 package com.afterroot.allusive2.magisk
 
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.graphics.scale
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.afterroot.allusive2.Result
-import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.data.pointers
+import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
-import com.afterroot.core.extensions.getAsBitmap
+import com.afterroot.allusive2.model.Pointer
 import com.afterroot.core.extensions.visible
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
 import javax.inject.Inject
 
@@ -45,8 +51,15 @@ import javax.inject.Inject
 class MagiskRROFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
-    @Inject lateinit var settings: Settings
+    @Inject lateinit var storage: FirebaseStorage
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var okHttpClient: OkHttpClient
     private val progress = MutableLiveData<Result>()
+    private lateinit var repoDocId: String
+    private lateinit var pointerFileName: String
+    private lateinit var selectedPointer: Pointer
+    private lateinit var downloadApkFileName: String
+    private lateinit var magiskModuleSaveName: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMagiskBinding.inflate(inflater, container, false)
@@ -55,7 +68,17 @@ class MagiskRROFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
+        repoDocId = arguments?.getString("repoDocId") ?: ""
+        pointerFileName = arguments?.getString("pointerFileName") ?: ""
+        downloadApkFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.apk"
+
+        lifecycleScope.launch {
+            selectedPointer =
+                firestore.pointers().document(repoDocId).get(Source.CACHE).await().toObject(Pointer::class.java)
+                ?: firestore.pointers().document(repoDocId).get().await().toObject(Pointer::class.java) ?: Pointer()
+            magiskModuleSaveName = "${selectedPointer.name}_RRO-2_Magisk.zip"
+            init()
+        }
     }
 
     private fun init() {
@@ -87,30 +110,19 @@ class MagiskRROFragment : Fragment() {
         }
 
         setPointerImage()
-
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            updateProgress("- Android 11 and Up Not Supported")
-            updateProgress(completed = true)
-            return
-        }*/
-
         val selectedPointerModule =
-            File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_RRO_Magisk.zip"))
+            File(repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
         if (selectedPointerModule.exists()) {
             setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Magisk module exist")
                 .setMessage(
-                    """- Magisk module already exist at: ${selectedPointerModule.path}
-                        |- If you changed pointer size click 'REPACK ANYWAY' to repack Magisk Module.
-                        |- If you want to repack anyway click 'REPACK ANYWAY'""".trimMargin()
+                    """- Magisk module already exist at: ${selectedPointerModule.path}""".trimMargin()
                 )
-                .setPositiveButton("REPACK ANYWAY") { _, _ ->
-                    setupInstallButton(selectedPointerModule.path, false)
-                    createMagiskModule()
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                .setPositiveButton("OK") { _, _ ->
+                    // setupInstallButton(selectedPointerModule.path, false)
+                    // createMagiskModule()
                 }
                 .show()
             updateProgress(completed = true)
@@ -120,29 +132,23 @@ class MagiskRROFragment : Fragment() {
     }
 
     private fun setPointerImage() {
-        if (settings.selectedPointerPath != null) {
-            binding.pointerContainer.visible(true)
-            binding.ivCurrentPointer.apply {
-                visible(true)
-                setPadding(settings.appliedPointerPadding)
-                setColorFilter(settings.pointerColor)
-                imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
-                Glide.with(requireContext())
-                    .load(Uri.fromFile(File(settings.selectedPointerPath!!)))
-                    .override(128)
-                    .into(this)
-            }
+        binding.pointerContainer.visible(true)
+        binding.ivCurrentPointer.apply {
+            visible(true)
+            val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+            Glide.with(requireContext())
+                .load(storage.pointers().child(pointerFileName))
+                .override(128)
+                .transition(DrawableTransitionOptions.withCrossFade(factory))
+                .into(this)
         }
     }
 
     private fun createMagiskModule() {
         lifecycleScope.launch {
+            downloadRROApk()
             copyAndExtractMagiskRROModuleZip()
-            extractAllusiveRROApk()
-            delay(500)
-            createAndReplacePointerFiles(variantsToReplace(magiskRROApkExtractPath(requireContext())))
-            repackAllusiveRROApk()
-            copyRepackedRROApk()
+            copyDownloadedRROApk()
 
             val module = repackMagiskModuleZip()
             if (module?.exists() == true) {
@@ -175,7 +181,8 @@ class MagiskRROFragment : Fragment() {
                         },
                         onElementAdd = { element ->
                             element?.let { it -> updateProgress(it) }
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -200,11 +207,53 @@ class MagiskRROFragment : Fragment() {
         progress.value = Result.Running(stringBuilder.toString())
     }
 
-    /**
-     * DONE
-     */
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun downloadRROApk(): Boolean {
+        var result = false
+        val url =
+            "https://github.com/afterroot/allusive-repo/raw/main/rros/$downloadApkFileName"
+
+        val fileName = downloadApkFileName
+        val rroApk = File(rroApkDownloadPath(requireContext()), fileName)
+
+        if (rroApk.parentFile?.exists() != true) {
+            rroApk.parentFile?.mkdirs()
+        }
+
+        if (rroApk.exists()) {
+            updateProgress("- RRO Apk already exist at: ${rroApk.path}")
+            return true
+        }
+
+        updateProgress("- Downloading RRO Apk from: $url")
+        withContext(Dispatchers.IO) {
+            val request = Request.Builder().url(url).build()
+            val response = okHttpClient.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body.byteStream()
+                val inputStream = body.buffered()
+                val outputStream = rroApk.outputStream()
+                inputStream.copyTo(outputStream)
+                withContext(Dispatchers.Main) {
+                    updateProgress("- RRO Apk saved at: ${rroApk.path}")
+                    result = true
+                }
+
+                if (repoDocId.isNotBlank()) {
+                    firestore.pointers().document(repoDocId)
+                        .update(DatabaseFields.FIELD_RRO_DOWNLOADS, FieldValue.increment(1))
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    updateProgress("- RRO Apk download failed")
+                    result = false
+                }
+            }
+        }
+        return result
+    }
+
     private suspend fun copyAndExtractMagiskRROModuleZip() {
-        withContext(Dispatchers.Main) { updateProgress("- Copying rro-module.zip from assets") }
         withContext(Dispatchers.IO) {
             copyMagiskRROZip()
             withContext(Dispatchers.Main) { updateProgress("- Extracting rro-module.zip") }
@@ -222,87 +271,17 @@ class MagiskRROFragment : Fragment() {
         }
     }
 
-    /**
-     * DONE
-     */
-    private suspend fun extractAllusiveRROApk() {
-        updateProgress("- Copying allusive_rro.apk from extracted module")
-        withContext(Dispatchers.IO) {
-            val rroApk = File(magiskRROSourceApkPath(requireContext()))
-            withContext(Dispatchers.Main) { updateProgress("- Extracting allusive_rro.apk") }
-
-            rroApk.unzip(toFolder = File(magiskRROApkExtractPath(requireContext())))
-
-            withContext(Dispatchers.Main) { updateProgress("- Done Extracting") }
-        }
-    }
-
-    /**
-     * DONE
-     */
-    private suspend fun createAndReplacePointerFiles(variants: List<Variant>) {
-        withContext(Dispatchers.Main) {
-            updateProgress("- Selected Pointer: ${settings.selectedPointerName}")
-
-            val bmp: Bitmap = binding.ivCurrentPointer.getAsBitmap() ?: return@withContext
-
-            variants.forEach { variant ->
-                when (variant) {
-                    Variant.MDPI -> {
-                        val scaled = bmp.scale(VariantSizes.MDPI, VariantSizes.MDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_MDPI").apply {
-                            if (this.exists()) updateProgress("- Replaced MDPI pointer_spot_touch.png")
-                        }
-                    }
-                    Variant.HDPI -> {
-                        val scaled = bmp.scale(VariantSizes.HDPI, VariantSizes.HDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_HDPI").apply {
-                            if (this.exists()) updateProgress("- Replaced HDPI pointer_spot_touch.png")
-                        }
-                    }
-                    Variant.XHDPI -> {
-                        val scaled = bmp.scale(VariantSizes.XHDPI, VariantSizes.XHDPI)
-                        scaled.saveAs("${magiskRROApkExtractPath(requireContext())}$POINTER_XHDPI").apply {
-                            if (this.exists()) updateProgress("- Replaced XHDPI pointer_spot_touch.png")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * DONE
-     */
-    private suspend fun repackAllusiveRROApk(): File? {
-        var result: File?
-        updateProgress("- Repacking allusive_rro.apk")
-        withContext(Dispatchers.IO) {
-            val path = magiskRROApkExtractPath(requireContext())
-            result = zip(sourceFolder = File(path), exportPath = repackedRROApkPath(requireContext()))
-        }
-        updateProgress("- Repack Successful")
-        return result
-    }
-
-    /**
-     * DONE
-     */
     private suspend fun repackMagiskModuleZip(): File? {
         var result: File?
         updateProgress("- Repacking magisk module")
         withContext(Dispatchers.IO) {
             val path = magiskRROModuleExtractPath(requireContext())
-            val fileName = "${settings.selectedPointerName}_RRO_Magisk.zip"
-            result = zip(sourceFolder = File(path), exportPath = repackedMagiskModulePath(requireContext(), fileName))
+            result = zip(sourceFolder = File(path), exportPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
         }
         updateProgress("- Repack Successful")
         return result
     }
 
-    /**
-     * DONE
-     */
     private suspend fun copyMagiskRROZip() {
         withContext(Dispatchers.Main) {
             updateProgress("- Copying $MAGISK_RRO_ZIP")
@@ -315,26 +294,12 @@ class MagiskRROFragment : Fragment() {
         }
     }
 
-    /**
-     * DONE
-     */
-    private suspend fun extractMagiskRROZip() {
-        updateProgress("- Extracting $MAGISK_RRO_ZIP")
-        withContext(Dispatchers.IO) {
-            extractMagiskZip(requireContext())
-        }
-        updateProgress("- Done Extracting $MAGISK_RRO_ZIP")
-    }
-
-    /**
-     * DONE
-     */
-    private suspend fun copyRepackedRROApk(): File {
-        updateProgress("- Copying repacked allusive_rro.apk")
+    private suspend fun copyDownloadedRROApk(): File {
+        updateProgress("- Copying downloaded rro apk")
         val result = withContext(Dispatchers.IO) {
-            copyRepackedRROApk(requireContext())
+            copyDownloadedRROApk(requireContext(), downloadApkFileName)
         }
-        updateProgress("- Done copying repacked allusive_rro.apk.apk")
+        updateProgress("- Done copying downloaded rro apk")
         return result
     }
 }

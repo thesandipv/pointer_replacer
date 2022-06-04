@@ -4,6 +4,12 @@
       "path": "."
     },
     {
+      "path": "core"
+    },
+    {
+      "path": "arro"
+    },
+    {
       "path": "website"
     }
   ],

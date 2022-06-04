@@ -47,6 +47,9 @@ dependencies {
 
     implementation libs.google.material
 
+    implementation libs.bundles.firebase
+    implementation libs.bundles.coroutines
+
     implementation libs.hilt.hilt
     kapt libs.hilt.compiler
 

@@ -17,6 +17,7 @@ package com.afterroot.allusive2.model
 import androidx.annotation.Keep
 import com.afterroot.allusive2.Reason
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.Date
@@ -30,9 +31,11 @@ data class Pointer(
     var uploadedBy: HashMap<String, String>? = null,
     @ServerTimestamp var time: Date = Timestamp.now().toDate(),
     var downloads: Int = 0,
+    var rroDownloads: Int = 0,
     /**
      * Use constants from [Reason]
      * */
     var reasonCode: Int = Reason.OK,
     var hasRRO: Boolean = false,
+    @Exclude var docId: String? = null
 ) : Serializable

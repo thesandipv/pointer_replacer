@@ -17,7 +17,6 @@ package com.afterroot.allusive2.magisk
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
-import android.util.Log
 import com.afollestad.materialdialogs.MaterialDialog
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
@@ -39,21 +38,18 @@ fun repackedFrameworkPath(context: Context) = "${context.externalCacheDir?.path}
 fun repackedMagiskModulePath(context: Context, name: String) = "${context.getExternalFilesDir(null)?.path}/$name"
 fun magiskEmptyModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/empty-module.zip"
 fun magiskEmptyModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/empty-module"
+fun rroApkDownloadPath(context: Context) = "${context.externalCacheDir?.path}/rros"
 const val POINTER_XHDPI = "/res/drawable-xhdpi-v4/pointer_spot_touch.png"
 const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
 const val POINTER_HDPI = "/res/drawable-hdpi-v4/pointer_spot_touch.png"
 const val MAGISK_EMPTY_ZIP = "empty-module.zip"
 const val MAGISK_PACKAGE = "com.topjohnwu.magisk"
 
-const val MAGISK_RRO_ZIP = "rro-module.zip"
-fun magiskRROModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/rro-module.zip"
-fun magiskRROModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/rro-module"
+const val MAGISK_RRO_ZIP = "rro-module-2.zip"
+fun magiskRROModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/rro-module-2.zip"
+fun magiskRROModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/rro-module-2"
 fun magiskRROSourceApkPath(context: Context) =
     "${magiskRROModuleExtractPath(context)}/system/vendor/overlay/allusive_rro.apk"
-
-fun magiskRROApkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro.apk"
-fun magiskRROApkExtractPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro"
-fun repackedRROApkPath(context: Context) = "${context.externalCacheDir?.path}/allusive_rro_repacked.apk"
 
 fun copyFrameworkRes(context: Context): File {
     val file = File(FRAMEWORK_APK)
@@ -156,7 +152,7 @@ fun copyAssetFile(context: Context, fileName: String, to: String) {
         outputStream.flush()
         outputStream.close()
     } catch (e: IOException) {
-        Log.e("COPY_ASSET", "Failed to copy asset file: $MAGISK_EMPTY_ZIP", e)
+        Timber.tag("COPY_ASSET").e(e, "Failed to copy asset file: %s", fileName)
     }
 }
 
@@ -165,9 +161,9 @@ fun copyRepackedFrameworkResApk(context: Context): File {
     return repacked.copyTo(target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"), overwrite = true)
 }
 
-fun copyRepackedRROApk(context: Context): File {
-    val repacked = File(repackedRROApkPath(context))
-    return repacked.copyTo(target = File(magiskRROSourceApkPath(context)), overwrite = true)
+fun copyDownloadedRROApk(context: Context, dlRROApkFileName: String): File {
+    val downloaded = File(rroApkDownloadPath(context), dlRROApkFileName)
+    return downloaded.copyTo(target = File(magiskRROSourceApkPath(context)), overwrite = true)
 }
 
 fun createModuleProp(context: Context) {

@@ -124,12 +124,12 @@
             <Button
                 android:id="@+id/info_action_install_rro"
                 android:layout_width="0dp"
-                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="@dimen/padding_vertical_half"
                 android:layout_marginEnd="@dimen/pointer_info_horizontal_margin"
                 android:layout_marginBottom="@dimen/padding_vertical_half"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -186,12 +186,28 @@
             android:autoLink="web|email"
             android:text="@{pointer.description}"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/info_pointer_id"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_pointer_container"
             app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_chainStyle="packed"
             tools:text="@string/text_multiline_sample" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/info_pointer_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pointer_info_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="@dimen/pointer_info_horizontal_margin"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/info_pack_desc"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="CN6ASD4MJHDSJK4FG" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

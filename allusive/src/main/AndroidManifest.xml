@@ -69,7 +69,10 @@
         <activity
             android:name="com.afterroot.allusive2.ui.MainActivity"
             android:theme="@style/MyTheme.Main"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+            <nav-graph android:value="@navigation/nav_graph" />
+        </activity>
 
         <activity
             android:name="com.afterroot.allusive2.ui.SplashActivity"

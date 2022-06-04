@@ -159,7 +159,8 @@ class MagiskFragment : Fragment() {
                     },
                     onElementAdd = { element ->
                         element?.let { it -> updateProgress(it) }
-                    })
+                    }
+                )
             }
         }
     }
