@@ -23,7 +23,7 @@ buildscript {
     ]
 
     ext.SDK = [
-            MIN    : 19,
+            MIN    : 21,
             COMPILE: 31,
             TARGET : 31
     ]

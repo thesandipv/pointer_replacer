@@ -32,7 +32,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/MyTheme.Main">
+        android:theme="@style/MyTheme.Main.Start">
 
         <meta-data
             android:name="xposedmodule"
@@ -77,7 +77,7 @@
         <activity
             android:name="com.afterroot.allusive2.ui.SplashActivity"
             android:exported="true"
-            android:theme="@style/MyTheme.Main.Launch">
+            android:theme="@style/MyTheme.Main.Start">
             <tools:validation testUrl="https://afterroot.web.app/apps/pointer-replacer/launch" />
 
             <intent-filter>

@@ -36,6 +36,18 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
+    <style name="MyTheme.Main.Start" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">?attr/colorSurface</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/MyTheme.Main</item>
+        <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/ar_logo</item>
+
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorSurface</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+
     <style name="MyTheme.Main.ActionBar" parent="MyTheme.Main">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>

@@ -22,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
@@ -49,6 +50,9 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var firebaseUtils: FirebaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { true }
+
         settings = Settings(this)
         val theme = settings.theme
         AppCompatDelegate.setDefaultNightMode(

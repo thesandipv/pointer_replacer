@@ -23,4 +23,5 @@ dependencies {
     api libs.google.material
     implementation libs.androidx.preference
     implementation libs.materialdialogs.core
+    implementation libs.androidx.core.splash
 }
