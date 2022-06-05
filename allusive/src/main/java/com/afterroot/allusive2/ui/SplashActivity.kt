@@ -119,7 +119,10 @@ class SplashActivity : AppCompatActivity() {
                 .setAuthMethodPickerLayout(pickerLayout)
                 .setTheme(CommonR.style.MyTheme_Main_FirebaseUI)
                 .setLogo(CommonR.drawable.ic_login_screen)
-                .setTosAndPrivacyPolicyUrls(getString(CommonR.string.url_privacy_policy), getString(CommonR.string.url_privacy_policy))
+                .setTosAndPrivacyPolicyUrls(
+                    getString(CommonR.string.url_privacy_policy),
+                    getString(CommonR.string.url_privacy_policy)
+                )
                 .setAvailableProviders(
                     listOf(
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),

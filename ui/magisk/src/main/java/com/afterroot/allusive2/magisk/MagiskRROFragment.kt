@@ -44,6 +44,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -168,6 +169,7 @@ class MagiskRROFragment : Fragment() {
                     installModule(
                         path = path,
                         callback = {
+                            Timber.d("MagiskInstall: $it")
                             it.err.forEach { error ->
                                 updateProgress("Error: $error")
                             }

@@ -136,7 +136,7 @@
                 app:layout_constraintStart_toEndOf="@id/info_action_pack"
                 app:layout_constraintTop_toBottomOf="@+id/info_tv_downloads_count"
                 app:layout_constraintVertical_bias="1.0"
-                tools:text="@string/text_download"
+                tools:text="@string/text_request_rro"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

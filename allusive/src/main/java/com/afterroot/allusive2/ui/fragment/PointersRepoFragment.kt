@@ -303,19 +303,33 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         }
                     }
                     binding.infoActionInstallRro.apply {
-                        if (!pointer.hasRRO || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                             visible(false)
-                            return
-                        }
-                        visible(true)
-                        text = getString(CommonR.string.text_install_rro)
-                        setOnClickListener {
-                            val directions = PointersRepoFragmentDirections.repoToRroInstall(
-                                pointer.docId.toString(),
-                                pointer.filename.toString()
-                            )
-                            requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
-                            dialog.dismiss()
+                        } else {
+                            visible(true)
+                            if (pointer.hasRRO) {
+                                text = getString(CommonR.string.text_install_rro)
+                                setOnClickListener {
+                                    val directions = PointersRepoFragmentDirections.repoToRroInstall(
+                                        pointer.docId.toString(),
+                                        pointer.filename.toString()
+                                    )
+                                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
+                                    dialog.dismiss()
+                                }
+                            } else {
+                                text = getString(CommonR.string.text_request_rro)
+                                isEnabled = !pointer.rroRequested
+                                setOnClickListener {
+                                    //TODO Add request rro
+                                    lifecycleScope.launch {
+                                        firestore.pointers().document(pointer.docId.toString())
+                                            .update(DatabaseFields.FIELD_RRO_REQUESTED, true)
+                                            .await()
+                                        isEnabled = false
+                                    }
+                                }
+                            }
                         }
                     }
                     val downloads = resources.getQuantityString(

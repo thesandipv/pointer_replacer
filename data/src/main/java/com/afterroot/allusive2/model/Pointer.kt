@@ -37,5 +37,6 @@ data class Pointer(
      * */
     var reasonCode: Int = Reason.OK,
     var hasRRO: Boolean = false,
+    var rroRequested: Boolean = false,
     @Exclude var docId: String? = null
 ) : Serializable

@@ -33,4 +33,5 @@ object DatabaseFields {
     const val FIELD_UPVOTES = "upvotes"
     const val FIELD_DOWNVOTES = "downvotes"
     const val FIELD_HAS_RRO = "hasRRO"
+    const val FIELD_RRO_REQUESTED = "rroRequested"
 }

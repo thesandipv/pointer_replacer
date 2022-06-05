@@ -235,4 +235,5 @@
     <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
     <string name="text_install_rro">Install RRO</string>
     <string name="text_chip_rro">RRO</string>
+    <string name="text_request_rro">Request RRO</string>
 </resources>

@@ -17,7 +17,6 @@ package com.afterroot.allusive2.repo
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -71,7 +70,7 @@ class PointerVH(
     private val itemThumb: AppCompatImageView = binding.infoPointerImage
     private val itemUploader: AppCompatTextView = binding.infoUsername
     private val infoMeta: AppCompatTextView = binding.infoMeta
-    private val metaRRO: ImageView = binding.metaRro
+    private val metaRRO: AppCompatTextView = binding.metaRro
 
     fun bind(pointer: Pointer) {
         when (pointer.reasonCode) {
@@ -94,12 +93,13 @@ class PointerVH(
                         .into(this)
                     background = context.getDrawableExt(CommonR.drawable.transparent_grid)
                 }
-                infoMeta.text = context.resources.getQuantityString(
-                    CommonR.plurals.str_format_download_count,
-                    pointer.downloads,
-                    pointer.downloads
-                )
-                metaRRO.visible(pointer.hasRRO)
+                infoMeta.text = pointer.downloads.toString()
+                metaRRO.apply {
+                    visible(pointer.hasRRO)
+                    if (pointer.hasRRO) {
+                        text = pointer.rroDownloads.toString()
+                    }
+                }
             }
             else -> {
                 itemThumb.apply {

@@ -15,7 +15,7 @@
 
 <resources>
     <plurals name="str_format_download_count">
-        <item quantity="one">%1$d</item>
-        <item quantity="other">%1$d</item>
+        <item quantity="one">%1$d download</item>
+        <item quantity="other">%1$d downloads</item>
     </plurals>
 </resources>
