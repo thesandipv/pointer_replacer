@@ -213,26 +213,33 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
 
         binding.filterChipSortByDate.apply {
+            isChipIconVisible = !isChecked
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     settings.orderBy = DatabaseFields.FIELD_TIME
                     refreshData()
                 }
+                isChipIconVisible = !isChecked
             }
         }
         binding.filterChipSortByDownload.apply {
+            isChipIconVisible = !isChecked
             setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     settings.orderBy = DatabaseFields.FIELD_DOWNLOADS
                     refreshData()
                 }
+                isChipIconVisible = !isChecked
             }
         }
 
         binding.filterChipShowUserUploaded.apply {
             visible(false)
+            isChipIconVisible = !isChecked
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
+                isChipIconVisible = !isChecked
+
                 // TODO
                 lifecycleScope.launch {
                     settings.filterUserPointers = isChecked
@@ -246,8 +253,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         }
 
         binding.filterChipShowOnlyRro.apply {
+            isChipIconVisible = !isChecked
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
+                isChipIconVisible = !isChecked
                 lifecycleScope.launch {
                     settings.filterRRO = isChecked
                     delay(200)

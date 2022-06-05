@@ -163,8 +163,8 @@
     <string name="text_alpha">Alpha</string>
     <string name="text_apply_pointer_confirm">Do you want to apply this pointer?</string>
     <string name="text_browse_pointer_image">Choose Pointer Image to Upload</string>
-    <string name="text_chip_sort_by_date">Sort by Date</string>
-    <string name="text_chip_sort_by_downloads">Sort by Downloads</string>
+    <string name="text_chip_sort_by_date">Date</string>
+    <string name="text_chip_sort_by_downloads">Downloads</string>
     <string name="text_click_to_change_pointer">Click to Change Pointer</string>
     <string name="text_click_to_mouse">Click to change mouse pointer</string>
     <string name="text_color_changed">Pointer color changed.</string>
