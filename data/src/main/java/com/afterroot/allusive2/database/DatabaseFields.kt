@@ -34,4 +34,8 @@ object DatabaseFields {
     const val FIELD_DOWNVOTES = "downvotes"
     const val FIELD_HAS_RRO = "hasRRO"
     const val FIELD_RRO_REQUESTED = "rroRequested"
+
+    // table 'requests'
+    const val COLLECTION_REQUESTS = "requests"
+    const val FIELD_REQUEST_CLOSED = "isRequestClosed"
 }

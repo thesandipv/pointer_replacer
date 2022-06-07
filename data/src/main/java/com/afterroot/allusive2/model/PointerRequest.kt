@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.model
 
 import androidx.annotation.Keep
@@ -45,5 +44,9 @@ data class PointerRequest(
     /**
      * Id of pointer document.
      */
-    var documentId: String? = null
+    var documentId: String? = null,
+    /**
+     * If true, request is closed.
+     */
+    var isRequestClosed: Boolean = false
 )

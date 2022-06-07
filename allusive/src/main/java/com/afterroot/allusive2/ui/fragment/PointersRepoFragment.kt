@@ -42,8 +42,10 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.data.mapper.toPointer
 import com.afterroot.allusive2.data.mapper.toRoomPointer
 import com.afterroot.allusive2.data.pointers
+import com.afterroot.allusive2.data.requests
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.databinding.DialogEditPointerBinding
@@ -51,6 +53,7 @@ import com.afterroot.allusive2.databinding.FragmentPointerInfoBinding
 import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.Pointer
+import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
@@ -74,6 +77,7 @@ import kotlinx.coroutines.tasks.await
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
+import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -328,14 +332,29 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                 }
                             } else {
                                 text = getString(CommonR.string.text_request_rro)
-                                isEnabled = !pointer.rroRequested
+                                firestore.pointers().document(pointer.docId.toString()).get(Source.CACHE)
+                                    .addOnSuccessListener {
+                                        val localPointer = it.toPointer()
+                                        isEnabled = localPointer?.rroRequested == false
+                                    }
                                 setOnClickListener {
-                                    //TODO Add request rro
                                     lifecycleScope.launch {
                                         firestore.pointers().document(pointer.docId.toString())
                                             .update(DatabaseFields.FIELD_RRO_REQUESTED, true)
                                             .await()
-                                        isEnabled = false
+                                        val request = PointerRequest(
+                                            pointer.filename,
+                                            firebaseUtils.uid,
+                                            documentId = pointer.docId
+                                        )
+                                        firestore.requests().document(pointer.docId.toString()).set(request)
+                                            .addOnSuccessListener {
+                                                isEnabled = false
+                                                requireContext().toast("RRO Requested")
+                                            }.addOnFailureListener {
+                                                Timber.d("showPointerInfoDialog: ${it.message}")
+                                                it.printStackTrace()
+                                            }
                                     }
                                 }
                             }
