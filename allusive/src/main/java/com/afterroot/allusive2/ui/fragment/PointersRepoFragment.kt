@@ -135,24 +135,27 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             loadPointers()
 
             val host: MenuHost = requireActivity() as MenuHost
-            host.addMenuProvider(object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(RepoR.menu.menu_repo, menu)
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    return when (menuItem.itemId) {
-                        android.R.id.home -> {
-                            false
-                        }
-                        RepoR.id.repo_request_status -> {
-                            findNavController().navigate(R.id.repo_to_rro_request)
-                            true
-                        }
-                        else -> menuItem.onNavDestinationSelected(findNavController())
+            host.addMenuProvider(
+                object : MenuProvider {
+                    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                        menuInflater.inflate(RepoR.menu.menu_repo, menu)
                     }
-                }
-            }, viewLifecycleOwner)
+
+                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                        return when (menuItem.itemId) {
+                            android.R.id.home -> {
+                                false
+                            }
+                            RepoR.id.repo_request_status -> {
+                                findNavController().navigate(R.id.repo_to_rro_request)
+                                true
+                            }
+                            else -> menuItem.onNavDestinationSelected(findNavController())
+                        }
+                    }
+                },
+                viewLifecycleOwner
+            )
         }
     }
 

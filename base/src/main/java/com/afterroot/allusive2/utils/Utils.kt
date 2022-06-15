@@ -77,6 +77,6 @@ fun whenBuildIs(debug: () -> Unit) {
     if (BuildConfig.DEBUG) debug.invoke()
 }
 
-fun ComponentActivity.addMenuProviderExt(menuProvider: MenuProvider){
+fun ComponentActivity.addMenuProviderExt(menuProvider: MenuProvider) {
     addMenuProvider(menuProvider)
 }

@@ -490,7 +490,12 @@ class MainFragment : Fragment() {
                     setTitle("Version Obsolete")
                     setMessage("This version is obsolete. You have to update to latest version.")
                     setPositiveButton("Update") { _, _ ->
-                        // TODO
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                        )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
                     }
                     setNegativeButton(android.R.string.cancel) { _, _ ->
                         requireActivity().finish()
@@ -503,7 +508,12 @@ class MainFragment : Fragment() {
                     setTitle("Update Available")
                     setMessage("New Version Available. Please update to get latest features.")
                     setPositiveButton("Update") { _, _ ->
-                        // TODO
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                        )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
                     }
                     setNegativeButton(android.R.string.cancel) { _, _ ->
                     }
@@ -633,7 +643,10 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var pointerAdapter: LocalPointersAdapter
-    private fun showListPointerChooser(title: String = getString(CommonR.string.dialog_title_select_pointer), pointerType: Int) {
+    private fun showListPointerChooser(
+        title: String = getString(CommonR.string.dialog_title_select_pointer),
+        pointerType: Int
+    ) {
         val bottomSheetListBinding = LayoutListBottomsheetBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
             customView(view = bottomSheetListBinding.root)

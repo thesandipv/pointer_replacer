@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.utils
 
 import com.afterroot.data.utils.FirebaseUtils
