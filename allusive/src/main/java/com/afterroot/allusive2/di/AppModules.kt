@@ -16,6 +16,8 @@ package com.afterroot.allusive2.di
 
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.base.CoroutineDispatchers
+import com.afterroot.allusive2.utils.getMailBodyForFeedback
+import com.afterroot.data.utils.FirebaseUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -56,8 +58,8 @@ object AppModules {
 
     @Provides
     @Named("feedback_body")
-    fun provideFeedbackBody(): String =
-        "" // getMailBodyForFeedback("", version = provideVersionName(), versionCode = provideVersionCode())
+    fun provideFeedbackBody(firebaseUtils: FirebaseUtils): String =
+        getMailBodyForFeedback(firebaseUtils, version = provideVersionName(), versionCode = provideVersionCode())
 
     @Provides
     @Singleton

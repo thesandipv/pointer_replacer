@@ -29,6 +29,7 @@ dependencies {
     api libs.glide.glide
     kapt libs.glide.compiler
 
+    implementation libs.androidx.activity
     implementation libs.firebase.firestore
 
     implementation libs.firebase.ui.firestore

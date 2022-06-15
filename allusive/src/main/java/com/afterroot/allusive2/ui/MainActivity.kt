@@ -18,16 +18,22 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive2.BuildConfig
@@ -36,13 +42,14 @@ import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.model.User
+import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.core.extensions.animateProperty
-import com.afterroot.core.extensions.visible
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.extensions.animateProperty
+import com.afterroot.utils.extensions.visible
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.appbar.AppBarLayout
@@ -53,9 +60,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.email
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Named
 import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
@@ -72,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
     @Inject lateinit var firestore: FirebaseFirestore
     @Inject lateinit var firebaseMessaging: FirebaseMessaging
+    @Inject @Named("feedback_body") lateinit var feedbackBody: String
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +89,27 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard)
         setSupportActionBar(binding.toolbar)
         title = null
+
+
+        addMenuProviderExt(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(CommonR.menu.menu_common, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    CommonR.id.send_feedback -> {
+                        email(
+                            email = "afterhasroot@gmail.com",
+                            subject = "Pointer Replacer Feedback",
+                            text = feedbackBody
+                        )
+                        true
+                    }
+                    else -> menuItem.onNavDestinationSelected(findNavController(R.id.fragment_repo_nav))
+                }
+            }
+        })
     }
 
     override fun onStart() {
@@ -327,6 +358,11 @@ class MainActivity : AppCompatActivity() {
                     fabApply.hide()
                     hideNavigation()
                     setTitle("Apply with Magisk [RRO]")
+                }
+                R.id.rroRequestFragment -> {
+                    fabApply.hide()
+                    hideNavigation()
+                    setTitle(getString(CommonR.string.text_your_requests))
                 }
             }
         }

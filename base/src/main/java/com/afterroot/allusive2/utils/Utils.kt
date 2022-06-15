@@ -15,7 +15,9 @@
 package com.afterroot.allusive2.utils
 
 import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.MenuProvider
 import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.utils.network.NetworkState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -73,4 +75,8 @@ fun <T> whenBuildIs(debug: () -> T, release: () -> T): T = whenBuildIs(debug.inv
  */
 fun whenBuildIs(debug: () -> Unit) {
     if (BuildConfig.DEBUG) debug.invoke()
+}
+
+fun ComponentActivity.addMenuProviderExt(menuProvider: MenuProvider){
+    addMenuProvider(menuProvider)
 }
