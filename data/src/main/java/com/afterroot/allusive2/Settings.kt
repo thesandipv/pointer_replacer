@@ -18,7 +18,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.afterroot.allusive2.database.DatabaseFields
-import com.afterroot.core.extensions.getPrefs
+import com.afterroot.utils.extensions.getPrefs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import com.afterroot.allusive2.resources.R as CommonR

@@ -26,8 +26,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.ui.MainActivity
-import com.afterroot.core.utils.getMaterialColor
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.getMaterialColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

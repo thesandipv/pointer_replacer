@@ -18,14 +18,21 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -57,11 +64,11 @@ import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.showStaticProgressDialog
-import com.afterroot.core.extensions.visible
-import com.afterroot.core.utils.getMaterialColor
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.extensions.getDrawableExt
+import com.afterroot.utils.extensions.showStaticProgressDialog
+import com.afterroot.utils.extensions.visible
+import com.afterroot.utils.getMaterialColor
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -81,6 +88,7 @@ import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.Inject
+import com.afterroot.allusive2.repo.R as RepoR
 import com.afterroot.allusive2.resources.R as CommonR
 import com.google.android.material.R as MaterialR
 
@@ -125,6 +133,26 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             // setUpList()
             setUpAdapter()
             loadPointers()
+
+            val host: MenuHost = requireActivity() as MenuHost
+            host.addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(RepoR.menu.menu_repo, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        android.R.id.home -> {
+                            false
+                        }
+                        RepoR.id.repo_request_status -> {
+                            findNavController().navigate(R.id.repo_to_rro_request)
+                            true
+                        }
+                        else -> menuItem.onNavDestinationSelected(findNavController())
+                    }
+                }
+            }, viewLifecycleOwner)
         }
     }
 

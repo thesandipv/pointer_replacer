@@ -30,7 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import com.afterroot.allusive2.Result
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
-import com.afterroot.core.extensions.visible
+import com.afterroot.utils.extensions.visible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -101,7 +101,8 @@ class MagiskFragment : Fragment() {
                 .setMessage(
                     """- Magisk module already exist at: ${selectedPointerModule.path}
                         |- If you changed pointer size click 'Yes' to repack Magisk Module.
-                        |- If you want to repack anyway click 'Yes'""".trimMargin()
+                        |- If you want to repack anyway click 'Yes'
+                    """.trimMargin()
                 )
                 .setPositiveButton("REPACK ANYWAY") { _, _ ->
                     setupInstallButton(selectedPointerModule.path, false)

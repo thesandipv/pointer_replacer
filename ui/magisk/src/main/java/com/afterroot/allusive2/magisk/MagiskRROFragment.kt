@@ -27,7 +27,7 @@ import com.afterroot.allusive2.data.pointers
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.allusive2.model.Pointer
-import com.afterroot.core.extensions.visible
+import com.afterroot.utils.extensions.visible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
@@ -76,7 +76,7 @@ class MagiskRROFragment : Fragment() {
         lifecycleScope.launch {
             selectedPointer =
                 firestore.pointers().document(repoDocId).get(Source.CACHE).await().toObject(Pointer::class.java)
-                ?: firestore.pointers().document(repoDocId).get().await().toObject(Pointer::class.java) ?: Pointer()
+                    ?: firestore.pointers().document(repoDocId).get().await().toObject(Pointer::class.java) ?: Pointer()
             magiskModuleSaveName = "${selectedPointer.name}_RRO-2_Magisk.zip"
             init()
         }

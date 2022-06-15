@@ -67,12 +67,12 @@ import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
-import com.afterroot.core.data.model.VersionInfo
-import com.afterroot.core.extensions.getAsBitmap
-import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.showStaticProgressDialog
-import com.afterroot.core.extensions.visible
-import com.afterroot.core.utils.VersionCheck
+import com.afterroot.utils.VersionCheck
+import com.afterroot.utils.data.model.VersionInfo
+import com.afterroot.utils.extensions.getAsBitmap
+import com.afterroot.utils.extensions.getDrawableExt
+import com.afterroot.utils.extensions.showStaticProgressDialog
+import com.afterroot.utils.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -119,6 +119,10 @@ class MainFragment : Fragment() {
     private var interstitialAd: InterstitialAd? = null
     private var isAdLoading = false
     private var targetPath: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)

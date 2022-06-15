@@ -44,8 +44,8 @@ import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
-import com.afterroot.core.extensions.showStaticProgressDialog
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.extensions.showStaticProgressDialog
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams

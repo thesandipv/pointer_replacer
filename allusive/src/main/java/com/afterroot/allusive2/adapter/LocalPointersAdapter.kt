@@ -30,7 +30,7 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
-import com.afterroot.core.extensions.getDrawableExt
+import com.afterroot.utils.extensions.getDrawableExt
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.afterroot.allusive2.resources.R as CommonR

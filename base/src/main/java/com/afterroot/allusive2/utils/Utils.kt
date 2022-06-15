@@ -17,7 +17,7 @@ package com.afterroot.allusive2.utils
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.afterroot.allusive2.base.BuildConfig
-import com.afterroot.core.network.NetworkState
+import com.afterroot.utils.network.NetworkState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**

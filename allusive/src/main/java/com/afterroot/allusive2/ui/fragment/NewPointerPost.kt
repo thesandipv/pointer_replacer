@@ -35,11 +35,11 @@ import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
-import com.afterroot.core.extensions.getAsBitmap
-import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.showStaticProgressDialog
-import com.afterroot.core.extensions.updateProgressText
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.extensions.getAsBitmap
+import com.afterroot.utils.extensions.getDrawableExt
+import com.afterroot.utils.extensions.showStaticProgressDialog
+import com.afterroot.utils.extensions.updateProgressText
 import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize

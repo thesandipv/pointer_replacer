@@ -30,10 +30,10 @@ import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
-import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.getTintedDrawable
-import com.afterroot.core.extensions.visible
-import com.afterroot.core.utils.getMaterialColor
+import com.afterroot.utils.extensions.getDrawableExt
+import com.afterroot.utils.extensions.getTintedDrawable
+import com.afterroot.utils.extensions.visible
+import com.afterroot.utils.getMaterialColor
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage

@@ -16,8 +16,8 @@ package com.afterroot.allusive2.viewmodel
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import com.afterroot.core.network.NetworkState
-import com.afterroot.core.network.NetworkStateMonitor
+import com.afterroot.utils.network.NetworkState
+import com.afterroot.utils.network.NetworkStateMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

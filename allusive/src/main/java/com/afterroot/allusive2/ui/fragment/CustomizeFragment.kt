@@ -42,8 +42,8 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.databinding.FragmentCustomizePointerBinding
 import com.afterroot.allusive2.getMinPointerSize
-import com.afterroot.core.extensions.getDrawableExt
-import com.afterroot.core.extensions.visible
+import com.afterroot.utils.extensions.getDrawableExt
+import com.afterroot.utils.extensions.visible
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.find
