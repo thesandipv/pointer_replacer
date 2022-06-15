@@ -23,9 +23,9 @@ buildscript {
     ]
 
     ext.SDK = [
-            MIN    : 19,
-            COMPILE: 31,
-            TARGET : 31
+            MIN    : 21,
+            COMPILE: 33,
+            TARGET : 33
     ]
 
     ext.VERSION_CODE = SDK.MIN * 10000000 + version.MAJOR * 10000 + version.MINOR * 100 + version.PATCH
@@ -59,8 +59,8 @@ allprojects {
     }
     repositories {
         google()
-        maven { url "https://jitpack.io" }
         mavenCentral()
+        maven { url "https://jitpack.io" }
         maven {
             name = "github-afterroot-core"
             url = uri("https://maven.pkg.github.com/afterroot/core")
