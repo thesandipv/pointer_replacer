@@ -36,8 +36,11 @@ abstract class CreateEmptyModuleZip extends DefaultTask {
             if (change.fileType == FileType.DIRECTORY) return
             isCreate = true
         }
+        def command
+        command = org.gradle.internal.os.OperatingSystem.current() == org.gradle.internal.os.OperatingSystem.WINDOWS
+                ? "python build.py" : "python3 build.py"
         if (isCreate) {
-            println "python build.py".execute([], project.rootDir).text
+            println command.execute([], project.rootDir).text
         }
     }
 }
