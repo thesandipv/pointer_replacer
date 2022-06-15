@@ -142,6 +142,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    composeOptions {
+        println("INFO: Compose Version: ${libs.versions.compose.get()}")
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+    }
 }
 
 configurations {

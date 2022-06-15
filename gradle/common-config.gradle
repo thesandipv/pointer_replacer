@@ -1,3 +1,9 @@
+//check project.path is in list of projects
+def composeProjects = [":ui:repo", ":ui:common-compose"]
+if (project.path in composeProjects) {
+    apply from: "$rootDir/gradle/compose.gradle"
+}
+
 android {
     compileSdkVersion SDK.COMPILE
 
