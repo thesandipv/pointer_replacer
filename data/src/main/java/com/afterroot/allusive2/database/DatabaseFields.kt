@@ -38,4 +38,5 @@ object DatabaseFields {
     // table 'requests'
     const val COLLECTION_REQUESTS = "requests"
     const val FIELD_REQUEST_CLOSED = "isRequestClosed"
+    const val FIELD_TIMESTAMP = "timestamp"
 }

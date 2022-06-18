@@ -1,6 +1,7 @@
 //check project.path is in list of projects
-def composeProjects = [":ui:repo", ":ui:common-compose"]
+def composeProjects = [":data", ":ui:repo", ":ui:common-compose"]
 if (project.path in composeProjects) {
+    println "Compose Enabled for ${project.path}"
     apply from: "$rootDir/gradle/compose.gradle"
 }
 

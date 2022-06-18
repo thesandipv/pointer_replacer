@@ -24,6 +24,9 @@ object Constants {
     const val RC_PERMISSION = 256
     const val RC_PICK_IMAGE: Int = 478
     const val PREF_KEY_THEME = "key_app_theme"
+    const val PLACEHOLDER_1 = "Lorem"
+    const val PLACEHOLDER_2 = "Lorem Ispum"
+    const val PLACEHOLDER_3 = "Lorem Ispum Dolor"
 }
 
 object Reason {

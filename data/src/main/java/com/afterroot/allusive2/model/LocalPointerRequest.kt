@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.afterroot.allusive2.model
 
 import androidx.annotation.Keep
+import androidx.compose.runtime.Immutable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 @Keep
-data class PointerRequest(
+@Immutable
+data class LocalPointerRequest(
     /**
      * File name of pointer with extension.
      */
@@ -48,5 +51,6 @@ data class PointerRequest(
     /**
      * If true, request is closed.
      */
-    @field:JvmField var isRequestClosed: Boolean = false
+    var isRequestClosed: Boolean = false,
+    var pointerName: String? = null,
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,7 @@
  * limitations under the License.
  */
 
-android {
-    buildFeatures {
-        compose true
-    }
+package com.afterroot.allusive2.base.compose
 
-    composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.compose.get()
-    }
-}
+abstract class Actions
 
-dependencies {
-    implementation libs.kotlin.stdLib
-    implementation libs.bundles.compose
-
-    implementation libs.coil
-
-    debugImplementation "androidx.customview:customview:1.1.0"
-    debugImplementation "androidx.customview:customview-poolingcontainer:1.0.0-rc01"
-}

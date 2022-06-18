@@ -36,9 +36,7 @@ fun Pointer.toRoomPointer(): RoomPointer {
 }
 
 fun QuerySnapshot.toPointers(): List<Pointer?> {
-    return this.documents.map {
-        it.toObject(Pointer::class.java)?.copy(docId = it.id)
-    }
+    return this.documents.map { it.toPointer() }
 }
 
-fun DocumentSnapshot.toPointer(): Pointer? = toObject(Pointer::class.java)
+fun DocumentSnapshot.toPointer(): Pointer? = toObject(Pointer::class.java)?.copy(docId = id)

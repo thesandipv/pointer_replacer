@@ -236,4 +236,6 @@
     <string name="text_install_rro">Install RRO</string>
     <string name="text_chip_rro">RRO</string>
     <string name="text_request_rro">Request RRO</string>
+    <string name="text_request_status">Request Status</string>
+    <string name="text_your_requests">Your Requests</string>
 </resources>

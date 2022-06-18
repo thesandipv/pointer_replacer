@@ -45,7 +45,15 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
-            app:popUpTo="@+id/repoFragment"/>
+            app:popUpTo="@+id/repoFragment" />
+        <action
+            android:id="@+id/repo_to_rro_request"
+            app:destination="@id/rroRequestFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@+id/repoFragment" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
@@ -115,4 +123,7 @@
             android:name="pointerFileName"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/rroRequestFragment"
+        android:name="com.afterroot.allusive2.ui.repo.RRORequestFragment" />
 </navigation>

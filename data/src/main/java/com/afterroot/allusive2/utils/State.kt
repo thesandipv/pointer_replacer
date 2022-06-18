@@ -12,23 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.afterroot.allusive2.utils
 
-android {
-    buildFeatures {
-        compose true
+sealed class State<T> {
+    class Loading<T> : State<T>()
+    data class Success<T>(val data: T) : State<T>()
+    data class Failed<T>(val message: String) : State<T>()
+
+    companion object {
+        fun <T> loading() = Loading<T>()
+        fun <T> success(data: T) = Success(data)
+        fun <T> failed(message: String) = Failed<T>(message)
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.compose.get()
-    }
-}
-
-dependencies {
-    implementation libs.kotlin.stdLib
-    implementation libs.bundles.compose
-
-    implementation libs.coil
-
-    debugImplementation "androidx.customview:customview:1.1.0"
-    debugImplementation "androidx.customview:customview-poolingcontainer:1.0.0-rc01"
 }
