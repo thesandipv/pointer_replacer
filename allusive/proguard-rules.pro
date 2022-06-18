@@ -21,3 +21,18 @@
 -keepclassmembers class com.afollestad.materialdialogs.** { *; }
 -keep class com.afterroot.** { *; }
 -keep class androidx.navigation.fragment.NavHostFragment
+
+# We only need to keep ComposeView
+-keep public class androidx.compose.ui.platform.ComposeView {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+
+# For enumeration classes
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
