@@ -2,7 +2,7 @@
 accompanist = "0.24.6-alpha"
 ankoCommons = "0.10.8"
 appcompat = "1.5.0-alpha01"
-activity = "1.5.0-beta01"
+activity = "1.5.0-rc01"
 billing = "5.0.0"
 browser = "1.0.0"
 cardView = "1.0.0"
