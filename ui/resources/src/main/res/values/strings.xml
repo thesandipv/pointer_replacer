@@ -238,4 +238,5 @@
     <string name="text_request_rro">Request RRO</string>
     <string name="text_request_status">Request Status</string>
     <string name="text_your_requests">Your Requests</string>
+    <string name="text_info_method">Apply Method: %1$s</string>
 </resources>
