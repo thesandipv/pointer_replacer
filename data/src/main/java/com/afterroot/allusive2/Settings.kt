@@ -20,132 +20,149 @@ import androidx.core.content.edit
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.utils.extensions.getPrefs
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 import com.afterroot.allusive2.resources.R as CommonR
 
 class Settings @Inject constructor(@ApplicationContext val context: Context) {
 
+    init {
+        Timber.d("Initializing Settings...")
+    }
+
     private val preferences: SharedPreferences = context.getPrefs()
     fun putString(key: String, value: String?) = preferences.edit(true) {
         putString(key, value)
+    }.also {
+        Timber.d("putString: $key, $value")
     }
 
-    fun getString(key: String, value: String?) = preferences.getString(key, value)
+    fun getString(key: String, value: String?): String? = preferences.getString(key, value).also {
+        Timber.d("getString: $key, $it")
+    }
 
     fun putInt(key: String, value: Int) = preferences.edit(true) {
         putInt(key, value)
+    }.also {
+        Timber.d("putInt: $key, $value")
     }
 
-    fun getInt(key: String, value: Int) = preferences.getInt(key, value)
+    fun getInt(key: String, value: Int): Int = preferences.getInt(key, value).also {
+        Timber.d("getInt: $key, $it")
+    }
 
     fun putBoolean(key: String, value: Boolean) = preferences.edit(true) {
         putBoolean(key, value)
+    }.also {
+        Timber.d("putBoolean: $key, $value")
     }
 
-    fun getBoolean(key: String, value: Boolean) = preferences.getBoolean(key, value)
+    fun getBoolean(key: String, value: Boolean): Boolean = preferences.getBoolean(key, value).also {
+        Timber.d("getBoolean: $key, $it")
+    }
 
     var pointerPath
-        get() = preferences.getString(context.getString(CommonR.string.key_pointerPath), null)
+        get() = getString(context.getString(CommonR.string.key_pointerPath), null)
         set(value) = putString(context.getString(CommonR.string.key_pointerPath), value)
 
     var mousePath
-        get() = preferences.getString(context.getString(CommonR.string.key_mousePath), null)
+        get() = getString(context.getString(CommonR.string.key_mousePath), null)
         set(value) = putString(context.getString(CommonR.string.key_mousePath), value)
 
     var selectedPointerPath
-        get() = preferences.getString(context.getString(CommonR.string.key_selectedPointerPath), null)
+        get() = getString(context.getString(CommonR.string.key_selectedPointerPath), null)
         set(value) = putString(context.getString(CommonR.string.key_selectedPointerPath), value)
 
     var appliedPointerSize
-        get() = preferences.getInt(context.getString(CommonR.string.key_appliedPointerSize), pointerSize)
+        get() = getInt(context.getString(CommonR.string.key_appliedPointerSize), pointerSize)
         set(value) = putInt(context.getString(CommonR.string.key_appliedPointerSize), value)
 
     var appliedPointerPadding
-        get() = preferences.getInt(context.getString(CommonR.string.key_appliedPointerPadding), pointerPadding)
+        get() = getInt(context.getString(CommonR.string.key_appliedPointerPadding), pointerPadding)
         set(value) = putInt(context.getString(CommonR.string.key_appliedPointerPadding), value)
 
     var selectedMousePath
-        get() = preferences.getString(context.getString(CommonR.string.key_selectedMousePath), null)
+        get() = getString(context.getString(CommonR.string.key_selectedMousePath), null)
         set(value) = putString(context.getString(CommonR.string.key_selectedMousePath), value)
 
     var appliedMouseSize
-        get() = preferences.getInt(context.getString(CommonR.string.key_appliedMouseSize), mouseSize)
+        get() = getInt(context.getString(CommonR.string.key_appliedMouseSize), mouseSize)
         set(value) = putInt(context.getString(CommonR.string.key_appliedMouseSize), value)
 
     var appliedMousePadding
-        get() = preferences.getInt(context.getString(CommonR.string.key_appliedMousePadding), mousePadding)
+        get() = getInt(context.getString(CommonR.string.key_appliedMousePadding), mousePadding)
         set(value) = putInt(context.getString(CommonR.string.key_appliedMousePadding), value)
 
     var selectedPointerName
-        get() = preferences.getString(context.getString(CommonR.string.key_selectedPointerName), null)
+        get() = getString(context.getString(CommonR.string.key_selectedPointerName), null)
         set(value) = putString(context.getString(CommonR.string.key_selectedPointerName), value)
 
     var selectedMouseName
-        get() = preferences.getString(context.getString(CommonR.string.key_selectedMouseName), null)
+        get() = getString(context.getString(CommonR.string.key_selectedMouseName), null)
         set(value) = putString(context.getString(CommonR.string.key_selectedMouseName), value)
 
     var pointerSize
-        get() = preferences.getInt(context.getString(CommonR.string.key_pointerSize), context.getMinPointerSize())
+        get() = getInt(context.getString(CommonR.string.key_pointerSize), context.getMinPointerSize())
         set(value) = putInt(context.getString(CommonR.string.key_pointerSize), value)
 
     var mouseSize
-        get() = preferences.getInt(context.getString(CommonR.string.key_mouseSize), context.getMinPointerSize())
+        get() = getInt(context.getString(CommonR.string.key_mouseSize), context.getMinPointerSize())
         set(value) = putInt(context.getString(CommonR.string.key_mouseSize), value)
 
     var pointerPadding
-        get() = preferences.getInt(context.getString(CommonR.string.key_pointerPadding), 0)
+        get() = getInt(context.getString(CommonR.string.key_pointerPadding), 0)
         set(value) = putInt(context.getString(CommonR.string.key_pointerPadding), value)
 
     var mousePadding
-        get() = preferences.getInt(context.getString(CommonR.string.key_mousePadding), 0)
+        get() = getInt(context.getString(CommonR.string.key_mousePadding), 0)
         set(value) = putInt(context.getString(CommonR.string.key_mousePadding), value)
 
     var pointerColor
-        get() = preferences.getInt(context.getString(CommonR.string.key_pointerColor), 0)
+        get() = getInt(context.getString(CommonR.string.key_pointerColor), 0)
         set(value) = putInt(context.getString(CommonR.string.key_pointerColor), value)
 
     var mouseColor
-        get() = preferences.getInt(context.getString(CommonR.string.key_mouseColor), 0)
+        get() = getInt(context.getString(CommonR.string.key_mouseColor), 0)
         set(value) = putInt(context.getString(CommonR.string.key_mouseColor), value)
 
     var pointerAlpha
-        get() = preferences.getInt(context.getString(CommonR.string.key_pointerAlpha), 255)
+        get() = getInt(context.getString(CommonR.string.key_pointerAlpha), 255)
         set(value) = putInt(context.getString(CommonR.string.key_pointerAlpha), value)
 
     var mouseAlpha
-        get() = preferences.getInt(context.getString(CommonR.string.key_mouseAlpha), 255)
+        get() = getInt(context.getString(CommonR.string.key_mouseAlpha), 255)
         set(value) = putInt(context.getString(CommonR.string.key_mouseAlpha), value)
 
     var maxPointerSize
-        get() = preferences.getInt(context.getString(CommonR.string.key_maxPointerSize), 100)
+        get() = getInt(context.getString(CommonR.string.key_maxPointerSize), 100)
         set(value) = putInt(context.getString(CommonR.string.key_maxPointerSize), value)
 
     var maxPointerPadding
-        get() = preferences.getInt(context.getString(CommonR.string.key_maxPaddingSize), 100)
+        get() = getInt(context.getString(CommonR.string.key_maxPaddingSize), 100)
         set(value) = putInt(context.getString(CommonR.string.key_maxPaddingSize), value)
 
     var isEnableAlpha
-        get() = preferences.getBoolean(context.getString(CommonR.string.key_EnablePointerAlpha), false)
+        get() = getBoolean(context.getString(CommonR.string.key_EnablePointerAlpha), false)
         set(value) = putBoolean(context.getString(CommonR.string.key_EnablePointerAlpha), value)
 
     var pointerTmpColor
-        get() = preferences.getInt("POINTER_TMP_COLOR", 0)
+        get() = getInt("POINTER_TMP_COLOR", 0)
         set(value) = putInt("POINTER_TMP_COLOR", value)
 
     var mouseTmpColor
-        get() = preferences.getInt("MOUSE_TMP_COLOR", 0)
+        get() = getInt("MOUSE_TMP_COLOR", 0)
         set(value) = putInt("MOUSE_TMP_COLOR", value)
 
     var isExtDialogCancelled
-        get() = preferences.getBoolean(context.getString(CommonR.string.key_ext_dialog_cancel), false)
+        get() = getBoolean(context.getString(CommonR.string.key_ext_dialog_cancel), false)
         set(value) = putBoolean(context.getString(CommonR.string.key_ext_dialog_cancel), value)
 
     var isShowTouches
-        get() = preferences.getBoolean(context.getString(CommonR.string.key_show_touches), false)
+        get() = getBoolean(context.getString(CommonR.string.key_show_touches), false)
         set(value) = putBoolean(context.getString(CommonR.string.key_show_touches), value)
 
     var orderBy
-        get() = preferences.getString(context.getString(CommonR.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
+        get() = getString(context.getString(CommonR.string.key_repo_order_by), DatabaseFields.FIELD_TIME)
             ?: DatabaseFields.FIELD_TIME
         set(value) = putString(context.getString(CommonR.string.key_repo_order_by), value)
 
@@ -158,13 +175,17 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
         set(value) = putBoolean(context.getString(CommonR.string.key_filter_rro), value)
 
     var safUri
-        get() = preferences.getString(context.getString(CommonR.string.key_saf_uri), null)
+        get() = getString(context.getString(CommonR.string.key_saf_uri), null)
         set(value) = putString(context.getString(CommonR.string.key_saf_uri), value)
 
     var isFirstInstalled
-        get() = preferences.getBoolean(Constants.PREF_KEY_FIRST_INSTALL, true)
+        get() = getBoolean(Constants.PREF_KEY_FIRST_INSTALL, true)
         set(value) = putBoolean(Constants.PREF_KEY_FIRST_INSTALL, value)
 
     val theme: String?
-        get() = preferences.getString(Constants.PREF_KEY_THEME, context.getString(CommonR.string.theme_device_default))
+        get() = getString(Constants.PREF_KEY_THEME, context.getString(CommonR.string.theme_device_default))
+
+    var applyMethod
+        get() = getInt("pointer_apply_method", 0)
+        set(value) = putInt("pointer_apply_method", value)
 }
