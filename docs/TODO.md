@@ -22,6 +22,8 @@ Create New Issue in Main Project
 - [ ] IMP - Detect change in size while repacking magisk module.
   - [ ] use database to store meta data of created magisk modules.
 - [ ] IMP - Remove `multiDexKeepFile` and use `multiDexKeepProguard` instead.
+- [ ] ADD - Create online repo of RRO Pointers
+  - [ ] add deeplink support
 
 ### v1.10.2
 
