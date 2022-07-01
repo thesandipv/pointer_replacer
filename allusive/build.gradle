@@ -158,6 +158,7 @@ configurations {
 dependencies {
     implementation project(":base")
     implementation project(":data")
+    implementation project(":ui:home")
     implementation project(":ui:magisk")
     implementation project(":ui:repo")
     implementation project(":ui:resources")

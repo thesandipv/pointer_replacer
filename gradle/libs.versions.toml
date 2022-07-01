@@ -1,64 +1,65 @@
 [versions]
-accompanist = "0.24.6-alpha"
+accompanist = "0.24.13-rc"
 ankoCommons = "0.10.8"
 appcompat = "1.5.0-alpha01"
-activity = "1.5.0-rc01"
+activity = "1.5.0"
 billing = "5.0.0"
 browser = "1.0.0"
 cardView = "1.0.0"
 coil = "1.4.0"
 collection = "1.1.0"
 commonsIo = "1.3.2"
-compose = "1.2.0-beta03"
-composeActivity = "1.5.0-rc01"
+compose = "1.2.0-rc03"
+composeCompiler = "1.2.0"
+composeActivity = "1.5.0"
 composeNavigation = "2.5.0-rc01"
 composePaging = "1.0.0-alpha15"
 constraintLayout = "2.1.4"
-ar-utils = "0.4.2" # AfterROOT Core
+ar-utils = "0.4.3" # AfterROOT Core
 coreKtx = "1.8.0"
 coreSplash = "1.0.0-rc01"
-crshlyticsPlugin = "2.9.0"
+crshlyticsPlugin = "2.9.1"
 dagger = "2.42"
 depUpdates = "0.42.0"
 emoji = "1.1.0"
 epoxy = "4.6.3"
 firebaseAds = "21.0.0"
 firebaseAnalytics = "21.0.0"
-firebaseAuth = "21.0.5"
-firebaseBom = "30.1.0"
+firebaseAuth = "21.0.6"
+firebaseBom = "30.2.0"
 firebaseConfig = "21.1.0"
 firebaseCore = "21.0.0"
 firebaseCrashlytics = "18.2.11"
 firebaseDatabase = "20.0.5"
-firebaseFirestore = "24.1.2"
-firebaseMessaging = "23.0.5"
+firebaseFirestore = "24.2.0"
+firebaseMessaging = "23.0.6"
 firebaseStorage = "20.0.1"
 firebaseUi = "8.0.1"
-fragmentKtx = "1.5.0-rc01"
+fragmentKtx = "1.5.0"
 glide = "4.13.2"
 googleMaterial = "1.7.0-alpha02"
 googleAuth = "20.2.0"
-googleAds = "20.6.0"
+googleAds = "21.0.0"
 gson = "2.9.0"
 hilt = "2.42"
 jackson = "2.13.1"
 koin = "2.2.2"
 koin3 = "3.1.2"
-kotlin = "1.6.21"
-kotlinxCoroutines = "1.6.2"
+kotlin = "1.7.0"
+kotlinxCoroutines = "1.6.3"
 ktlint = "0.45.2"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
 libsuVersion = '3.2.1'
-lifecycle = "2.5.0-rc01"
+lifecycle = "2.5.0"
 materialDialogs = "3.3.0"
 multidex = "2.0.1"
-navigation = "2.5.0-rc01"
-okhttp = "5.0.0-alpha.7"
+navigation = "2.5.0"
+okhttp = "5.0.0-alpha.10"
 paging = "3.2.0-alpha01"
 palette = "1.0.0"
 preference = "1.2.0"
-recyclerview = "1.3.0-alpha02"
+recyclerview = "1.3.0-beta01"
 retrofit = "2.9.0"
 room = "2.4.2"
 spotless = "6.4.1"
@@ -129,7 +130,7 @@ androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-
 
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
-androidx-navigation-pluginSafeArgs = { module = "androidx.navigation.safeargs.kotlin:androidx.navigation.safeargs.kotlin.gradle.plugin", version.ref = "navigation" }
+androidx-navigation-pluginSafeArgs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 
 androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
@@ -138,24 +139,25 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-test = { module = "androidx.room:room-testing", version.ref = "room" }
 
-androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-androidx-compose-ui-gfonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "compose" }
-androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+androidx-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "composeCompiler" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.0.0-alpha13" }
-androidx-compose-materialThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "compose" }
 androidx-compose-iconsCore = { module = "androidx.compose.material:material-icons-core", version.ref = "compose" }
 androidx-compose-iconsExt = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
 androidx-compose-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
-androidx-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.0.0-alpha14" }
+androidx-compose-materialThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "compose" }
 androidx-compose-paging = { module = "androidx.paging:paging-compose", version.ref = "composePaging" }
+androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+androidx-compose-ui-gfonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "compose" }
 androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 androidx-test-archCore = "androidx.arch.core:core-testing:2.1.0"
-androidx-test-core = "androidx.test:core:1.4.1-alpha06"
-androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.0-alpha06"
-androidx-test-junitExt = "androidx.test.ext:junit:1.1.4-alpha06"
+androidx-test-core = "androidx.test:core-ktx:1.4.1-alpha07"
+androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.0-alpha07"
+androidx-test-junitExt = "androidx.test.ext:junit:1.1.4-alpha07"
 androidx-test-runner = "androidx.test:runner:1.4.0"
 
 materialdialogs-input = { module = "com.afollestad.material-dialogs:input", version.ref = "materialDialogs" }
@@ -186,7 +188,7 @@ google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.0"
 google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.5"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-google-pluginGservices = "com.google.gms:google-services:4.3.10"
+google-pluginGservices = "com.google.gms:google-services:4.3.13"
 
 dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
@@ -245,12 +247,13 @@ firebase = [
 ]
 compose = [
     "androidx-activity-compose",
-#    "androidx-navigation-compose",
+    #    "androidx-navigation-compose",
     "androidx-compose-ui",
+    "androidx-compose-compiler",
     "androidx-compose-ui-gfonts",
     "androidx-compose-tooling",
     "androidx-compose-foundation",
-#    "androidx-compose-material",
+    #    "androidx-compose-material",
     "androidx-compose-material3",
     "androidx-compose-iconsCore",
     "androidx-compose-iconsExt",

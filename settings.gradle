@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 plugins {
-    id "com.gradle.enterprise" version "3.8"
+    id "com.gradle.enterprise" version "3.10.2"
 }
 
 gradleEnterprise {
@@ -31,6 +31,7 @@ include ':base'
 include ':data'
 include ':domain'
 include ':ui:common-compose'
+include ':ui:home'
 include ':ui:magisk'
 include ':ui:repo'
 include ':ui:resources'
