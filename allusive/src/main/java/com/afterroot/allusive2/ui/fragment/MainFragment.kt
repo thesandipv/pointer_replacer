@@ -14,6 +14,7 @@
  */
 package com.afterroot.allusive2.ui.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -32,6 +33,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.net.toUri
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.setPadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -55,7 +58,6 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
-import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.database.addLocalPointer
 import com.afterroot.allusive2.databinding.FragmentMainBinding
@@ -72,7 +74,6 @@ import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.utils.extensions.getAsBitmap
 import com.afterroot.utils.extensions.getDrawableExt
-import com.afterroot.utils.extensions.showStaticProgressDialog
 import com.afterroot.utils.extensions.visible
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
@@ -85,15 +86,12 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.storage.FirebaseStorage
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
-import org.jetbrains.anko.toast
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -106,17 +104,35 @@ import com.afterroot.allusive2.resources.R as CommonR
 class MainFragment : Fragment() {
 
     @Inject lateinit var firestore: FirebaseFirestore
-    @Inject lateinit var gson: Gson
     @Inject lateinit var myDatabase: MyDatabase
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
     @Inject lateinit var settings: Settings
-    @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentMainBinding
     private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private var targetPath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.profile_logout -> {
+                        signOutDialog().show()
+                        true
+                    }
+                    else -> {
+                        menuItem.onNavDestinationSelected(
+                            requireActivity().findNavController(R.id.fragment_repo_nav)
+                        )
+                    }
+                }
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -428,6 +444,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    @SuppressLint("VisibleForTests")
     private fun setUpAd() {
         sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
             .observe(requireActivity()) {
@@ -570,6 +587,8 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var pointerAdapter: LocalPointersAdapter
+
+    @SuppressLint("CheckResult")
     private fun showListPointerChooser(
         title: String = getString(CommonR.string.dialog_title_select_pointer),
         pointerType: Int
@@ -579,7 +598,7 @@ class MainFragment : Fragment() {
             customView(view = bottomSheetListBinding.root)
             title(text = title)
             noAutoDismiss()
-            positiveButton(text = "Import Your Pointers") { // Remove this
+            positiveButton(text = getString(CommonR.string.action_import_pointers)) { // Remove this
                 try {
                     import()
                 } catch (e: IllegalStateException) {
@@ -663,6 +682,7 @@ class MainFragment : Fragment() {
         }
     }
 
+/*
     private fun downloadPointer(roomPointer: RoomPointer) {
         val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_downloading_missing))
         lifecycleScope.launch(Dispatchers.IO) {
@@ -677,26 +697,7 @@ class MainFragment : Fragment() {
                 }
         }
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_dashboard_activity, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.profile_logout -> {
-                signOutDialog().show()
-            }
-            else -> {
-                return item.onNavDestinationSelected(
-                    requireActivity().findNavController(R.id.fragment_repo_nav)
-                ) || super.onOptionsItemSelected(
-                    item
-                )
-            }
-        }
-        return true
-    }
+*/
 
     private fun signOutDialog(): AlertDialog.Builder {
         return MaterialAlertDialogBuilder(requireContext())
