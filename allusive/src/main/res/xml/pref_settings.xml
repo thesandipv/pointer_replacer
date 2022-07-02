@@ -17,6 +17,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="@string/pref_title_pointer_settings">
         <Preference
+            app:enabled="false"
+            app:summary="@string/pref_summary_method_note" />
+        <Preference
             app:key="@string/key_maxPointerSize"
             app:title="@string/text_max_pointer_size" />
         <Preference
@@ -43,8 +46,8 @@
             app:summary="@string/pref_summary_donation"
             app:title="@string/pref_title_donate_dev" />
         <Preference
-            app:key="@string/key_watch_ads"
             app:isPreferenceVisible="false"
+            app:key="@string/key_watch_ads"
             app:summary="@string/pref_summary_watch_ad"
             app:title="@string/pref_title_watch_ad" />
     </PreferenceCategory>

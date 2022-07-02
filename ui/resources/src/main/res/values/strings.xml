@@ -130,6 +130,7 @@
     <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
     <string name="pref_summary_xda">tap to visit official XDA thread</string>
     <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
+    <string name="pref_summary_method_note">These settings are only applicable for Xposed Method and Magisk (framework-res) Method.</string>
     <string name="pref_title_donate_dev">Donate Developer</string>
     <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
     <string name="pref_title_licences">Licenses</string>
