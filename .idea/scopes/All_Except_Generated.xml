@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="All Except Generated" pattern="!file[*]:*/build//*&amp;&amp;!ext:*/" />
+</component>
