@@ -20,6 +20,6 @@ fun reboot(reason: String = "") {
     Shell.su("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
 }
 
-fun softReboot(){
+fun softReboot() {
     Shell.su("busybox killall system_server || busybox killall zygote").submit()
 }

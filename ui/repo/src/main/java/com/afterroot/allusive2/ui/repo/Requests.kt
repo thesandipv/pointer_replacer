@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.afterroot.allusive2.ui.repo
 
 import androidx.compose.animation.AnimatedVisibility
@@ -158,9 +157,12 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
 
 @Composable
 fun PointerIcon(url: String) {
-    Image(painter = rememberImagePainter(data = url, builder = {
-        crossfade(true)
-    }), contentDescription = "Pointer Icon")
+    Image(
+        painter = rememberImagePainter(data = url, builder = {
+            crossfade(true)
+        }),
+        contentDescription = "Pointer Icon"
+    )
 }
 
 val placeholderRequests = buildList {
@@ -218,4 +220,3 @@ fun PreviewRequestListItemDark() {
         }
     }
 }
-

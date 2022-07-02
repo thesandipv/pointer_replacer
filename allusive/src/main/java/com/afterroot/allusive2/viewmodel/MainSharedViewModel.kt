@@ -59,7 +59,7 @@ class MainSharedViewModel @Inject constructor(
             actions.collect { action ->
                 Timber.d("action: $action")
                 when (action) {
-                    //Add actions should be handled by ViewModel.
+                    // Add actions should be handled by ViewModel.
                     else -> {}
                 }
             }
@@ -89,11 +89,11 @@ class MainSharedViewModel @Inject constructor(
         _snackbarMsg.value = Event(msg)
     }
 
-    fun loadIntAdInterstitial(isShow: Boolean = false){
+    fun loadIntAdInterstitial(isShow: Boolean = false) {
         submitAction(HomeActions.LoadIntAd(isShow))
     }
 
-    fun showInterstitialAd(){
+    fun showInterstitialAd() {
         submitAction(HomeActions.ShowIntAd)
     }
 
