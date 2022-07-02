@@ -70,8 +70,6 @@ import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
-import com.afterroot.utils.VersionCheck
-import com.afterroot.utils.data.model.VersionInfo
 import com.afterroot.utils.extensions.getAsBitmap
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.showStaticProgressDialog
@@ -132,7 +130,6 @@ class MainFragment : Fragment() {
     }
 
     private fun init() {
-        setUpVersionCheck()
         targetPath = requireContext().getPointerSaveDir()
 
         binding.layoutNewPointer.setOnClickListener {
@@ -448,53 +445,6 @@ class MainFragment : Fragment() {
                         binding.adContainer.addView(this)
                         loadAd(AdRequest.Builder().build())
                     }
-                }
-            }
-    }
-
-    private fun setUpVersionCheck() {
-        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
-            .observe(requireActivity()) {
-                if (!it) return@observe
-                val versionJson = remoteConfig.getString("versions_allusive")
-                if (versionJson.isBlank()) return@observe
-                val versionChecker = VersionCheck(
-                    gson.fromJson(versionJson, VersionInfo::class.java)
-                        .copy(currentVersion = BuildConfig.VERSION_CODE)
-                )
-                versionChecker.onVersionDisabled {
-                    AlertDialog.Builder(requireContext()).apply {
-                        setTitle("Version Obsolete")
-                        setMessage("This version is obsolete. You have to update to latest version.")
-                        setPositiveButton("Update") { _, _ ->
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                            )
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }
-                        setNegativeButton(android.R.string.cancel) { _, _ ->
-                            requireActivity().finish()
-                        }
-                        setCancelable(false)
-                    }.show()
-                }
-                versionChecker.onUpdateAvailable {
-                    AlertDialog.Builder(requireContext()).apply {
-                        setTitle("Update Available")
-                        setMessage("New Version Available. Please update to get latest features.")
-                        setPositiveButton("Update") { _, _ ->
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                            )
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }
-                        setNegativeButton(android.R.string.cancel) { _, _ ->
-                        }
-                    }.show()
                 }
             }
     }

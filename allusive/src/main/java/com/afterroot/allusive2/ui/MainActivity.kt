@@ -16,6 +16,7 @@ package com.afterroot.allusive2.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -50,6 +51,8 @@ import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.VersionCheck
+import com.afterroot.utils.data.model.VersionInfo
 import com.afterroot.utils.extensions.animateProperty
 import com.afterroot.utils.extensions.visible
 import com.google.android.gms.ads.AdError
@@ -67,6 +70,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
@@ -93,6 +97,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var firebaseMessaging: FirebaseMessaging
     @Inject lateinit var firebaseUtils: FirebaseUtils
     @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var gson: Gson
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
     @Inject lateinit var settings: Settings
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
@@ -129,6 +134,11 @@ class MainActivity : AppCompatActivity() {
         if (!firebaseUtils.isUserSignedIn) { // If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
         } else initialize()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setUpVersionCheck()
     }
 
     @SuppressLint("MissingPermission")
@@ -456,6 +466,53 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment_repo_nav).navigateUp(appBarConfiguration)
+    }
+
+    private fun setUpVersionCheck() {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
+            .observe(this) {
+                if (!it) return@observe
+                val versionJson = remoteConfig.getString("versions_allusive")
+                if (versionJson.isBlank()) return@observe
+                val versionChecker = VersionCheck(
+                    gson.fromJson(versionJson, VersionInfo::class.java)
+                        .copy(currentVersion = BuildConfig.VERSION_CODE)
+                )
+                versionChecker.onVersionDisabled {
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Version Obsolete")
+                        setMessage("This version is obsolete. You have to update to latest version.")
+                        setPositiveButton("Update") { _, _ ->
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        setNegativeButton(android.R.string.cancel) { _, _ ->
+                            finish()
+                        }
+                        setCancelable(false)
+                    }.show()
+                }
+                versionChecker.onUpdateAvailable {
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Update Available")
+                        setMessage("New Version Available. Please update to get latest features.")
+                        setPositiveButton("Update") { _, _ ->
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        setNegativeButton(android.R.string.cancel) { _, _ ->
+                        }
+                    }.show()
+                }
+            }
     }
 
     companion object {
