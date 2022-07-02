@@ -26,6 +26,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
@@ -78,7 +79,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var firestore: FirebaseFirestore
     @Inject lateinit var firebaseUtils: FirebaseUtils
-    private val sharedViewModel: MainSharedViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -116,7 +117,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun initFirebaseConfig() {
-        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED).observe(requireActivity()) {
             if (!it) return@observe
             setDonatePref(it)
         }

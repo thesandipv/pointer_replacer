@@ -24,10 +24,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.FirestorePagingSource
+import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,15 +45,36 @@ class MainSharedViewModel @Inject constructor(
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()
 
+    var actions = MutableSharedFlow<HomeActions>()
+        private set
+
     init {
+        Timber.d("init $this")
+
         remoteConfig.fetchAndActivate().addOnSuccessListener {
-            savedStateHandle["configLoaded"] = true
+            savedStateHandle[KEY_CONFIG_LOADED] = true
+        }
+
+        viewModelScope.launch {
+            actions.collect { action ->
+                Timber.d("action: $action")
+                when (action) {
+                    //Add actions should be handled by ViewModel.
+                    else -> {}
+                }
+            }
         }
     }
 
     val pointers = Pager(PagingConfig(20)) {
         FirestorePagingSource(firebaseFirestore, settings, firebaseUtils)
     }.flow.cachedIn(viewModelScope)
+
+    internal fun submitAction(action: HomeActions) {
+        viewModelScope.launch {
+            actions.emit(action)
+        }
+    }
 
     fun setTitle(title: String?) {
         if (liveTitle.value != title) { // Don't change title if new title is equal to old.
@@ -62,5 +87,17 @@ class MainSharedViewModel @Inject constructor(
 
     fun displayMsg(msg: String) {
         _snackbarMsg.value = Event(msg)
+    }
+
+    fun loadIntAdInterstitial(isShow: Boolean = false){
+        submitAction(HomeActions.LoadIntAd(isShow))
+    }
+
+    fun showInterstitialAd(){
+        submitAction(HomeActions.ShowIntAd)
+    }
+
+    companion object {
+        const val KEY_CONFIG_LOADED = "configLoaded"
     }
 }

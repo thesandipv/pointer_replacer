@@ -35,7 +35,7 @@ import androidx.core.net.toUri
 import androidx.core.view.setPadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -62,6 +62,7 @@ import com.afterroot.allusive2.databinding.LayoutListBottomsheetBinding
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.getPointerSaveRootDir
+import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
@@ -75,14 +76,9 @@ import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.showStaticProgressDialog
 import com.afterroot.utils.extensions.visible
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -94,6 +90,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
@@ -116,9 +113,7 @@ class MainFragment : Fragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentMainBinding
-    private val sharedViewModel: MainSharedViewModel by viewModels()
-    private var interstitialAd: InterstitialAd? = null
-    private var isAdLoading = false
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private var targetPath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,9 +150,12 @@ class MainFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Apply Pointer With")
                         .setItems(CommonR.array.pointer_apply_modes) { _, which ->
+                            settings.applyMethod = which
                             when (which) {
                                 0 -> { // Xposed Method
-                                    applyPointer()
+                                    showInterstitialAd {
+                                        applyPointer()
+                                    }
                                 }
                                 1 -> { // Magisk - framework-res Method
                                     if (!isPointerSelected()) {
@@ -378,21 +376,18 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
-        interstitialAd?.let {
-            it.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    interstitialAd = null
-                    loadInterstitialAd()
-                    onAdDismiss()
-                }
+    private fun loadInterstitialAd() {
+        sharedViewModel.loadIntAdInterstitial()
+    }
 
-                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                    interstitialAd = null
+    private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
+        sharedViewModel.showInterstitialAd()
+        lifecycleScope.launch {
+            sharedViewModel.actions.collectLatest { action ->
+                if (action is HomeActions.OnIntAdDismiss) {
                     onAdDismiss()
                 }
             }
-            it.show(requireActivity())
         }
     }
 
@@ -429,96 +424,72 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun loadInterstitialAd() {
-        val interstitialAdUnitId: String = whenBuildIs(
-            debug = getString(CommonR.string.ad_interstitial_1_id),
-            release = remoteConfig.getString("ad_interstitial_1_id")
-        )
-
-        InterstitialAd.load(
-            requireContext(),
-            interstitialAdUnitId,
-            AdRequest.Builder().build(),
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(ad: InterstitialAd) {
-                    interstitialAd = ad
-                    isAdLoading = false
-                    // interstitialAd.show(requireActivity())
-                }
-
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                    interstitialAd = null
-                    isAdLoading = false
-                    super.onAdFailedToLoad(loadAdError)
-                }
-            }
-        )
-    }
-
     private fun setUpAd() {
-        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
-            if (!it) return@observe
-            kotlin.runCatching {
-                val bannerAdUnitId: String = whenBuildIs(
-                    debug = getString(CommonR.string.ad_banner_unit_id),
-                    release = remoteConfig.getString("ad_main_unit_id")
-                )
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
+            .observe(requireActivity()) {
+                if (!it) return@observe
+                kotlin.runCatching {
+                    val bannerAdUnitId: String = whenBuildIs(
+                        debug = getString(CommonR.string.ad_banner_unit_id),
+                        release = remoteConfig.getString("ad_main_unit_id")
+                    )
 
-                val adView = AdView(requireContext())
-                adView.apply {
-                    setAdSize(AdSize.BANNER)
-                    adUnitId = bannerAdUnitId
-                    binding.adContainer.addView(this)
-                    loadAd(AdRequest.Builder().build())
+                    val adView = AdView(requireContext())
+                    adView.apply {
+                        setAdSize(AdSize.BANNER)
+                        adUnitId = bannerAdUnitId
+                        binding.adContainer.addView(this)
+                        loadAd(AdRequest.Builder().build())
+                    }
                 }
             }
-        }
     }
 
     private fun setUpVersionCheck() {
-        sharedViewModel.savedStateHandle.getLiveData<Boolean>("configLoaded").observe(requireActivity()) {
-            if (!it) return@observe
-            val versionJson = remoteConfig.getString("versions_allusive")
-            if (versionJson.isBlank()) return@observe
-            val versionChecker = VersionCheck(
-                gson.fromJson(versionJson, VersionInfo::class.java)
-                    .copy(currentVersion = BuildConfig.VERSION_CODE)
-            )
-            versionChecker.onVersionDisabled {
-                AlertDialog.Builder(requireContext()).apply {
-                    setTitle("Version Obsolete")
-                    setMessage("This version is obsolete. You have to update to latest version.")
-                    setPositiveButton("Update") { _, _ ->
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                        )
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                    }
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
-                        requireActivity().finish()
-                    }
-                    setCancelable(false)
-                }.show()
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
+            .observe(requireActivity()) {
+                if (!it) return@observe
+                val versionJson = remoteConfig.getString("versions_allusive")
+                if (versionJson.isBlank()) return@observe
+                val versionChecker = VersionCheck(
+                    gson.fromJson(versionJson, VersionInfo::class.java)
+                        .copy(currentVersion = BuildConfig.VERSION_CODE)
+                )
+                versionChecker.onVersionDisabled {
+                    AlertDialog.Builder(requireContext()).apply {
+                        setTitle("Version Obsolete")
+                        setMessage("This version is obsolete. You have to update to latest version.")
+                        setPositiveButton("Update") { _, _ ->
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        setNegativeButton(android.R.string.cancel) { _, _ ->
+                            requireActivity().finish()
+                        }
+                        setCancelable(false)
+                    }.show()
+                }
+                versionChecker.onUpdateAvailable {
+                    AlertDialog.Builder(requireContext()).apply {
+                        setTitle("Update Available")
+                        setMessage("New Version Available. Please update to get latest features.")
+                        setPositiveButton("Update") { _, _ ->
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        setNegativeButton(android.R.string.cancel) { _, _ ->
+                        }
+                    }.show()
+                }
             }
-            versionChecker.onUpdateAvailable {
-                AlertDialog.Builder(requireContext()).apply {
-                    setTitle("Update Available")
-                    setMessage("New Version Available. Please update to get latest features.")
-                    setPositiveButton("Update") { _, _ ->
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                        )
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                    }
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
-                    }
-                }.show()
-            }
-        }
     }
 
     private fun createFileFromView(view: View, exportPath: String) {

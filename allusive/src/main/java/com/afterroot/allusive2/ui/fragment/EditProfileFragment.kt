@@ -20,7 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentEditProfileBinding
@@ -41,7 +41,7 @@ import com.afterroot.allusive2.resources.R as CommonR
 class EditProfileFragment : Fragment() {
     private lateinit var binding: FragmentEditProfileBinding
     private lateinit var fabApply: ExtendedFloatingActionButton
-    private val sharedViewModel: MainSharedViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false)

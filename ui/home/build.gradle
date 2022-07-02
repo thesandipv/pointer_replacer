@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+apply from: "$rootDir/gradle/apply-core.gradle"
+apply from: "$rootDir/gradle/common-config.gradle"
+apply from: "$rootDir/gradle/common-config-library.gradle"
+apply from: "$rootDir/gradle/oss-licence.gradle"
+
+android {
+    namespace 'com.afterroot.allusive2.home'
+
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation project(":base")
+    implementation project(":data")
+    implementation project(":domain")
+    implementation project(":ui:common-compose")
+    implementation project(":ui:resources")
+
+    implementation libs.bundles.firebase
+
+    implementation libs.androidx.fragment
+    implementation libs.androidx.paging
+    implementation libs.androidx.Lifecycle.viewmodel
+
+    implementation libs.kotlin.coroutines.core
+    implementation libs.kotlin.coroutines.android
+    implementation libs.kotlin.coroutines.play
+
+    implementation libs.hilt.hilt
+    implementation libs.hilt.compose
+    kapt libs.hilt.compiler
+}

@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
@@ -75,7 +76,7 @@ class NewPointerPost : Fragment() {
     private lateinit var rewardedAd: RewardedAd
     private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
     private val pointerName: String get() = binding.editName.text.toString().trim()
-    private val sharedViewModel: MainSharedViewModel by viewModels()
+    private val sharedViewModel: MainSharedViewModel by activityViewModels()
     private var adLoaded: Boolean = false
     private var clickedUpload: Boolean = false
     private var isPointerImported = false

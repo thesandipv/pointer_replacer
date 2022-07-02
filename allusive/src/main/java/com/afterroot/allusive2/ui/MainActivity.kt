@@ -28,6 +28,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -40,16 +41,24 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
+import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
+import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.animateProperty
 import com.afterroot.utils.extensions.visible
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -57,7 +66,9 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.email
 import timber.log.Timber
@@ -71,16 +82,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDashboardBinding
-    private lateinit var navigation: BottomNavigationView
     private lateinit var fabApply: ExtendedFloatingActionButton
+    private lateinit var navigation: BottomNavigationView
     private val networkViewModel: NetworkViewModel by viewModels()
     private val sharedViewModel: MainSharedViewModel by viewModels()
-    @Inject lateinit var settings: Settings
-    @Inject lateinit var firebaseUtils: FirebaseUtils
-    @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
-    @Inject lateinit var firestore: FirebaseFirestore
-    @Inject lateinit var firebaseMessaging: FirebaseMessaging
+    private var interstitialAd: InterstitialAd? = null
+
     @Inject @Named("feedback_body") lateinit var feedbackBody: String
+    @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
+    @Inject lateinit var firebaseMessaging: FirebaseMessaging
+    @Inject lateinit var firebaseUtils: FirebaseUtils
+    @Inject lateinit var firestore: FirebaseFirestore
+    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+    @Inject lateinit var settings: Settings
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -145,6 +159,75 @@ class MainActivity : AppCompatActivity() {
         setUpTitleObserver()
         setUpErrorObserver()
         setUpNetworkObserver()
+        loadInterstitialAd()
+        lifecycleScope.launch { setUpActions() }
+    }
+
+    private suspend fun setUpActions() {
+        sharedViewModel.actions.collect { action ->
+            Timber.d("setUpActions: Action: $action")
+            when (action) {
+                is HomeActions.LoadIntAd -> {
+                    loadInterstitialAd(action.isShow)
+                }
+                HomeActions.ShowIntAd -> {
+                    if (interstitialAd == null) {
+                        loadInterstitialAd(true)
+                    } else {
+                        showInterstitialAd()
+                    }
+                }
+                else -> {}
+            }
+
+        }
+    }
+
+    private fun loadInterstitialAd(isShow: Boolean = false) {
+        if (interstitialAd != null) {
+            return
+        }
+        val interstitialAdUnitId: String = whenBuildIs(
+            debug = getString(CommonR.string.ad_interstitial_1_id),
+            release = remoteConfig.getString("ad_interstitial_1_id")
+        )
+
+        InterstitialAd.load(
+            this,
+            interstitialAdUnitId,
+            AdRequest.Builder().build(),
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    if (isShow) showInterstitialAd()
+                }
+
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    interstitialAd = null
+                    super.onAdFailedToLoad(loadAdError)
+                }
+            }
+        )
+    }
+
+    private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
+        interstitialAd?.let {
+            it.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    interstitialAd = null
+                    loadInterstitialAd()
+                    sharedViewModel.submitAction(HomeActions.OnIntAdDismiss)
+                    onAdDismiss()
+                }
+
+                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                    interstitialAd = null
+                    sharedViewModel.submitAction(HomeActions.OnIntAdDismiss)
+                    onAdDismiss()
+                }
+            }
+            it.show(this)
+        }
     }
 
     private fun setUpErrorObserver() {
