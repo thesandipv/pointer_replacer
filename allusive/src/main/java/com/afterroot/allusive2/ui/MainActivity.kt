@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun setUpActions() {
         sharedViewModel.actions.collect { action ->
-            Timber.d("setUpActions: Action: $action")
+            Timber.d("setUpActions: Collected Action: $action")
             when (action) {
                 is HomeActions.LoadIntAd -> {
                     loadInterstitialAd(action.isShow)
@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     interstitialAd = null
+                    sharedViewModel.submitAction(HomeActions.OnIntAdDismiss)
                     super.onAdFailedToLoad(loadAdError)
                 }
             }
