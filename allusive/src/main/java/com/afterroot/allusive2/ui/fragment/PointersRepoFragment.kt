@@ -29,7 +29,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -105,7 +104,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
     private lateinit var fabApply: ExtendedFloatingActionButton
     private lateinit var pointersPagingAdapter: PointerPagingAdapter
     private lateinit var targetPath: String
-    private val networkViewModel: NetworkViewModel by viewModels()
+    private val networkViewModel: NetworkViewModel by activityViewModels()
     private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

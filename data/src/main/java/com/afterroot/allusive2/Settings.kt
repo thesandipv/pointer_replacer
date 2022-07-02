@@ -186,6 +186,14 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
         get() = getString(Constants.PREF_KEY_THEME, context.getString(CommonR.string.theme_device_default))
 
     var applyMethod
-        get() = getInt("pointer_apply_method", 0)
+        get() = getInt("pointer_apply_method", -1)
         set(value) = putInt("pointer_apply_method", value)
+
+    val applyMethodName
+        get() = when (applyMethod) {
+            Constants.INDEX_XPOSED_METHOD -> "Xposed"
+            Constants.INDEX_FW_RES_METHOD -> "Magisk (framework-res)"
+            Constants.INDEX_RRO_METHOD -> "Magisk (RRO)"
+            else -> ""
+        }
 }

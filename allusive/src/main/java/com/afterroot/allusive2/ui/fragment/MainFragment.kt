@@ -47,6 +47,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
 import com.afterroot.allusive2.GlideApp
@@ -134,101 +135,107 @@ class MainFragment : Fragment() {
         setUpVersionCheck()
         targetPath = requireContext().getPointerSaveDir()
 
-        requireActivity().apply {
-            binding.layoutNewPointer.setOnClickListener {
-                showListPointerChooser(pointerType = POINTER_TOUCH)
-            }
-            binding.layoutNewMouse.setOnClickListener {
-                showListPointerChooser(
-                    pointerType = POINTER_MOUSE,
-                    title = getString(CommonR.string.dialog_title_select_mouse_pointer)
-                )
-            }
-            findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
-                icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
-                setOnClickListener {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Apply Pointer With")
-                        .setItems(CommonR.array.pointer_apply_modes) { _, which ->
-                            settings.applyMethod = which
-                            when (which) {
-                                0 -> { // Xposed Method
-                                    showInterstitialAd {
-                                        applyPointer()
-                                    }
-                                }
-                                1 -> { // Magisk - framework-res Method
-                                    if (!isPointerSelected()) {
-                                        sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
-                                        return@setItems
-                                    }
-                                    if (!isMouseSelected()) {
-                                        sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
-                                        return@setItems
-                                    }
-                                    val filesDir = requireContext().getPointerSaveRootDir()
-                                    val pointerPath = "$filesDir/pointer.png"
-                                    val mousePath = "$filesDir/mouse.png"
-                                    settings.pointerPath = pointerPath
-                                    settings.mousePath = mousePath
-                                    createFileFromView(binding.selectedPointer, pointerPath)
-                                    createFileFromView(binding.selectedMouse, mousePath)
-
-                                    binding.textNoPointerApplied.visible(false)
-                                    binding.textNoMouseApplied.visible(false)
-                                    binding.currentPointer.apply {
-                                        visible(true)
-                                        setImageDrawable(Drawable.createFromPath(pointerPath))
-                                    }
-                                    binding.currentMouse.apply {
-                                        visible(true)
-                                        setImageDrawable(Drawable.createFromPath(mousePath))
-                                    }
-                                    showInterstitialAd {
-                                        requireActivity().findNavController(R.id.fragment_repo_nav)
-                                            .navigate(R.id.magiskFragment)
-                                    }
-                                }
-                                2 -> { // Magisk - RRO Method
-                                    showInterstitialAd {
-                                        requireActivity().findNavController(R.id.fragment_repo_nav)
-                                            .navigate(R.id.magiskRROFragment)
-                                    }
-                                }
-                            }
-                        }.show()
-                }
-            }
-            setUpAd()
-            loadInterstitialAd()
-
-            loadCurrentPointers()
-
-            binding.actionCustomize.setOnClickListener {
-                if (!isPointerSelected()) {
-                    sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
-                } else {
-                    val bundle = Bundle().apply {
-                        putInt("TYPE", POINTER_TOUCH)
-                    }
-                    val extras =
-                        FragmentNavigatorExtras(binding.selectedPointer to getString(CommonR.string.main_fragment_transition))
-                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
-                }
-            }
-
-            binding.actionCustomizeMouse.setOnClickListener {
-                if (!isMouseSelected()) {
-                    sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
-                } else {
-                    val bundle = Bundle().apply {
-                        putInt("TYPE", POINTER_MOUSE)
-                    }
-                    val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(CommonR.string.transition_mouse))
-                    findNavController(R.id.fragment_repo_nav).navigate(R.id.customizeFragment, bundle, null, extras)
-                }
+        binding.layoutNewPointer.setOnClickListener {
+            showListPointerChooser(pointerType = POINTER_TOUCH)
+        }
+        binding.layoutNewMouse.setOnClickListener {
+            showListPointerChooser(
+                pointerType = POINTER_MOUSE,
+                title = getString(CommonR.string.dialog_title_select_mouse_pointer)
+            )
+        }
+        requireActivity().findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
+            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
+            setOnClickListener {
+                showApplyMethodDialog()
             }
         }
+        setUpAd()
+        loadInterstitialAd()
+
+        loadCurrentPointers()
+
+        binding.actionCustomize.setOnClickListener {
+            if (!isPointerSelected()) {
+                sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
+            } else {
+                val bundle = Bundle().apply {
+                    putInt("TYPE", POINTER_TOUCH)
+                }
+                val extras =
+                    FragmentNavigatorExtras(binding.selectedPointer to getString(CommonR.string.main_fragment_transition))
+                requireActivity().findNavController(R.id.fragment_repo_nav)
+                    .navigate(R.id.customizeFragment, bundle, null, extras)
+            }
+        }
+
+        binding.actionCustomizeMouse.setOnClickListener {
+            if (!isMouseSelected()) {
+                sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
+            } else {
+                val bundle = Bundle().apply {
+                    putInt("TYPE", POINTER_MOUSE)
+                }
+                val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(CommonR.string.transition_mouse))
+                requireActivity().findNavController(R.id.fragment_repo_nav)
+                    .navigate(R.id.customizeFragment, bundle, null, extras)
+            }
+        }
+
+        binding.textApplyMethod.text = getString(CommonR.string.text_info_method, settings.applyMethodName)
+    }
+
+    private fun showApplyMethodDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Apply Pointer With")
+            .setItems(CommonR.array.pointer_apply_modes) { _, which ->
+                settings.applyMethod = which
+                when (which) {
+                    Constants.INDEX_XPOSED_METHOD -> { // Xposed Method
+                        showInterstitialAd {
+                            applyPointer()
+                        }
+                    }
+                    Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
+                        if (!isPointerSelected()) {
+                            sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
+                            return@setItems
+                        }
+                        if (!isMouseSelected()) {
+                            sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
+                            return@setItems
+                        }
+                        val filesDir = requireContext().getPointerSaveRootDir()
+                        val pointerPath = "$filesDir/pointer.png"
+                        val mousePath = "$filesDir/mouse.png"
+                        settings.pointerPath = pointerPath
+                        settings.mousePath = mousePath
+                        createFileFromView(binding.selectedPointer, pointerPath)
+                        createFileFromView(binding.selectedMouse, mousePath)
+
+                        binding.textNoPointerApplied.visible(false)
+                        binding.textNoMouseApplied.visible(false)
+                        binding.currentPointer.apply {
+                            visible(true)
+                            setImageDrawable(Drawable.createFromPath(pointerPath))
+                        }
+                        binding.currentMouse.apply {
+                            visible(true)
+                            setImageDrawable(Drawable.createFromPath(mousePath))
+                        }
+                        showInterstitialAd {
+                            requireActivity().findNavController(R.id.fragment_repo_nav)
+                                .navigate(R.id.magiskFragment)
+                        }
+                    }
+                    Constants.INDEX_RRO_METHOD -> { // Magisk - RRO Method
+                        showInterstitialAd {
+                            requireActivity().findNavController(R.id.fragment_repo_nav)
+                                .navigate(R.id.magiskRROFragment)
+                        }
+                    }
+                }
+            }.show()
     }
 
     private fun isPointerSelected(): Boolean {

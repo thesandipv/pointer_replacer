@@ -22,7 +22,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.Result
+import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.pointers
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
@@ -55,6 +57,7 @@ class MagiskRROFragment : Fragment() {
     @Inject lateinit var storage: FirebaseStorage
     @Inject lateinit var firestore: FirebaseFirestore
     @Inject lateinit var okHttpClient: OkHttpClient
+    @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
     private lateinit var repoDocId: String
     private lateinit var pointerFileName: String
@@ -175,6 +178,7 @@ class MagiskRROFragment : Fragment() {
                             }
                             if (it.isSuccess) {
                                 updateProgress(completed = true)
+                                settings.applyMethod = Constants.INDEX_RRO_METHOD
                                 showRebootDialog(requireContext())
                             } else {
                                 updateProgress("- Module installation failed")
@@ -278,7 +282,8 @@ class MagiskRROFragment : Fragment() {
         updateProgress("- Repacking magisk module")
         withContext(Dispatchers.IO) {
             val path = magiskRROModuleExtractPath(requireContext())
-            result = zip(sourceFolder = File(path), exportPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
+            result =
+                zip(sourceFolder = File(path), exportPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
         }
         updateProgress("- Repack Successful")
         return result
