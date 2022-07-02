@@ -96,7 +96,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/action_import_old_pointers" />
+                android:text="@string/action_import_pointers" />
 
         </LinearLayout>
 
