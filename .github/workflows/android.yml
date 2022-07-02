@@ -91,6 +91,7 @@ jobs:
           COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
         with:
           arguments: :allusive:assembleRelease :allusive:bundleRelease :allusive:lintDebug :allusive:testDebug --stacktrace
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && startsWith(github.ref, 'refs/tags/allusive_v') == false }}
 
       - name: Run Tests in app module
         uses: gradle/gradle-build-action@v2
