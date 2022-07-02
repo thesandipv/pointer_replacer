@@ -63,6 +63,7 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.getPointerSaveRootDir
 import com.afterroot.allusive2.magisk.reboot
+import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
@@ -395,7 +396,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    fun showPointerAppliedMessage() {
+    private fun showPointerAppliedMessage() {
         requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
             message = getString(CommonR.string.text_pointer_applied),
             actionText = getString(CommonR.string.reboot)
@@ -420,8 +421,7 @@ class MainFragment : Fragment() {
             }
             setNeutralButton(CommonR.string.text_soft_reboot) { _, _ ->
                 try { // Also try "killall zygote"
-                    val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "busybox killall system_server"))
-                    process.waitFor()
+                    softReboot()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
