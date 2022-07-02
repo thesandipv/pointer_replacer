@@ -2,14 +2,14 @@ name: Android CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ dev ]
     tags:
       - allusive_v*
       - run_ci_build
     paths-ignore:
       - '.idea/**'
   pull_request:
-    branches: [ main, dev ]
+    branches: [ dev ]
 
 jobs:
   build:
@@ -82,7 +82,6 @@ jobs:
       - name: Build with Gradle
         id: build
         uses: gradle/gradle-build-action@v2
-#        run: ./gradlew assemble bundle lintDebug testDebug --stacktrace
         env:
           CI: true
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
@@ -91,7 +90,7 @@ jobs:
           SIGN_STORE_PW: ${{ secrets.SIGN_STORE_PW }}
           COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
         with:
-          arguments: :allusive:assemble :allusive:bundle :allusive:lintDebug :allusive:testDebug --stacktrace
+          arguments: :allusive:assembleRelease :allusive:bundleRelease :allusive:lintDebug :allusive:testDebug --stacktrace
 
       - name: Run Tests in app module
         uses: gradle/gradle-build-action@v2
