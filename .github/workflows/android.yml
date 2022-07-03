@@ -8,6 +8,7 @@ on:
       - run_ci_build
     paths-ignore:
       - '.idea/**'
+      - '**/README.md'
   pull_request:
     branches: [ dev ]
 
