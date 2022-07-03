@@ -10,6 +10,11 @@ sidebar_position: 2
 
 ## v1.11.x
 
+### v1.11.1 (02-07-2022)
+- Introducing Downloadable RROs
+- Other internal changes
+- Removed support for Android KitKat
+
 ### v1.11.0 (10-04-2022)
 - Major Design Upgrade.
 - Fix Magisk Module Install button is not visible.
