@@ -40,16 +40,18 @@ import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.data.mapper.toNetworkUser
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.model.User
 import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
+import com.afterroot.data.model.NetworkUser
+import com.afterroot.data.model.UserProperties
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.VersionCheck
 import com.afterroot.utils.data.model.VersionInfo
@@ -68,6 +70,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
@@ -318,24 +321,45 @@ class MainActivity : AppCompatActivity() {
                         if (!tokenTask.isSuccessful) {
                             return@OnCompleteListener
                         }
+                        firebaseUtils.fcmId = tokenTask.result
                         userRef.get().addOnCompleteListener { getUserTask ->
                             if (getUserTask.isSuccessful) {
                                 if (!getUserTask.result!!.exists()) {
                                     sharedViewModel.displayMsg("User not available. Creating User..")
-                                    val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
-                                    userRef.set(user).addOnCompleteListener { setUserTask ->
-                                        if (!setUserTask.isSuccessful) Timber.tag(TAG)
-                                            .e(setUserTask.exception, "Can't create firebaseUser")
+                                    userRef.set(
+                                        NetworkUser(
+                                            name = curUser.displayName,
+                                            email = curUser.email,
+                                            uid = curUser.uid,
+                                            fcmId = tokenTask.result
+                                        )
+                                    ).addOnCompleteListener { setUserTask ->
+                                        if (!setUserTask.isSuccessful) Timber.e(
+                                            setUserTask.exception,
+                                            "addUserInfoInDB: Can't create firebaseUser"
+                                        )
                                     }
                                 } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
                                     userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
+                                } else if (getUserTask.result!![DatabaseFields.FIELD_VERSION] == null) {
+                                    Timber.d("addUserInfoInDB: Migrating to v1")
+                                    userRef.update(
+                                        hashMapOf(
+                                            DatabaseFields.FIELD_VERSION to 1,
+                                            DatabaseFields.FIELD_USERNAME to null,
+                                            DatabaseFields.FIELD_USER_PROPERTIES to UserProperties()
+                                        )
+                                    )
                                 }
-                            } else Timber.tag(TAG).e(getUserTask.exception, "Unknown Error")
+                                userRef.get(Source.CACHE).addOnSuccessListener {
+                                    firebaseUtils.networkUser = it.toNetworkUser()
+                                }
+                            } else Timber.e(getUserTask.exception, "addUserInfoInDB: ${getUserTask.exception?.message}")
                         }
                     }
                 )
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "addUserInfoInDB")
+            Timber.e(e, "addUserInfoInDB: ${e.message}")
         }
     }
 

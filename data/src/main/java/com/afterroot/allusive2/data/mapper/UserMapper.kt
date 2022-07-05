@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2022 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afterroot.ui.common.compose.components
+package com.afterroot.allusive2.data.mapper
 
-import androidx.compose.runtime.compositionLocalOf
-import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.model.LocalUser
+import com.afterroot.data.model.NetworkUser
+import com.google.firebase.firestore.DocumentSnapshot
 
-val LocalCurrentUser = compositionLocalOf { LocalUser() }
+fun LocalUser.toNetworkUser() = NetworkUser(
+    name = name,
+    email = email,
+    uid = uid,
+    fcmId = fcmId,
+    userName = userName,
+    properties = properties
+)
 
-val LocalSettings = compositionLocalOf<Settings> { throw IllegalStateException("LocalSettings is not initialized") }
+fun NetworkUser.toLocalUser() = LocalUser(
+    name = name,
+    email = email,
+    uid = uid ?: "",
+    fcmId = fcmId ?: "",
+    userName = userName,
+    properties = properties
+)
+
+fun DocumentSnapshot.toNetworkUser() = toObject(NetworkUser::class.java)

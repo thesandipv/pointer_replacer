@@ -27,6 +27,7 @@ import com.afterroot.allusive2.domain.interactors.PagingPointerRequest
 import com.afterroot.allusive2.model.LocalPointerRequest
 import com.afterroot.allusive2.ui.repo.RepoActions
 import com.afterroot.allusive2.ui.repo.RepoState
+import com.afterroot.data.model.UserRole
 import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -86,8 +87,11 @@ class RepoViewModel @Inject constructor(
     }
 
     private fun loadRequests() {
-        val query = firestore.requests().orderBy(DatabaseFields.FIELD_TIMESTAMP, Query.Direction.DESCENDING)
-            .whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
+        val baseQuery = firestore.requests().orderBy(DatabaseFields.FIELD_TIMESTAMP, Query.Direction.DESCENDING)
+        var query = baseQuery.whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
+        if (firebaseUtils.networkUser?.properties?.userRole == UserRole.ADMIN) {
+            query = baseQuery
+        }
         pagingPointerRequest(PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG))
     }
 

@@ -116,10 +116,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun initFirebaseConfig() {
-        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED).observe(requireActivity()) {
-            if (!it) return@observe
-            setDonatePref(it)
-        }
+        sharedViewModel.savedStateHandle.getLiveData<Boolean>(MainSharedViewModel.KEY_CONFIG_LOADED)
+            .observe(requireActivity()) {
+                if (!it) return@observe
+                setDonatePref(it)
+            }
     }
 
     private fun setDonatePref(isEnable: Boolean) {
@@ -313,6 +314,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("key_create_stub_pointers")?.apply {
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 createStubPointers(firestore, firebaseUtils)
+                true
+            }
+        }
+        findPreference<Preference>("key_clear_persistence")?.apply {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                firestore.terminate().also {
+                    if (it.isSuccessful) {
+                        firestore.clearPersistence()
+                        Toast.makeText(requireContext(), "App will close. You'll need to restart.", Toast.LENGTH_SHORT)
+                            .show()
+                        requireActivity().finish()
+                    }
+                }
                 true
             }
         }
