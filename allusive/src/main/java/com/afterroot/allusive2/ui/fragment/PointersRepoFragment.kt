@@ -59,6 +59,7 @@ import com.afterroot.allusive2.databinding.DialogEditPointerBinding
 import com.afterroot.allusive2.databinding.FragmentPointerInfoBinding
 import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.getPointerSaveDir
+import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
@@ -79,6 +80,7 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -354,38 +356,49 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             if (pointer.hasRRO) {
                                 text = getString(CommonR.string.text_install_rro)
                                 setOnClickListener {
-                                    val directions = PointersRepoFragmentDirections.repoToRroInstall(
-                                        pointer.docId.toString(),
-                                        pointer.filename.toString()
-                                    )
-                                    requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
-                                    dialog.dismiss()
+                                    showInterstitialAd {
+                                        val directions = PointersRepoFragmentDirections.repoToRroInstall(
+                                            pointer.docId.toString(),
+                                            pointer.filename.toString()
+                                        )
+                                        requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
+                                        dialog.dismiss()
+                                    }
                                 }
                             } else {
                                 text = getString(CommonR.string.text_request_rro)
                                 firestore.pointers().document(pointer.docId.toString()).get(Source.CACHE)
-                                    .addOnSuccessListener {
-                                        val localPointer = it.toPointer()
+                                    .addOnSuccessListener { localDoc ->
+                                        val localPointer = localDoc.toPointer()
                                         isEnabled = localPointer?.rroRequested == false
+                                    }.addOnFailureListener {
+                                        Timber.e(it, "showPointerInfoDialog: ${it.message}")
+                                        firestore.pointers().document(pointer.docId.toString()).get()
+                                            .addOnSuccessListener { serverDoc ->
+                                                val localPointer = serverDoc.toPointer()
+                                                isEnabled = localPointer?.rroRequested == false
+                                            }
                                     }
                                 setOnClickListener {
-                                    lifecycleScope.launch {
-                                        firestore.pointers().document(pointer.docId.toString())
-                                            .update(DatabaseFields.FIELD_RRO_REQUESTED, true)
-                                            .await()
-                                        val request = PointerRequest(
-                                            pointer.filename,
-                                            firebaseUtils.uid,
-                                            documentId = pointer.docId
-                                        )
-                                        firestore.requests().document(pointer.docId.toString()).set(request)
-                                            .addOnSuccessListener {
-                                                isEnabled = false
-                                                requireContext().toast("RRO Requested")
-                                            }.addOnFailureListener {
-                                                Timber.d("showPointerInfoDialog: ${it.message}")
-                                                it.printStackTrace()
-                                            }
+                                    showInterstitialAd {
+                                        lifecycleScope.launch {
+                                            firestore.pointers().document(pointer.docId.toString())
+                                                .update(DatabaseFields.FIELD_RRO_REQUESTED, true)
+                                                .await()
+                                            val request = PointerRequest(
+                                                pointer.filename,
+                                                firebaseUtils.uid,
+                                                documentId = pointer.docId
+                                            )
+                                            firestore.requests().document(pointer.docId.toString()).set(request)
+                                                .addOnSuccessListener {
+                                                    isEnabled = false
+                                                    requireContext().toast("RRO Requested")
+                                                }.addOnFailureListener {
+                                                    Timber.d("showPointerInfoDialog: ${it.message}")
+                                                    it.printStackTrace()
+                                                }
+                                        }
                                     }
                                 }
                             }
@@ -544,5 +557,17 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             it.message?.let { it1 -> requireContext().toast(it1) }
         }
         return true
+    }
+
+    private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
+        sharedViewModel.showInterstitialAd()
+        lifecycleScope.launch {
+            sharedViewModel.actions.collectLatest { action ->
+                if (action is HomeActions.OnIntAdDismiss) {
+                    onAdDismiss()
+                    coroutineContext.job.cancel()
+                }
+            }
+        }
     }
 }

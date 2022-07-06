@@ -15,7 +15,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="MyTheme.Main" parent="Theme.Allusive.DayNight">
+    <style name="MyTheme.Main" parent="MyTheme.Allusive.DayNight">
         <item name="android:fontFamily">@font/ubuntu</item>
         <item name="shapeAppearanceSmallComponent">@style/MyStyle.ShapeAppearance.SmallComponents</item>
         <item name="shapeAppearanceMediumComponent">@style/MyStyle.ShapeAppearance.MediumComponents</item>
@@ -30,7 +30,7 @@
         <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
     </style>
 
-    <style name="MyTheme.Main.Launch" parent="Theme.Allusive.Dark">
+    <style name="MyTheme.Main.Launch" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
@@ -41,9 +41,9 @@
         <item name="windowNoTitle">false</item>
     </style>
 
-    <style name="Theme.Allusive.DayNight" parent="Theme.Allusive" />
+    <style name="MyTheme.Allusive.DayNight" parent="MyTheme.Allusive" />
 
-    <style name="Theme.Allusive" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="MyTheme.Allusive" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>

@@ -15,9 +15,9 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Allusive.DayNight" parent="Theme.Allusive.Dark" />
+    <style name="MyTheme.Allusive.DayNight" parent="MyTheme.Allusive.Dark" />
 
-    <style name="Theme.Allusive.Dark" parent="Theme.Allusive">
+    <style name="MyTheme.Allusive.Dark" parent="MyTheme.Allusive">
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>

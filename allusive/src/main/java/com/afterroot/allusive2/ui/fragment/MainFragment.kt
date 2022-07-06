@@ -88,7 +88,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
@@ -406,6 +408,7 @@ class MainFragment : Fragment() {
             sharedViewModel.actions.collectLatest { action ->
                 if (action is HomeActions.OnIntAdDismiss) {
                     onAdDismiss()
+                    coroutineContext.job.cancel()
                 }
             }
         }
