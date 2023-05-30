@@ -184,8 +184,8 @@ firebase-ui-storage = { module = "com.firebaseui:firebase-ui-storage", version.r
 
 google-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "googleAds" }
 google-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "googleAuth" }
-google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.0"
-google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.5"
+google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.1"
+google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 google-pluginGservices = "com.google.gms:google-services:4.3.13"
