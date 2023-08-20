@@ -100,6 +100,7 @@ output.json
 # My List
 /others
 /keystore.properties
+/private.properties
 /publish.properties
 google-services.json
 /ui/magisk/src/main/assets/empty-module.zip

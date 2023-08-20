@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2023 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,14 +13,12 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-
-apply from: "$rootDir/gradle/common-config.gradle"
-apply from: "$rootDir/gradle/common-config-library.gradle"
-apply from: "$rootDir/gradle/oss-licence.gradle"
-
-dependencies {
-    api libs.google.material
-    implementation libs.androidx.preference
-    implementation libs.materialdialogs.core
+//check project.path is in list of projects
+val composeProjects = arrayOf(":data", ":ui:repo", ":ui:common-compose")
+if (project.path in composeProjects) {
+    println("- INFO: Compose Enabled for ${project.path}")
+    apply(from = "$rootDir/gradle/compose.gradle")
 }
+
+apply(from = "$rootDir/gradle/apply-common-deps.gradle")
+apply(from = "$rootDir/gradle/apply-core.gradle")

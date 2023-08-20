@@ -14,18 +14,18 @@
 */
 
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    id("com.afterroot.android.library")
+    id("com.afterroot.kotlin.android")
+    id("com.afterroot.android.compose")
+    id("com.afterroot.allusive2.android.common")
 }
 
-apply from: "$rootDir/gradle/common-config.gradle"
-apply from: "$rootDir/gradle/oss-licence.gradle"
+android {
+    namespace = "com.afterroot.allusive2.compose"
+}
 
 dependencies {
-    //All compose dependencies applied with compose.gradle
-    implementation project(":base")
-    implementation project(":data")
-    implementation project(":ui:resources")
+    implementation(projects.data)
 
-    api libs.androidx.lifecycle.runtime
+    api(libs.androidx.lifecycle.runtime)
 }
