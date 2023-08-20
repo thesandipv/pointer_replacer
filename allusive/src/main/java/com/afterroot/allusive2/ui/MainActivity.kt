@@ -350,7 +350,7 @@ class MainActivity : AppCompatActivity() {
                                             DatabaseFields.FIELD_USER_PROPERTIES to UserProperties()
                                         )
                                     )
-                                }
+                                } // Add Future Migrations Here
                                 userRef.get(Source.CACHE).addOnSuccessListener {
                                     firebaseUtils.networkUser = it.toNetworkUser()
                                 }

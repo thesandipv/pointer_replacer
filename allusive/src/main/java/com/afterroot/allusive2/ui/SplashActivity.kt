@@ -17,7 +17,6 @@ package com.afterroot.allusive2.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -30,11 +29,14 @@ import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import org.jetbrains.anko.browse
+import org.jetbrains.anko.toast
+import timber.log.Timber
 import javax.inject.Inject
 import com.afterroot.allusive2.resources.R as CommonR
 
@@ -101,7 +103,17 @@ class SplashActivity : AppCompatActivity() {
         if (it.resultCode == Activity.RESULT_OK) {
             launchDashboard()
         } else {
-            Toast.makeText(this, getString(CommonR.string.msg_login_failed), Toast.LENGTH_SHORT).show()
+            if (it.idpResponse == null) {
+                toast("Sign In Cancelled")
+            }
+
+            if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
+                toast("No internet")
+            }
+
+            toast("Error: ${it.idpResponse?.error?.message}")
+            Timber.e(it.idpResponse?.error, "Sign-in error: ${it.idpResponse?.error?.message}")
+
             tryLogin()
         }
     }
