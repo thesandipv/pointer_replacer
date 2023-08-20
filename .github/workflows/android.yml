@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ main ]
     tags:
       - allusive_v*
       - run_ci_build
@@ -10,7 +10,7 @@ on:
       - '.idea/**'
       - '**/README.md'
   pull_request:
-    branches: [ dev ]
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
-      - uses: act10ns/slack@v1
+      - uses: act10ns/slack@v2
         with:
           status: starting
           channel: '#pointer-replacer'
@@ -28,7 +28,7 @@ jobs:
 
       - name: Check Out
         id: check-out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
@@ -53,9 +53,10 @@ jobs:
 
       - name: set up JDK
         id: setup-jdk
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3.12.0
         with:
-          java-version: 11
+          distribution: 'zulu'
+          java-version: 17
 
       - name: Set up Python 3
         id: setup-python
@@ -82,7 +83,7 @@ jobs:
 
       - name: Build with Gradle
         id: build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.7.0
         env:
           CI: true
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
@@ -95,7 +96,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && (startsWith(github.ref, 'refs/tags/allusive_v') == false) }}
 
       - name: Run Tests in app module
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.7.0
         id: run-tests
         with:
           arguments: :allusive:test
@@ -105,12 +106,26 @@ jobs:
       - name: Publish to Play Store
         id: publish-to-play-store
         if: startsWith(github.ref, 'refs/tags/allusive_v')
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.1.1
         with:
           serviceAccountJson: release/serviceAccount.json
           packageName: com.afterroot.allusive2
-          track: beta
-          status: draft
+          track: production
+          status: inProgress
+          userFraction: 0.80
+          releaseFiles: allusive/build/outputs/bundle/release/allusive-release.aab
+          mappingFile: allusive/build/outputs/mapping/release/mapping.txt
+
+      - name: Publish to Internal Track Play Store
+        id: publish-to-play-store-internal
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        uses: r0adkll/upload-google-play@v1.1.1
+        with:
+          serviceAccountJson: release/serviceAccount.json
+          packageName: com.afterroot.allusive2
+          track: internal
+          status: completed
           releaseFiles: allusive/build/outputs/bundle/release/allusive-release.aab
           mappingFile: allusive/build/outputs/mapping/release/mapping.txt
 
@@ -130,6 +145,7 @@ jobs:
         run: ./release/clean.sh
 
       - name: Android App size difference
+        continue-on-error: true
         uses: microsoft/android-app-size-diff@v1.0.5
         with:
           baseAppPath: allusive/build/outputs/apk/release/allusive-release.apk
@@ -140,7 +156,7 @@ jobs:
       - name: Upload build outputs
         id: upload-outputs
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: release-apk
           path: allusive/build/outputs/apk/release/allusive-release.apk
@@ -148,7 +164,7 @@ jobs:
       - name: Upload build reports
         id: upload-reports
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: build-reports
           path: allusive/build/reports
@@ -156,13 +172,14 @@ jobs:
       - name: Upload to Slack
         id: upload-to-slack
         uses: adrey/slack-file-upload-action@1.0.5
+        continue-on-error: true
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           path: allusive/build/outputs/apk/release/allusive-release.apk
           channel: pointer-replacer
           filename: Allusive-${{ steps.commithash.outputs.sha_short }}.apk
 
-      - uses: act10ns/slack@v1
+      - uses: act10ns/slack@v2
         if: always()
         with:
           status: ${{ job.status }}
