@@ -21,6 +21,7 @@
 -keepclassmembers class com.afollestad.materialdialogs.** { *; }
 -keep class com.afterroot.** { *; }
 -keep class androidx.navigation.fragment.NavHostFragment
+-keep class com.afterroot.allusive2.XposedMod
 
 # We only need to keep ComposeView
 -keep public class androidx.compose.ui.platform.ComposeView {
