@@ -30,9 +30,6 @@ plugins {
     id("kotlin-parcelize")
 }
 
-apply(from = "$rootDir/gradle/oss-licence.gradle")
-apply(from = "$rootDir/gradle/apply-core.gradle")
-
 val ci by extra { System.getenv("CI") == "true" }
 
 android {
