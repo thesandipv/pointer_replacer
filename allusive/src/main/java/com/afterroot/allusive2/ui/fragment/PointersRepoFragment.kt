@@ -78,6 +78,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.job
@@ -357,11 +358,13 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                 text = getString(CommonR.string.text_install_rro)
                                 setOnClickListener {
                                     showInterstitialAd {
-                                        val directions = PointersRepoFragmentDirections.repoToRroInstall(
-                                            pointer.docId.toString(),
-                                            pointer.filename.toString()
-                                        )
-                                        requireActivity().findNavController(R.id.fragment_repo_nav).navigate(directions)
+                                        if (findNavController().currentDestination?.id == R.id.repoFragment) {
+                                            val directions = PointersRepoFragmentDirections.repoToRroInstall(
+                                                pointer.docId.toString(),
+                                                pointer.filename.toString()
+                                            )
+                                            findNavController().navigate(directions)
+                                        }
                                         dialog.dismiss()
                                     }
                                 }
@@ -559,14 +562,18 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
         return true
     }
 
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable, "CoroutineException: ${throwable.message}")
+    }
+
     private fun showInterstitialAd(onAdDismiss: () -> Unit = {}) {
         sharedViewModel.showInterstitialAd()
-        lifecycleScope.launch {
+        lifecycleScope.launch(coroutineExceptionHandler) {
             sharedViewModel.actions.collectLatest { action ->
                 if (action is HomeActions.OnIntAdDismiss) {
                     onAdDismiss()
-                    coroutineContext.job.cancel()
                 }
+                coroutineContext.job.cancel()
             }
         }
     }
