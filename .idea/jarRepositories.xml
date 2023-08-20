@@ -36,5 +36,10 @@
       <option name="name" value="gphCore" />
       <option name="url" value="https://maven.pkg.github.com/afterroot/core" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="github-afterroot-utils" />
+      <option name="name" value="github-afterroot-utils" />
+      <option name="url" value="https://maven.pkg.github.com/afterroot/utils" />
+    </remote-repository>
   </component>
 </project>
