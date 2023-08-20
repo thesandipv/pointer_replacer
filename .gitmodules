@@ -1,6 +1,6 @@
-[submodule "core"]
-	path = core
-	url = https://github.com/afterroot/core.git
+[submodule "utils"]
+	path = utils
+	url = https://github.com/afterroot/utils.git
 [submodule "website"]
 	path = website
 	url = https://github.com/thesandipv/allusive-web.git
@@ -10,3 +10,6 @@
 [submodule "arro"]
 	path = arro
 	url = https://github.com/afterroot/allusive_rro.git
+[submodule "gradle/build-logic"]
+	path = gradle/build-logic
+	url = https://github.com/afterroot/build-logic.git
