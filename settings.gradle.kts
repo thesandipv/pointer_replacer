@@ -32,6 +32,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
 
         maven {
             name = "github-afterroot-utils"
