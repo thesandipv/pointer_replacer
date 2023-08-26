@@ -25,17 +25,17 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.afterroot.allusive2.database.DatabaseFields
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.ui.MainActivity
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.getMaterialColor
-import com.google.android.material.R as MaterialR
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @AndroidEntryPoint
 class FireMessagingService : FirebaseMessagingService() {
@@ -81,7 +81,7 @@ class FireMessagingService : FirebaseMessagingService() {
         url: String? = "",
         channelId: String? = getString(CommonR.string.fcm_channel_id),
         channelName: String? = getString(CommonR.string.fcm_channel_default),
-        title: String? = getString(CommonR.string.app_name)
+        title: String? = getString(CommonR.string.app_name),
     ) {
         val intent: Intent
         if (url!!.isEmpty()) {
@@ -92,7 +92,8 @@ class FireMessagingService : FirebaseMessagingService() {
                 data = Uri.parse(url)
             }
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(
             this,
