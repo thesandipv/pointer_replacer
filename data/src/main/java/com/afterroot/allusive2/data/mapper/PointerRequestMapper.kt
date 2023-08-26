@@ -31,7 +31,13 @@ fun QuerySnapshot.toRequests(): List<PointerRequest?> {
 fun DocumentSnapshot.toRequest(): PointerRequest? = toObject(PointerRequest::class.java)
 
 fun PointerRequest.toLocalPointerRequest() = LocalPointerRequest(
-    fileName, uid, timestamp, force, exclude, documentId, isRequestClosed
+    fileName,
+    uid,
+    timestamp,
+    force,
+    exclude,
+    documentId,
+    isRequestClosed
 )
 
 suspend fun List<PointerRequest?>.toLocalPointerRequest(firestore: FirebaseFirestore): List<LocalPointerRequest> {
@@ -50,7 +56,9 @@ suspend fun List<PointerRequest?>.toLocalPointerRequest(firestore: FirebaseFires
             }
             if (result.isSuccess) {
                 result.getOrNull()?.toPointer().let {
-                    val transformed = pointerRequest.toLocalPointerRequest().copy(pointerName = it?.name)
+                    val transformed = pointerRequest.toLocalPointerRequest().copy(
+                        pointerName = it?.name
+                    )
                     list.add(transformed)
                 }
             }

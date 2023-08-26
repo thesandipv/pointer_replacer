@@ -42,10 +42,11 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
                 // Ignore directories, only create files
                 continue
             }
-            val name = if (junkPath)
+            val name = if (junkPath) {
                 entry.name.substring(entry.name.lastIndexOf('/') + 1)
-            else
+            } else {
                 entry.name
+            }
 
             val dest = File(folder, name)
             dest.parentFile!!.mkdirs()
@@ -66,7 +67,8 @@ fun zip(sourceFolder: File, exportPath: String): File {
         val fos = FileOutputStream(exportPath)
         val zos = ZipOutputStream(fos)
         for (filePath in filesListInDir) {
-            val ze = ZipEntry(filePath.substring(sourceFolder.absolutePath.length + 1, filePath.length))
+            val ze =
+                ZipEntry(filePath.substring(sourceFolder.absolutePath.length + 1, filePath.length))
             if (filePath.endsWith(".png") || filePath.endsWith("resources.arsc")) {
                 ze.apply {
                     method = ZipEntry.STORED

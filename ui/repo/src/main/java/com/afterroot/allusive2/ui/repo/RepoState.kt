@@ -14,10 +14,8 @@
  */
 package com.afterroot.allusive2.ui.repo
 
-import androidx.compose.runtime.Immutable
 import com.afterroot.allusive2.base.compose.ViewState
 
-@Immutable
 data class RepoState(val message: String? = null) : ViewState() {
     companion object {
         val Empty = RepoState()

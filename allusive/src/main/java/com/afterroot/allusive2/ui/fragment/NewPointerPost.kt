@@ -33,6 +33,7 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -55,21 +56,23 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
-import org.jetbrains.anko.find
-import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
+import org.jetbrains.anko.find
+import timber.log.Timber
 
 @AndroidEntryPoint
 class NewPointerPost : Fragment() {
 
     @Inject lateinit var db: FirebaseFirestore
+
     @Inject lateinit var firebaseUtils: FirebaseUtils
+
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+
     @Inject lateinit var storage: FirebaseStorage
     private lateinit var binding: FragmentNewPointerPostBinding
     private lateinit var rewardedAd: RewardedAd
@@ -104,7 +107,9 @@ class NewPointerPost : Fragment() {
                     setAdSize(AdSize.BANNER)
                     adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
                         getString(CommonR.string.ad_banner_new_pointer)
-                    } else remoteConfig.getString("ad_banner_new_pointer")
+                    } else {
+                        remoteConfig.getString("ad_banner_new_pointer")
+                    }
                     binding.adContainer.addView(this)
                     loadAd(AdRequest.Builder().build())
                 }
@@ -205,24 +210,33 @@ class NewPointerPost : Fragment() {
         }
     }
 
-    private val actionGetUploadPointer = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            Glide.with(this).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
-            binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
+    private val actionGetUploadPointer =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                Glide.with(
+                    this
+                ).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
+                binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
+            }
         }
-    }
 
     private fun upload(file: File) {
-        val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_init))
+        val dialog = requireContext().showStaticProgressDialog(
+            getString(CommonR.string.text_progress_init)
+        )
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
-        val fileRef = storageRef.child("${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}")
+        val fileRef = storageRef.child(
+            "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}"
+        )
         val uploadTask = fileRef.putFile(fileUri)
 
         uploadTask.addOnProgressListener {
             val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
-            dialog.updateProgressText(String.format("%s..%s", getString(CommonR.string.text_progress_uploading), progress))
+            dialog.updateProgressText(
+                String.format("%s..%s", getString(CommonR.string.text_progress_uploading), progress)
+            )
         }.addOnCompleteListener { task ->
             val map = hashMapOf<String, String>()
             map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
@@ -236,9 +250,13 @@ class NewPointerPost : Fragment() {
                     time = Timestamp.now().toDate()
                 )
                 Timber.tag(TAG).d("upload: %s", pointer)
-                db.collection(DatabaseFields.COLLECTION_POINTERS).add(pointer).addOnSuccessListener {
+                db.collection(
+                    DatabaseFields.COLLECTION_POINTERS
+                ).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
-                        sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_upload_success))
+                        sharedViewModel.displayMsg(
+                            getString(CommonR.string.msg_pointer_upload_success)
+                        )
                         dialog.dismiss()
                         findNavController().navigateUp()
                     }

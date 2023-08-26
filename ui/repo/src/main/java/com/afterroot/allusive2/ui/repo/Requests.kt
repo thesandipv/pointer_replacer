@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,15 +45,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
-import coil.compose.rememberImagePainter
+import androidx.paging.compose.itemKey
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.model.LocalPointerRequest
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.viewmodel.RepoViewModel
 import com.afterroot.ui.common.compose.theme.Palette
 import com.afterroot.ui.common.compose.utils.rememberFlowWithLifecycle
 import timber.log.Timber
-import com.afterroot.allusive2.resources.R as CommonR
 
 @Composable
 fun Requests() {
@@ -61,7 +63,9 @@ fun Requests() {
 
 @Composable
 internal fun Requests(viewModel: RepoViewModel) {
-    val requestsList = rememberFlowWithLifecycle(flow = viewModel.requestPagedList).collectAsLazyPagingItems()
+    val requestsList = rememberFlowWithLifecycle(
+        flow = viewModel.requestPagedList
+    ).collectAsLazyPagingItems()
     Requests(viewModel = viewModel, requestsList = requestsList) { action ->
         when (action) {
             else -> viewModel.submitAction(action)
@@ -75,7 +79,9 @@ fun Requests(
     requestsList: LazyPagingItems<LocalPointerRequest>,
     actions: (RepoActions) -> Unit
 ) {
-    val state by rememberFlowWithLifecycle(flow = viewModel.state).collectAsState(initial = RepoState.Empty)
+    val state by rememberFlowWithLifecycle(
+        flow = viewModel.state
+    ).collectAsState(initial = RepoState.Empty)
     val isLoading = requestsList.loadState.refresh == LoadState.Loading
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibility(visible = isLoading) {
@@ -92,13 +98,20 @@ fun Requests(
 }
 
 @Composable
-fun RequestsList(list: LazyPagingItems<LocalPointerRequest>, onClick: (LocalPointerRequest) -> Unit) {
+fun RequestsList(
+    list: LazyPagingItems<LocalPointerRequest>,
+    onClick: (LocalPointerRequest) -> Unit
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        items(list) { item ->
-            if (item != null) {
+        items(count = list.itemCount, key = {
+            list.itemKey { item ->
+                item.pointerName!!
+            }
+        }) { index ->
+            list[index]?.let { item ->
                 RequestListItem(pointerRequest = item)
             }
         }
@@ -149,7 +162,9 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
                         color = Palette.Green50,
                         modifier = Modifier
                     )
-                } else Text(text = "OPEN", color = Palette.Red50, modifier = Modifier)
+                } else {
+                    Text(text = "OPEN", color = Palette.Red50, modifier = Modifier)
+                }
             }
         }
     }
@@ -158,9 +173,9 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
 @Composable
 fun PointerIcon(url: String) {
     Image(
-        painter = rememberImagePainter(data = url, builder = {
-            crossfade(true)
-        }),
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(url).crossfade(true).build()
+        ),
         contentDescription = "Pointer Icon"
     )
 }

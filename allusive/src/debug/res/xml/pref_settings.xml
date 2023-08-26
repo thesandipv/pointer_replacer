@@ -41,11 +41,14 @@
             app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             app:defaultValue="false"
-            app:title="Enable Emulator on Firestore"
-            app:key="key_enable_emulator"/>
+            app:key="key_enable_emulator"
+            app:title="Enable Emulator on Firestore" />
         <Preference
-            app:title="Create Stub Pointers"
-            app:key="key_create_stub_pointers"/>
+            app:key="key_create_stub_pointers"
+            app:title="Create Stub Pointers" />
+        <Preference
+            app:key="key_clear_persistence"
+            app:title="Clear Persistence" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/pref_category_support">
         <Preference
@@ -53,8 +56,8 @@
             app:summary="@string/pref_summary_donation"
             app:title="@string/pref_title_donate_dev" />
         <Preference
-            app:key="@string/key_watch_ads"
             app:isPreferenceVisible="false"
+            app:key="@string/key_watch_ads"
             app:summary="@string/pref_summary_watch_ad"
             app:title="@string/pref_title_watch_ad" />
     </PreferenceCategory>

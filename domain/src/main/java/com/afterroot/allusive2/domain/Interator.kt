@@ -20,6 +20,7 @@ import com.afterroot.allusive2.base.InvokeError
 import com.afterroot.allusive2.base.InvokeStarted
 import com.afterroot.allusive2.base.InvokeStatus
 import com.afterroot.allusive2.base.InvokeSuccess
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import java.util.concurrent.TimeUnit
 
 abstract class Interactor<in P> {
     operator fun invoke(params: P, timeout: Long = defaultTimeoutMs): Flow<InvokeStatus> {

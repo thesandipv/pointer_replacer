@@ -44,9 +44,13 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
     }
 
     @Throws(Throwable::class)
-    override fun handleInitPackageResources(resparam: XC_InitPackageResources.InitPackageResourcesParam) {
+    override fun handleInitPackageResources(
+        resparam: XC_InitPackageResources.InitPackageResourcesParam
+    ) {
         XResources.setSystemWideReplacement(
-            "android", "drawable", "pointer_spot_touch",
+            "android",
+            "drawable",
+            "pointer_spot_touch",
             object : XResources.DrawableLoader() {
                 @Throws(Throwable::class)
                 override fun newDrawable(xResources: XResources, i: Int): Drawable? {
@@ -58,7 +62,9 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
         )
 
         XResources.setSystemWideReplacement(
-            "android", "drawable", "pointer_arrow",
+            "android",
+            "drawable",
+            "pointer_arrow",
             object : XResources.DrawableLoader() {
                 @Throws(Throwable::class)
                 override fun newDrawable(res: XResources?, id: Int): Drawable? {

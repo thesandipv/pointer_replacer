@@ -32,8 +32,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
 import com.google.android.material.R as MaterialR
 
@@ -41,7 +41,9 @@ import com.google.android.material.R as MaterialR
 class FireMessagingService : FirebaseMessagingService() {
 
     private val _tag = "FireMessagingService"
+
     @Inject lateinit var firebaseUtils: FirebaseUtils
+
     @Inject lateinit var firebaseFirestore: FirebaseFirestore
 
     override fun onNewToken(token: String) {
@@ -79,7 +81,7 @@ class FireMessagingService : FirebaseMessagingService() {
         url: String? = "",
         channelId: String? = getString(CommonR.string.fcm_channel_id),
         channelName: String? = getString(CommonR.string.fcm_channel_default),
-        title: String? = getString(CommonR.string.app_name)
+        title: String? = getString(CommonR.string.app_name),
     ) {
         val intent: Intent
         if (url!!.isEmpty()) {
@@ -90,9 +92,13 @@ class FireMessagingService : FirebaseMessagingService() {
                 data = Uri.parse(url)
             }
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, channelId ?: getString(CommonR.string.fcm_channel_id))
+        val notificationBuilder = NotificationCompat.Builder(
+            this,
+            channelId ?: getString(CommonR.string.fcm_channel_id)
+        )
             .setSmallIcon(CommonR.drawable.ic_launch_screen)
             .setContentTitle(title ?: getString(CommonR.string.app_name))
             .setContentText(message)
@@ -101,7 +107,9 @@ class FireMessagingService : FirebaseMessagingService() {
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(
+            Context.NOTIFICATION_SERVICE
+        ) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

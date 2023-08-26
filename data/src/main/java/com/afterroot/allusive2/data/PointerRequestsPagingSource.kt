@@ -28,7 +28,9 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class PointerRequestsPagingSource(private val query: Query, private val firestore: FirebaseFirestore) : PagingSource<QuerySnapshot, LocalPointerRequest>() {
-    override fun getRefreshKey(state: PagingState<QuerySnapshot, LocalPointerRequest>): QuerySnapshot? {
+    override fun getRefreshKey(
+        state: PagingState<QuerySnapshot, LocalPointerRequest>
+    ): QuerySnapshot? {
         return null
     }
 

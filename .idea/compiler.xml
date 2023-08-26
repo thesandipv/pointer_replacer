@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="11">
+      <module name="build-logic.convention" target="17" />
+      <module name="build-logic.convention.main" target="17" />
+      <module name="build-logic.convention.test" target="17" />
+      <module name="lib.pointer-replacer.utils" target="17" />
+      <module name="pointer-replacer.allusive" target="17" />
+      <module name="pointer-replacer.arro" target="17" />
+      <module name="pointer-replacer.base" target="17" />
+      <module name="pointer-replacer.common.ui.compose" target="17" />
+      <module name="pointer-replacer.common.ui.resources" target="17" />
+      <module name="pointer-replacer.data" target="17" />
+      <module name="pointer-replacer.domain" target="17" />
+      <module name="pointer-replacer.ui.common-compose" target="17" />
+      <module name="pointer-replacer.ui.home" target="17" />
+      <module name="pointer-replacer.ui.magisk" target="17" />
+      <module name="pointer-replacer.ui.repo" target="17" />
+      <module name="pointer-replacer.ui.resources" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

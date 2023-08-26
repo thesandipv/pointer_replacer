@@ -31,9 +31,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCM(@ApplicationContext context: Context): ConnectivityManager =
-        context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        context.applicationContext.getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
 
     @Provides
     @Singleton
-    fun provideStateMonitor(connectivityManager: ConnectivityManager) = NetworkStateMonitor(connectivityManager)
+    fun provideStateMonitor(
+        connectivityManager: ConnectivityManager
+    ) = NetworkStateMonitor(connectivityManager)
 }

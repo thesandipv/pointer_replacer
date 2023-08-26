@@ -17,7 +17,6 @@ package com.afterroot.allusive2.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,18 +24,21 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
-import org.jetbrains.anko.browse
 import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
+import org.jetbrains.anko.browse
+import org.jetbrains.anko.toast
+import timber.log.Timber
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -44,8 +46,11 @@ class SplashActivity : AppCompatActivity() {
     private val _tag = "SplashActivity"
     private val networkViewModel: NetworkViewModel by viewModels()
     private lateinit var settings: Settings
+
     @Inject lateinit var firebaseAuth: FirebaseAuth
+
     @Inject lateinit var firestore: FirebaseFirestore
+
     @Inject lateinit var firebaseUtils: FirebaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +58,9 @@ class SplashActivity : AppCompatActivity() {
         val theme = settings.theme
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
-                getString(CommonR.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                getString(
+                    CommonR.string.theme_device_default
+                ) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
                 getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
                 getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
@@ -101,7 +108,17 @@ class SplashActivity : AppCompatActivity() {
         if (it.resultCode == Activity.RESULT_OK) {
             launchDashboard()
         } else {
-            Toast.makeText(this, getString(CommonR.string.msg_login_failed), Toast.LENGTH_SHORT).show()
+            if (it.idpResponse == null) {
+                toast("Sign In Cancelled")
+            }
+
+            if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
+                toast("No internet")
+            }
+
+            toast("Error: ${it.idpResponse?.error?.message}")
+            Timber.e(it.idpResponse?.error, "Sign-in error: ${it.idpResponse?.error?.message}")
+
             tryLogin()
         }
     }
@@ -145,7 +162,9 @@ class SplashActivity : AppCompatActivity() {
                 if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
             },
             onDisconnect = {
-                dialog = showNetworkDialog(state = it, positive = { setUpNetworkObserver() }, negative = { finish() })
+                dialog = showNetworkDialog(state = it, positive = {
+                    setUpNetworkObserver()
+                }, negative = { finish() })
             }
         )
     }

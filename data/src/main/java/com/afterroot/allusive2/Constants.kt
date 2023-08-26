@@ -42,7 +42,9 @@ object Reason {
     const val NOTICE = 4
 }
 
-fun Context.getMinPointerSize(): Int = this.resources.getInteger(com.afterroot.allusive2.resources.R.integer.min_pointer_size)
+fun Context.getMinPointerSize(): Int = this.resources.getInteger(
+    com.afterroot.allusive2.resources.R.integer.min_pointer_size
+)
 
 fun Context.getMinPointerSizePx(): Int = (this.getMinPointerSize() * this.resources.displayMetrics.density.toInt()) / 160
 

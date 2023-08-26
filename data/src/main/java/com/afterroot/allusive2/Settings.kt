@@ -18,11 +18,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.afterroot.allusive2.database.DatabaseFields
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getPrefs
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
+import timber.log.Timber
 
 class Settings @Inject constructor(@ApplicationContext val context: Context) {
 
@@ -102,7 +102,10 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
         set(value) = putString(context.getString(CommonR.string.key_selectedMouseName), value)
 
     var pointerSize
-        get() = getInt(context.getString(CommonR.string.key_pointerSize), context.getMinPointerSize())
+        get() = getInt(
+            context.getString(CommonR.string.key_pointerSize),
+            context.getMinPointerSize()
+        )
         set(value) = putInt(context.getString(CommonR.string.key_pointerSize), value)
 
     var mouseSize
@@ -183,7 +186,10 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
         set(value) = putBoolean(Constants.PREF_KEY_FIRST_INSTALL, value)
 
     val theme: String?
-        get() = getString(Constants.PREF_KEY_THEME, context.getString(CommonR.string.theme_device_default))
+        get() = getString(
+            Constants.PREF_KEY_THEME,
+            context.getString(CommonR.string.theme_device_default)
+        )
 
     var applyMethod
         get() = getInt("pointer_apply_method", -1)

@@ -18,9 +18,9 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive2.resources.R as CommonR
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -28,16 +28,23 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Properties
-import com.afterroot.allusive2.resources.R as CommonR
+import timber.log.Timber
 
 const val FRAMEWORK_APK = "/system/framework/framework-res.apk"
 fun frameworkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/framework.apk"
 fun frameworkExtractPath(context: Context) = "${context.externalCacheDir?.path}/framework"
 fun pointerSavePath(context: Context) = "${context.externalCacheDir?.path}/pointers"
 fun repackedFrameworkPath(context: Context) = "${context.externalCacheDir?.path}/repacked.apk"
-fun repackedMagiskModulePath(context: Context, name: String) = "${context.getExternalFilesDir(null)?.path}/$name"
-fun magiskEmptyModuleZipPath(context: Context) = "${context.externalCacheDir?.path}/empty-module.zip"
-fun magiskEmptyModuleExtractPath(context: Context) = "${context.externalCacheDir?.path}/empty-module"
+fun repackedMagiskModulePath(
+    context: Context,
+    name: String
+) = "${context.getExternalFilesDir(null)?.path}/$name"
+fun magiskEmptyModuleZipPath(
+    context: Context
+) = "${context.externalCacheDir?.path}/empty-module.zip"
+fun magiskEmptyModuleExtractPath(
+    context: Context
+) = "${context.externalCacheDir?.path}/empty-module"
 fun rroApkDownloadPath(context: Context) = "${context.externalCacheDir?.path}/rros"
 const val POINTER_XHDPI = "/res/drawable-xhdpi-v4/pointer_spot_touch.png"
 const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
@@ -158,7 +165,10 @@ fun copyAssetFile(context: Context, fileName: String, to: String) {
 
 fun copyRepackedFrameworkResApk(context: Context): File {
     val repacked = File(repackedFrameworkPath(context))
-    return repacked.copyTo(target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"), overwrite = true)
+    return repacked.copyTo(
+        target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"),
+        overwrite = true
+    )
 }
 
 fun copyDownloadedRROApk(context: Context, dlRROApkFileName: String): File {

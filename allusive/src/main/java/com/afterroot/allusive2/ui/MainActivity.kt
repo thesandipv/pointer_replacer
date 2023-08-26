@@ -40,16 +40,19 @@ import androidx.navigation.ui.setupWithNavController
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.data.mapper.toNetworkUser
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.model.User
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.EventObserver
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
+import com.afterroot.data.model.NetworkUser
+import com.afterroot.data.model.UserProperties
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.VersionCheck
 import com.afterroot.utils.data.model.VersionInfo
@@ -68,18 +71,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.email
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -93,12 +96,19 @@ class MainActivity : AppCompatActivity() {
     private var interstitialAd: InterstitialAd? = null
 
     @Inject @Named("feedback_body") lateinit var feedbackBody: String
+
     @Inject lateinit var firebaseAnalytics: FirebaseAnalytics
+
     @Inject lateinit var firebaseMessaging: FirebaseMessaging
+
     @Inject lateinit var firebaseUtils: FirebaseUtils
+
     @Inject lateinit var firestore: FirebaseFirestore
+
     @Inject lateinit var gson: Gson
+
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+
     @Inject lateinit var settings: Settings
     // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
@@ -123,7 +133,9 @@ class MainActivity : AppCompatActivity() {
                         )
                         true
                     }
-                    else -> menuItem.onNavDestinationSelected(findNavController(R.id.fragment_repo_nav))
+                    else -> menuItem.onNavDestinationSelected(
+                        findNavController(R.id.fragment_repo_nav)
+                    )
                 }
             }
         })
@@ -133,7 +145,9 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         if (!firebaseUtils.isUserSignedIn) { // If not logged in, go to login.
             startActivity(Intent(this, SplashActivity::class.java))
-        } else initialize()
+        } else {
+            initialize()
+        }
     }
 
     override fun onResume() {
@@ -311,31 +325,63 @@ class MainActivity : AppCompatActivity() {
     private fun addUserInfoInDB() {
         try {
             val curUser = firebaseUtils.firebaseUser!!
-            val userRef = firestore.collection(DatabaseFields.COLLECTION_USERS).document(curUser.uid)
+            val userRef = firestore.collection(
+                DatabaseFields.COLLECTION_USERS
+            ).document(curUser.uid)
             firebaseMessaging.token
                 .addOnCompleteListener(
                     OnCompleteListener { tokenTask ->
                         if (!tokenTask.isSuccessful) {
                             return@OnCompleteListener
                         }
+                        firebaseUtils.fcmId = tokenTask.result
                         userRef.get().addOnCompleteListener { getUserTask ->
                             if (getUserTask.isSuccessful) {
                                 if (!getUserTask.result!!.exists()) {
-                                    sharedViewModel.displayMsg("User not available. Creating User..")
-                                    val user = User(curUser.displayName, curUser.email, curUser.uid, tokenTask.result)
-                                    userRef.set(user).addOnCompleteListener { setUserTask ->
-                                        if (!setUserTask.isSuccessful) Timber.tag(TAG)
-                                            .e(setUserTask.exception, "Can't create firebaseUser")
+                                    sharedViewModel.displayMsg(
+                                        "User not available. Creating User.."
+                                    )
+                                    userRef.set(
+                                        NetworkUser(
+                                            name = curUser.displayName,
+                                            email = curUser.email,
+                                            uid = curUser.uid,
+                                            fcmId = tokenTask.result
+                                        )
+                                    ).addOnCompleteListener { setUserTask ->
+                                        if (!setUserTask.isSuccessful) {
+                                            Timber.e(
+                                                setUserTask.exception,
+                                                "addUserInfoInDB: Can't create firebaseUser"
+                                            )
+                                        }
                                     }
                                 } else if (getUserTask.result!![DatabaseFields.FIELD_FCM_ID] != tokenTask.result) {
                                     userRef.update(DatabaseFields.FIELD_FCM_ID, tokenTask.result)
+                                } else if (getUserTask.result!![DatabaseFields.FIELD_VERSION] == null) {
+                                    Timber.d("addUserInfoInDB: Migrating to v1")
+                                    userRef.update(
+                                        hashMapOf(
+                                            DatabaseFields.FIELD_VERSION to 1,
+                                            DatabaseFields.FIELD_USERNAME to null,
+                                            DatabaseFields.FIELD_USER_PROPERTIES to UserProperties()
+                                        )
+                                    )
+                                } // Add Future Migrations Here
+                                userRef.get(Source.CACHE).addOnSuccessListener {
+                                    firebaseUtils.networkUser = it.toNetworkUser()
                                 }
-                            } else Timber.tag(TAG).e(getUserTask.exception, "Unknown Error")
+                            } else {
+                                Timber.e(
+                                    getUserTask.exception,
+                                    "addUserInfoInDB: ${getUserTask.exception?.message}"
+                                )
+                            }
                         }
                     }
                 )
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "addUserInfoInDB")
+            Timber.e(e, "addUserInfoInDB: ${e.message}")
         }
     }
 
@@ -481,11 +527,15 @@ class MainActivity : AppCompatActivity() {
                 versionChecker.onVersionDisabled {
                     AlertDialog.Builder(this).apply {
                         setTitle("Version Obsolete")
-                        setMessage("This version is obsolete. You have to update to latest version.")
+                        setMessage(
+                            "This version is obsolete. You have to update to latest version."
+                        )
                         setPositiveButton("Update") { _, _ ->
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                                Uri.parse(
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
+                                )
                             )
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)
@@ -503,7 +553,9 @@ class MainActivity : AppCompatActivity() {
                         setPositiveButton("Update") { _, _ ->
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                                Uri.parse(
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
+                                )
                             )
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)

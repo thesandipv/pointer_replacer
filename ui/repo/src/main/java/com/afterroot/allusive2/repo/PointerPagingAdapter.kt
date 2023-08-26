@@ -24,20 +24,20 @@ import androidx.core.view.updateLayoutParams
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.getTintedDrawable
 import com.afterroot.utils.extensions.visible
 import com.afterroot.utils.getMaterialColor
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
-import com.afterroot.allusive2.resources.R as CommonR
 
 class PointerPagingAdapter(
     private val callbacks: ItemSelectedCallback<Pointer>,
@@ -45,12 +45,22 @@ class PointerPagingAdapter(
 ) : PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
 
     companion object : DiffUtil.ItemCallback<Pointer>() {
-        override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem.filename == newItem.filename
-        override fun areContentsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem == newItem
+        override fun areItemsTheSame(
+            oldItem: Pointer,
+            newItem: Pointer
+        ): Boolean = oldItem.filename == newItem.filename
+        override fun areContentsTheSame(
+            oldItem: Pointer,
+            newItem: Pointer
+        ): Boolean = oldItem == newItem
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val binding = ItemPointerRepoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemPointerRepoBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return PointerVH(binding, callbacks, firebaseStorage)
     }
 
@@ -85,8 +95,10 @@ class PointerVH(
                         height = context.getMinPointerSize()
                         width = context.getMinPointerSize()
                     }
-                    val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                    GlideApp.with(context)
+                    val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(
+                        true
+                    ).build()
+                    Glide.with(context)
                         .load(storageReference)
                         .override(context.getMinPointerSize(), context.getMinPointerSize())
                         .transition(DrawableTransitionOptions.withCrossFade(factory))
@@ -127,7 +139,10 @@ class PointerVH(
                 callbacks.onClick(absoluteAdapterPosition, itemView, pointer)
             }
             setOnLongClickListener {
-                return@setOnLongClickListener callbacks.onLongClick(absoluteAdapterPosition, pointer)
+                return@setOnLongClickListener callbacks.onLongClick(
+                    absoluteAdapterPosition,
+                    pointer
+                )
             }
         }
     }

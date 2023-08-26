@@ -56,7 +56,9 @@ class FirestorePagingSource(
 
             var currentPageSource = if (settings.orderBy == DatabaseFields.FIELD_DOWNLOADS || settings.filterRRO) {
                 Source.DEFAULT
-            } else Source.CACHE
+            } else {
+                Source.CACHE
+            }
             var nextPageSource = Source.DEFAULT
 
             val cachedPointerSnapshot = pointersQuery.limit(3).get(Source.CACHE).await()
