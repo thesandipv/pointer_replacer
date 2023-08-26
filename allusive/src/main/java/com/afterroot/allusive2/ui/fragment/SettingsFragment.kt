@@ -37,12 +37,13 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
-import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
+import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.showStaticProgressDialog
@@ -60,23 +61,26 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
 
 @SuppressLint("ValidFragment")
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var billingClient: BillingClient
+
     @Inject lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var firestore: FirebaseFirestore
+
     @Inject lateinit var firebaseUtils: FirebaseUtils
     private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
@@ -109,7 +113,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     billingClient.consumeAsync(params) { result, _ ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                             Timber.tag(TAG).d("initBilling: Purchase Done and Consumed")
-                        } else Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
+                        } else {
+                            Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
+                        }
                     }
                 }
             }.build()
@@ -156,11 +162,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setAppThemePref() {
-        findPreference<ListPreference>("key_app_theme")?.setOnPreferenceChangeListener { _, newValue ->
+        findPreference<ListPreference>(
+            "key_app_theme"
+        )?.setOnPreferenceChangeListener { _, newValue ->
             AppCompatDelegate.setDefaultNightMode(
                 when (newValue) {
-                    getString(CommonR.string.theme_device_default) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                    getString(
+                        CommonR.string.theme_device_default
+                    )
+                    -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+
+                    getString(
+                        CommonR.string.theme_battery
+                    )
+                    -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+
                     getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
                     getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -271,8 +287,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         lifecycleScope.launch {
-            val skuModel = Gson().fromJson(firebaseRemoteConfig.getString("pr_sku_list"), SkuModel::class.java)
-            val params = SkuDetailsParams.newBuilder().setSkusList(skuModel.sku).setType(BillingClient.SkuType.INAPP).build()
+            val skuModel = Gson().fromJson(
+                firebaseRemoteConfig.getString("pr_sku_list"),
+                SkuModel::class.java
+            )
+            val params = SkuDetailsParams.newBuilder().setSkusList(
+                skuModel.sku
+            ).setType(BillingClient.SkuType.INAPP).build()
 
             val queryResult = billingClient.querySkuDetails(params)
             val billingResult = queryResult.billingResult
@@ -286,14 +307,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
             }
 
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, list)
+            val adapter =
+                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, list)
             withContext(Dispatchers.Main) {
                 delay(100)
                 loadingDialog.dismiss()
-                MaterialAlertDialogBuilder(requireContext()).setTitle(getString(CommonR.string.pref_title_donate_dev))
+                MaterialAlertDialogBuilder(
+                    requireContext()
+                ).setTitle(getString(CommonR.string.pref_title_donate_dev))
                     .setAdapter(adapter) { _, which ->
                         val billingFlowParams =
-                            BillingFlowParams.newBuilder().setSkuDetails(skuDetailsList[which]).build()
+                            BillingFlowParams.newBuilder().setSkuDetails(
+                                skuDetailsList[which]
+                            ).build()
                         billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
                     }.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
                         dialog.dismiss()

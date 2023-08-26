@@ -23,8 +23,8 @@ import com.afterroot.allusive2.domain.PagingInteractor
 import com.afterroot.allusive2.model.LocalPointerRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 class PagingPointerRequest @Inject constructor() : PagingInteractor<PagingPointerRequest.Params, LocalPointerRequest>() {
 
@@ -35,7 +35,9 @@ class PagingPointerRequest @Inject constructor() : PagingInteractor<PagingPointe
         override val pagingConfig: PagingConfig
     ) : Parameters<LocalPointerRequest>
 
-    override fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(config = params.pagingConfig) {
+    override fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(
+        config = params.pagingConfig
+    ) {
         PointerRequestsPagingSource(params.query, params.firestore)
     }.flow
 }

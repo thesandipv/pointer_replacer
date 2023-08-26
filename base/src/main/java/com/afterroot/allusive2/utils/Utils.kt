@@ -35,7 +35,9 @@ fun Context.showNetworkDialog(
     isShowHide: Boolean = false
 ): AlertDialog {
     val dialog = MaterialAlertDialogBuilder(this).apply {
-        setTitle(if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected")
+        setTitle(
+            if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected"
+        )
         setCancelable(false)
         setMessage(com.afterroot.allusive2.resources.R.string.dialog_msg_no_network)
         setNegativeButton("Exit") { _, _ -> negative() }
@@ -66,7 +68,10 @@ fun <T> whenBuildIs(debug: T, release: T): T = if (BuildConfig.DEBUG) debug else
  * @since v1.9.4
  * @return either [debug] or [release] with provided type [T]
  */
-fun <T> whenBuildIs(debug: () -> T, release: () -> T): T = whenBuildIs(debug.invoke(), release.invoke())
+fun <T> whenBuildIs(
+    debug: () -> T,
+    release: () -> T
+): T = whenBuildIs(debug.invoke(), release.invoke())
 
 /**
  * Helper Function for invoking function only if build is Debug

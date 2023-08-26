@@ -106,7 +106,12 @@ internal fun CommonFAB(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    FloatingActionButton(onClick = onClick, modifier = modifier, shape = fabShape, contentColor = Color.Black) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = modifier,
+        shape = fabShape,
+        contentColor = Color.Black
+    ) {
         Icon(imageVector = icon, contentDescription = icon.name)
     }
 }

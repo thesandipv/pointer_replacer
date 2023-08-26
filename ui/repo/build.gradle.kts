@@ -16,6 +16,7 @@
 plugins {
     id("com.afterroot.android.library")
     id("com.afterroot.kotlin.android")
+    id("com.afterroot.android.compose")
     id("com.afterroot.allusive2.android.common")
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.kapt)
@@ -40,11 +41,14 @@ dependencies {
 
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.paging)
+    implementation(libs.androidx.paging)
     implementation(libs.androidx.lifecycle.viewmodel)
 
     implementation(libs.bundles.coroutines)
 
     implementation(libs.hilt.hilt)
+    implementation(libs.hilt.compose)
     kapt(libs.hilt.compiler)
 
+    implementation(libs.coil)
 }

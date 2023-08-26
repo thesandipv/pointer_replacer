@@ -15,13 +15,11 @@
 package com.afterroot.allusive2.model
 
 import androidx.annotation.Keep
-import androidx.compose.runtime.Immutable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 @Keep
-@Immutable
 data class LocalPointerRequest(
     /**
      * File name of pointer with extension.
@@ -51,5 +49,5 @@ data class LocalPointerRequest(
      * If true, request is closed.
      */
     var isRequestClosed: Boolean = false,
-    var pointerName: String? = null,
+    var pointerName: String? = null
 )

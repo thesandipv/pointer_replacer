@@ -22,11 +22,11 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.afterroot.allusive2.model.RoomPointer
+import java.io.IOException
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class MigrationTest {

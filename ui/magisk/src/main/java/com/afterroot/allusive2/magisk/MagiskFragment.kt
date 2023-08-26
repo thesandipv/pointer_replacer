@@ -33,17 +33,18 @@ import com.afterroot.allusive2.magisk.databinding.FragmentMagiskBinding
 import com.afterroot.utils.extensions.visible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
-import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MagiskFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
+
     @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
 
@@ -78,10 +79,18 @@ class MagiskFragment : Fragment() {
         binding.openMagisk.apply {
             visible(false)
             setOnClickListener {
-                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(
+                    MAGISK_PACKAGE
+                )
                 if (intent != null) {
                     startActivity(intent)
-                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Magisk Manager not Installed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -92,7 +101,12 @@ class MagiskFragment : Fragment() {
         }*/
 
         val selectedPointerModule =
-            File(repackedMagiskModulePath(requireContext(), "${settings.selectedPointerName}_Magisk.zip"))
+            File(
+                repackedMagiskModulePath(
+                    requireContext(),
+                    "${settings.selectedPointerName}_Magisk.zip"
+                )
+            )
         if (selectedPointerModule.exists()) {
             setupInstallButton(selectedPointerModule.path)
             updateProgress("- Magisk module already exist at: ${selectedPointerModule.path}")
@@ -237,7 +251,9 @@ class MagiskFragment : Fragment() {
         var result: File?
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
-            File(FRAMEWORK_APK).copyTo(File(repackedFrameworkPath(requireContext())), overwrite = true)
+            File(
+                FRAMEWORK_APK
+            ).copyTo(File(repackedFrameworkPath(requireContext())), overwrite = true)
             ZipFile(File(repackedFrameworkPath(requireContext())))
                 .addFolder(File("${pointerSavePath(requireContext())}/res"))
 
@@ -262,7 +278,10 @@ class MagiskFragment : Fragment() {
     private suspend fun copyMagiskModuleZip() {
         updateProgress("- Copying $MAGISK_EMPTY_ZIP")
         withContext(Dispatchers.IO) {
-            copyMagiskEmptyZip(context = requireContext(), to = magiskEmptyModuleZipPath(requireContext()))
+            copyMagiskEmptyZip(
+                context = requireContext(),
+                to = magiskEmptyModuleZipPath(requireContext())
+            )
         }
         updateProgress("- Done copying $MAGISK_EMPTY_ZIP")
     }

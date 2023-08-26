@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,7 +43,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class RepoViewModel @Inject constructor(
@@ -54,7 +54,9 @@ class RepoViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val actions = MutableSharedFlow<RepoActions>()
-    val requestPagedList: Flow<PagingData<LocalPointerRequest>> = pagingPointerRequest.flow.cachedIn(viewModelScope)
+    val requestPagedList: Flow<PagingData<LocalPointerRequest>> = pagingPointerRequest.flow.cachedIn(
+        viewModelScope
+    )
     private val messages = MutableSharedFlow<String>()
 
     val state: StateFlow<RepoState> = combine(messages) {
@@ -87,12 +89,17 @@ class RepoViewModel @Inject constructor(
     }
 
     private fun loadRequests() {
-        val baseQuery = firestore.requests().orderBy(DatabaseFields.FIELD_TIMESTAMP, Query.Direction.DESCENDING)
+        val baseQuery = firestore.requests().orderBy(
+            DatabaseFields.FIELD_TIMESTAMP,
+            Query.Direction.DESCENDING
+        )
         var query = baseQuery.whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
         if (firebaseUtils.networkUser?.properties?.userRole == UserRole.ADMIN) {
             query = baseQuery
         }
-        pagingPointerRequest(PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG))
+        pagingPointerRequest(
+            PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG)
+        )
     }
 
     private suspend fun getDownloadUrl(fileName: String): String {
@@ -102,7 +109,7 @@ class RepoViewModel @Inject constructor(
     companion object {
         private val PAGING_CONFIG = PagingConfig(
             pageSize = 20,
-            initialLoadSize = 20,
+            initialLoadSize = 20
         )
     }
 }

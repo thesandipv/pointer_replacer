@@ -29,10 +29,10 @@ import com.afterroot.data.utils.FirebaseUtils
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class MainSharedViewModel @Inject constructor(

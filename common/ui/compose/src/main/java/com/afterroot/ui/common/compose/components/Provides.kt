@@ -20,4 +20,5 @@ import com.afterroot.allusive2.model.LocalUser
 
 val LocalCurrentUser = compositionLocalOf { LocalUser() }
 
-val LocalSettings = compositionLocalOf<Settings> { throw IllegalStateException("LocalSettings is not initialized") }
+val LocalSettings =
+    compositionLocalOf<Settings> { throw IllegalStateException("LocalSettings is not initialized") }

@@ -24,6 +24,7 @@ plugins {
     alias(libs.plugins.gms.googleServices)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 
     id("androidx.navigation.safeargs")
     id("com.google.android.gms.oss-licenses-plugin")
@@ -92,7 +93,7 @@ android {
         "/*.properties",
         "fabric/*.properties",
         "META-INF/*.properties",
-        "META-INF/LICENSE*.md"
+        "META-INF/LICENSE*.md",
     )
 }
 
@@ -104,9 +105,9 @@ configurations {
 
 dependencies {
     implementation(projects.data)
-    implementation(project(":ui:home"))
-    implementation(project(":ui:magisk"))
-    implementation(project(":ui:repo"))
+    implementation(projects.ui.home)
+    implementation(projects.ui.magisk)
+    implementation(projects.ui.repo)
 
     implementation(libs.kotlin.stdLib)
 
@@ -143,7 +144,7 @@ dependencies {
     implementation(libs.firebase.ui.firestore)
     implementation(libs.firebase.ui.storage)
 
-    kapt(libs.glide.compiler)
+    ksp(libs.glide.ksp)
 
     implementation(libs.google.ossLic)
     implementation(libs.google.material)
@@ -151,7 +152,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
-    implementation("com.google.android.play:core:1.10.3")
+    implementation(libs.google.playCore)
     implementation(libs.google.gson)
 
     implementation(libs.commonsIo)
@@ -160,13 +161,7 @@ dependencies {
     implementation(libs.hilt.hilt)
     kapt(libs.hilt.compiler)
 
-    implementation(libs.epoxy.epoxy)
-    kapt(libs.epoxy.processor)
-
-    implementation(libs.kotlin.coroutines.core)
-    implementation(libs.kotlin.coroutines.android)
-    implementation(libs.kotlin.coroutines.play)
-    testImplementation(libs.kotlin.coroutines.test)
+    implementation(libs.bundles.coroutines)
 
     testImplementation(libs.test.junit)
     androidTestImplementation(libs.androidx.test.junitExt)
@@ -175,5 +170,5 @@ dependencies {
     testImplementation(libs.androidx.test.core)
 
     implementation(libs.okhttp.okhttp)
-    implementation("me.zhanghai.android.fastscroll:library:1.1.8")
+    implementation(libs.fastScroll)
 }

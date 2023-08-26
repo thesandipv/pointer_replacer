@@ -28,17 +28,26 @@ enum class FabState {
 }
 
 @Composable
-fun AnimatedFab(fab: @Composable (animationState: MutableState<FabState>, scale: State<Float>, alpha: State<Float>) -> Unit) {
+fun AnimatedFab(
+    fab: @Composable (
+        animationState: MutableState<FabState>,
+        scale: State<Float>,
+        alpha: State<Float>
+    ) -> Unit
+) {
     val animationTargetState = remember { mutableStateOf(FabState.Invisible) }
     val transition = updateTransition(targetState = animationTargetState.value, label = "")
 
     val alpha = transition.animateFloat(
-        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) }, label = ""
+        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
+        label = ""
     ) {
         if (it == FabState.Invisible) 0f else 1f
     }
 
-    val scale = transition.animateFloat(transitionSpec = { tween(durationMillis = ANIMATION_DURATION) }, label = "") {
+    val scale = transition.animateFloat(transitionSpec = {
+        tween(durationMillis = ANIMATION_DURATION)
+    }, label = "") {
         if (it == FabState.Invisible) 0.5f else 1f
     }
 

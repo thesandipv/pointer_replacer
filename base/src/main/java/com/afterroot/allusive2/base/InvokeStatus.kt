@@ -31,7 +31,11 @@ data class InvokeError(val throwable: Throwable) : InvokeStatus()
  * @param onSuccess Lambda to Execute when [InvokeStatus] is [InvokeSuccess]
  * @return Launched [Job] on specified [scope]
  */
-fun Flow<InvokeStatus>.watchStatus(scope: CoroutineScope, tag: String = "", onSuccess: () -> Unit = {}): Job {
+fun Flow<InvokeStatus>.watchStatus(
+    scope: CoroutineScope,
+    tag: String = "",
+    onSuccess: () -> Unit = {}
+): Job {
     return scope.launch { collectStatus(tag, onSuccess) }
 }
 
@@ -40,7 +44,10 @@ fun Flow<InvokeStatus>.watchStatus(scope: CoroutineScope, tag: String = "", onSu
  * @param tag Additional log tag prefix
  * @param onSuccess Lambda to Execute when [InvokeStatus] is [InvokeSuccess]
  */
-private suspend fun Flow<InvokeStatus>.collectStatus(tag: String = "InvokeStatus", onSuccess: () -> Unit = {}) = collect { status ->
+private suspend fun Flow<InvokeStatus>.collectStatus(
+    tag: String = "InvokeStatus",
+    onSuccess: () -> Unit = {}
+) = collect { status ->
 
     when (status) {
         InvokeStarted -> {

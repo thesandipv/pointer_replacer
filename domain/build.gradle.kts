@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":base"))
+    implementation(projects.base)
     implementation(projects.data)
 
     implementation(libs.androidx.core)

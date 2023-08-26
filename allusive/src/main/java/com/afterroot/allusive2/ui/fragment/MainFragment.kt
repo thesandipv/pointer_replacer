@@ -53,7 +53,6 @@ import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.Constants.POINTER_MOUSE
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
-import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
@@ -69,12 +68,14 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.utils.extensions.getAsBitmap
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.visible
+import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -87,27 +88,28 @@ import com.google.android.play.core.review.testing.FakeReviewManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
 import timber.log.Timber
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
     @Inject lateinit var firestore: FirebaseFirestore
+
     @Inject lateinit var myDatabase: MyDatabase
+
     @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+
     @Inject lateinit var settings: Settings
     private lateinit var binding: FragmentMainBinding
     private val sharedViewModel: MainSharedViewModel by activityViewModels()
@@ -178,7 +180,9 @@ class MainFragment : Fragment() {
                     putInt("TYPE", POINTER_TOUCH)
                 }
                 val extras =
-                    FragmentNavigatorExtras(binding.selectedPointer to getString(CommonR.string.main_fragment_transition))
+                    FragmentNavigatorExtras(
+                        binding.selectedPointer to getString(CommonR.string.main_fragment_transition)
+                    )
                 requireActivity().findNavController(R.id.fragment_repo_nav)
                     .navigate(R.id.customizeFragment, bundle, null, extras)
             }
@@ -191,7 +195,10 @@ class MainFragment : Fragment() {
                 val bundle = Bundle().apply {
                     putInt("TYPE", POINTER_MOUSE)
                 }
-                val extras = FragmentNavigatorExtras(binding.selectedMouse to getString(CommonR.string.transition_mouse))
+                val extras =
+                    FragmentNavigatorExtras(
+                        binding.selectedMouse to getString(CommonR.string.transition_mouse)
+                    )
                 requireActivity().findNavController(R.id.fragment_repo_nav)
                     .navigate(R.id.customizeFragment, bundle, null, extras)
             }
@@ -213,11 +220,15 @@ class MainFragment : Fragment() {
                     }
                     Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
                         if (!isPointerSelected()) {
-                            sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_selected))
+                            sharedViewModel.displayMsg(
+                                getString(CommonR.string.msg_pointer_not_selected)
+                            )
                             return@setItems
                         }
                         if (!isMouseSelected()) {
-                            sharedViewModel.displayMsg(getString(CommonR.string.msg_mouse_not_selected))
+                            sharedViewModel.displayMsg(
+                                getString(CommonR.string.msg_mouse_not_selected)
+                            )
                             return@setItems
                         }
                         val filesDir = requireContext().getPointerSaveRootDir()
@@ -323,7 +334,7 @@ class MainFragment : Fragment() {
                     setColorFilter(pointerColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.pointerAlpha else 255
                 }
-                GlideApp.with(requireContext())
+                Glide.with(requireContext())
                     .load(Uri.fromFile(File(selectedPointerPath)))
                     .into(binding.selectedPointer)
             }
@@ -334,7 +345,7 @@ class MainFragment : Fragment() {
                     setColorFilter(mouseColor)
                     imageAlpha = if (settings.isEnableAlpha) settings.mouseAlpha else 255
                 }
-                GlideApp.with(requireContext())
+                Glide.with(requireContext())
                     .load(Uri.fromFile(File(selectedMousePath)))
                     .into(binding.selectedMouse)
             }
@@ -379,7 +390,13 @@ class MainFragment : Fragment() {
         }
 
         val reviewManager =
-            if (BuildConfig.DEBUG) FakeReviewManager(requireContext()) else ReviewManagerFactory.create(requireContext())
+            if (BuildConfig.DEBUG) {
+                FakeReviewManager(
+                    requireContext()
+                )
+            } else {
+                ReviewManagerFactory.create(requireContext())
+            }
         val request = reviewManager.requestReviewFlow()
         request.addOnCompleteListener {
             if (it.isSuccessful) {
@@ -529,7 +546,10 @@ class MainFragment : Fragment() {
             arePermissionsGranted(safUri) -> {
                 // DO WORK
                 val fileNames = arrayListOf<String>()
-                val pointerFolder = DocumentFile.fromTreeUri(requireContext(), settings.safUri!!.toUri())
+                val pointerFolder = DocumentFile.fromTreeUri(
+                    requireContext(),
+                    settings.safUri!!.toUri()
+                )
 
                 pointerFolder?.listFiles()?.filterNotNull()?.forEach {
                     it.name?.let { fileName ->
@@ -619,7 +639,7 @@ class MainFragment : Fragment() {
                     settings.selectedMouseName = item.pointer_name
                     settings.selectedMousePath = targetPath + item.file_name
                 }
-                GlideApp.with(requireContext())
+                Glide.with(requireContext())
                     .load(File(targetPath + item.file_name))
                     .override(requireContext().getMinPointerSize())
                     .into(if (pointerType == POINTER_TOUCH) binding.selectedPointer else binding.selectedMouse)

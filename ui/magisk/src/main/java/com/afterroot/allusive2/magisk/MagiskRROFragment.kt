@@ -39,6 +39,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,16 +49,18 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MagiskRROFragment : Fragment() {
 
     private lateinit var binding: FragmentMagiskBinding
+
     @Inject lateinit var storage: FirebaseStorage
+
     @Inject lateinit var firestore: FirebaseFirestore
+
     @Inject lateinit var okHttpClient: OkHttpClient
+
     @Inject lateinit var settings: Settings
     private val progress = MutableLiveData<Result>()
     private lateinit var repoDocId: String
@@ -106,10 +110,18 @@ class MagiskRROFragment : Fragment() {
         binding.openMagisk.apply {
             visible(false)
             setOnClickListener {
-                val intent = requireContext().packageManager.getLaunchIntentForPackage(MAGISK_PACKAGE)
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(
+                    MAGISK_PACKAGE
+                )
                 if (intent != null) {
                     startActivity(intent)
-                } else Toast.makeText(requireContext(), "Magisk Manager not Installed", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Magisk Manager not Installed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -267,7 +279,9 @@ class MagiskRROFragment : Fragment() {
                 .unzip(toFolder = File(magiskRROModuleExtractPath(requireContext())))
 
             // Delete placeholder file if exists
-            File("${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder").apply {
+            File(
+                "${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder"
+            ).apply {
                 if (exists() && delete()) {
                     withContext(Dispatchers.Main) { updateProgress("- Deleted Placeholder file") }
                 }
@@ -294,7 +308,10 @@ class MagiskRROFragment : Fragment() {
             updateProgress("- Copying $MAGISK_RRO_ZIP")
         }
         withContext(Dispatchers.IO) {
-            copyMagiskRROZip(context = requireContext(), to = magiskRROModuleZipPath(requireContext()))
+            copyMagiskRROZip(
+                context = requireContext(),
+                to = magiskRROModuleZipPath(requireContext())
+            )
         }
         withContext(Dispatchers.Main) {
             updateProgress("- Done copying $MAGISK_RRO_ZIP")

@@ -37,20 +37,20 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.color.ColorPalette
 import com.afollestad.materialdialogs.color.colorChooser
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
-import com.afterroot.allusive2.GlideApp
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.databinding.FragmentCustomizePointerBinding
 import com.afterroot.allusive2.getMinPointerSize
+import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.visible
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import org.jetbrains.anko.find
 import java.io.File
 import java.util.Locale
 import javax.inject.Inject
-import com.afterroot.allusive2.resources.R as CommonR
+import org.jetbrains.anko.find
 
 /**
  * Created by Sandip on 04-10-2017.
@@ -58,6 +58,7 @@ import com.afterroot.allusive2.resources.R as CommonR
 @AndroidEntryPoint
 class CustomizeFragment : Fragment() {
     private lateinit var typePath: String
+
     @Inject lateinit var settings: Settings
     private var pointerType: Int = 0
     private var selectedColor: Int = 0
@@ -93,7 +94,7 @@ class CustomizeFragment : Fragment() {
 
         binding.imageCustomizePointer.setColorFilter(typeColor)
 
-        GlideApp.with(requireContext())
+        Glide.with(requireContext())
             .load(Uri.fromFile(File(typePath)))
             .into(binding.imageCustomizePointer)
 
@@ -114,7 +115,9 @@ class CustomizeFragment : Fragment() {
                         mouseColor = selectedColor
                     }
                 }
-                requireActivity().find<FragmentContainerView>(R.id.fragment_repo_nav).findNavController().navigateUp()
+                requireActivity().find<FragmentContainerView>(
+                    R.id.fragment_repo_nav
+                ).findNavController().navigateUp()
             }
             icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
             icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
@@ -185,7 +188,11 @@ class CustomizeFragment : Fragment() {
             setPointerImageParams(currentSize, padding)
 
             seekBarSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, newProgress: Int, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    newProgress: Int,
+                    fromUser: Boolean
+                ) {
                     currentSize = minSize + newProgress
                     textSize.text =
                         String.format(Locale.US, formatTextSize, getString(CommonR.string.text_size), currentSize, currentSize)
@@ -202,7 +209,11 @@ class CustomizeFragment : Fragment() {
 
             seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 var imagePadding: Int = 0
-                override fun onProgressChanged(seekBar: SeekBar, newPadding: Int, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    newPadding: Int,
+                    fromUser: Boolean
+                ) {
                     textPadding.text =
                         String.format(Locale.US, formatPadding, getString(CommonR.string.text_padding), newPadding)
                     setLayoutPadding(newPadding)
@@ -248,7 +259,6 @@ class CustomizeFragment : Fragment() {
 
     private fun setClickListeners() {
         binding.apply {
-
             butMinus.setOnClickListener {
                 seekBarSize.progress = seekBarSize.progress - 1
             }
@@ -289,7 +299,9 @@ class CustomizeFragment : Fragment() {
                         this@CustomizeFragment.selectedColor = selectedColor
                         if (pointerType == POINTER_TOUCH) {
                             settings.pointerTmpColor = selectedColor
-                        } else settings.mouseTmpColor = selectedColor
+                        } else {
+                            settings.mouseTmpColor = selectedColor
+                        }
                     }
                     positiveButton(android.R.string.ok)
                     negativeButton(android.R.string.cancel)
@@ -299,7 +311,9 @@ class CustomizeFragment : Fragment() {
             actionResetColor.setOnClickListener {
                 if (pointerType == POINTER_TOUCH) {
                     settings.pointerTmpColor = 0
-                } else settings.mouseTmpColor = 0
+                } else {
+                    settings.mouseTmpColor = 0
+                }
                 selectedColor = 0
                 imageCustomizePointer.setColorFilter(0)
             }

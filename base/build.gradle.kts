@@ -17,6 +17,7 @@ plugins {
     id("com.afterroot.android.library")
     id("com.afterroot.kotlin.android")
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -36,14 +37,13 @@ android {
     }
 }
 
-
 dependencies {
     api(libs.kotlin.coroutines.core)
 
     implementation(projects.common.ui.resources)
 
     api(libs.glide.glide)
-    kapt(libs.glide.compiler)
+    ksp(libs.glide.ksp)
 
     implementation(libs.androidx.activity)
     implementation(libs.firebase.firestore)

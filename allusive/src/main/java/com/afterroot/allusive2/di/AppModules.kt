@@ -14,7 +14,7 @@
  */
 package com.afterroot.allusive2.di
 
-import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.allusive2.base.CoroutineDispatchers
 import com.afterroot.allusive2.utils.getMailBodyForFeedback
 import com.afterroot.data.utils.FirebaseUtils
@@ -24,9 +24,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Named
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -59,7 +59,11 @@ object AppModules {
     @Provides
     @Named("feedback_body")
     fun provideFeedbackBody(firebaseUtils: FirebaseUtils): String =
-        getMailBodyForFeedback(firebaseUtils, version = provideVersionName(), versionCode = provideVersionCode())
+        getMailBodyForFeedback(
+            firebaseUtils,
+            version = provideVersionName(),
+            versionCode = provideVersionCode()
+        )
 
     @Provides
     @Singleton
