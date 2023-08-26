@@ -1,5 +1,5 @@
 [versions]
-agp = "8.1.0"
+agp = "8.1.1"
 accompanist = "0.30.1"
 activity = "1.7.2"
 ankoCommons = "0.10.8"
@@ -47,7 +47,7 @@ kotlinxCoroutines = "1.7.3"
 ktlint = "0.50.0"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
-libsuVersion = "3.2.1"
+libsuVersion = "5.2.0"
 lifecycle = "2.6.1"
 materialDialogs = "3.3.0"
 multidex = "2.0.1"
@@ -93,6 +93,7 @@ spotless-pluginGradle = { module = "com.diffplug.spotless:spotless-plugin-gradle
 commonsCodec = "commons-codec:commons-codec:1.16.0"
 commonsIo = "org.apache.commons:commons-io:1.3.2"
 commonsLang = "org.apache.commons:commons-lang3:3.13.0"
+fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "com.dropbox.mobile.store:store4:4.0.5"
 coil = { module = "io.coil-kt:coil-compose", version = "2.4.0" }
@@ -206,6 +207,7 @@ google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 google-pluginGservices = "com.google.gms:google-services:4.3.15"
+google-playCore = "com.google.android.play:core:1.10.3"
 
 dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
