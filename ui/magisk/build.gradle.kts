@@ -53,5 +53,5 @@ dependencies {
     implementation(libs.libsu.core)
     implementation(libs.libsu.io)
 
-    implementation("net.lingala.zip4j:zip4j:2.11.1")
+    implementation("net.lingala.zip4j:zip4j:2.11.5")
 }
