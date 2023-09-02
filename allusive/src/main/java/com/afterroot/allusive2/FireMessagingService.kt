@@ -71,7 +71,7 @@ class FireMessagingService : FirebaseMessagingService() {
                 url = remoteMessage.data["link"],
                 channelId = remoteMessage.notification!!.channelId,
                 channelName = remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
-                title = remoteMessage.notification?.title
+                title = remoteMessage.notification?.title,
             )
         }
     }
@@ -92,12 +92,16 @@ class FireMessagingService : FirebaseMessagingService() {
                 data = Uri.parse(url)
             }
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
+        )
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(
             this,
-            channelId ?: getString(CommonR.string.fcm_channel_id)
+            channelId ?: getString(CommonR.string.fcm_channel_id),
         )
             .setSmallIcon(CommonR.drawable.ic_launch_screen)
             .setContentTitle(title ?: getString(CommonR.string.app_name))
@@ -108,14 +112,14 @@ class FireMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(
-            Context.NOTIFICATION_SERVICE
+            Context.NOTIFICATION_SERVICE,
         ) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId ?: getString(CommonR.string.fcm_channel_id),
                 channelName ?: getString(CommonR.string.fcm_channel_default),
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_DEFAULT,
             )
             notificationManager.createNotificationChannel(channel)
         }

@@ -36,7 +36,7 @@ object AppModules {
     fun provideDispatchers() = CoroutineDispatchers(
         default = Dispatchers.Default,
         io = Dispatchers.IO,
-        main = Dispatchers.Main
+        main = Dispatchers.Main,
     )
 
     @Provides
@@ -62,7 +62,7 @@ object AppModules {
         getMailBodyForFeedback(
             firebaseUtils,
             version = provideVersionName(),
-            versionCode = provideVersionCode()
+            versionCode = provideVersionCode(),
         )
 
     @Provides

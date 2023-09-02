@@ -37,5 +37,5 @@ fun Modifier.sidePadding(padding: Dp = 16.dp, applyBottom: Boolean = false) =
         start = padding,
         top = padding,
         end = padding,
-        bottom = if (applyBottom) padding else 0.dp
+        bottom = if (applyBottom) padding else 0.dp,
     )

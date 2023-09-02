@@ -29,7 +29,6 @@ import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.getTintedDrawable
 import com.afterroot.utils.extensions.visible
@@ -38,20 +37,21 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.firebase.storage.FirebaseStorage
+import com.afterroot.allusive2.resources.R as CommonR
 
 class PointerPagingAdapter(
     private val callbacks: ItemSelectedCallback<Pointer>,
-    private val firebaseStorage: FirebaseStorage
+    private val firebaseStorage: FirebaseStorage,
 ) : PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
 
     companion object : DiffUtil.ItemCallback<Pointer>() {
         override fun areItemsTheSame(
             oldItem: Pointer,
-            newItem: Pointer
+            newItem: Pointer,
         ): Boolean = oldItem.filename == newItem.filename
         override fun areContentsTheSame(
             oldItem: Pointer,
-            newItem: Pointer
+            newItem: Pointer,
         ): Boolean = oldItem == newItem
     }
 
@@ -59,7 +59,7 @@ class PointerPagingAdapter(
         val binding = ItemPointerRepoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
-            false
+            false,
         )
         return PointerVH(binding, callbacks, firebaseStorage)
     }
@@ -73,7 +73,7 @@ class PointerPagingAdapter(
 class PointerVH(
     binding: ItemPointerRepoBinding,
     private val callbacks: ItemSelectedCallback<Pointer>,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
 ) : RecyclerView.ViewHolder(binding.root) {
     val context: Context = binding.root.context
     private val itemName: AppCompatTextView = binding.infoPointerPackName
@@ -96,7 +96,7 @@ class PointerVH(
                         width = context.getMinPointerSize()
                     }
                     val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(
-                        true
+                        true,
                     ).build()
                     Glide.with(context)
                         .load(storageReference)
@@ -123,8 +123,8 @@ class PointerVH(
                     setImageDrawable(
                         context.getTintedDrawable(
                             CommonR.drawable.ic_removed,
-                            getMaterialColor(com.google.android.material.R.attr.colorError)
-                        )
+                            getMaterialColor(com.google.android.material.R.attr.colorError),
+                        ),
                     )
                 }
                 itemName.text = pointer.name
@@ -141,7 +141,7 @@ class PointerVH(
             setOnLongClickListener {
                 return@setOnLongClickListener callbacks.onLongClick(
                     absoluteAdapterPosition,
-                    pointer
+                    pointer,
                 )
             }
         }

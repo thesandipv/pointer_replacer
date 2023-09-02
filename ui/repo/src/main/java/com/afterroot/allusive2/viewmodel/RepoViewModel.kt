@@ -50,12 +50,12 @@ class RepoViewModel @Inject constructor(
     private val pagingPointerRequest: PagingPointerRequest,
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
-    private val firebaseUtils: FirebaseUtils
+    private val firebaseUtils: FirebaseUtils,
 ) : ViewModel() {
 
     private val actions = MutableSharedFlow<RepoActions>()
     val requestPagedList: Flow<PagingData<LocalPointerRequest>> = pagingPointerRequest.flow.cachedIn(
-        viewModelScope
+        viewModelScope,
     )
     private val messages = MutableSharedFlow<String>()
 
@@ -64,7 +64,7 @@ class RepoViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = RepoState.Empty
+        initialValue = RepoState.Empty,
     )
 
     init {
@@ -91,14 +91,14 @@ class RepoViewModel @Inject constructor(
     private fun loadRequests() {
         val baseQuery = firestore.requests().orderBy(
             DatabaseFields.FIELD_TIMESTAMP,
-            Query.Direction.DESCENDING
+            Query.Direction.DESCENDING,
         )
         var query = baseQuery.whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
         if (firebaseUtils.networkUser?.properties?.userRole == UserRole.ADMIN) {
             query = baseQuery
         }
         pagingPointerRequest(
-            PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG)
+            PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG),
         )
     }
 
@@ -109,7 +109,7 @@ class RepoViewModel @Inject constructor(
     companion object {
         private val PAGING_CONFIG = PagingConfig(
             pageSize = 20,
-            initialLoadSize = 20
+            initialLoadSize = 20,
         )
     }
 }

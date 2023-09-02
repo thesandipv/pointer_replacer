@@ -33,7 +33,6 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -63,6 +62,7 @@ import java.io.IOException
 import javax.inject.Inject
 import org.jetbrains.anko.find
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class NewPointerPost : Fragment() {
@@ -184,7 +184,7 @@ class NewPointerPost : Fragment() {
     private fun createAndLoadRewardedAd() {
         val adUnitId = whenBuildIs(
             debug = getString(CommonR.string.ad_rewarded_1_id),
-            release = remoteConfig.getString("ad_rewarded_1_id")
+            release = remoteConfig.getString("ad_rewarded_1_id"),
         )
         val adLoadCallback = object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
@@ -214,7 +214,7 @@ class NewPointerPost : Fragment() {
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 Glide.with(
-                    this
+                    this,
                 ).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
                 binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
             }
@@ -222,20 +222,24 @@ class NewPointerPost : Fragment() {
 
     private fun upload(file: File) {
         val dialog = requireContext().showStaticProgressDialog(
-            getString(CommonR.string.text_progress_init)
+            getString(CommonR.string.text_progress_init),
         )
 
         val storageRef = storage.reference
         val fileUri = Uri.fromFile(file)
         val fileRef = storageRef.child(
-            "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}"
+            "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}",
         )
         val uploadTask = fileRef.putFile(fileUri)
 
         uploadTask.addOnProgressListener {
             val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
             dialog.updateProgressText(
-                String.format("%s..%s", getString(CommonR.string.text_progress_uploading), progress)
+                String.format(
+                    "%s..%s",
+                    getString(CommonR.string.text_progress_uploading),
+                    progress,
+                ),
             )
         }.addOnCompleteListener { task ->
             val map = hashMapOf<String, String>()
@@ -247,15 +251,15 @@ class NewPointerPost : Fragment() {
                     filename = fileUri.lastPathSegment!!,
                     description = pointerDescription,
                     uploadedBy = map,
-                    time = Timestamp.now().toDate()
+                    time = Timestamp.now().toDate(),
                 )
                 Timber.tag(TAG).d("upload: %s", pointer)
                 db.collection(
-                    DatabaseFields.COLLECTION_POINTERS
+                    DatabaseFields.COLLECTION_POINTERS,
                 ).add(pointer).addOnSuccessListener {
                     requireActivity().apply {
                         sharedViewModel.displayMsg(
-                            getString(CommonR.string.msg_pointer_upload_success)
+                            getString(CommonR.string.msg_pointer_upload_success),
                         )
                         dialog.dismiss()
                         findNavController().navigateUp()

@@ -44,6 +44,6 @@ fun Theme(context: Context, content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = colorScheme,
         typography = MaterialTheme.typography,
-        content = content
+        content = content,
     )
 }

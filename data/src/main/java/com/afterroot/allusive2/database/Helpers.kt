@@ -22,7 +22,7 @@ suspend fun MyDatabase.addLocalPointer(fileName: String) {
         uploader_name = "You (Local)",
         uploader_id = "N/A",
         pointer_name = fileName,
-        pointer_desc = "N/A"
+        pointer_desc = "N/A",
     )
     addRoomPointer(pointer)
 }

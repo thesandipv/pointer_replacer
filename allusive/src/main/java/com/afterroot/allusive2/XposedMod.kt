@@ -45,7 +45,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
 
     @Throws(Throwable::class)
     override fun handleInitPackageResources(
-        resparam: XC_InitPackageResources.InitPackageResourcesParam
+        resparam: XC_InitPackageResources.InitPackageResourcesParam,
     ) {
         XResources.setSystemWideReplacement(
             "android",
@@ -58,7 +58,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
                     // XposedBridge.log(Throwable())
                     return drawable
                 }
-            }
+            },
         )
 
         XResources.setSystemWideReplacement(
@@ -72,7 +72,7 @@ class XposedMod : IXposedHookZygoteInit, IXposedHookInitPackageResources {
                     // XposedBridge.log(Throwable())
                     return mousePointer
                 }
-            }
+            },
         )
     }
 }

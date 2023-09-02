@@ -32,11 +32,11 @@ class PagingPointerRequest @Inject constructor() : PagingInteractor<PagingPointe
         val query: Query,
         val firestore: FirebaseFirestore,
         val cached: Boolean = false,
-        override val pagingConfig: PagingConfig
+        override val pagingConfig: PagingConfig,
     ) : Parameters<LocalPointerRequest>
 
     override fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(
-        config = params.pagingConfig
+        config = params.pagingConfig,
     ) {
         PointerRequestsPagingSource(params.query, params.firestore)
     }.flow

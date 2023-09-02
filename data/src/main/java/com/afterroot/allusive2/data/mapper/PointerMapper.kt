@@ -31,7 +31,7 @@ fun Pointer.toRoomPointer(): RoomPointer {
         pointer_desc = description,
         pointer_name = name,
         uploader_id = uploaderId,
-        uploader_name = uploaderName
+        uploader_name = uploaderName,
     )
 }
 

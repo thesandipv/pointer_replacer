@@ -41,7 +41,6 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.databinding.FragmentCustomizePointerBinding
 import com.afterroot.allusive2.getMinPointerSize
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.visible
 import com.bumptech.glide.Glide
@@ -51,6 +50,7 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import org.jetbrains.anko.find
+import com.afterroot.allusive2.resources.R as CommonR
 
 /**
  * Created by Sandip on 04-10-2017.
@@ -116,7 +116,7 @@ class CustomizeFragment : Fragment() {
                     }
                 }
                 requireActivity().find<FragmentContainerView>(
-                    R.id.fragment_repo_nav
+                    R.id.fragment_repo_nav,
                 ).findNavController().navigateUp()
             }
             icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
@@ -191,7 +191,7 @@ class CustomizeFragment : Fragment() {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
                     newProgress: Int,
-                    fromUser: Boolean
+                    fromUser: Boolean,
                 ) {
                     currentSize = minSize + newProgress
                     textSize.text =
@@ -212,7 +212,7 @@ class CustomizeFragment : Fragment() {
                 override fun onProgressChanged(
                     seekBar: SeekBar,
                     newPadding: Int,
-                    fromUser: Boolean
+                    fromUser: Boolean,
                 ) {
                     textPadding.text =
                         String.format(Locale.US, formatPadding, getString(CommonR.string.text_padding), newPadding)
@@ -293,7 +293,7 @@ class CustomizeFragment : Fragment() {
                         ColorPalette.PrimarySub,
                         allowCustomArgb = true,
                         showAlphaSelector = true,
-                        initialSelection = tmpColor
+                        initialSelection = tmpColor,
                     ) { _, selectedColor ->
                         imageCustomizePointer.setColorFilter(selectedColor)
                         this@CustomizeFragment.selectedColor = selectedColor

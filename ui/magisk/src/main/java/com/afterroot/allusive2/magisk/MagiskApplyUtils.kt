@@ -18,7 +18,6 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.allusive2.resources.R as CommonR
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import java.io.File
@@ -29,6 +28,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Properties
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 const val FRAMEWORK_APK = "/system/framework/framework-res.apk"
 fun frameworkCopyApkPath(context: Context) = "${context.externalCacheDir?.path}/framework.apk"
@@ -37,13 +37,13 @@ fun pointerSavePath(context: Context) = "${context.externalCacheDir?.path}/point
 fun repackedFrameworkPath(context: Context) = "${context.externalCacheDir?.path}/repacked.apk"
 fun repackedMagiskModulePath(
     context: Context,
-    name: String
+    name: String,
 ) = "${context.getExternalFilesDir(null)?.path}/$name"
 fun magiskEmptyModuleZipPath(
-    context: Context
+    context: Context,
 ) = "${context.externalCacheDir?.path}/empty-module.zip"
 fun magiskEmptyModuleExtractPath(
-    context: Context
+    context: Context,
 ) = "${context.externalCacheDir?.path}/empty-module"
 fun rroApkDownloadPath(context: Context) = "${context.externalCacheDir?.path}/rros"
 const val POINTER_XHDPI = "/res/drawable-xhdpi-v4/pointer_spot_touch.png"
@@ -72,7 +72,7 @@ fun filesToReplace(context: Context): List<File> {
     val paths = listOf(
         "$targetPath$POINTER_HDPI",
         "$targetPath$POINTER_MDPI",
-        "$targetPath$POINTER_XHDPI"
+        "$targetPath$POINTER_XHDPI",
     )
     paths.forEach {
         val file = File(it)
@@ -167,7 +167,7 @@ fun copyRepackedFrameworkResApk(context: Context): File {
     val repacked = File(repackedFrameworkPath(context))
     return repacked.copyTo(
         target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"),
-        overwrite = true
+        overwrite = true,
     )
 }
 
@@ -213,7 +213,7 @@ fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean)
         message(
             text = "Applying Pointer by Creating RRO Layer is completely experimental. " +
                 "It's is not guaranteed that it'll work for you. By clicking Install, you understand that your device may stuck in bootloop. " +
-                "Also you are aware about methods of disabling magisk."
+                "Also you are aware about methods of disabling magisk.",
         )
         positiveButton(text = "Install") {
             onResponse(true)

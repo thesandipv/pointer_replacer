@@ -111,7 +111,7 @@ class MagiskRROFragment : Fragment() {
             visible(false)
             setOnClickListener {
                 val intent = requireContext().packageManager.getLaunchIntentForPackage(
-                    MAGISK_PACKAGE
+                    MAGISK_PACKAGE,
                 )
                 if (intent != null) {
                     startActivity(intent)
@@ -119,7 +119,7 @@ class MagiskRROFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         "Magisk Manager not Installed",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
             }
@@ -134,7 +134,7 @@ class MagiskRROFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Magisk module exist")
                 .setMessage(
-                    """- Magisk module already exist at: ${selectedPointerModule.path}""".trimMargin()
+                    """- Magisk module already exist at: ${selectedPointerModule.path}""".trimMargin(),
                 )
                 .setPositiveButton("OK") { _, _ ->
                     // setupInstallButton(selectedPointerModule.path, false)
@@ -199,7 +199,7 @@ class MagiskRROFragment : Fragment() {
                         },
                         onElementAdd = { element ->
                             element?.let { it -> updateProgress(it) }
-                        }
+                        },
                     )
                 }
             }
@@ -280,7 +280,7 @@ class MagiskRROFragment : Fragment() {
 
             // Delete placeholder file if exists
             File(
-                "${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder"
+                "${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder",
             ).apply {
                 if (exists() && delete()) {
                     withContext(Dispatchers.Main) { updateProgress("- Deleted Placeholder file") }
@@ -310,7 +310,7 @@ class MagiskRROFragment : Fragment() {
         withContext(Dispatchers.IO) {
             copyMagiskRROZip(
                 context = requireContext(),
-                to = magiskRROModuleZipPath(requireContext())
+                to = magiskRROModuleZipPath(requireContext()),
             )
         }
         withContext(Dispatchers.Main) {

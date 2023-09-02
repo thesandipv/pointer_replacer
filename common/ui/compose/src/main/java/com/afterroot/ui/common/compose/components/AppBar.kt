@@ -38,13 +38,13 @@ fun CommonAppBar(
     modifier: Modifier = Modifier,
     withTitle: String,
     navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = withTitle) },
         navigationIcon = navigationIcon,
-        actions = actions
+        actions = actions,
     )
     /* TopAppBar(modifier = modifier) {
          Box(modifier = Modifier.fillMaxWidth()) {

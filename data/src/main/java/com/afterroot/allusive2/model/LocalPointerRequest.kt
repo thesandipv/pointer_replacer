@@ -49,5 +49,5 @@ data class LocalPointerRequest(
      * If true, request is closed.
      */
     var isRequestClosed: Boolean = false,
-    var pointerName: String? = null
+    var pointerName: String? = null,
 )

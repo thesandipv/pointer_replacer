@@ -26,5 +26,5 @@ data class LocalUser(
     var uid: String = "",
     var fcmId: String = "",
     var userName: String? = null,
-    var properties: UserProperties = UserProperties()
+    var properties: UserProperties = UserProperties(),
 ) : Serializable

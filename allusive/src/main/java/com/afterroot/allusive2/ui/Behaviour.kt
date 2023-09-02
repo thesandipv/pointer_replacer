@@ -34,7 +34,7 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
         directTargetChild: View,
         target: View,
         axes: Int,
-        type: Int
+        type: Int,
     ): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
     }
@@ -46,7 +46,7 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
         dx: Int,
         dy: Int,
         consumed: IntArray,
-        type: Int
+        type: Int,
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
         child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
@@ -80,7 +80,7 @@ class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
         directTargetChild: View,
         target: View,
         axes: Int,
-        type: Int
+        type: Int,
     ): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL ||
             super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
@@ -95,7 +95,7 @@ class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
         dxUnconsumed: Int,
         dyUnconsumed: Int,
         type: Int,
-        consumed: IntArray
+        consumed: IntArray,
     ) {
         super.onNestedScroll(
             coordinatorLayout,
@@ -106,7 +106,7 @@ class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
             dxUnconsumed,
             dyUnconsumed,
             type,
-            consumed
+            consumed,
         )
         val fab = child as ExtendedFloatingActionButton
 

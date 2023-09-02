@@ -44,7 +44,6 @@ import com.afterroot.allusive2.data.mapper.toNetworkUser
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.utils.whenBuildIs
@@ -83,6 +82,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.email
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -129,12 +129,12 @@ class MainActivity : AppCompatActivity() {
                         email(
                             email = "afterhasroot@gmail.com",
                             subject = "Pointer Replacer Feedback",
-                            text = feedbackBody
+                            text = feedbackBody,
                         )
                         true
                     }
                     else -> menuItem.onNavDestinationSelected(
-                        findNavController(R.id.fragment_repo_nav)
+                        findNavController(R.id.fragment_repo_nav),
                     )
                 }
             }
@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity() {
         }
         val interstitialAdUnitId: String = whenBuildIs(
             debug = getString(CommonR.string.ad_interstitial_1_id),
-            release = remoteConfig.getString("ad_interstitial_1_id")
+            release = remoteConfig.getString("ad_interstitial_1_id"),
         )
 
         InterstitialAd.load(
@@ -230,7 +230,7 @@ class MainActivity : AppCompatActivity() {
                     sharedViewModel.submitAction(HomeActions.OnIntAdDismiss)
                     super.onAdFailedToLoad(loadAdError)
                 }
-            }
+            },
         )
     }
 
@@ -259,7 +259,7 @@ class MainActivity : AppCompatActivity() {
             this,
             EventObserver {
                 findViewById<CoordinatorLayout>(R.id.container).snackbar(it).anchorView = navigation
-            }
+            },
         )
     }
 
@@ -304,9 +304,9 @@ class MainActivity : AppCompatActivity() {
                     state = it,
                     positive = { dialog?.dismiss() },
                     negative = { finish() },
-                    isShowHide = true
+                    isShowHide = true,
                 )
-            }
+            },
         )
     }
 
@@ -326,7 +326,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val curUser = firebaseUtils.firebaseUser!!
             val userRef = firestore.collection(
-                DatabaseFields.COLLECTION_USERS
+                DatabaseFields.COLLECTION_USERS,
             ).document(curUser.uid)
             firebaseMessaging.token
                 .addOnCompleteListener(
@@ -339,20 +339,20 @@ class MainActivity : AppCompatActivity() {
                             if (getUserTask.isSuccessful) {
                                 if (!getUserTask.result!!.exists()) {
                                     sharedViewModel.displayMsg(
-                                        "User not available. Creating User.."
+                                        "User not available. Creating User..",
                                     )
                                     userRef.set(
                                         NetworkUser(
                                             name = curUser.displayName,
                                             email = curUser.email,
                                             uid = curUser.uid,
-                                            fcmId = tokenTask.result
-                                        )
+                                            fcmId = tokenTask.result,
+                                        ),
                                     ).addOnCompleteListener { setUserTask ->
                                         if (!setUserTask.isSuccessful) {
                                             Timber.e(
                                                 setUserTask.exception,
-                                                "addUserInfoInDB: Can't create firebaseUser"
+                                                "addUserInfoInDB: Can't create firebaseUser",
                                             )
                                         }
                                     }
@@ -364,8 +364,8 @@ class MainActivity : AppCompatActivity() {
                                         hashMapOf(
                                             DatabaseFields.FIELD_VERSION to 1,
                                             DatabaseFields.FIELD_USERNAME to null,
-                                            DatabaseFields.FIELD_USER_PROPERTIES to UserProperties()
-                                        )
+                                            DatabaseFields.FIELD_USER_PROPERTIES to UserProperties(),
+                                        ),
                                     )
                                 } // Add Future Migrations Here
                                 userRef.get(Source.CACHE).addOnSuccessListener {
@@ -374,11 +374,11 @@ class MainActivity : AppCompatActivity() {
                             } else {
                                 Timber.e(
                                     getUserTask.exception,
-                                    "addUserInfoInDB: ${getUserTask.exception?.message}"
+                                    "addUserInfoInDB: ${getUserTask.exception?.message}",
                                 )
                             }
                         }
-                    }
+                    },
                 )
         } catch (e: Exception) {
             Timber.e(e, "addUserInfoInDB: ${e.message}")
@@ -522,20 +522,20 @@ class MainActivity : AppCompatActivity() {
                 if (versionJson.isBlank()) return@observe
                 val versionChecker = VersionCheck(
                     gson.fromJson(versionJson, VersionInfo::class.java)
-                        .copy(currentVersion = BuildConfig.VERSION_CODE)
+                        .copy(currentVersion = BuildConfig.VERSION_CODE),
                 )
                 versionChecker.onVersionDisabled {
                     AlertDialog.Builder(this).apply {
                         setTitle("Version Obsolete")
                         setMessage(
-                            "This version is obsolete. You have to update to latest version."
+                            "This version is obsolete. You have to update to latest version.",
                         )
                         setPositiveButton("Update") { _, _ ->
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse(
-                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
-                                )
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                ),
                             )
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)
@@ -554,8 +554,8 @@ class MainActivity : AppCompatActivity() {
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse(
-                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
-                                )
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                                ),
                             )
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)

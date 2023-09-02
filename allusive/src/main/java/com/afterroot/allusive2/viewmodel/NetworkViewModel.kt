@@ -23,14 +23,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NetworkViewModel @Inject constructor(
-    private val networkStateMonitor: NetworkStateMonitor
+    private val networkStateMonitor: NetworkStateMonitor,
 ) : ViewModel() {
 
     fun monitor(
         lifecycleOwner: LifecycleOwner,
         doInitially: (() -> Unit)? = null,
         onConnect: (state: NetworkState) -> Unit,
-        onDisconnect: ((state: NetworkState) -> Unit)? = null
+        onDisconnect: ((state: NetworkState) -> Unit)? = null,
     ) {
         if (doInitially == null) {
             onConnect(NetworkState.CONNECTED) // Run [doWhenConnected] id [doInitially] is null

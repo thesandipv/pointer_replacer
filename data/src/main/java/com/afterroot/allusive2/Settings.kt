@@ -18,11 +18,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.afterroot.allusive2.database.DatabaseFields
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getPrefs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 class Settings @Inject constructor(@ApplicationContext val context: Context) {
 
@@ -104,7 +104,7 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
     var pointerSize
         get() = getInt(
             context.getString(CommonR.string.key_pointerSize),
-            context.getMinPointerSize()
+            context.getMinPointerSize(),
         )
         set(value) = putInt(context.getString(CommonR.string.key_pointerSize), value)
 
@@ -188,7 +188,7 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
     val theme: String?
         get() = getString(
             Constants.PREF_KEY_THEME,
-            context.getString(CommonR.string.theme_device_default)
+            context.getString(CommonR.string.theme_device_default),
         )
 
     var applyMethod

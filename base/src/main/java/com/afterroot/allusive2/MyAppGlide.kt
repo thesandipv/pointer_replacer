@@ -32,7 +32,7 @@ class MyAppGlide : AppGlideModule() {
         registry.append(
             StorageReference::class.java,
             InputStream::class.java,
-            FirebaseImageLoader.Factory()
+            FirebaseImageLoader.Factory(),
         )
     }
 }

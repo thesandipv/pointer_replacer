@@ -43,7 +43,6 @@ import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.showStaticProgressDialog
@@ -68,6 +67,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @SuppressLint("ValidFragment")
 @AndroidEntryPoint
@@ -146,7 +146,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     getString(CommonR.string.str_format_version),
                     BuildConfig.VERSION_NAME,
                     BuildConfig.VERSION_CODE,
-                    BuildConfig.COMMIT_ID
+                    BuildConfig.COMMIT_ID,
                 )
         }
     }
@@ -163,24 +163,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun setAppThemePref() {
         findPreference<ListPreference>(
-            "key_app_theme"
+            "key_app_theme",
         )?.setOnPreferenceChangeListener { _, newValue ->
             AppCompatDelegate.setDefaultNightMode(
                 when (newValue) {
                     getString(
-                        CommonR.string.theme_device_default
-                    )
+                        CommonR.string.theme_device_default,
+                    ),
                     -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 
                     getString(
-                        CommonR.string.theme_battery
-                    )
+                        CommonR.string.theme_battery,
+                    ),
                     -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 
                     getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
                     getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                }
+                },
             )
             return@setOnPreferenceChangeListener true
         }
@@ -197,7 +197,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         hint = getString(CommonR.string.input_hint_max_padding_size),
                         prefill = settings.maxPointerPadding.toString(),
                         allowEmpty = false, maxLength = 3,
-                        inputType = InputType.TYPE_CLASS_NUMBER
+                        inputType = InputType.TYPE_CLASS_NUMBER,
                     ) { _, input ->
                         if (input.toString().toInt() > 0) {
                             settings.maxPointerPadding = input.toString().toInt()
@@ -225,14 +225,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     input(
                         hintRes = CommonR.string.text_max_pointer_size,
                         prefill = settings.maxPointerSize.toString(),
-                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false
+                        inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 3, allowEmpty = false,
                     ) { _, input ->
                         if (input.toString().toInt() > context.getMinPointerSize()) {
                             settings.maxPointerSize = input.toString().toInt()
                             this@apply.summary = input
                         } else {
                             sharedViewModel.displayMsg(
-                                String.format(getString(CommonR.string.str_format_value_error), context.getMinPointerSize())
+                                String.format(getString(CommonR.string.str_format_value_error), context.getMinPointerSize()),
                             )
                         }
                     }
@@ -251,7 +251,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 Bundle().apply {
                     putString(
                         FirebaseAnalytics.Param.ITEM_NAME,
-                        getString(CommonR.string.key_rate_on_g_play)
+                        getString(CommonR.string.key_rate_on_g_play),
                     )
                     FirebaseAnalytics.getInstance(requireContext()).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
                 }
@@ -289,10 +289,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         lifecycleScope.launch {
             val skuModel = Gson().fromJson(
                 firebaseRemoteConfig.getString("pr_sku_list"),
-                SkuModel::class.java
+                SkuModel::class.java,
             )
             val params = SkuDetailsParams.newBuilder().setSkusList(
-                skuModel.sku
+                skuModel.sku,
             ).setType(BillingClient.SkuType.INAPP).build()
 
             val queryResult = billingClient.querySkuDetails(params)
@@ -313,12 +313,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 delay(100)
                 loadingDialog.dismiss()
                 MaterialAlertDialogBuilder(
-                    requireContext()
+                    requireContext(),
                 ).setTitle(getString(CommonR.string.pref_title_donate_dev))
                     .setAdapter(adapter) { _, which ->
                         val billingFlowParams =
                             BillingFlowParams.newBuilder().setSkuDetails(
-                                skuDetailsList[which]
+                                skuDetailsList[which],
                             ).build()
                         billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
                     }.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->

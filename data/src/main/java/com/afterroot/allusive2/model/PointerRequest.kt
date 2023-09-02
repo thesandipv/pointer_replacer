@@ -48,5 +48,5 @@ data class PointerRequest(
     /**
      * If true, request is closed.
      */
-    @field:JvmField var isRequestClosed: Boolean = false
+    @field:JvmField var isRequestClosed: Boolean = false,
 )

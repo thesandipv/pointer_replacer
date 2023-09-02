@@ -45,7 +45,7 @@ data class AssistChipContainer(
         0.dp // md.sys.elevation.level0
     },
     val OutlineSize: Dp = if (elevated) 0.dp else 1.dp,
-    val OutlineColor: Color = Palette.NeutralVariant60 // md.sys.color.outline
+    val OutlineColor: Color = Palette.NeutralVariant60, // md.sys.color.outline
 
     // if Elevated tokens
     // Color = md.sys.color.surface

@@ -29,7 +29,7 @@ data class RoomPointer(
     @ColumnInfo val file_name: String?,
     @ColumnInfo val pointer_desc: String?,
     @ColumnInfo val uploader_id: String,
-    @ColumnInfo val uploader_name: String
+    @ColumnInfo val uploader_name: String,
 ) {
     companion object {
         const val TABLE_NAME = "pointers"
