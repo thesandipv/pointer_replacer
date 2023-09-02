@@ -15,7 +15,7 @@ jobs:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
 
-      - name: Set up JDK 11
+      - name: Set up JDK
         uses: actions/setup-java@v3.12.0
         with:
           distribution: 'zulu'
