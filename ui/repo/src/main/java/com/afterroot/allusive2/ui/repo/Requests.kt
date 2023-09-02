@@ -50,11 +50,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.model.LocalPointerRequest
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.viewmodel.RepoViewModel
 import com.afterroot.ui.common.compose.theme.Palette
 import com.afterroot.ui.common.compose.utils.rememberFlowWithLifecycle
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @Composable
 fun Requests() {
@@ -64,7 +64,7 @@ fun Requests() {
 @Composable
 internal fun Requests(viewModel: RepoViewModel) {
     val requestsList = rememberFlowWithLifecycle(
-        flow = viewModel.requestPagedList
+        flow = viewModel.requestPagedList,
     ).collectAsLazyPagingItems()
     Requests(viewModel = viewModel, requestsList = requestsList) { action ->
         when (action) {
@@ -77,16 +77,16 @@ internal fun Requests(viewModel: RepoViewModel) {
 fun Requests(
     viewModel: RepoViewModel,
     requestsList: LazyPagingItems<LocalPointerRequest>,
-    actions: (RepoActions) -> Unit
+    actions: (RepoActions) -> Unit,
 ) {
     val state by rememberFlowWithLifecycle(
-        flow = viewModel.state
+        flow = viewModel.state,
     ).collectAsState(initial = RepoState.Empty)
     val isLoading = requestsList.loadState.refresh == LoadState.Loading
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibility(visible = isLoading) {
             LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
         AnimatedVisibility(visible = !isLoading) {
@@ -100,11 +100,11 @@ fun Requests(
 @Composable
 fun RequestsList(
     list: LazyPagingItems<LocalPointerRequest>,
-    onClick: (LocalPointerRequest) -> Unit
+    onClick: (LocalPointerRequest) -> Unit,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         items(count = list.itemCount, key = {
             list.itemKey { item ->
@@ -131,7 +131,7 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .then(modifier)
+            .then(modifier),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -140,19 +140,19 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
                 .fillMaxWidth()
                 .padding(
                     horizontal = dimensionResource(id = CommonR.dimen.activity_horizontal_margin),
-                    vertical = 8.dp
-                )
+                    vertical = 8.dp,
+                ),
         ) {
             Column(
-                modifier = Modifier
+                modifier = Modifier,
             ) {
                 Text(
                     text = pointerRequest.pointerName.toString(),
-                    modifier = Modifier
+                    modifier = Modifier,
                 )
                 Text(
                     text = pointerRequest.fileName.toString(),
-                    modifier = Modifier
+                    modifier = Modifier,
                 )
             }
             Column {
@@ -160,7 +160,7 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
                     Text(
                         text = "CLOSED",
                         color = Palette.Green50,
-                        modifier = Modifier
+                        modifier = Modifier,
                     )
                 } else {
                     Text(text = "OPEN", color = Palette.Red50, modifier = Modifier)
@@ -174,9 +174,9 @@ fun RequestListItem(modifier: Modifier = Modifier, pointerRequest: LocalPointerR
 fun PointerIcon(url: String) {
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(url).crossfade(true).build()
+            ImageRequest.Builder(LocalContext.current).data(url).crossfade(true).build(),
         ),
-        contentDescription = "Pointer Icon"
+        contentDescription = "Pointer Icon",
     )
 }
 
@@ -186,8 +186,8 @@ val placeholderRequests = buildList {
             LocalPointerRequest(
                 pointerName = Constants.PLACEHOLDER_3,
                 fileName = Constants.PLACEHOLDER_3,
-                isRequestClosed = false
-            )
+                isRequestClosed = false,
+            ),
         )
     }
 }
@@ -200,15 +200,15 @@ fun PreviewRequestListItem() {
             pointerRequest = LocalPointerRequest(
                 fileName = "test.png",
                 pointerName = "Pointer Name",
-                isRequestClosed = true
-            )
+                isRequestClosed = true,
+            ),
         )
         RequestListItem(
             pointerRequest = LocalPointerRequest(
                 pointerName = Constants.PLACEHOLDER_3,
                 fileName = Constants.PLACEHOLDER_3,
-                isRequestClosed = false
-            )
+                isRequestClosed = false,
+            ),
         )
     }
 }
@@ -222,15 +222,15 @@ fun PreviewRequestListItemDark() {
                 pointerRequest = LocalPointerRequest(
                     fileName = "test.png",
                     pointerName = "Pointer Name",
-                    isRequestClosed = true
-                )
+                    isRequestClosed = true,
+                ),
             )
             RequestListItem(
                 pointerRequest = LocalPointerRequest(
                     pointerName = Constants.PLACEHOLDER_3,
                     fileName = Constants.PLACEHOLDER_3,
-                    isRequestClosed = false
-                )
+                    isRequestClosed = false,
+                ),
             )
         }
     }

@@ -24,7 +24,6 @@ import androidx.fragment.app.activityViewModels
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentEditProfileBinding
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -36,6 +35,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class EditProfileFragment : Fragment() {
@@ -74,7 +74,7 @@ class EditProfileFragment : Fragment() {
                         user.updateProfile(request).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 sharedViewModel.displayMsg(
-                                    getString(CommonR.string.msg_profile_updated)
+                                    getString(CommonR.string.msg_profile_updated),
                                 )
                                 db.collection(DatabaseFields.COLLECTION_USERS)
                                     .document(user.uid)
@@ -87,7 +87,7 @@ class EditProfileFragment : Fragment() {
                 }
                 icon = requireContext().getDrawableExt(
                     CommonR.drawable.ic_action_save,
-                    getMaterialColor(com.google.android.material.R.attr.colorOnSecondary)
+                    getMaterialColor(com.google.android.material.R.attr.colorOnSecondary),
                 )
             }
         } else {

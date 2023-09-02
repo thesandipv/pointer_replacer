@@ -61,8 +61,6 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
-import com.afterroot.allusive2.repo.R as RepoR
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -73,7 +71,6 @@ import com.afterroot.utils.getMaterialColor
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
-import com.google.android.material.R as MaterialR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -93,6 +90,9 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.jetbrains.anko.doFromSdk
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import com.afterroot.allusive2.repo.R as RepoR
+import com.afterroot.allusive2.resources.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @AndroidEntryPoint
 class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
@@ -128,7 +128,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             },
             onDisconnect = {
                 onNetworkChange(false)
-            }
+            },
         )
     }
 
@@ -161,7 +161,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         }
                     }
                 },
-                viewLifecycleOwner
+                viewLifecycleOwner,
             )
         }
     }
@@ -179,7 +179,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 show()
                 setOnClickListener {
                     requireActivity().findNavController(
-                        R.id.fragment_repo_nav
+                        R.id.fragment_repo_nav,
                     ).navigate(R.id.repo_to_new_pointer)
                 }
                 icon = requireContext().getDrawableExt(CommonR.drawable.ic_add)
@@ -199,7 +199,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                 setBackgroundColor(getMaterialColor(MaterialR.attr.colorSurfaceVariant))
                 setColorSchemeColors(
                     getMaterialColor(MaterialR.attr.colorPrimary),
-                    getMaterialColor(MaterialR.attr.colorSecondary)
+                    getMaterialColor(MaterialR.attr.colorSecondary),
                 )
             }
         }
@@ -332,7 +332,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         val storageReference = storage.reference
                             .child("${DatabaseFields.COLLECTION_POINTERS}/${pointer.filename}")
                         val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(
-                            true
+                            true,
                         ).build()
                         background = context.getDrawableExt(CommonR.drawable.transparent_grid)
                         Glide.with(context)
@@ -369,10 +369,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                         if (this@PointersRepoFragment.findNavController().currentDestination?.id == R.id.repoFragment) {
                                             val directions = PointersRepoFragmentDirections.repoToRroInstall(
                                                 pointer.docId.toString(),
-                                                pointer.filename.toString()
+                                                pointer.filename.toString(),
                                             )
                                             this@PointersRepoFragment.findNavController().navigate(
-                                                directions
+                                                directions,
                                             )
                                         }
                                         dialog.dismiss()
@@ -381,7 +381,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                             } else {
                                 text = getString(CommonR.string.text_request_rro)
                                 firestore.pointers().document(
-                                    pointer.docId.toString()
+                                    pointer.docId.toString(),
                                 ).get(Source.CACHE)
                                     .addOnSuccessListener { localDoc ->
                                         val localPointer = localDoc.toPointer()
@@ -389,7 +389,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                     }.addOnFailureListener {
                                         Timber.e(it, "showPointerInfoDialog: ${it.message}")
                                         firestore.pointers().document(
-                                            pointer.docId.toString()
+                                            pointer.docId.toString(),
                                         ).get()
                                             .addOnSuccessListener { serverDoc ->
                                                 val localPointer = serverDoc.toPointer()
@@ -405,10 +405,10 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                                             val request = PointerRequest(
                                                 pointer.filename,
                                                 firebaseUtils.uid,
-                                                documentId = pointer.docId
+                                                documentId = pointer.docId,
                                             )
                                             firestore.requests().document(
-                                                pointer.docId.toString()
+                                                pointer.docId.toString(),
                                             ).set(request)
                                                 .addOnSuccessListener {
                                                     isEnabled = false
@@ -426,7 +426,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     val downloads = resources.getQuantityString(
                         CommonR.plurals.str_format_download_count,
                         pointer.downloads,
-                        pointer.downloads
+                        pointer.downloads,
                     )
                     val date = SimpleDateFormat.getDateInstance().format(pointer.time)
                     binding.downloadsText =
@@ -439,7 +439,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         getString(
                             CommonR.string.format_text_info_pointer_id,
                             pointer.docId.toString(),
-                            pointer.filename?.substringBeforeLast(".")
+                            pointer.filename?.substringBeforeLast("."),
                         )
                 }
 
@@ -453,8 +453,8 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                         setImageDrawable(
                             context.getDrawableExt(
                                 CommonR.drawable.ic_removed,
-                                getMaterialColor(MaterialR.attr.colorError)
-                            )
+                                getMaterialColor(MaterialR.attr.colorError),
+                            ),
                         )
                     }
                     binding.apply {
@@ -470,7 +470,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
 
     private fun downloadPointer(pointer: Pointer) {
         val dialog = requireContext().showStaticProgressDialog(
-            getString(CommonR.string.text_progress_downloading)
+            getString(CommonR.string.text_progress_downloading),
         )
         val ref = storage.pointers().child(pointer.filename!!)
         ref.getFile(File("$targetPath${pointer.filename}"))
@@ -511,13 +511,13 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
                     lifecycleScope.launch {
                         val snapshot = firestore.pointers().whereEqualTo(
                             DatabaseFields.FIELD_FILENAME,
-                            pointer.filename
+                            pointer.filename,
                         )
                             .get(Source.CACHE).await()
                         val docId = snapshot.documents.first().id
                         val updates = mapOf(
                             Pair(DatabaseFields.FIELD_NAME, newTitle),
-                            Pair(DatabaseFields.FIELD_DESC, newDesc)
+                            Pair(DatabaseFields.FIELD_DESC, newDesc),
                         )
                         firestore.pointers().document(docId).update(updates).addOnCompleteListener {
                             refreshData()
@@ -566,7 +566,7 @@ class PointersRepoFragment : Fragment(), ItemSelectedCallback<Pointer> {
             val list =
                 mutableListOf(
                     getString(CommonR.string.text_edit),
-                    getString(CommonR.string.text_delete)
+                    getString(CommonR.string.text_delete),
                 )
             MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 cornerRadius(16f)

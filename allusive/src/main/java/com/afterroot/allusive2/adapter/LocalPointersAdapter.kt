@@ -29,11 +29,11 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.repo.databinding.ItemPointerRepoBinding
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.utils.extensions.getDrawableExt
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.afterroot.allusive2.resources.R as CommonR
 
 /**
  * New list adapter for Pointer Choose screen.
@@ -42,7 +42,7 @@ class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPoint
     ListAdapter<RoomPointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<RoomPointer?>() {
         override fun areItemsTheSame(
             oldItem: RoomPointer,
-            newItem: RoomPointer
+            newItem: RoomPointer,
         ): Boolean = oldItem == newItem
 
         override fun areContentsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
@@ -53,7 +53,7 @@ class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPoint
         val binding = ItemPointerRepoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
-            false
+            false,
         )
         return PointerVH(binding, callbacks)
     }

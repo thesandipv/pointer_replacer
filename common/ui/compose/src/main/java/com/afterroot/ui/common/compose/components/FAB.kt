@@ -35,7 +35,7 @@ import com.afterroot.ui.common.compose.theme.fabShape
 @Composable
 fun FABAdd(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AnimatedFab { state, scale, alpha ->
         CommonFAB(
@@ -43,7 +43,7 @@ fun FABAdd(
             modifier = modifier
                 .alpha(alpha.value)
                 .scale(scale.value),
-            onClick = onClick
+            onClick = onClick,
         )
         state.value = FabState.Visible
     }
@@ -52,7 +52,7 @@ fun FABAdd(
 @Composable
 fun FABDone(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AnimatedFab { state, scale, alpha ->
         CommonFAB(
@@ -60,7 +60,7 @@ fun FABDone(
             modifier = modifier
                 .alpha(alpha.value)
                 .scale(scale.value),
-            onClick = onClick
+            onClick = onClick,
         )
         state.value = FabState.Visible
     }
@@ -69,7 +69,7 @@ fun FABDone(
 @Composable
 fun FABSave(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AnimatedFab { state, scale, alpha ->
         CommonFAB(
@@ -77,7 +77,7 @@ fun FABSave(
             modifier = modifier
                 .alpha(alpha.value)
                 .scale(scale.value),
-            onClick = onClick
+            onClick = onClick,
         )
         state.value = FabState.Visible
     }
@@ -86,7 +86,7 @@ fun FABSave(
 @Composable
 fun FABEdit(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AnimatedFab { state, scale, alpha ->
         CommonFAB(
@@ -94,7 +94,7 @@ fun FABEdit(
             modifier = modifier
                 .alpha(alpha.value)
                 .scale(scale.value),
-            onClick = onClick
+            onClick = onClick,
         )
         state.value = FabState.Visible
     }
@@ -104,13 +104,13 @@ fun FABEdit(
 internal fun CommonFAB(
     icon: ImageVector,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier,
         shape = fabShape,
-        contentColor = Color.Black
+        contentColor = Color.Black,
     ) {
         Icon(imageVector = icon, contentDescription = icon.name)
     }

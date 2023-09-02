@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -39,6 +38,7 @@ import javax.inject.Inject
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -59,13 +59,14 @@ class SplashActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
                 getString(
-                    CommonR.string.theme_device_default
-                ) -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    CommonR.string.theme_device_default,
+                ),
+                -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
                 getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
                 getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }
+            },
         )
         super.onCreate(savedInstanceState)
     }
@@ -138,14 +139,14 @@ class SplashActivity : AppCompatActivity() {
                 .setLogo(CommonR.drawable.ic_login_screen)
                 .setTosAndPrivacyPolicyUrls(
                     getString(CommonR.string.url_privacy_policy),
-                    getString(CommonR.string.url_privacy_policy)
+                    getString(CommonR.string.url_privacy_policy),
                 )
                 .setAvailableProviders(
                     listOf(
                         AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
-                        AuthUI.IdpConfig.GoogleBuilder().build()
-                    )
-                ).build()
+                        AuthUI.IdpConfig.GoogleBuilder().build(),
+                    ),
+                ).build(),
         )
     }
 
@@ -165,7 +166,7 @@ class SplashActivity : AppCompatActivity() {
                 dialog = showNetworkDialog(state = it, positive = {
                     setUpNetworkObserver()
                 }, negative = { finish() })
-            }
+            },
         )
     }
 }

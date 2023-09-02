@@ -37,7 +37,7 @@ fun PointerRequest.toLocalPointerRequest() = LocalPointerRequest(
     force,
     exclude,
     documentId,
-    isRequestClosed
+    isRequestClosed,
 )
 
 suspend fun List<PointerRequest?>.toLocalPointerRequest(firestore: FirebaseFirestore): List<LocalPointerRequest> {
@@ -57,7 +57,7 @@ suspend fun List<PointerRequest?>.toLocalPointerRequest(firestore: FirebaseFires
             if (result.isSuccess) {
                 result.getOrNull()?.toPointer().let {
                     val transformed = pointerRequest.toLocalPointerRequest().copy(
-                        pointerName = it?.name
+                        pointerName = it?.name,
                     )
                     list.add(transformed)
                 }

@@ -27,7 +27,7 @@ fun createStubPointers(firestore: FirebaseFirestore, firebaseUtils: FirebaseUtil
             filename = "pointer$i.png",
             description = "Awesome Pointer $i",
             uploadedBy = hashMapOf(Pair(firebaseUtils.uid ?: "stub-uid", "Awesome User")),
-            time = Timestamp.now().toDate()
+            time = Timestamp.now().toDate(),
         )
         firestore.collection(DatabaseFields.COLLECTION_POINTERS).document().set(pointer)
     }

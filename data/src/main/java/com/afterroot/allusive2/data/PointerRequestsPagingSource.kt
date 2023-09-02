@@ -29,7 +29,7 @@ import timber.log.Timber
 
 class PointerRequestsPagingSource(private val query: Query, private val firestore: FirebaseFirestore) : PagingSource<QuerySnapshot, LocalPointerRequest>() {
     override fun getRefreshKey(
-        state: PagingState<QuerySnapshot, LocalPointerRequest>
+        state: PagingState<QuerySnapshot, LocalPointerRequest>,
     ): QuerySnapshot? {
         return null
     }
@@ -74,7 +74,7 @@ class PointerRequestsPagingSource(private val query: Query, private val firestor
             LoadResult.Page(
                 data = currentPage.toRequests().toLocalPointerRequest(firestore),
                 prevKey = null,
-                nextKey = nextPage
+                nextKey = nextPage,
             )
         } catch (e: Exception) {
             Timber.e(e, "load: Error while loading")

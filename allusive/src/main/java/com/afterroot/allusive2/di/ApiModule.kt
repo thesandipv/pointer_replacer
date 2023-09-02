@@ -48,7 +48,7 @@ object ApiModule {
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = whenBuildIs(
             debug = HttpLoggingInterceptor.Level.BODY,
-            release = HttpLoggingInterceptor.Level.NONE
+            release = HttpLoggingInterceptor.Level.NONE,
         )
     }
 }

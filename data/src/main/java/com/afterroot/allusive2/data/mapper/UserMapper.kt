@@ -24,7 +24,7 @@ fun LocalUser.toNetworkUser() = NetworkUser(
     uid = uid,
     fcmId = fcmId,
     userName = userName,
-    properties = properties
+    properties = properties,
 )
 
 fun NetworkUser.toLocalUser() = LocalUser(
@@ -33,7 +33,7 @@ fun NetworkUser.toLocalUser() = LocalUser(
     uid = uid ?: "",
     fcmId = fcmId ?: "",
     userName = userName,
-    properties = properties
+    properties = properties,
 )
 
 fun DocumentSnapshot.toNetworkUser() = toObject(NetworkUser::class.java)

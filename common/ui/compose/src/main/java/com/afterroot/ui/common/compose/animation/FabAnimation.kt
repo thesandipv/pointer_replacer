@@ -32,15 +32,15 @@ fun AnimatedFab(
     fab: @Composable (
         animationState: MutableState<FabState>,
         scale: State<Float>,
-        alpha: State<Float>
-    ) -> Unit
+        alpha: State<Float>,
+    ) -> Unit,
 ) {
     val animationTargetState = remember { mutableStateOf(FabState.Invisible) }
     val transition = updateTransition(targetState = animationTargetState.value, label = "")
 
     val alpha = transition.animateFloat(
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
-        label = ""
+        label = "",
     ) {
         if (it == FabState.Invisible) 0f else 1f
     }

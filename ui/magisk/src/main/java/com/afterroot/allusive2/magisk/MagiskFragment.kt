@@ -80,7 +80,7 @@ class MagiskFragment : Fragment() {
             visible(false)
             setOnClickListener {
                 val intent = requireContext().packageManager.getLaunchIntentForPackage(
-                    MAGISK_PACKAGE
+                    MAGISK_PACKAGE,
                 )
                 if (intent != null) {
                     startActivity(intent)
@@ -88,7 +88,7 @@ class MagiskFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         "Magisk Manager not Installed",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
             }
@@ -104,8 +104,8 @@ class MagiskFragment : Fragment() {
             File(
                 repackedMagiskModulePath(
                     requireContext(),
-                    "${settings.selectedPointerName}_Magisk.zip"
-                )
+                    "${settings.selectedPointerName}_Magisk.zip",
+                ),
             )
         if (selectedPointerModule.exists()) {
             setupInstallButton(selectedPointerModule.path)
@@ -116,7 +116,7 @@ class MagiskFragment : Fragment() {
                     """- Magisk module already exist at: ${selectedPointerModule.path}
                         |- If you changed pointer size click 'Yes' to repack Magisk Module.
                         |- If you want to repack anyway click 'Yes'
-                    """.trimMargin()
+                    """.trimMargin(),
                 )
                 .setPositiveButton("REPACK ANYWAY") { _, _ ->
                     setupInstallButton(selectedPointerModule.path, false)
@@ -174,7 +174,7 @@ class MagiskFragment : Fragment() {
                     },
                     onElementAdd = { element ->
                         element?.let { it -> updateProgress(it) }
-                    }
+                    },
                 )
             }
         }
@@ -194,7 +194,7 @@ class MagiskFragment : Fragment() {
                 {
                     progress.value = Result.Success
                 },
-                300
+                300,
             )
 
             return
@@ -252,7 +252,7 @@ class MagiskFragment : Fragment() {
         updateProgress("- Repacking framework-res.apk")
         withContext(Dispatchers.IO) {
             File(
-                FRAMEWORK_APK
+                FRAMEWORK_APK,
             ).copyTo(File(repackedFrameworkPath(requireContext())), overwrite = true)
             ZipFile(File(repackedFrameworkPath(requireContext())))
                 .addFolder(File("${pointerSavePath(requireContext())}/res"))
@@ -280,7 +280,7 @@ class MagiskFragment : Fragment() {
         withContext(Dispatchers.IO) {
             copyMagiskEmptyZip(
                 context = requireContext(),
-                to = magiskEmptyModuleZipPath(requireContext())
+                to = magiskEmptyModuleZipPath(requireContext()),
             )
         }
         updateProgress("- Done copying $MAGISK_EMPTY_ZIP")

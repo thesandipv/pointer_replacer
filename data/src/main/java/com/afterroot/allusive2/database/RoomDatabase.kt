@@ -37,11 +37,11 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.apply {
             execSQL(
-                "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)"
+                "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
             )
             execSQL("CREATE INDEX IF NOT EXISTS `index_pointers_new__id` ON pointers_new (_id)")
             execSQL(
-                "INSERT INTO pointers_new (pointer_name, file_name, pointer_desc, uploader_id, uploader_name) SELECT pointer_name, file_name, pointer_desc, uploader_id, uploader_name FROM pointers"
+                "INSERT INTO pointers_new (pointer_name, file_name, pointer_desc, uploader_id, uploader_name) SELECT pointer_name, file_name, pointer_desc, uploader_id, uploader_name FROM pointers",
             )
             execSQL("DROP TABLE pointers")
             execSQL("ALTER TABLE pointers_new RENAME TO pointers")
@@ -54,11 +54,11 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 object RoomModule {
     @Provides
     fun provideRoomDatabase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): MyDatabase = Room.databaseBuilder(
         context,
         MyDatabase::class.java,
-        "installed-pointers"
+        "installed-pointers",
     ).addMigrations(MIGRATION_1_2).build()
 
     @Provides

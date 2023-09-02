@@ -40,7 +40,7 @@ class MainSharedViewModel @Inject constructor(
     private val remoteConfig: FirebaseRemoteConfig,
     private val firebaseFirestore: FirebaseFirestore,
     private val firebaseUtils: FirebaseUtils,
-    private val settings: Settings
+    private val settings: Settings,
 ) : ViewModel() {
     private val _snackbarMsg = MutableLiveData<Event<String>>()
     val liveTitle = MutableLiveData<String>()

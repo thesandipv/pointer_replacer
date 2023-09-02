@@ -68,7 +68,6 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
-import com.afterroot.allusive2.resources.R as CommonR
 import com.afterroot.allusive2.ui.SplashActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
@@ -100,6 +99,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.find
 import timber.log.Timber
+import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -131,7 +131,7 @@ class MainFragment : Fragment() {
                     }
                     else -> {
                         menuItem.onNavDestinationSelected(
-                            requireActivity().findNavController(R.id.fragment_repo_nav)
+                            requireActivity().findNavController(R.id.fragment_repo_nav),
                         )
                     }
                 }
@@ -158,7 +158,7 @@ class MainFragment : Fragment() {
         binding.layoutNewMouse.setOnClickListener {
             showListPointerChooser(
                 pointerType = POINTER_MOUSE,
-                title = getString(CommonR.string.dialog_title_select_mouse_pointer)
+                title = getString(CommonR.string.dialog_title_select_mouse_pointer),
             )
         }
         requireActivity().findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
@@ -181,7 +181,7 @@ class MainFragment : Fragment() {
                 }
                 val extras =
                     FragmentNavigatorExtras(
-                        binding.selectedPointer to getString(CommonR.string.main_fragment_transition)
+                        binding.selectedPointer to getString(CommonR.string.main_fragment_transition),
                     )
                 requireActivity().findNavController(R.id.fragment_repo_nav)
                     .navigate(R.id.customizeFragment, bundle, null, extras)
@@ -197,7 +197,7 @@ class MainFragment : Fragment() {
                 }
                 val extras =
                     FragmentNavigatorExtras(
-                        binding.selectedMouse to getString(CommonR.string.transition_mouse)
+                        binding.selectedMouse to getString(CommonR.string.transition_mouse),
                     )
                 requireActivity().findNavController(R.id.fragment_repo_nav)
                     .navigate(R.id.customizeFragment, bundle, null, extras)
@@ -221,13 +221,13 @@ class MainFragment : Fragment() {
                     Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
                         if (!isPointerSelected()) {
                             sharedViewModel.displayMsg(
-                                getString(CommonR.string.msg_pointer_not_selected)
+                                getString(CommonR.string.msg_pointer_not_selected),
                             )
                             return@setItems
                         }
                         if (!isMouseSelected()) {
                             sharedViewModel.displayMsg(
-                                getString(CommonR.string.msg_mouse_not_selected)
+                                getString(CommonR.string.msg_mouse_not_selected),
                             )
                             return@setItems
                         }
@@ -392,7 +392,7 @@ class MainFragment : Fragment() {
         val reviewManager =
             if (BuildConfig.DEBUG) {
                 FakeReviewManager(
-                    requireContext()
+                    requireContext(),
                 )
             } else {
                 ReviewManagerFactory.create(requireContext())
@@ -434,7 +434,7 @@ class MainFragment : Fragment() {
     private fun showPointerAppliedMessage() {
         requireActivity().find<CoordinatorLayout>(R.id.container).longSnackbar(
             message = getString(CommonR.string.text_pointer_applied),
-            actionText = getString(CommonR.string.reboot)
+            actionText = getString(CommonR.string.reboot),
         ) {
             showRebootDialog()
         }.anchorView = requireActivity().find<BottomNavigationView>(R.id.navigation)
@@ -472,7 +472,7 @@ class MainFragment : Fragment() {
                 kotlin.runCatching {
                     val bannerAdUnitId: String = whenBuildIs(
                         debug = getString(CommonR.string.ad_banner_unit_id),
-                        release = remoteConfig.getString("ad_main_unit_id")
+                        release = remoteConfig.getString("ad_main_unit_id"),
                     )
 
                     val adView = AdView(requireContext())
@@ -548,7 +548,7 @@ class MainFragment : Fragment() {
                 val fileNames = arrayListOf<String>()
                 val pointerFolder = DocumentFile.fromTreeUri(
                     requireContext(),
-                    settings.safUri!!.toUri()
+                    settings.safUri!!.toUri(),
                 )
 
                 pointerFolder?.listFiles()?.filterNotNull()?.forEach {
@@ -614,7 +614,7 @@ class MainFragment : Fragment() {
     @SuppressLint("CheckResult")
     private fun showListPointerChooser(
         title: String = getString(CommonR.string.dialog_title_select_pointer),
-        pointerType: Int
+        pointerType: Int,
     ) {
         val bottomSheetListBinding = LayoutListBottomsheetBinding.inflate(layoutInflater)
         val dialog = MaterialDialog(requireContext(), BottomSheet(LayoutMode.MATCH_PARENT)).show {
@@ -731,7 +731,7 @@ class MainFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         getString(CommonR.string.dialog_sign_out_result_success),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                     startActivity(Intent(requireContext(), SplashActivity::class.java))
                 }
