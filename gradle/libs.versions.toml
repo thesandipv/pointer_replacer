@@ -205,7 +205,7 @@ google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.1"
 google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-google-pluginGservices = "com.google.gms:google-services:4.3.15"
+google-pluginGservices = "com.google.gms:google-services:4.4.0"
 google-playCore = "com.google.android.play:core:1.10.3"
 
 dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
