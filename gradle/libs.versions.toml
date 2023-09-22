@@ -244,7 +244,7 @@ accompanist-navigation = { module = "com.google.accompanist:accompanist-navigati
 accompanist-suc = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 test-junit = "junit:junit:4.13.2"
-test-mockk = "io.mockk:mockk:1.13.7"
+test-mockk = "io.mockk:mockk:1.13.8"
 test-robolectric = "org.robolectric:robolectric:4.10.3"
 
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsuVersion" }
