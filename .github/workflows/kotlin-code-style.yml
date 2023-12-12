@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run spotlessKotlinCheck task
-        uses: gradle/gradle-build-action@v2.10.0
+        uses: gradle/gradle-build-action@v2.11.0
         env:
           CI: true
           GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
