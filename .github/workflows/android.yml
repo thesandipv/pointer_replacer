@@ -156,7 +156,7 @@ jobs:
       - name: Upload build outputs
         id: upload-outputs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: allusive/build/outputs/apk/release/allusive-release.apk
@@ -164,7 +164,7 @@ jobs:
       - name: Upload build reports
         id: upload-reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-reports
           path: allusive/build/reports
