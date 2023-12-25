@@ -83,7 +83,7 @@ jobs:
 
       - name: Build with Gradle
         id: build
-        uses: gradle/gradle-build-action@v2.11.0
+        uses: gradle/gradle-build-action@v2.11.1
         env:
           CI: true
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
@@ -96,7 +96,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && (startsWith(github.ref, 'refs/tags/allusive_v') == false) }}
 
       - name: Run Tests in app module
-        uses: gradle/gradle-build-action@v2.11.0
+        uses: gradle/gradle-build-action@v2.11.1
         id: run-tests
         with:
           arguments: :allusive:test
