@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    api(libs.kotlin.coroutines.core)
+    api(libs.kotlinx.coroutines.core)
 
     implementation(projects.common.ui.resources)
 

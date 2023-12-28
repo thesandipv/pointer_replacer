@@ -28,7 +28,6 @@ pluginManagement {
 dependencyResolutionManagement {
     val properties = readProperties(file("private.properties"))
 
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
@@ -41,6 +40,12 @@ dependencyResolutionManagement {
                 username = properties.getProperty("gpr.user") ?: System.getenv("GHUSERNAME")
                 password = properties.getProperty("gpr.key") ?: System.getenv("GHTOKEN")
             }
+        }
+    }
+
+    versionCatalogs {
+        create("afterroot") {
+            from(files("gradle/build-logic/convention.versions.toml"))
         }
     }
 }
