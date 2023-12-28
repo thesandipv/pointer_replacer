@@ -28,7 +28,7 @@ jobs:
 
       - name: Check Out
         id: check-out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
@@ -53,14 +53,14 @@ jobs:
 
       - name: set up JDK
         id: setup-jdk
-        uses: actions/setup-java@v3.12.0
+        uses: actions/setup-java@v4.0.0
         with:
           distribution: 'zulu'
           java-version: 17
 
       - name: Set up Python 3
         id: setup-python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -83,7 +83,7 @@ jobs:
 
       - name: Build with Gradle
         id: build
-        uses: gradle/gradle-build-action@v2.8.0
+        uses: gradle/gradle-build-action@v2.11.1
         env:
           CI: true
           GHUSERNAME: ${{ secrets.GHUSERNAME }}
@@ -96,7 +96,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && (startsWith(github.ref, 'refs/tags/allusive_v') == false) }}
 
       - name: Run Tests in app module
-        uses: gradle/gradle-build-action@v2.8.0
+        uses: gradle/gradle-build-action@v2.11.1
         id: run-tests
         with:
           arguments: :allusive:test
@@ -106,7 +106,7 @@ jobs:
       - name: Publish to Play Store
         id: publish-to-play-store
         if: startsWith(github.ref, 'refs/tags/allusive_v')
-        uses: r0adkll/upload-google-play@v1.1.1
+        uses: r0adkll/upload-google-play@v1.1.2
         with:
           serviceAccountJson: release/serviceAccount.json
           packageName: com.afterroot.allusive2
@@ -120,7 +120,7 @@ jobs:
         id: publish-to-play-store-internal
         if: github.ref == 'refs/heads/main'
         continue-on-error: true
-        uses: r0adkll/upload-google-play@v1.1.1
+        uses: r0adkll/upload-google-play@v1.1.2
         with:
           serviceAccountJson: release/serviceAccount.json
           packageName: com.afterroot.allusive2
@@ -156,7 +156,7 @@ jobs:
       - name: Upload build outputs
         id: upload-outputs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: allusive/build/outputs/apk/release/allusive-release.apk
@@ -164,7 +164,7 @@ jobs:
       - name: Upload build reports
         id: upload-reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-reports
           path: allusive/build/reports

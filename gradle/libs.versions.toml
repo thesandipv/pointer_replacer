@@ -1,29 +1,29 @@
 [versions]
-agp = "8.1.1"
+agp = "8.1.2"
 accompanist = "0.32.0"
-activity = "1.7.2"
+activity = "1.8.2"
 ankoCommons = "0.10.8"
 appcompat = "1.6.1"
-billing = "6.0.1"
-browser = "1.6.0"
+billing = "6.1.0"
+browser = "1.7.0"
 cardView = "1.0.0"
-collection = "1.2.0"
+collection = "1.3.0"
 compose = "1.3.0"
-composeBom = "2023.08.00"
-composeCompiler = "1.5.3"
+composeBom = "2023.10.01"
+composeCompiler = "1.5.7"
 constraintLayout = "2.1.4"
 ar-utils = "0.6.0" # AfterROOT Core
-coreKtx = "1.10.1"
+coreKtx = "1.12.0"
 coreSplash = "1.0.1"
 crshlyticsPlugin = "2.9.9"
-dagger = "2.48"
+dagger = "2.50"
 depUpdates = "0.46.0"
 emoji = "1.1.0"
-epoxy = "4.6.4"
-firebaseAds = "22.3.0"
+epoxy = "5.1.3"
+firebaseAds = "22.6.0"
 firebaseAnalytics = "21.2.2"
 firebaseAuth = "22.0.0"
-firebaseBom = "32.2.3"
+firebaseBom = "32.7.0"
 firebaseConfig = "21.4.0"
 firebaseCore = "21.1.1"
 firebaseCrashlytics = "18.3.7"
@@ -32,38 +32,38 @@ firebaseFirestore = "24.6.0"
 firebaseMessaging = "23.1.2"
 firebaseStorage = "20.2.0"
 firebaseUi = "8.0.2"
-fragmentKtx = "1.6.1"
+fragmentKtx = "1.6.2"
 glide = "4.16.0"
-googleMaterial = "1.9.0"
+googleMaterial = "1.11.0"
 googleAuth = "20.7.0"
-googleAds = "22.3.0"
+googleAds = "22.6.0"
 gson = "2.10.1"
-hilt = "2.48"
+hilt = "2.50"
 jackson = "2.13.4"
 koin = "2.2.2"
-koin3 = "3.4.6"
-kotlin = "1.9.10"
+koin3 = "3.5.3"
+kotlin = "1.9.21"
 kotlinxCoroutines = "1.7.3"
 ktlint = "0.50.0"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
-libsuVersion = "5.2.0"
-lifecycle = "2.6.1"
+libsuVersion = "5.2.2"
+lifecycle = "2.6.2"
 materialDialogs = "3.3.0"
 multidex = "2.0.1"
-navigation = "2.7.1"
-okhttp = "5.0.0-alpha.11"
-paging = "3.2.0"
+navigation = "2.7.6"
+okhttp = "5.0.0-alpha.12"
+paging = "3.2.1"
 palette = "1.0.0"
 preference = "1.2.1"
-recyclerview = "1.3.1"
+recyclerview = "1.3.2"
 retrofit = "2.9.0"
-room = "2.5.2"
-spotless = "6.21.0"
+room = "2.6.1"
+spotless = "6.23.3"
 startUp = "1.1.1"
 transition = "1.4.1"
 vectorDrawable = "1.2.0-beta01"
-work = "2.8.1"
+work = "2.9.0"
 compileSdk = "34"
 minSdk = "21"
 targetSdk = "34"
@@ -77,11 +77,11 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 android-lint = { id = "com.android.lint", version.ref = "agp" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crshlyticsPlugin" }
-gms-googleServices = "com.google.gms.google-services:4.3.15"
+gms-googleServices = "com.google.gms.google-services:4.4.0"
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-ksp = "com.google.devtools.ksp:1.9.10-1.0.13"
+ksp = "com.google.devtools.ksp:1.9.21-1.0.16"
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
@@ -91,11 +91,11 @@ spotless-pluginGradle = { module = "com.diffplug.spotless:spotless-plugin-gradle
 
 commonsCodec = "commons-codec:commons-codec:1.16.0"
 commonsIo = "org.apache.commons:commons-io:1.3.2"
-commonsLang = "org.apache.commons:commons-lang3:3.13.0"
+commonsLang = "org.apache.commons:commons-lang3:3.14.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "com.dropbox.mobile.store:store4:4.0.5"
-coil = { module = "io.coil-kt:coil-compose", version = "2.4.0" }
+coil = { module = "io.coil-kt:coil-compose", version = "2.5.0" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 
 afterroot-utils = { module = "com.afterroot:utils", version.ref = "ar-utils" }
@@ -122,7 +122,7 @@ androidx-core-splash = { module = "androidx.core:core-splashscreen", version.ref
 androidx-datastore = "androidx.datastore:datastore-preferences:1.0.0"
 androidx-emoji = { module = "androidx.emoji:emoji", version.ref = "emoji" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.0.0"
+androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.1.0"
 androidx-multiDex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 androidx-paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 androidx-paging-common = { module = "androidx.paging:paging-common-ktx", version.ref = "paging" }
@@ -205,7 +205,7 @@ google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.1"
 google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-google-pluginGservices = "com.google.gms:google-services:4.3.15"
+google-pluginGservices = "com.google.gms:google-services:4.4.0"
 google-playCore = "com.google.android.play:core:1.10.3"
 
 dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
@@ -214,7 +214,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 hilt-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.0.0"
+hilt-compose = "androidx.hilt:hilt-navigation-compose:1.1.0"
 hilt-pluginGradle = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin3" }
@@ -244,8 +244,8 @@ accompanist-navigation = { module = "com.google.accompanist:accompanist-navigati
 accompanist-suc = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 test-junit = "junit:junit:4.13.2"
-test-mockk = "io.mockk:mockk:1.13.7"
-test-robolectric = "org.robolectric:robolectric:4.10.3"
+test-mockk = "io.mockk:mockk:1.13.8"
+test-robolectric = "org.robolectric:robolectric:4.11.1"
 
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsuVersion" }
 libsu-io = { module = "com.github.topjohnwu.libsu:io", version.ref = "libsuVersion" }
