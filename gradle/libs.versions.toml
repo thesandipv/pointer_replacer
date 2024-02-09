@@ -89,7 +89,7 @@ android-pluginGradle = { module = "com.android.tools.build:gradle", version.ref 
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 spotless-pluginGradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
-commonsCodec = "commons-codec:commons-codec:1.16.0"
+commonsCodec = "commons-codec:commons-codec:1.16.1"
 commonsIo = "org.apache.commons:commons-io:1.3.2"
 commonsLang = "org.apache.commons:commons-lang3:3.14.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
