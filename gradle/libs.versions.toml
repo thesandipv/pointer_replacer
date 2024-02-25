@@ -122,7 +122,7 @@ androidx-core-splash = { module = "androidx.core:core-splashscreen", version.ref
 androidx-datastore = "androidx.datastore:datastore-preferences:1.0.0"
 androidx-emoji = { module = "androidx.emoji:emoji", version.ref = "emoji" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.1.0"
+androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.2.0"
 androidx-multiDex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 androidx-paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 androidx-paging-common = { module = "androidx.paging:paging-common-ktx", version.ref = "paging" }
