@@ -95,7 +95,7 @@ commonsLang = "org.apache.commons:commons-lang3:3.14.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "com.dropbox.mobile.store:store4:4.0.5"
-coil = { module = "io.coil-kt:coil-compose", version = "2.5.0" }
+coil = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 
 afterroot-utils = { module = "com.afterroot:utils", version.ref = "ar-utils" }
