@@ -214,7 +214,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 hilt-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.1.0"
+hilt-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-pluginGradle = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin3" }
