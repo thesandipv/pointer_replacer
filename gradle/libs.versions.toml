@@ -1,7 +1,7 @@
 [versions]
 agp = "8.2.0"
 androidTools = "31.2.0"
-accompanist = "0.32.0"
+accompanist = "0.34.0"
 activity = "1.8.2"
 ankoCommons = "0.10.8"
 appcompat = "1.6.1"
@@ -9,22 +9,22 @@ ar-utils = "0.6.0" # AfterROOT Core
 billing = "6.1.0"
 browser = "1.7.0"
 cardView = "1.0.0"
-collection = "1.3.0"
+collection = "1.4.0"
 compose = "1.3.0"
-composeBom = "2023.10.01"
-composeCompiler = "1.5.7"
+composeBom = "2024.02.01"
+composeCompiler = "1.5.10"
 constraintLayout = "2.1.4"
 coreKtx = "1.12.0"
 coreSplash = "1.0.1"
 crshlyticsPlugin = "2.9.9"
-dagger = "2.50"
+dagger = "2.51"
 depUpdates = "0.46.0"
 emoji = "1.1.0"
-epoxy = "5.1.3"
+epoxy = "5.1.4"
 firebaseAds = "22.6.0"
 firebaseAnalytics = "21.2.2"
 firebaseAuth = "22.0.0"
-firebaseBom = "32.7.0"
+firebaseBom = "32.7.3"
 firebaseConfig = "21.4.0"
 firebaseCore = "21.1.1"
 firebaseCrashlytics = "18.3.7"
@@ -39,26 +39,26 @@ googleMaterial = "1.11.0"
 googleAuth = "20.7.0"
 googleAds = "22.6.0"
 gson = "2.10.1"
-hilt = "2.50"
+hilt = "2.51"
 jackson = "2.13.4"
 junit = "4.13.2"
 junit-jupiter = "5.10.1"
 koin = "2.2.2"
 koin3 = "3.5.3"
-kotlin = "1.9.21"
-kotlinxCoroutines = "1.7.3"
+kotlin = "1.9.22"
+kotlinxCoroutines = "1.8.0"
 kotlinxDatetime = "0.5.0"
 ktlint = "0.50.0"
 ktor = "2.3.7"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
 libsuVersion = "5.2.2"
-lifecycle = "2.6.2"
+lifecycle = "2.7.0"
 materialDialogs = "3.3.0"
 mockito-inline = "5.2.0"
 mockito-kotlin = "5.2.1"
 multidex = "2.0.1"
-navigation = "2.7.6"
+navigation = "2.7.7"
 okhttp = "5.0.0-alpha.12"
 paging = "3.2.1"
 palette = "1.0.0"
@@ -66,7 +66,7 @@ preference = "1.2.1"
 recyclerview = "1.3.2"
 retrofit = "2.9.0"
 room = "2.6.1"
-spotless = "6.23.3"
+spotless = "6.25.0"
 startUp = "1.1.1"
 transition = "1.4.1"
 truth = "1.2.0"
@@ -86,14 +86,14 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 android-lint = { id = "com.android.lint", version.ref = "agp" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crshlyticsPlugin" }
-gms-googleServices = "com.google.gms.google-services:4.4.0"
+gms-googleServices = "com.google.gms.google-services:4.4.1"
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ksp = "com.google.devtools.ksp:1.9.21-1.0.16"
+ksp = "com.google.devtools.ksp:1.9.22-1.0.17"
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
@@ -102,14 +102,13 @@ android-tools-common = { group = "com.android.tools", name = "common", version.r
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 spotless-pluginGradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
-commonsCodec = "commons-codec:commons-codec:1.16.0"
+commonsCodec = "commons-codec:commons-codec:1.16.1"
 commonsIo = "org.apache.commons:commons-io:1.3.2"
 commonsLang = "org.apache.commons:commons-lang3:3.14.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "org.mobilenativefoundation.store:store5:5.0.0"
-coil = { module = "io.coil-kt:coil-compose", version = "2.5.0" }
-
+coil = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 
 afterroot-utils = { module = "com.afterroot:utils", version.ref = "ar-utils" }
@@ -141,7 +140,7 @@ androidx-core-splash = { module = "androidx.core:core-splashscreen", version.ref
 androidx-datastore = "androidx.datastore:datastore-preferences:1.0.0"
 androidx-emoji = { module = "androidx.emoji:emoji", version.ref = "emoji" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.1.0"
+androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.2.0"
 androidx-multiDex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 androidx-paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 androidx-paging-common = { module = "androidx.paging:paging-common-ktx", version.ref = "paging" }
@@ -230,7 +229,7 @@ google-ossLic = "com.google.android.gms:play-services-oss-licenses:17.0.1"
 google-pluginOssLic = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 google-material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-google-pluginGservices = "com.google.gms:google-services:4.4.0"
+google-pluginGservices = "com.google.gms:google-services:4.4.1"
 google-playCore = "com.google.android.play:core:1.10.3"
 
 dagger-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
@@ -239,7 +238,7 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 hilt-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.1.0"
+hilt-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-pluginGradle = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin3" }
@@ -271,7 +270,7 @@ accompanist-testharness = { group = "com.google.accompanist", name = "accompanis
 
 junit = { module = "junit:junit", version.ref = "junit" }
 test-junit = { module = "junit:junit", version.ref = "junit" }
-test-mockk = "io.mockk:mockk:1.13.8"
+test-mockk = "io.mockk:mockk:1.13.10"
 test-robolectric = "org.robolectric:robolectric:4.11.1"
 
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }

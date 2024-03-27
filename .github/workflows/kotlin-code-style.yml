@@ -16,7 +16,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Set up JDK
-        uses: actions/setup-java@v4.0.0
+        uses: actions/setup-java@v4.1.0
         with:
           distribution: 'zulu'
           java-version: 17
@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run spotlessKotlinCheck task
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v3.1.0
         env:
           CI: true
           GHTOKEN: ${{ secrets.GITHUB_TOKEN }}
