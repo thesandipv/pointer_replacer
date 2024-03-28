@@ -81,7 +81,7 @@ gms-googleServices = "com.google.gms.google-services:4.4.1"
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-ksp = "com.google.devtools.ksp:1.9.22-1.0.17"
+ksp = "com.google.devtools.ksp:1.9.23-1.0.19"
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
