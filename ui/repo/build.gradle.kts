@@ -14,12 +14,11 @@
  */
 
 plugins {
-    id("com.afterroot.android.library")
-    id("com.afterroot.kotlin.android")
-    id("com.afterroot.android.compose")
-    id("com.afterroot.allusive2.android.common")
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    id(afterroot.plugins.android.library.get().pluginId)
+    id(afterroot.plugins.kotlin.android.get().pluginId)
+    id(afterroot.plugins.android.compose.get().pluginId)
+    id(afterroot.plugins.android.hilt.get().pluginId)
+    id(afterroot.plugins.allusive2.android.common.get().pluginId)
 }
 
 android {
@@ -46,9 +45,7 @@ dependencies {
 
     implementation(libs.bundles.coroutines)
 
-    implementation(libs.hilt.hilt)
     implementation(libs.hilt.compose)
-    kapt(libs.hilt.compiler)
 
     implementation(libs.coil)
 }
