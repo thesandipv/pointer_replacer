@@ -14,10 +14,9 @@
  */
 
 plugins {
-    id("com.afterroot.android.library")
-    id("com.afterroot.kotlin.android")
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
+    id(afterroot.plugins.android.library.get().pluginId)
+    id(afterroot.plugins.kotlin.android.get().pluginId)
+    id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
 android {
@@ -54,7 +53,4 @@ dependencies {
     implementation(libs.materialdialogs.core)
 
     api(libs.timber)
-
-    implementation(libs.hilt.hilt)
-    kapt(libs.hilt.compiler)
 }

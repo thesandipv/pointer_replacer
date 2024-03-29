@@ -12,6 +12,7 @@
       <module name="pointer-replacer.common.ui.compose" target="17" />
       <module name="pointer-replacer.common.ui.resources" target="17" />
       <module name="pointer-replacer.data" target="17" />
+      <module name="pointer-replacer.data.model" target="17" />
       <module name="pointer-replacer.domain" target="17" />
       <module name="pointer-replacer.ui.common-compose" target="17" />
       <module name="pointer-replacer.ui.home" target="17" />

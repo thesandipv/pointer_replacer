@@ -14,7 +14,7 @@
  */
 
 plugins {
-    id("com.afterroot.android.library")
+    id(afterroot.plugins.android.library.get().pluginId)
 }
 
 android {

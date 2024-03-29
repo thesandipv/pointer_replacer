@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 plugins {
-    id("com.afterroot.android.library")
-    id("com.afterroot.kotlin.android")
-    id("com.afterroot.allusive2.android.common")
-    // id("com.afterroot.android.compose")
+    id(afterroot.plugins.android.library.get().pluginId)
+    id(afterroot.plugins.kotlin.android.get().pluginId)
+    id(afterroot.plugins.android.compose.get().pluginId)
+    id(afterroot.plugins.android.hilt.get().pluginId)
+    id(afterroot.plugins.allusive2.android.common.get().pluginId)
 
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
+    id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.afterroot.allusive2.data"
+    buildFeatures.buildConfig = true
 }
 
 ksp {
@@ -33,6 +34,8 @@ ksp {
 
 dependencies {
     api(projects.ards)
+    api(projects.core.logging)
+    implementation(projects.data.model)
 
     implementation(libs.androidx.paging)
     implementation(libs.androidx.preference)
@@ -50,9 +53,6 @@ dependencies {
     api(libs.okhttp.logging)
     api(libs.retrofit.retrofit)
     api(libs.retrofit.gson)
-
-    implementation(libs.hilt.hilt)
-    kapt(libs.hilt.compiler)
 
     implementation(libs.materialdialogs.core)
 }

@@ -16,18 +16,19 @@
 import com.afterroot.gradle.readProperties
 
 plugins {
-    id("com.afterroot.android.application")
-    id("com.afterroot.kotlin.android")
-    id("com.afterroot.allusive2.android.common")
+    id(afterroot.plugins.android.application.get().pluginId)
+    id(afterroot.plugins.kotlin.android.get().pluginId)
+    id(afterroot.plugins.android.compose.get().pluginId)
+    id(afterroot.plugins.android.hilt.get().pluginId)
+    id(afterroot.plugins.allusive2.android.common.get().pluginId)
 
     alias(libs.plugins.firebase.crashlytics)
-    alias(libs.plugins.gms.googleServices)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.google.gms)
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.jetbrains.kotlin.kapt) // TODO Remove after removing data-binding
 
-    id("androidx.navigation.safeargs")
-    id("com.google.android.gms.oss-licenses-plugin")
+    id(libs.plugins.google.ossLic.get().pluginId)
+    id("androidx.navigation.safeargs.kotlin")
     id("kotlin-parcelize")
 }
 
@@ -88,13 +89,15 @@ android {
 
     lint.abortOnError = false
 
-    packaging.resources.excludes += setOf(
-        "META-INF/proguard/*",
-        "/*.properties",
-        "fabric/*.properties",
-        "META-INF/*.properties",
-        "META-INF/LICENSE*.md",
-    )
+    packaging.resources.excludes +=
+        setOf(
+            "META-INF/proguard/*",
+            "/*.properties",
+            "fabric/*.properties",
+            "META-INF/*.properties",
+            "META-INF/LICENSE*.md",
+            "META-INF/**/previous-compilation-data.bin",
+        )
 }
 
 configurations {
@@ -132,7 +135,7 @@ dependencies {
 
     implementation(libs.androidx.room.room)
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.test)
 
     implementation(libs.materialdialogs.input)
