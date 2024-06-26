@@ -42,8 +42,8 @@ hilt = "2.51.1"
 jackson = "2.13.4"
 koin = "2.2.2"
 koin3 = "3.5.6"
-kotlin = "1.9.23"
-kotlinxCoroutines = "1.8.0"
+kotlin = "1.9.24"
+kotlinxCoroutines = "1.8.1"
 ktlint = "0.50.0"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
@@ -81,7 +81,7 @@ gms-googleServices = "com.google.gms.google-services:4.4.2"
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-ksp = "com.google.devtools.ksp:1.9.23-1.0.19"
+ksp = "com.google.devtools.ksp:1.9.24-1.0.20"
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [libraries]
