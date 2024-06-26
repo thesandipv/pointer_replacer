@@ -174,7 +174,7 @@ androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-
 androidx-test-archCore = "androidx.arch.core:core-testing:2.2.0"
 androidx-test-core = "androidx.test:core-ktx:1.5.0"
 androidx-test-espresso = "androidx.test.espresso:espresso-core:3.6.0"
-androidx-test-junitExt = "androidx.test.ext:junit:1.1.5"
+androidx-test-junitExt = "androidx.test.ext:junit:1.2.0"
 androidx-test-runner = "androidx.test:runner:1.5.2"
 
 materialdialogs-input = { module = "com.afollestad.material-dialogs:input", version.ref = "materialDialogs" }
