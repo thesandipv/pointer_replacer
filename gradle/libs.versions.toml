@@ -175,7 +175,7 @@ androidx-test-archCore = "androidx.arch.core:core-testing:2.2.0"
 androidx-test-core = "androidx.test:core-ktx:1.6.1"
 androidx-test-espresso = "androidx.test.espresso:espresso-core:3.6.1"
 androidx-test-junitExt = "androidx.test.ext:junit:1.2.1"
-androidx-test-runner = "androidx.test:runner:1.6.0"
+androidx-test-runner = "androidx.test:runner:1.6.1"
 
 materialdialogs-input = { module = "com.afollestad.material-dialogs:input", version.ref = "materialDialogs" }
 materialdialogs-core = { module = "com.afollestad.material-dialogs:core", version.ref = "materialDialogs" }
