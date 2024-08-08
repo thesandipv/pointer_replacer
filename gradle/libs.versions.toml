@@ -91,7 +91,7 @@ spotless-pluginGradle = { module = "com.diffplug.spotless:spotless-plugin-gradle
 
 commonsCodec = "commons-codec:commons-codec:1.17.1"
 commonsIo = "org.apache.commons:commons-io:1.3.2"
-commonsLang = "org.apache.commons:commons-lang3:3.15.0"
+commonsLang = "org.apache.commons:commons-lang3:3.16.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 materialProgress = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 store = "com.dropbox.mobile.store:store4:4.0.5"
