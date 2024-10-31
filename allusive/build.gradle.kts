@@ -152,7 +152,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
-    implementation(libs.google.playCore)
     implementation(libs.google.gson)
 
     implementation(libs.commonsIo)
