@@ -13,46 +13,46 @@
  * limitations under the License.
  */
 plugins {
-    id("com.afterroot.android.library")
-    id("com.afterroot.kotlin.android")
-    id("com.afterroot.allusive2.android.common")
-    // id("com.afterroot.android.compose")
+  id("com.afterroot.android.library")
+  id("com.afterroot.kotlin.android")
+  id("com.afterroot.allusive2.android.common")
+  // id("com.afterroot.android.compose")
 
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
+  alias(libs.plugins.jetbrains.kotlin.kapt)
+  alias(libs.plugins.google.ksp)
 }
 
 android {
-    namespace = "com.afterroot.allusive2.data"
+  namespace = "com.afterroot.allusive2.data"
 }
 
 ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-    arg("room.incremental", "true")
+  arg("room.schemaLocation", "$projectDir/schemas")
+  arg("room.incremental", "true")
 }
 
 dependencies {
-    api(projects.ards)
+  api(projects.ards)
 
-    implementation(libs.androidx.paging)
-    implementation(libs.androidx.preference)
+  implementation(libs.androidx.paging)
+  implementation(libs.androidx.preference)
 
-    implementation(libs.bundles.coroutines)
+  implementation(libs.bundles.coroutines)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase)
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.bundles.firebase)
 
-    api(libs.androidx.room.room)
-    api(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
+  api(libs.androidx.room.room)
+  api(libs.androidx.room.runtime)
+  ksp(libs.androidx.room.compiler)
 
-    api(libs.okhttp.okhttp)
-    api(libs.okhttp.logging)
-    api(libs.retrofit.retrofit)
-    api(libs.retrofit.gson)
+  api(libs.okhttp.okhttp)
+  api(libs.okhttp.logging)
+  api(libs.retrofit.retrofit)
+  api(libs.retrofit.gson)
 
-    implementation(libs.hilt.hilt)
-    kapt(libs.hilt.compiler)
+  implementation(libs.hilt.hilt)
+  kapt(libs.hilt.compiler)
 
-    implementation(libs.materialdialogs.core)
+  implementation(libs.materialdialogs.core)
 }

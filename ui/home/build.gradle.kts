@@ -2,8 +2,8 @@ plugins {
     id("com.afterroot.android.library")
     id("com.afterroot.kotlin.android")
     id("com.afterroot.allusive2.android.common")
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.jetbrains.kotlin.kapt)
 }
 
 android {

@@ -1,7 +1,7 @@
 plugins {
     id("com.afterroot.android.library")
     id("com.afterroot.kotlin.android")
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.jetbrains.kotlin.kapt)
 }
 
 android {

@@ -14,47 +14,44 @@
  */
 
 plugins {
-    id("com.afterroot.android.library")
-    id("com.afterroot.kotlin.android")
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
+  id("com.afterroot.android.library")
+  id("com.afterroot.kotlin.android")
+  alias(libs.plugins.jetbrains.kotlin.kapt)
+  alias(libs.plugins.google.ksp)
 }
 
 android {
-    namespace = "com.afterroot.allusive2.base"
+  namespace = "com.afterroot.allusive2.base"
 
-    buildFeatures.buildConfig = true
+  buildFeatures.buildConfig = true
 
-    defaultConfig {
-        val commitHash = providers.exec {
-            commandLine("git", "rev-parse", "--short", "HEAD")
-        }.standardOutput.asText.get()
+  defaultConfig {
+    val commitHash = providers.exec {
+      commandLine("git", "rev-parse", "--short", "HEAD")
+    }.standardOutput.asText.get()
 
-        val commit = System.getenv("COMMIT_ID") ?: commitHash.trim()
-        buildConfigField("String", "COMMIT_ID", "\"$commit\"")
-        buildConfigField("int", "VERSION_CODE", "${rootProject.extra["versionCode"]}")
-        buildConfigField("String", "VERSION_NAME", "\"${rootProject.extra["versionName"]}\"")
-    }
+    val commit = System.getenv("COMMIT_ID") ?: commitHash.trim()
+    buildConfigField("String", "COMMIT_ID", "\"$commit\"")
+    buildConfigField("int", "VERSION_CODE", "${rootProject.extra["versionCode"]}")
+    buildConfigField("String", "VERSION_NAME", "\"${rootProject.extra["versionName"]}\"")
+  }
 }
 
 dependencies {
-    api(libs.kotlin.coroutines.core)
+  api(libs.kotlinx.coroutines.core)
 
-    implementation(projects.common.ui.resources)
+  implementation(projects.common.ui.resources)
 
-    api(libs.glide.glide)
-    ksp(libs.glide.ksp)
+  api(libs.glide.glide)
+  ksp(libs.glide.ksp)
 
-    implementation(libs.androidx.activity)
-    implementation(libs.firebase.firestore)
+  implementation(libs.androidx.activity)
+  implementation(libs.firebase.firestore)
 
-    implementation(libs.firebase.ui.firestore)
-    implementation(libs.firebase.ui.storage)
+  implementation(libs.firebase.ui.firestore)
+  implementation(libs.firebase.ui.storage)
 
-    implementation(libs.materialdialogs.core)
+  implementation(libs.materialdialogs.core)
 
-    api(libs.timber)
-
-    implementation(libs.hilt.hilt)
-    kapt(libs.hilt.compiler)
+  api(libs.timber)
 }
