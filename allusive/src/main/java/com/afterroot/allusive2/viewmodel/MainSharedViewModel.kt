@@ -36,68 +36,68 @@ import timber.log.Timber
 
 @HiltViewModel
 class MainSharedViewModel @Inject constructor(
-    val savedStateHandle: SavedStateHandle,
-    private val remoteConfig: FirebaseRemoteConfig,
-    private val firebaseFirestore: FirebaseFirestore,
-    private val firebaseUtils: FirebaseUtils,
-    private val settings: Settings,
+  val savedStateHandle: SavedStateHandle,
+  private val remoteConfig: FirebaseRemoteConfig,
+  private val firebaseFirestore: FirebaseFirestore,
+  private val firebaseUtils: FirebaseUtils,
+  private val settings: Settings,
 ) : ViewModel() {
-    private val _snackbarMsg = MutableLiveData<Event<String>>()
-    val liveTitle = MutableLiveData<String>()
+  private val _snackbarMsg = MutableLiveData<Event<String>>()
+  val liveTitle = MutableLiveData<String>()
 
-    var actions = MutableSharedFlow<HomeActions>()
-        private set
+  var actions = MutableSharedFlow<HomeActions>()
+    private set
 
-    init {
-        Timber.d("init $this")
+  init {
+    Timber.d("init $this")
 
-        remoteConfig.fetchAndActivate().addOnSuccessListener {
-            savedStateHandle[KEY_CONFIG_LOADED] = true
+    remoteConfig.fetchAndActivate().addOnSuccessListener {
+      savedStateHandle[KEY_CONFIG_LOADED] = true
+    }
+
+    viewModelScope.launch {
+      actions.collect { action ->
+        Timber.d("action: $action")
+        when (action) {
+          // Add actions should be handled by ViewModel.
+          else -> {}
         }
-
-        viewModelScope.launch {
-            actions.collect { action ->
-                Timber.d("action: $action")
-                when (action) {
-                    // Add actions should be handled by ViewModel.
-                    else -> {}
-                }
-            }
-        }
+      }
     }
+  }
 
-    val pointers = Pager(PagingConfig(20)) {
-        FirestorePagingSource(firebaseFirestore, settings, firebaseUtils)
-    }.flow.cachedIn(viewModelScope)
+  val pointers = Pager(PagingConfig(20)) {
+    FirestorePagingSource(firebaseFirestore, settings, firebaseUtils)
+  }.flow.cachedIn(viewModelScope)
 
-    internal fun submitAction(action: HomeActions) {
-        viewModelScope.launch {
-            actions.emit(action)
-        }
+  internal fun submitAction(action: HomeActions) {
+    viewModelScope.launch {
+      actions.emit(action)
     }
+  }
 
-    fun setTitle(title: String?) {
-        if (liveTitle.value != title) { // Don't change title if new title is equal to old.
-            liveTitle.value = title!!
-        }
+  fun setTitle(title: String?) {
+    if (liveTitle.value != title) { // Don't change title if new title is equal to old.
+      liveTitle.value = title!!
     }
+  }
 
-    val snackbarMsg: LiveData<Event<String>>
-        get() = _snackbarMsg
+  val snackbarMsg: LiveData<Event<String>>
+    get() = _snackbarMsg
 
-    fun displayMsg(msg: String) {
-        _snackbarMsg.value = Event(msg)
-    }
+  fun displayMsg(msg: String) {
+    _snackbarMsg.value = Event(msg)
+  }
 
-    fun loadIntAdInterstitial(isShow: Boolean = false) {
-        submitAction(HomeActions.LoadIntAd(isShow))
-    }
+  fun loadIntAdInterstitial(isShow: Boolean = false) {
+    submitAction(HomeActions.LoadIntAd(isShow))
+  }
 
-    fun showInterstitialAd() {
-        submitAction(HomeActions.ShowIntAd)
-    }
+  fun showInterstitialAd() {
+    submitAction(HomeActions.ShowIntAd)
+  }
 
-    companion object {
-        const val KEY_CONFIG_LOADED = "configLoaded"
-    }
+  companion object {
+    const val KEY_CONFIG_LOADED = "configLoaded"
+  }
 }

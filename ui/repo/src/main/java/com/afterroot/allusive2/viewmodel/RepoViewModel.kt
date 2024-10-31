@@ -46,70 +46,69 @@ import timber.log.Timber
 
 @HiltViewModel
 class RepoViewModel @Inject constructor(
-    val savedStateHandle: SavedStateHandle,
-    private val pagingPointerRequest: PagingPointerRequest,
-    private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage,
-    private val firebaseUtils: FirebaseUtils,
+  val savedStateHandle: SavedStateHandle,
+  private val pagingPointerRequest: PagingPointerRequest,
+  private val firestore: FirebaseFirestore,
+  private val storage: FirebaseStorage,
+  private val firebaseUtils: FirebaseUtils,
 ) : ViewModel() {
 
-    private val actions = MutableSharedFlow<RepoActions>()
-    val requestPagedList: Flow<PagingData<LocalPointerRequest>> = pagingPointerRequest.flow.cachedIn(
-        viewModelScope,
+  private val actions = MutableSharedFlow<RepoActions>()
+  val requestPagedList: Flow<PagingData<LocalPointerRequest>> = pagingPointerRequest.flow.cachedIn(
+    viewModelScope,
+  )
+  private val messages = MutableSharedFlow<String>()
+
+  val state: StateFlow<RepoState> = combine(messages) {
+    RepoState(it[0])
+  }.stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = RepoState.Empty,
+  )
+
+  init {
+    Timber.d("init")
+
+    viewModelScope.launch {
+      actions.collect { action ->
+        when (action) {
+          RepoActions.LoadRequests -> loadRequests()
+          is RepoActions.ApproveRequest -> {
+          }
+          else -> {}
+        }
+      }
+    }
+  }
+
+  internal fun submitAction(action: RepoActions) {
+    viewModelScope.launch {
+      actions.emit(action)
+    }
+  }
+
+  private fun loadRequests() {
+    val baseQuery = firestore.requests().orderBy(
+      DatabaseFields.FIELD_TIMESTAMP,
+      Query.Direction.DESCENDING,
     )
-    private val messages = MutableSharedFlow<String>()
-
-    val state: StateFlow<RepoState> = combine(messages) {
-        RepoState(it[0])
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = RepoState.Empty,
+    var query = baseQuery.whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
+    if (firebaseUtils.networkUser?.properties?.userRole == UserRole.ADMIN) {
+      query = baseQuery
+    }
+    pagingPointerRequest(
+      PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG),
     )
+  }
 
-    init {
-        Timber.d("init")
+  private suspend fun getDownloadUrl(fileName: String): String =
+    storage.pointers().child(fileName).downloadUrl.await().toString()
 
-        viewModelScope.launch {
-            actions.collect { action ->
-                when (action) {
-                    RepoActions.LoadRequests -> loadRequests()
-                    is RepoActions.ApproveRequest -> {
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
-
-    internal fun submitAction(action: RepoActions) {
-        viewModelScope.launch {
-            actions.emit(action)
-        }
-    }
-
-    private fun loadRequests() {
-        val baseQuery = firestore.requests().orderBy(
-            DatabaseFields.FIELD_TIMESTAMP,
-            Query.Direction.DESCENDING,
-        )
-        var query = baseQuery.whereEqualTo(DatabaseFields.FIELD_UID, firebaseUtils.uid)
-        if (firebaseUtils.networkUser?.properties?.userRole == UserRole.ADMIN) {
-            query = baseQuery
-        }
-        pagingPointerRequest(
-            PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG),
-        )
-    }
-
-    private suspend fun getDownloadUrl(fileName: String): String {
-        return storage.pointers().child(fileName).downloadUrl.await().toString()
-    }
-
-    companion object {
-        private val PAGING_CONFIG = PagingConfig(
-            pageSize = 20,
-            initialLoadSize = 20,
-        )
-    }
+  companion object {
+    private val PAGING_CONFIG = PagingConfig(
+      pageSize = 20,
+      initialLoadSize = 20,
+    )
+  }
 }

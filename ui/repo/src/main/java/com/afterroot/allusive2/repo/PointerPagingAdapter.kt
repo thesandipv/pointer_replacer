@@ -40,110 +40,110 @@ import com.google.firebase.storage.FirebaseStorage
 import com.afterroot.allusive2.resources.R as CommonR
 
 class PointerPagingAdapter(
-    private val callbacks: ItemSelectedCallback<Pointer>,
-    private val firebaseStorage: FirebaseStorage,
+  private val callbacks: ItemSelectedCallback<Pointer>,
+  private val firebaseStorage: FirebaseStorage,
 ) : PagingDataAdapter<Pointer, RecyclerView.ViewHolder>(Companion) {
 
-    companion object : DiffUtil.ItemCallback<Pointer>() {
-        override fun areItemsTheSame(
-            oldItem: Pointer,
-            newItem: Pointer,
-        ): Boolean = oldItem.filename == newItem.filename
-        override fun areContentsTheSame(
-            oldItem: Pointer,
-            newItem: Pointer,
-        ): Boolean = oldItem == newItem
-    }
+  companion object : DiffUtil.ItemCallback<Pointer>() {
+    override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean =
+      oldItem.filename == newItem.filename
+    override fun areContentsTheSame(oldItem: Pointer, newItem: Pointer): Boolean =
+      oldItem == newItem
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val binding = ItemPointerRepoBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false,
-        )
-        return PointerVH(binding, callbacks, firebaseStorage)
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    val binding = ItemPointerRepoBinding.inflate(
+      LayoutInflater.from(parent.context),
+      parent,
+      false,
+    )
+    return PointerVH(binding, callbacks, firebaseStorage)
+  }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as PointerVH
-        getItem(position)?.let { holder.bind(it) }
-    }
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    holder as PointerVH
+    getItem(position)?.let { holder.bind(it) }
+  }
 }
 
 class PointerVH(
-    binding: ItemPointerRepoBinding,
-    private val callbacks: ItemSelectedCallback<Pointer>,
-    private val storage: FirebaseStorage,
+  binding: ItemPointerRepoBinding,
+  private val callbacks: ItemSelectedCallback<Pointer>,
+  private val storage: FirebaseStorage,
 ) : RecyclerView.ViewHolder(binding.root) {
-    val context: Context = binding.root.context
-    private val itemName: AppCompatTextView = binding.infoPointerPackName
-    private val itemThumb: AppCompatImageView = binding.infoPointerImage
-    private val itemUploader: AppCompatTextView = binding.infoUsername
-    private val infoMeta: AppCompatTextView = binding.infoMeta
-    private val metaRRO: AppCompatTextView = binding.metaRro
+  val context: Context = binding.root.context
+  private val itemName: AppCompatTextView = binding.infoPointerPackName
+  private val itemThumb: AppCompatImageView = binding.infoPointerImage
+  private val itemUploader: AppCompatTextView = binding.infoUsername
+  private val infoMeta: AppCompatTextView = binding.infoMeta
+  private val metaRRO: AppCompatTextView = binding.metaRro
 
-    fun bind(pointer: Pointer) {
-        when (pointer.reasonCode) {
-            Reason.OK -> {
-                val storageReference = storage.reference.child("pointers/${pointer.filename}")
-                itemName.text = pointer.name
-                pointer.uploadedBy?.forEach {
-                    itemUploader.text = String.format(context.getString(CommonR.string.str_format_uploaded_by), it.value)
-                }
-                itemThumb.apply {
-                    updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = context.getMinPointerSize()
-                        width = context.getMinPointerSize()
-                    }
-                    val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(
-                        true,
-                    ).build()
-                    Glide.with(context)
-                        .load(storageReference)
-                        .override(context.getMinPointerSize(), context.getMinPointerSize())
-                        .transition(DrawableTransitionOptions.withCrossFade(factory))
-                        .into(this)
-                    background = context.getDrawableExt(CommonR.drawable.transparent_grid)
-                }
-                infoMeta.text = pointer.downloads.toString()
-                metaRRO.apply {
-                    visible(pointer.hasRRO)
-                    if (pointer.hasRRO) {
-                        text = pointer.rroDownloads.toString()
-                    }
-                }
-            }
-            else -> {
-                itemThumb.apply {
-                    updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = context.getMinPointerSize()
-                        width = context.getMinPointerSize()
-                    }
-                    background = null
-                    setImageDrawable(
-                        context.getTintedDrawable(
-                            CommonR.drawable.ic_removed,
-                            getMaterialColor(com.google.android.material.R.attr.colorError),
-                        ),
-                    )
-                }
-                itemName.text = pointer.name
-                infoMeta.text = null
-                itemUploader.text = null
-            }
+  fun bind(pointer: Pointer) {
+    when (pointer.reasonCode) {
+      Reason.OK -> {
+        val storageReference = storage.reference.child("pointers/${pointer.filename}")
+        itemName.text = pointer.name
+        pointer.uploadedBy?.forEach {
+          itemUploader.text =
+            String.format(
+              context.getString(CommonR.string.str_format_uploaded_by),
+              it.value,
+            )
         }
-
-        with(super.itemView) {
-            tag = pointer
-            setOnClickListener {
-                callbacks.onClick(absoluteAdapterPosition, itemView, pointer)
-            }
-            setOnLongClickListener {
-                return@setOnLongClickListener callbacks.onLongClick(
-                    absoluteAdapterPosition,
-                    pointer,
-                )
-            }
+        itemThumb.apply {
+          updateLayoutParams<ConstraintLayout.LayoutParams> {
+            height = context.getMinPointerSize()
+            width = context.getMinPointerSize()
+          }
+          val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(
+            true,
+          ).build()
+          Glide.with(context)
+            .load(storageReference)
+            .override(context.getMinPointerSize(), context.getMinPointerSize())
+            .transition(DrawableTransitionOptions.withCrossFade(factory))
+            .into(this)
+          background = context.getDrawableExt(CommonR.drawable.transparent_grid)
         }
+        infoMeta.text = pointer.downloads.toString()
+        metaRRO.apply {
+          visible(pointer.hasRRO)
+          if (pointer.hasRRO) {
+            text = pointer.rroDownloads.toString()
+          }
+        }
+      }
+      else -> {
+        itemThumb.apply {
+          updateLayoutParams<ConstraintLayout.LayoutParams> {
+            height = context.getMinPointerSize()
+            width = context.getMinPointerSize()
+          }
+          background = null
+          setImageDrawable(
+            context.getTintedDrawable(
+              CommonR.drawable.ic_removed,
+              getMaterialColor(com.google.android.material.R.attr.colorError),
+            ),
+          )
+        }
+        itemName.text = pointer.name
+        infoMeta.text = null
+        itemUploader.text = null
+      }
     }
+
+    with(super.itemView) {
+      tag = pointer
+      setOnClickListener {
+        callbacks.onClick(absoluteAdapterPosition, itemView, pointer)
+      }
+      setOnLongClickListener {
+        return@setOnLongClickListener callbacks.onLongClick(
+          absoluteAdapterPosition,
+          pointer,
+        )
+      }
+    }
+  }
 }

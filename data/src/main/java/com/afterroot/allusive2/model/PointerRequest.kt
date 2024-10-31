@@ -21,32 +21,32 @@ import java.util.Date
 
 @Keep
 data class PointerRequest(
-    /**
-     * File name of pointer with extension.
-     */
-    var fileName: String? = null,
-    /**
-     * Uid of user who has requested.
-     */
-    var uid: String? = null,
-    /**
-     * Timestamp of request.
-     */
-    @ServerTimestamp var timestamp: Date = Timestamp.now().toDate(),
-    /**
-     * If true, rro will be built even if it is already exist.
-     */
-    var force: Boolean = false,
-    /**
-     * If true, rro will not be built.
-     */
-    var exclude: Boolean = false,
-    /**
-     * Id of pointer document.
-     */
-    var documentId: String? = null,
-    /**
-     * If true, request is closed.
-     */
-    @field:JvmField var isRequestClosed: Boolean = false,
+  /**
+   * File name of pointer with extension.
+   */
+  var fileName: String? = null,
+  /**
+   * Uid of user who has requested.
+   */
+  var uid: String? = null,
+  /**
+   * Timestamp of request.
+   */
+  @ServerTimestamp var timestamp: Date = Timestamp.now().toDate(),
+  /**
+   * If true, rro will be built even if it is already exist.
+   */
+  var force: Boolean = false,
+  /**
+   * If true, rro will not be built.
+   */
+  var exclude: Boolean = false,
+  /**
+   * Id of pointer document.
+   */
+  var documentId: String? = null,
+  /**
+   * If true, request is closed.
+   */
+  @field:JvmField var isRequestClosed: Boolean = false,
 )

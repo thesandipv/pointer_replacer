@@ -21,10 +21,10 @@ import java.io.Serializable
 // Collection 'users'
 @Keep
 data class LocalUser(
-    var name: String? = null,
-    var email: String? = null,
-    var uid: String = "",
-    var fcmId: String = "",
-    var userName: String? = null,
-    var properties: UserProperties = UserProperties(),
+  var name: String? = null,
+  var email: String? = null,
+  var uid: String = "",
+  var fcmId: String = "",
+  var userName: String? = null,
+  var properties: UserProperties = UserProperties(),
 ) : Serializable

@@ -30,68 +30,70 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class FirestorePagingSource(
-    private val firestore: FirebaseFirestore,
-    private val settings: Settings,
-    private val firebaseUtils: FirebaseUtils,
+  private val firestore: FirebaseFirestore,
+  private val settings: Settings,
+  private val firebaseUtils: FirebaseUtils,
 ) : PagingSource<QuerySnapshot, Pointer>() {
-    override fun getRefreshKey(state: PagingState<QuerySnapshot, Pointer>): QuerySnapshot? {
-        return null
+  override fun getRefreshKey(state: PagingState<QuerySnapshot, Pointer>): QuerySnapshot? = null
+
+  override suspend fun load(
+    params: LoadParams<QuerySnapshot>,
+  ): LoadResult<QuerySnapshot, Pointer> = try {
+    var pointersQuery = firestore.pointers()
+      .orderBy(settings.orderBy, Query.Direction.DESCENDING)
+
+    if (settings.filterUserPointers) {
+      pointersQuery = firestore.pointers()
+        .orderBy("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}")
+        // .orderBy(settings.orderBy, Query.Direction.DESCENDING)
+        .whereNotEqualTo("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}", "")
     }
 
-    override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, Pointer> {
-        return try {
-            var pointersQuery = firestore.pointers()
-                .orderBy(settings.orderBy, Query.Direction.DESCENDING)
+    if (settings.filterRRO) {
+      pointersQuery = pointersQuery.whereEqualTo(DatabaseFields.FIELD_HAS_RRO, true)
+    }
 
-            if (settings.filterUserPointers) {
-                pointersQuery = firestore.pointers()
-                    .orderBy("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}")
-                    // .orderBy(settings.orderBy, Query.Direction.DESCENDING)
-                    .whereNotEqualTo("${DatabaseFields.FIELD_UPLOAD_BY}.${firebaseUtils.uid}", "")
-            }
+    var currentPageSource = if (settings.orderBy == DatabaseFields.FIELD_DOWNLOADS ||
+      settings.filterRRO
+    ) {
+      Source.DEFAULT
+    } else {
+      Source.CACHE
+    }
+    var nextPageSource = Source.DEFAULT
 
-            if (settings.filterRRO) {
-                pointersQuery = pointersQuery.whereEqualTo(DatabaseFields.FIELD_HAS_RRO, true)
-            }
+    val cachedPointerSnapshot = pointersQuery.limit(3).get(Source.CACHE).await()
 
-            var currentPageSource = if (settings.orderBy == DatabaseFields.FIELD_DOWNLOADS || settings.filterRRO) {
-                Source.DEFAULT
-            } else {
-                Source.CACHE
-            }
-            var nextPageSource = Source.DEFAULT
+    if (!cachedPointerSnapshot.isEmpty && cachedPointerSnapshot.size() > 2) {
+      val latestPointerSnapshot = pointersQuery.limit(1).get().await()
+      val latestPointer = latestPointerSnapshot.documents.first().toPointer()
+      val cachedPointer = cachedPointerSnapshot.documents.first().toPointer()
+      Timber.d("load: Latest Pointer - ${latestPointer?.name}")
+      Timber.d("load: Cached Pointer - ${cachedPointer?.name}")
+      Timber.d("load: Is Pointers Same: ${latestPointer == cachedPointer}")
 
-            val cachedPointerSnapshot = pointersQuery.limit(3).get(Source.CACHE).await()
+      if (latestPointer != cachedPointer) {
+        currentPageSource = Source.DEFAULT
+      }
+    } else {
+      currentPageSource = Source.DEFAULT
+    }
 
-            if (!cachedPointerSnapshot.isEmpty && cachedPointerSnapshot.size() > 2) {
-                val latestPointerSnapshot = pointersQuery.limit(1).get().await()
-                val latestPointer = latestPointerSnapshot.documents.first().toPointer()
-                val cachedPointer = cachedPointerSnapshot.documents.first().toPointer()
-                Timber.d("load: Latest Pointer - ${latestPointer?.name}")
-                Timber.d("load: Cached Pointer - ${cachedPointer?.name}")
-                Timber.d("load: Is Pointers Same: ${latestPointer == cachedPointer}")
+    Timber.d("load: Source: currentPage loading source: ${currentPageSource.name}")
 
-                if (latestPointer != cachedPointer) {
-                    currentPageSource = Source.DEFAULT
-                }
-            } else {
-                currentPageSource = Source.DEFAULT
-            }
+    var currentPage: QuerySnapshot =
+      params.key ?: pointersQuery.limit(20).get(currentPageSource).await()
 
-            Timber.d("load: Source: currentPage loading source: ${currentPageSource.name}")
+    if (currentPage.isEmpty || currentPage.size() < 15) {
+      Timber.d("load: Cache is empty. Getting data from Server.")
+      currentPage = params.key ?: pointersQuery.limit(20).get().await()
+    }
 
-            var currentPage: QuerySnapshot = params.key ?: pointersQuery.limit(20).get(currentPageSource).await()
+    val nextPageQuery = pointersQuery
+      .limit(15)
+      .startAfter(currentPage.documents.last())
 
-            if (currentPage.isEmpty || currentPage.size() < 15) {
-                Timber.d("load: Cache is empty. Getting data from Server.")
-                currentPage = params.key ?: pointersQuery.limit(20).get().await()
-            }
-
-            val nextPageQuery = pointersQuery
-                .limit(15)
-                .startAfter(currentPage.documents.last())
-
-            // Server query 1st pointer and Cached query 1st pointer
+    // Server query 1st pointer and Cached query 1st pointer
             /*val nextPointerCompareQuery = pointersQuery.limit(1).startAfter(currentPage.documents.last().toPointer())
             val latestPointerNextSnapshot = nextPointerCompareQuery.get().await()
             val cachedPointerNextSnapshot = nextPointerCompareQuery.get(Source.CACHE).await()
@@ -105,18 +107,17 @@ class FirestorePagingSource(
                 nextPageSource = Source.DEFAULT
             }*/
 
-            Timber.d("load: Source: nextPage loading source: ${nextPageSource.name}")
+    Timber.d("load: Source: nextPage loading source: ${nextPageSource.name}")
 
-            val nextPage = nextPageQuery.get(nextPageSource).await()
+    val nextPage = nextPageQuery.get(nextPageSource).await()
 
-            LoadResult.Page(
-                data = currentPage.toPointers().filterNotNull(),
-                prevKey = null,
-                nextKey = nextPage,
-            )
-        } catch (e: Exception) {
-            Timber.e(e, "load: Error while loading")
-            LoadResult.Error(e)
-        }
-    }
+    LoadResult.Page(
+      data = currentPage.toPointers().filterNotNull(),
+      prevKey = null,
+      nextKey = nextPage,
+    )
+  } catch (e: Exception) {
+    Timber.e(e, "load: Error while loading")
+    LoadResult.Error(e)
+  }
 }

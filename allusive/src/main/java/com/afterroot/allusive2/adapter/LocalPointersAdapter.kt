@@ -39,65 +39,68 @@ import com.afterroot.allusive2.resources.R as CommonR
  * New list adapter for Pointer Choose screen.
  * */
 class LocalPointersAdapter(private val callbacks: ItemSelectedCallback<RoomPointer>) :
-    ListAdapter<RoomPointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<RoomPointer?>() {
-        override fun areItemsTheSame(
-            oldItem: RoomPointer,
-            newItem: RoomPointer,
-        ): Boolean = oldItem == newItem
+  ListAdapter<RoomPointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<RoomPointer?>() {
+    override fun areItemsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
+      oldItem == newItem
 
-        override fun areContentsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
-            oldItem.hashCode() == newItem.hashCode()
-    }) {
+    override fun areContentsTheSame(oldItem: RoomPointer, newItem: RoomPointer): Boolean =
+      oldItem.hashCode() == newItem.hashCode()
+  }) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val binding = ItemPointerRepoBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false,
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    val binding = ItemPointerRepoBinding.inflate(
+      LayoutInflater.from(parent.context),
+      parent,
+      false,
+    )
+    return PointerVH(binding, callbacks)
+  }
+
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    holder as PointerVH
+    holder.bind(getItem(position))
+  }
+
+  inner class PointerVH(
+    binding: ItemPointerRepoBinding,
+    private val callbacks: ItemSelectedCallback<RoomPointer>,
+  ) : RecyclerView.ViewHolder(binding.root) {
+    val context: Context = binding.root.context
+    private val itemName: AppCompatTextView = binding.infoPointerPackName
+    private val itemThumb: AppCompatImageView = binding.infoPointerImage
+    private val itemUploader: AppCompatTextView = binding.infoUsername
+
+    fun bind(pointer: RoomPointer) {
+      itemName.text = pointer.pointer_name
+      itemUploader.text =
+        String.format(
+          context.getString(CommonR.string.str_format_uploaded_by),
+          pointer.uploader_name,
         )
-        return PointerVH(binding, callbacks)
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as PointerVH
-        holder.bind(getItem(position))
-    }
-
-    inner class PointerVH(binding: ItemPointerRepoBinding, private val callbacks: ItemSelectedCallback<RoomPointer>) :
-        RecyclerView.ViewHolder(binding.root) {
-        val context: Context = binding.root.context
-        private val itemName: AppCompatTextView = binding.infoPointerPackName
-        private val itemThumb: AppCompatImageView = binding.infoPointerImage
-        private val itemUploader: AppCompatTextView = binding.infoUsername
-
-        fun bind(pointer: RoomPointer) {
-            itemName.text = pointer.pointer_name
-            itemUploader.text =
-                String.format(context.getString(CommonR.string.str_format_uploaded_by), pointer.uploader_name)
-            itemThumb.apply {
-                updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    height = context.getMinPointerSize()
-                    width = context.getMinPointerSize()
-                }
-                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                Glide.with(context)
-                    .load("${context.getPointerSaveDir()}${pointer.file_name}")
-                    .override(context.getMinPointerSize(), context.getMinPointerSize())
-                    .transition(DrawableTransitionOptions.withCrossFade(factory))
-                    .into(this)
-                background = context.getDrawableExt(CommonR.drawable.transparent_grid)
-            }
-
-            with(super.itemView) {
-                tag = pointer
-                setOnClickListener {
-                    callbacks.onClick(adapterPosition, itemView, pointer)
-                }
-                setOnLongClickListener {
-                    callbacks.onLongClick(adapterPosition, pointer)
-                    return@setOnLongClickListener true
-                }
-            }
+      itemThumb.apply {
+        updateLayoutParams<ConstraintLayout.LayoutParams> {
+          height = context.getMinPointerSize()
+          width = context.getMinPointerSize()
         }
+        val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+        Glide.with(context)
+          .load("${context.getPointerSaveDir()}${pointer.file_name}")
+          .override(context.getMinPointerSize(), context.getMinPointerSize())
+          .transition(DrawableTransitionOptions.withCrossFade(factory))
+          .into(this)
+        background = context.getDrawableExt(CommonR.drawable.transparent_grid)
+      }
+
+      with(super.itemView) {
+        tag = pointer
+        setOnClickListener {
+          callbacks.onClick(adapterPosition, itemView, pointer)
+        }
+        setOnLongClickListener {
+          callbacks.onLongClick(adapterPosition, pointer)
+          return@setOnLongClickListener true
+        }
+      }
     }
+  }
 }

@@ -40,90 +40,89 @@ import com.google.android.material.R as MaterialR
 @AndroidEntryPoint
 class FireMessagingService : FirebaseMessagingService() {
 
-    private val _tag = "FireMessagingService"
+  @Inject lateinit var firebaseUtils: FirebaseUtils
 
-    @Inject lateinit var firebaseUtils: FirebaseUtils
+  @Inject lateinit var firebaseFirestore: FirebaseFirestore
 
-    @Inject lateinit var firebaseFirestore: FirebaseFirestore
+  override fun onNewToken(token: String) {
+    super.onNewToken(token)
+    Timber.tag("FireMessagingService").e("NEW_TOKEN %s", token)
+    updateToken(token)
+  }
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        Timber.tag(_tag).e("NEW_TOKEN %s", token)
-        updateToken(token)
+  private fun updateToken(token: String) {
+    try {
+      if (firebaseUtils.isUserSignedIn) {
+        firebaseFirestore.collection(DatabaseFields.COLLECTION_USERS)
+          .document(firebaseUtils.uid!!)
+          .update(DatabaseFields.FIELD_FCM_ID, token)
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+  }
+
+  override fun onMessageReceived(remoteMessage: RemoteMessage) {
+    if (remoteMessage.notification != null && remoteMessage.data.isNotEmpty()) {
+      sendNotification(
+        message = remoteMessage.notification!!.body!!,
+        url = remoteMessage.data["link"],
+        channelId = remoteMessage.notification!!.channelId,
+        channelName =
+        remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
+        title = remoteMessage.notification?.title,
+      )
+    }
+  }
+
+  private fun sendNotification(
+    message: String,
+    url: String? = "",
+    channelId: String? = getString(CommonR.string.fcm_channel_id),
+    channelName: String? = getString(CommonR.string.fcm_channel_default),
+    title: String? = getString(CommonR.string.app_name),
+  ) {
+    val intent: Intent
+    if (url!!.isEmpty()) {
+      intent = Intent(this, MainActivity::class.java)
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    } else {
+      intent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse(url)
+      }
+    }
+    val pendingIntent = PendingIntent.getActivity(
+      this,
+      0,
+      intent,
+      PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
+    )
+    val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+    val notificationBuilder = NotificationCompat.Builder(
+      this,
+      channelId ?: getString(CommonR.string.fcm_channel_id),
+    )
+      .setSmallIcon(CommonR.drawable.ic_launch_screen)
+      .setContentTitle(title ?: getString(CommonR.string.app_name))
+      .setContentText(message)
+      .setAutoCancel(true)
+      .setColor(ContextCompat.getColor(this, getMaterialColor(MaterialR.attr.colorSecondary)))
+      .setSound(defaultSoundUri)
+      .setContentIntent(pendingIntent)
+
+    val notificationManager = getSystemService(
+      Context.NOTIFICATION_SERVICE,
+    ) as NotificationManager
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channel = NotificationChannel(
+        channelId ?: getString(CommonR.string.fcm_channel_id),
+        channelName ?: getString(CommonR.string.fcm_channel_default),
+        NotificationManager.IMPORTANCE_DEFAULT,
+      )
+      notificationManager.createNotificationChannel(channel)
     }
 
-    private fun updateToken(token: String) {
-        try {
-            if (firebaseUtils.isUserSignedIn) {
-                firebaseFirestore.collection(DatabaseFields.COLLECTION_USERS)
-                    .document(firebaseUtils.uid!!)
-                    .update(DatabaseFields.FIELD_FCM_ID, token)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        if (remoteMessage.notification != null && remoteMessage.data.isNotEmpty()) {
-            sendNotification(
-                message = remoteMessage.notification!!.body!!,
-                url = remoteMessage.data["link"],
-                channelId = remoteMessage.notification!!.channelId,
-                channelName = remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
-                title = remoteMessage.notification?.title,
-            )
-        }
-    }
-
-    private fun sendNotification(
-        message: String,
-        url: String? = "",
-        channelId: String? = getString(CommonR.string.fcm_channel_id),
-        channelName: String? = getString(CommonR.string.fcm_channel_default),
-        title: String? = getString(CommonR.string.app_name),
-    ) {
-        val intent: Intent
-        if (url!!.isEmpty()) {
-            intent = Intent(this, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        } else {
-            intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(url)
-            }
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
-        )
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(
-            this,
-            channelId ?: getString(CommonR.string.fcm_channel_id),
-        )
-            .setSmallIcon(CommonR.drawable.ic_launch_screen)
-            .setContentTitle(title ?: getString(CommonR.string.app_name))
-            .setContentText(message)
-            .setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, getMaterialColor(MaterialR.attr.colorSecondary)))
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-
-        val notificationManager = getSystemService(
-            Context.NOTIFICATION_SERVICE,
-        ) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId ?: getString(CommonR.string.fcm_channel_id),
-                channelName ?: getString(CommonR.string.fcm_channel_default),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        notificationManager.notify(0, notificationBuilder.build())
-    }
+    notificationManager.notify(0, notificationBuilder.build())
+  }
 }

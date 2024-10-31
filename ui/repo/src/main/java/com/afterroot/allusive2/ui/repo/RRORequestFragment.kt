@@ -29,35 +29,39 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class RRORequestFragment : Fragment() {
 
-    private var _binding: FragmentRroRequestBinding? = null
-    private val binding get() = _binding!!
-    private val repoViewModel: RepoViewModel by viewModels()
+  private var _binding: FragmentRroRequestBinding? = null
+  private val binding get() = _binding!!
+  private val repoViewModel: RepoViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        loadRequests()
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    loadRequests()
+  }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = FragmentRroRequestBinding.inflate(inflater, container, false)
-        val view = binding.root
-        binding.composeLayout.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                Theme(requireContext()) {
-                    Requests()
-                }
-            }
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View? {
+    _binding = FragmentRroRequestBinding.inflate(inflater, container, false)
+    val view = binding.root
+    binding.composeLayout.apply {
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+      setContent {
+        Theme(requireContext()) {
+          Requests()
         }
-        return view
+      }
     }
+    return view
+  }
 
-    private fun loadRequests() {
-        repoViewModel.submitAction(RepoActions.LoadRequests)
-    }
+  private fun loadRequests() {
+    repoViewModel.submitAction(RepoActions.LoadRequests)
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

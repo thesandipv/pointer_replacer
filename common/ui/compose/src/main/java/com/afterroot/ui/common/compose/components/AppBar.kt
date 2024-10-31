@@ -35,17 +35,17 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonAppBar(
-    modifier: Modifier = Modifier,
-    withTitle: String,
-    navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {},
+  modifier: Modifier = Modifier,
+  withTitle: String,
+  navigationIcon: @Composable () -> Unit = {},
+  actions: @Composable RowScope.() -> Unit = {},
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = { Text(text = withTitle) },
-        navigationIcon = navigationIcon,
-        actions = actions,
-    )
+  CenterAlignedTopAppBar(
+    modifier = modifier,
+    title = { Text(text = withTitle) },
+    navigationIcon = navigationIcon,
+    actions = actions,
+  )
     /* TopAppBar(modifier = modifier) {
          Box(modifier = Modifier.fillMaxWidth()) {
              if (navigationIcon != null) {
@@ -92,9 +92,9 @@ fun CommonAppBar(
 
 @Composable
 fun UpActionButton(onUpClick: () -> Unit) {
-    IconButton(onClick = onUpClick) {
-        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
-    }
+  IconButton(onClick = onUpClick) {
+    Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+  }
 }
 
 val AppBarHeight = 56.dp

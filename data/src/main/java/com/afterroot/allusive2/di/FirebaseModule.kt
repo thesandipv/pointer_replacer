@@ -42,46 +42,46 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
-    @Provides
-    @Singleton
-    fun provideFirestore(): FirebaseFirestore = Firebase.firestore.apply {
-        firestoreSettings = firestoreSettings {
-            isPersistenceEnabled = true
-        }
+  @Provides
+  @Singleton
+  fun provideFirestore(): FirebaseFirestore = Firebase.firestore.apply {
+    firestoreSettings = firestoreSettings {
+      isPersistenceEnabled = true
     }
+  }
 
-    @Provides
-    @Singleton
-    fun provideDatabase(): FirebaseDatabase = Firebase.database
+  @Provides
+  @Singleton
+  fun provideDatabase(): FirebaseDatabase = Firebase.database
 
-    @Provides
-    @Singleton
-    fun provideAuth(): FirebaseAuth = Firebase.auth
+  @Provides
+  @Singleton
+  fun provideAuth(): FirebaseAuth = Firebase.auth
 
-    @Provides
-    @Singleton
-    fun provideStorage(): FirebaseStorage = Firebase.storage
+  @Provides
+  @Singleton
+  fun provideStorage(): FirebaseStorage = Firebase.storage
 
-    @Provides
-    @Singleton
-    fun provideRemoteConfig(): FirebaseRemoteConfig = Firebase.remoteConfig.apply {
-        setConfigSettingsAsync(
-            remoteConfigSettings {
-                fetchTimeoutInSeconds = whenBuildIs(debug = 0, release = 3600)
-            },
-        )
+  @Provides
+  @Singleton
+  fun provideRemoteConfig(): FirebaseRemoteConfig = Firebase.remoteConfig.apply {
+    setConfigSettingsAsync(
+      remoteConfigSettings {
+        fetchTimeoutInSeconds = whenBuildIs(debug = 0, release = 3600)
+      },
+    )
 //        setDefaultsAsync(R.xml.remote_configs)
-    }
+  }
 
-    @Provides
-    @Singleton
-    fun provideFirebaseUtils(firebaseAuth: FirebaseAuth) = Firebase.utils(firebaseAuth)
+  @Provides
+  @Singleton
+  fun provideFirebaseUtils(firebaseAuth: FirebaseAuth) = Firebase.utils(firebaseAuth)
 
-    @Provides
-    @Singleton
-    fun provideFirebaseMessaging(): FirebaseMessaging = Firebase.messaging
+  @Provides
+  @Singleton
+  fun provideFirebaseMessaging(): FirebaseMessaging = Firebase.messaging
 
-    @Provides
-    @Singleton
-    fun provideAnalytics(): FirebaseAnalytics = Firebase.analytics
+  @Provides
+  @Singleton
+  fun provideAnalytics(): FirebaseAnalytics = Firebase.analytics
 }

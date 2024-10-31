@@ -14,15 +14,15 @@
  */
 
 plugins {
-    id("com.afterroot.android.library")
+  id("com.afterroot.android.library")
 }
 
 android {
-    namespace = "com.afterroot.allusive2.resources"
+  namespace = "com.afterroot.allusive2.resources"
 }
 
 dependencies {
-    api(libs.google.material)
-    implementation(libs.androidx.preference)
-    implementation(libs.materialdialogs.core)
+  api(libs.google.material)
+  implementation(libs.androidx.preference)
+  implementation(libs.materialdialogs.core)
 }

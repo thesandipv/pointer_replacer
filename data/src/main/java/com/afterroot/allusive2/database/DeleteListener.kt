@@ -15,6 +15,6 @@
 package com.afterroot.allusive2.database
 
 interface DeleteListener {
-    fun onDeleteSuccess()
-    fun onDeleteFailed()
+  fun onDeleteSuccess()
+  fun onDeleteFailed()
 }

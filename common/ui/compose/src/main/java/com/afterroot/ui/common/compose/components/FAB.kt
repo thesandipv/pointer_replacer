@@ -33,87 +33,71 @@ import com.afterroot.ui.common.compose.animation.FabState
 import com.afterroot.ui.common.compose.theme.fabShape
 
 @Composable
-fun FABAdd(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    AnimatedFab { state, scale, alpha ->
-        CommonFAB(
-            icon = Icons.Rounded.Add,
-            modifier = modifier
-                .alpha(alpha.value)
-                .scale(scale.value),
-            onClick = onClick,
-        )
-        state.value = FabState.Visible
-    }
+fun FABAdd(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  AnimatedFab { state, scale, alpha ->
+    CommonFAB(
+      icon = Icons.Rounded.Add,
+      modifier = modifier
+        .alpha(alpha.value)
+        .scale(scale.value),
+      onClick = onClick,
+    )
+    state.value = FabState.Visible
+  }
 }
 
 @Composable
-fun FABDone(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    AnimatedFab { state, scale, alpha ->
-        CommonFAB(
-            icon = Icons.Rounded.Done,
-            modifier = modifier
-                .alpha(alpha.value)
-                .scale(scale.value),
-            onClick = onClick,
-        )
-        state.value = FabState.Visible
-    }
+fun FABDone(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  AnimatedFab { state, scale, alpha ->
+    CommonFAB(
+      icon = Icons.Rounded.Done,
+      modifier = modifier
+        .alpha(alpha.value)
+        .scale(scale.value),
+      onClick = onClick,
+    )
+    state.value = FabState.Visible
+  }
 }
 
 @Composable
-fun FABSave(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    AnimatedFab { state, scale, alpha ->
-        CommonFAB(
-            icon = Icons.Rounded.Save,
-            modifier = modifier
-                .alpha(alpha.value)
-                .scale(scale.value),
-            onClick = onClick,
-        )
-        state.value = FabState.Visible
-    }
+fun FABSave(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  AnimatedFab { state, scale, alpha ->
+    CommonFAB(
+      icon = Icons.Rounded.Save,
+      modifier = modifier
+        .alpha(alpha.value)
+        .scale(scale.value),
+      onClick = onClick,
+    )
+    state.value = FabState.Visible
+  }
 }
 
 @Composable
-fun FABEdit(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    AnimatedFab { state, scale, alpha ->
-        CommonFAB(
-            icon = Icons.Rounded.Edit,
-            modifier = modifier
-                .alpha(alpha.value)
-                .scale(scale.value),
-            onClick = onClick,
-        )
-        state.value = FabState.Visible
-    }
+fun FABEdit(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  AnimatedFab { state, scale, alpha ->
+    CommonFAB(
+      icon = Icons.Rounded.Edit,
+      modifier = modifier
+        .alpha(alpha.value)
+        .scale(scale.value),
+      onClick = onClick,
+    )
+    state.value = FabState.Visible
+  }
 }
 
 @Composable
-internal fun CommonFAB(
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    FloatingActionButton(
-        onClick = onClick,
-        modifier = modifier,
-        shape = fabShape,
-        contentColor = Color.Black,
-    ) {
-        Icon(imageVector = icon, contentDescription = icon.name)
-    }
+internal fun CommonFAB(icon: ImageVector, modifier: Modifier = Modifier, onClick: () -> Unit) {
+  FloatingActionButton(
+    onClick = onClick,
+    modifier = modifier,
+    shape = fabShape,
+    contentColor = Color.Black,
+  ) {
+    Icon(imageVector = icon, contentDescription = icon.name)
+  }
 }
 
 val FABSize = 56.dp

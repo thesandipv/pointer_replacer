@@ -15,7 +15,7 @@
 package com.afterroot.allusive2
 
 sealed class Result {
-    object Success : Result()
-    data class Running(val message: String) : Result()
-    data class Failed(val error: String) : Result()
+  object Success : Result()
+  data class Running(val message: String) : Result()
+  data class Failed(val error: String) : Result()
 }

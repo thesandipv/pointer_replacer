@@ -20,23 +20,21 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 fun Pointer.toRoomPointer(): RoomPointer {
-    var uploaderId = ""
-    var uploaderName = ""
-    uploadedBy?.forEach {
-        uploaderId = it.key
-        uploaderName = it.value
-    }
-    return RoomPointer(
-        file_name = filename,
-        pointer_desc = description,
-        pointer_name = name,
-        uploader_id = uploaderId,
-        uploader_name = uploaderName,
-    )
+  var uploaderId = ""
+  var uploaderName = ""
+  uploadedBy?.forEach {
+    uploaderId = it.key
+    uploaderName = it.value
+  }
+  return RoomPointer(
+    file_name = filename,
+    pointer_desc = description,
+    pointer_name = name,
+    uploader_id = uploaderId,
+    uploader_name = uploaderName,
+  )
 }
 
-fun QuerySnapshot.toPointers(): List<Pointer?> {
-    return this.documents.map { it.toPointer() }
-}
+fun QuerySnapshot.toPointers(): List<Pointer?> = this.documents.map { it.toPointer() }
 
 fun DocumentSnapshot.toPointer(): Pointer? = toObject(Pointer::class.java)?.copy(docId = id)

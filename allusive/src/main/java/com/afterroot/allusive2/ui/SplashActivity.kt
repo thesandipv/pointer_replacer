@@ -43,130 +43,129 @@ import com.afterroot.allusive2.resources.R as CommonR
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    private val _tag = "SplashActivity"
-    private val networkViewModel: NetworkViewModel by viewModels()
-    private lateinit var settings: Settings
+  private val networkViewModel: NetworkViewModel by viewModels()
+  private lateinit var settings: Settings
 
-    @Inject lateinit var firebaseAuth: FirebaseAuth
+  @Inject lateinit var firebaseAuth: FirebaseAuth
 
-    @Inject lateinit var firestore: FirebaseFirestore
+  @Inject lateinit var firestore: FirebaseFirestore
 
-    @Inject lateinit var firebaseUtils: FirebaseUtils
+  @Inject lateinit var firebaseUtils: FirebaseUtils
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        settings = Settings(this)
-        val theme = settings.theme
-        AppCompatDelegate.setDefaultNightMode(
-            when (theme) {
-                getString(
-                    CommonR.string.theme_device_default,
-                ),
-                -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
-                getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            },
-        )
-        super.onCreate(savedInstanceState)
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    settings = Settings(this)
+    val theme = settings.theme
+    AppCompatDelegate.setDefaultNightMode(
+      when (theme) {
+        getString(
+          CommonR.string.theme_device_default,
+        ),
+        -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+        getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
+        getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
+        else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+      },
+    )
+    super.onCreate(savedInstanceState)
+  }
 
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        setUpNetworkObserver()
-        when {
-            !firebaseUtils.isUserSignedIn -> {
-                tryLogin()
-            }
-            intent.extras != null -> {
-                intent.extras?.let {
-                    val link = it.getString("link")
-                    when {
-                        link != null -> {
-                            browse(link, true)
-                        }
-                        else -> {
-                            launchDashboard()
-                        }
-                    }
-                    finish()
-                }
+  override fun onPostCreate(savedInstanceState: Bundle?) {
+    super.onPostCreate(savedInstanceState)
+    setUpNetworkObserver()
+    when {
+      !firebaseUtils.isUserSignedIn -> {
+        tryLogin()
+      }
+      intent.extras != null -> {
+        intent.extras?.let {
+          val link = it.getString("link")
+          when {
+            link != null -> {
+              browse(link, true)
             }
             else -> {
-                launchDashboard()
+              launchDashboard()
             }
+          }
+          finish()
         }
-
-        // Use Firebase emulators
-        runCatching {
-            if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
-                firestore.useEmulator("10.0.2.2", 8080)
-            }
-        }
+      }
+      else -> {
+        launchDashboard()
+      }
     }
 
-    private val resultLauncher = registerForActivityResult(FirebaseAuthUIActivityResultContract()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            launchDashboard()
-        } else {
-            if (it.idpResponse == null) {
-                toast("Sign In Cancelled")
-            }
-
-            if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
-                toast("No internet")
-            }
-
-            toast("Error: ${it.idpResponse?.error?.message}")
-            Timber.e(it.idpResponse?.error, "Sign-in error: ${it.idpResponse?.error?.message}")
-
-            tryLogin()
-        }
+    // Use Firebase emulators
+    runCatching {
+      if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
+        firestore.useEmulator("10.0.2.2", 8080)
+      }
     }
+  }
 
-    private fun tryLogin() {
-        val pickerLayout = AuthMethodPickerLayout.Builder(R.layout.layout_custom_auth)
-            .setGoogleButtonId(R.id.button_auth_sign_in_google)
-            .setEmailButtonId(R.id.button_auth_sign_in_email)
-            .setTosAndPrivacyPolicyId(R.id.text_top_pp)
-            .build()
+  private val resultLauncher = registerForActivityResult(FirebaseAuthUIActivityResultContract()) {
+    if (it.resultCode == Activity.RESULT_OK) {
+      launchDashboard()
+    } else {
+      if (it.idpResponse == null) {
+        toast("Sign In Cancelled")
+      }
 
-        resultLauncher.launch(
-            AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAuthMethodPickerLayout(pickerLayout)
-                .setTheme(CommonR.style.MyTheme_Main_FirebaseUI)
-                .setLogo(CommonR.drawable.ic_login_screen)
-                .setTosAndPrivacyPolicyUrls(
-                    getString(CommonR.string.url_privacy_policy),
-                    getString(CommonR.string.url_privacy_policy),
-                )
-                .setAvailableProviders(
-                    listOf(
-                        AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
-                        AuthUI.IdpConfig.GoogleBuilder().build(),
-                    ),
-                ).build(),
+      if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
+        toast("No internet")
+      }
+
+      toast("Error: ${it.idpResponse?.error?.message}")
+      Timber.e(it.idpResponse?.error, "Sign-in error: ${it.idpResponse?.error?.message}")
+
+      tryLogin()
+    }
+  }
+
+  private fun tryLogin() {
+    val pickerLayout = AuthMethodPickerLayout.Builder(R.layout.layout_custom_auth)
+      .setGoogleButtonId(R.id.button_auth_sign_in_google)
+      .setEmailButtonId(R.id.button_auth_sign_in_email)
+      .setTosAndPrivacyPolicyId(R.id.text_top_pp)
+      .build()
+
+    resultLauncher.launch(
+      AuthUI.getInstance()
+        .createSignInIntentBuilder()
+        .setAuthMethodPickerLayout(pickerLayout)
+        .setTheme(CommonR.style.MyTheme_Main_FirebaseUI)
+        .setLogo(CommonR.drawable.ic_login_screen)
+        .setTosAndPrivacyPolicyUrls(
+          getString(CommonR.string.url_privacy_policy),
+          getString(CommonR.string.url_privacy_policy),
         )
-    }
+        .setAvailableProviders(
+          listOf(
+            AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
+            AuthUI.IdpConfig.GoogleBuilder().build(),
+          ),
+        ).build(),
+    )
+  }
 
-    private fun launchDashboard() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
+  private fun launchDashboard() {
+    startActivity(Intent(this, MainActivity::class.java))
+    finish()
+  }
 
-    private var dialog: AlertDialog? = null
-    private fun setUpNetworkObserver() {
-        networkViewModel.monitor(
-            this,
-            onConnect = {
-                if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
-            },
-            onDisconnect = {
-                dialog = showNetworkDialog(state = it, positive = {
-                    setUpNetworkObserver()
-                }, negative = { finish() })
-            },
-        )
-    }
+  private var dialog: AlertDialog? = null
+  private fun setUpNetworkObserver() {
+    networkViewModel.monitor(
+      this,
+      onConnect = {
+        if (dialog != null && dialog?.isShowing!!) dialog?.dismiss()
+      },
+      onDisconnect = {
+        dialog = showNetworkDialog(state = it, positive = {
+          setUpNetworkObserver()
+        }, negative = { finish() })
+      },
+    )
+  }
 }

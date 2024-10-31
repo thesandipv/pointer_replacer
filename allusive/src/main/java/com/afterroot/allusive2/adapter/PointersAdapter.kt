@@ -29,29 +29,25 @@ import com.google.firebase.storage.FirebaseStorage
  * New list adapter for Repository screen.
  * */
 class PointersAdapter(
-    private val callbacks: ItemSelectedCallback<Pointer>,
-    private val firebaseStorage: FirebaseStorage,
-) :
-    ListAdapter<Pointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<Pointer?>() {
-        override fun areItemsTheSame(
-            oldItem: Pointer,
-            newItem: Pointer,
-        ): Boolean = oldItem == newItem
+  private val callbacks: ItemSelectedCallback<Pointer>,
+  private val firebaseStorage: FirebaseStorage,
+) : ListAdapter<Pointer, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<Pointer?>() {
+  override fun areItemsTheSame(oldItem: Pointer, newItem: Pointer): Boolean = oldItem == newItem
 
-        override fun areContentsTheSame(oldItem: Pointer, newItem: Pointer): Boolean =
-            oldItem.hashCode() == newItem.hashCode()
-    }) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val binding = ItemPointerRepoBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false,
-        )
-        return PointerVH(binding, callbacks, firebaseStorage)
-    }
+  override fun areContentsTheSame(oldItem: Pointer, newItem: Pointer): Boolean =
+    oldItem.hashCode() == newItem.hashCode()
+}) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    val binding = ItemPointerRepoBinding.inflate(
+      LayoutInflater.from(parent.context),
+      parent,
+      false,
+    )
+    return PointerVH(binding, callbacks, firebaseStorage)
+  }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as PointerVH
-        holder.bind(getItem(position))
-    }
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    holder as PointerVH
+    holder.bind(getItem(position))
+  }
 }

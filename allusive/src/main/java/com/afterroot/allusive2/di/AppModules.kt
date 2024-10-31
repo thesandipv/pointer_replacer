@@ -31,41 +31,40 @@ import kotlinx.coroutines.Dispatchers
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModules {
-    @Singleton
-    @Provides
-    fun provideDispatchers() = CoroutineDispatchers(
-        default = Dispatchers.Default,
-        io = Dispatchers.IO,
-        main = Dispatchers.Main,
-    )
+  @Singleton
+  @Provides
+  fun provideDispatchers() = CoroutineDispatchers(
+    default = Dispatchers.Default,
+    io = Dispatchers.IO,
+    main = Dispatchers.Main,
+  )
 
-    @Provides
-    @Named("feedback_email")
-    fun provideFeedbackEmail(): String = "afterhasroot@gmail.com"
+  @Provides
+  @Named("feedback_email")
+  fun provideFeedbackEmail(): String = "afterhasroot@gmail.com"
 
-    @Provides
-    @Named("version_Code")
-    fun provideVersionCode(): Int = BuildConfig.VERSION_CODE
+  @Provides
+  @Named("version_Code")
+  fun provideVersionCode(): Int = BuildConfig.VERSION_CODE
 
-    @Provides
-    @Named("version_name")
-    fun provideVersionName(): String = BuildConfig.VERSION_NAME
+  @Provides
+  @Named("version_name")
+  fun provideVersionName(): String = BuildConfig.VERSION_NAME
 
-    @Provides
-    @Named("version_string")
-    fun provideVersionString() =
-        "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) - ${BuildConfig.COMMIT_ID}"
+  @Provides
+  @Named("version_string")
+  fun provideVersionString() =
+    "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) - ${BuildConfig.COMMIT_ID}"
 
-    @Provides
-    @Named("feedback_body")
-    fun provideFeedbackBody(firebaseUtils: FirebaseUtils): String =
-        getMailBodyForFeedback(
-            firebaseUtils,
-            version = provideVersionName(),
-            versionCode = provideVersionCode(),
-        )
+  @Provides
+  @Named("feedback_body")
+  fun provideFeedbackBody(firebaseUtils: FirebaseUtils): String = getMailBodyForFeedback(
+    firebaseUtils,
+    version = provideVersionName(),
+    versionCode = provideVersionCode(),
+  )
 
-    @Provides
-    @Singleton
-    fun provideGson(): Gson = GsonBuilder().create()
+  @Provides
+  @Singleton
+  fun provideGson(): Gson = GsonBuilder().create()
 }

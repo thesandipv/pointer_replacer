@@ -19,21 +19,21 @@ import com.afterroot.data.model.NetworkUser
 import com.google.firebase.firestore.DocumentSnapshot
 
 fun LocalUser.toNetworkUser() = NetworkUser(
-    name = name,
-    email = email,
-    uid = uid,
-    fcmId = fcmId,
-    userName = userName,
-    properties = properties,
+  name = name,
+  email = email,
+  uid = uid,
+  fcmId = fcmId,
+  userName = userName,
+  properties = properties,
 )
 
 fun NetworkUser.toLocalUser() = LocalUser(
-    name = name,
-    email = email,
-    uid = uid ?: "",
-    fcmId = fcmId ?: "",
-    userName = userName,
-    properties = properties,
+  name = name,
+  email = email,
+  uid = uid ?: "",
+  fcmId = fcmId ?: "",
+  userName = userName,
+  properties = properties,
 )
 
 fun DocumentSnapshot.toNetworkUser() = toObject(NetworkUser::class.java)

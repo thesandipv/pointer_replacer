@@ -32,12 +32,10 @@ data class InvokeError(val throwable: Throwable) : InvokeStatus()
  * @return Launched [Job] on specified [scope]
  */
 fun Flow<InvokeStatus>.watchStatus(
-    scope: CoroutineScope,
-    tag: String = "",
-    onSuccess: () -> Unit = {},
-): Job {
-    return scope.launch { collectStatus(tag, onSuccess) }
-}
+  scope: CoroutineScope,
+  tag: String = "",
+  onSuccess: () -> Unit = {},
+): Job = scope.launch { collectStatus(tag, onSuccess) }
 
 /**
  * Collects [InvokeStatus]
@@ -45,20 +43,20 @@ fun Flow<InvokeStatus>.watchStatus(
  * @param onSuccess Lambda to Execute when [InvokeStatus] is [InvokeSuccess]
  */
 private suspend fun Flow<InvokeStatus>.collectStatus(
-    tag: String = "InvokeStatus",
-    onSuccess: () -> Unit = {},
+  tag: String = "InvokeStatus",
+  onSuccess: () -> Unit = {},
 ) = collect { status ->
 
-    when (status) {
-        InvokeStarted -> {
-            Timber.tag(tag).d("collectStatus: Start")
-        }
-        InvokeSuccess -> {
-            Timber.tag(tag).d("collectStatus: Success")
-            onSuccess()
-        }
-        is InvokeError -> {
-            Timber.tag(tag).d(status.throwable, "collectStatus: Error")
-        }
+  when (status) {
+    InvokeStarted -> {
+      Timber.tag(tag).d("collectStatus: Start")
     }
+    InvokeSuccess -> {
+      Timber.tag(tag).d("collectStatus: Success")
+      onSuccess()
+    }
+    is InvokeError -> {
+      Timber.tag(tag).d(status.throwable, "collectStatus: Error")
+    }
+  }
 }

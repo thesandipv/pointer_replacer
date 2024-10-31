@@ -54,4 +54,5 @@ dependencies {
   implementation(libs.materialdialogs.core)
 
   api(libs.timber)
+  api(projects.utils)
 }
