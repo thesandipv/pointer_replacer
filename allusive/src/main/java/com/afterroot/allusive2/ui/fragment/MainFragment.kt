@@ -592,7 +592,8 @@ class MainFragment : Fragment() {
     val list = requireActivity().contentResolver.persistedUriPermissions
     for (i in list.indices) {
       val persistedUriString = list[i].uri.toString()
-      if (persistedUriString == uriString && list[i].isWritePermission &&
+      if (persistedUriString == uriString &&
+        list[i].isWritePermission &&
         list[i].isReadPermission
       ) {
         return true
