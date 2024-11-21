@@ -17,7 +17,7 @@ package com.afterroot.allusive2.base
 import kotlinx.coroutines.CoroutineDispatcher
 
 data class CoroutineDispatchers(
-    val default: CoroutineDispatcher,
-    val io: CoroutineDispatcher,
-    val main: CoroutineDispatcher,
+  val default: CoroutineDispatcher,
+  val io: CoroutineDispatcher,
+  val main: CoroutineDispatcher,
 )

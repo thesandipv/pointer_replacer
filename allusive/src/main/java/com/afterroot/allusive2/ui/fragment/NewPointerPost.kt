@@ -67,64 +67,69 @@ import com.afterroot.allusive2.resources.R as CommonR
 @AndroidEntryPoint
 class NewPointerPost : Fragment() {
 
-    @Inject lateinit var db: FirebaseFirestore
+  @Inject lateinit var db: FirebaseFirestore
 
-    @Inject lateinit var firebaseUtils: FirebaseUtils
+  @Inject lateinit var firebaseUtils: FirebaseUtils
 
-    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+  @Inject lateinit var remoteConfig: FirebaseRemoteConfig
 
-    @Inject lateinit var storage: FirebaseStorage
-    private lateinit var binding: FragmentNewPointerPostBinding
-    private lateinit var rewardedAd: RewardedAd
-    private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
-    private val pointerName: String get() = binding.editName.text.toString().trim()
-    private val sharedViewModel: MainSharedViewModel by activityViewModels()
-    private var adLoaded: Boolean = false
-    private var clickedUpload: Boolean = false
-    private var isPointerImported = false
+  @Inject lateinit var storage: FirebaseStorage
+  private lateinit var binding: FragmentNewPointerPostBinding
+  private lateinit var rewardedAd: RewardedAd
+  private val pointerDescription: String get() = binding.editDesc.text.toString().trim()
+  private val pointerName: String get() = binding.editName.text.toString().trim()
+  private val sharedViewModel: MainSharedViewModel by activityViewModels()
+  private var adLoaded: Boolean = false
+  private var clickedUpload: Boolean = false
+  private var isPointerImported = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentNewPointerPostBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    binding = FragmentNewPointerPostBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.actionUpload.setOnClickListener {
+      actionGetUploadPointer.launch("image/png")
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.actionUpload.setOnClickListener {
-            actionGetUploadPointer.launch("image/png")
+    initFirebaseConfig()
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun initFirebaseConfig() {
+    remoteConfig.fetchAndActivate().addOnCompleteListener { result ->
+      kotlin.runCatching {
+        // Load Banner Ad
+        val adView = AdView(requireContext())
+        adView.apply {
+          setAdSize(AdSize.BANNER)
+          adUnitId =
+            if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
+              getString(CommonR.string.ad_banner_new_pointer)
+            } else {
+              remoteConfig.getString("ad_banner_new_pointer")
+            }
+          binding.adContainer.addView(this)
+          loadAd(AdRequest.Builder().build())
         }
 
-        initFirebaseConfig()
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun initFirebaseConfig() {
-        remoteConfig.fetchAndActivate().addOnCompleteListener { result ->
-            kotlin.runCatching {
-                // Load Banner Ad
-                val adView = AdView(requireContext())
-                adView.apply {
-                    setAdSize(AdSize.BANNER)
-                    adUnitId = if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
-                        getString(CommonR.string.ad_banner_new_pointer)
-                    } else {
-                        remoteConfig.getString("ad_banner_new_pointer")
-                    }
-                    binding.adContainer.addView(this)
-                    loadAd(AdRequest.Builder().build())
-                }
-
-                if (result.isSuccessful) {
-                    if (remoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
-                        setUpRewardedAd()
-                        requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
-                            setOnClickListener {
-                                if (verifyData()) {
-                                    clickedUpload = true
-                                    MaterialDialog(requireContext()).show {
-                                        title(CommonR.string.text_action_upload)
-                                        message(CommonR.string.dialog_msg_rewarded_ad)
-                                        positiveButton(android.R.string.ok) {
+        if (result.isSuccessful) {
+          if (remoteConfig.getBoolean("FLAG_ENABLE_REWARDED_ADS")) {
+            setUpRewardedAd()
+            requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
+              setOnClickListener {
+                if (verifyData()) {
+                  clickedUpload = true
+                  MaterialDialog(requireContext()).show {
+                    title(CommonR.string.text_action_upload)
+                    message(CommonR.string.dialog_msg_rewarded_ad)
+                    positiveButton(android.R.string.ok) {
 /*
                                             if (rewardedAd.isLoaded) {
                                                 showAd()
@@ -132,37 +137,37 @@ class NewPointerPost : Fragment() {
                                                 sharedViewModel.displayMsg("Ad is not loaded yet. Loading...")
                                             }
 */
-                                        }
-                                        negativeButton(android.R.string.cancel)
-                                    }
-                                }
-                            }
-                            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
-                        }
-                    } else {
-                        setFabAsDirectUpload()
                     }
-                } else {
-                    setFabAsDirectUpload()
+                    negativeButton(android.R.string.cancel)
+                  }
                 }
+              }
+              icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
             }
+          } else {
+            setFabAsDirectUpload()
+          }
+        } else {
+          setFabAsDirectUpload()
         }
+      }
     }
+  }
 
-    private fun setFabAsDirectUpload() {
-        requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
-            setOnClickListener {
-                if (verifyData()) {
-                    upload(saveTmpPointer())
-                }
-            }
-            icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
+  private fun setFabAsDirectUpload() {
+    requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
+      setOnClickListener {
+        if (verifyData()) {
+          upload(saveTmpPointer())
         }
+      }
+      icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
     }
+  }
 
-    private fun showAd() { // TODO Rewrite logic
-        rewardedAd.setOnPaidEventListener {
-        }
+  private fun showAd() { // TODO Rewrite logic
+    rewardedAd.setOnPaidEventListener {
+    }
 
 /*
         val adCallback = object : RewardedAdCallback() {
@@ -179,168 +184,171 @@ class NewPointerPost : Fragment() {
             }
         }
 */
+  }
+
+  private fun createAndLoadRewardedAd() {
+    val adUnitId = whenBuildIs(
+      debug = getString(CommonR.string.ad_rewarded_1_id),
+      release = remoteConfig.getString("ad_rewarded_1_id"),
+    )
+    val adLoadCallback = object : RewardedAdLoadCallback() {
+      override fun onAdLoaded(ad: RewardedAd) {
+        super.onAdLoaded(ad)
+        adLoaded = true
+        rewardedAd = ad
+        if (clickedUpload) {
+          showAd()
+        }
+      }
+
+      override fun onAdFailedToLoad(p0: LoadAdError) {
+        super.onAdFailedToLoad(p0)
+        adLoaded = false
+      }
+    }
+    RewardedAd.load(requireContext(), adUnitId, AdRequest.Builder().build(), adLoadCallback)
+  }
+
+  private fun setUpRewardedAd() {
+    kotlin.runCatching {
+      createAndLoadRewardedAd()
+    }
+  }
+
+  private val actionGetUploadPointer =
+    registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+      uri?.let {
+        Glide.with(
+          this,
+        ).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
+        binding.pointerThumb.background =
+          context?.getDrawableExt(CommonR.drawable.transparent_grid)
+      }
     }
 
-    private fun createAndLoadRewardedAd() {
-        val adUnitId = whenBuildIs(
-            debug = getString(CommonR.string.ad_rewarded_1_id),
-            release = remoteConfig.getString("ad_rewarded_1_id"),
+  private fun upload(file: File) {
+    val dialog = requireContext().showStaticProgressDialog(
+      getString(CommonR.string.text_progress_init),
+    )
+
+    val storageRef = storage.reference
+    val fileUri = Uri.fromFile(file)
+    val fileRef = storageRef.child(
+      "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}",
+    )
+    val uploadTask = fileRef.putFile(fileUri)
+
+    uploadTask.addOnProgressListener {
+      val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
+      dialog.updateProgressText(
+        String.format(
+          "%s..%s",
+          getString(CommonR.string.text_progress_uploading),
+          progress,
+        ),
+      )
+    }.addOnCompleteListener { task ->
+      val map = hashMapOf<String, String>()
+      map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
+      if (task.isSuccessful) {
+        dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
+        val pointer = Pointer(
+          name = pointerName,
+          filename = fileUri.lastPathSegment!!,
+          description = pointerDescription,
+          uploadedBy = map,
+          time = Timestamp.now().toDate(),
         )
-        val adLoadCallback = object : RewardedAdLoadCallback() {
-            override fun onAdLoaded(ad: RewardedAd) {
-                super.onAdLoaded(ad)
-                adLoaded = true
-                rewardedAd = ad
-                if (clickedUpload) {
-                    showAd()
-                }
-            }
-
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                super.onAdFailedToLoad(p0)
-                adLoaded = false
-            }
-        }
-        RewardedAd.load(requireContext(), adUnitId, AdRequest.Builder().build(), adLoadCallback)
-    }
-
-    private fun setUpRewardedAd() {
-        kotlin.runCatching {
-            createAndLoadRewardedAd()
-        }
-    }
-
-    private val actionGetUploadPointer =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                Glide.with(
-                    this,
-                ).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
-                binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
-            }
-        }
-
-    private fun upload(file: File) {
-        val dialog = requireContext().showStaticProgressDialog(
-            getString(CommonR.string.text_progress_init),
-        )
-
-        val storageRef = storage.reference
-        val fileUri = Uri.fromFile(file)
-        val fileRef = storageRef.child(
-            "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}",
-        )
-        val uploadTask = fileRef.putFile(fileUri)
-
-        uploadTask.addOnProgressListener {
-            val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
-            dialog.updateProgressText(
-                String.format(
-                    "%s..%s",
-                    getString(CommonR.string.text_progress_uploading),
-                    progress,
-                ),
+        Timber.tag(TAG).d("upload: %s", pointer)
+        db.collection(
+          DatabaseFields.COLLECTION_POINTERS,
+        ).add(pointer).addOnSuccessListener {
+          requireActivity().apply {
+            sharedViewModel.displayMsg(
+              getString(CommonR.string.msg_pointer_upload_success),
             )
-        }.addOnCompleteListener { task ->
-            val map = hashMapOf<String, String>()
-            map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
-            if (task.isSuccessful) {
-                dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
-                val pointer = Pointer(
-                    name = pointerName,
-                    filename = fileUri.lastPathSegment!!,
-                    description = pointerDescription,
-                    uploadedBy = map,
-                    time = Timestamp.now().toDate(),
-                )
-                Timber.tag(TAG).d("upload: %s", pointer)
-                db.collection(
-                    DatabaseFields.COLLECTION_POINTERS,
-                ).add(pointer).addOnSuccessListener {
-                    requireActivity().apply {
-                        sharedViewModel.displayMsg(
-                            getString(CommonR.string.msg_pointer_upload_success),
-                        )
-                        dialog.dismiss()
-                        findNavController().navigateUp()
-                    }
-                }.addOnFailureListener {
-                    sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
-                }
-            }
+            dialog.dismiss()
+            findNavController().navigateUp()
+          }
         }.addOnFailureListener {
-            binding.pointerThumb.background = context?.getDrawableExt(CommonR.drawable.transparent_grid)
-            sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
+          sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
         }
+      }
+    }.addOnFailureListener {
+      binding.pointerThumb.background =
+        context?.getDrawableExt(CommonR.drawable.transparent_grid)
+      sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
     }
+  }
 
-    /**
-     * @throws IOException exception
-     */
-    @Throws(IOException::class)
-    private fun saveTmpPointer(): File {
-        binding.pointerThumb.background = null
-        val bitmap = binding.pointerThumb.getAsBitmap()
-        val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
-        val out: FileOutputStream
-        try {
-            out = FileOutputStream(file)
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-        } catch (iae: IllegalArgumentException) {
-            iae.printStackTrace()
-        }
-        return file
+  /**
+   * @throws IOException exception
+   */
+  @Throws(IOException::class)
+  private fun saveTmpPointer(): File {
+    binding.pointerThumb.background = null
+    val bitmap = binding.pointerThumb.getAsBitmap()
+    val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
+    val out: FileOutputStream
+    try {
+      out = FileOutputStream(file)
+      bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+      out.flush()
+      out.close()
+    } catch (e: FileNotFoundException) {
+      e.printStackTrace()
+    } catch (iae: IllegalArgumentException) {
+      iae.printStackTrace()
     }
+    return file
+  }
 
-    private fun verifyData(): Boolean {
-        var isOK = true
-        binding.apply {
-            if (pointerName.isEmpty()) {
-                setListener(editName, inputName)
-                setError(inputName)
-                isOK = false
-            }
+  private fun verifyData(): Boolean {
+    var isOK = true
+    binding.apply {
+      if (pointerName.isEmpty()) {
+        setListener(editName, inputName)
+        setError(inputName)
+        isOK = false
+      }
 
-            if (pointerDescription.length >= inputDesc.counterMaxLength) {
-                setListener(editDesc, inputDesc)
-                inputDesc.error = "Maximum Characters"
-                isOK = false
-            }
+      if (pointerDescription.length >= inputDesc.counterMaxLength) {
+        setListener(editDesc, inputDesc)
+        inputDesc.error = "Maximum Characters"
+        isOK = false
+      }
 
-            if (!isPointerImported) {
-                sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_imported))
-                isOK = false
-            }
-        }
-        return isOK
+      if (!isPointerImported) {
+        sharedViewModel.displayMsg(getString(CommonR.string.msg_pointer_not_imported))
+        isOK = false
+      }
     }
+    return isOK
+  }
 
-    private fun setError(inputLayoutView: TextInputLayout) {
-        inputLayoutView.apply {
-            isErrorEnabled = true
-            error = String.format(getString(CommonR.string.format_text_empty_error), inputLayoutView.hint)
-        }
+  private fun setError(inputLayoutView: TextInputLayout) {
+    inputLayoutView.apply {
+      isErrorEnabled = true
+      error =
+        String.format(getString(CommonR.string.format_text_empty_error), inputLayoutView.hint)
     }
+  }
 
-    private fun setListener(editTextView: TextInputEditText, inputLayoutView: TextInputLayout) {
-        editTextView.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-            }
+  private fun setListener(editTextView: TextInputEditText, inputLayoutView: TextInputLayout) {
+    editTextView.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(s: Editable?) {
+      }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+      }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                inputLayoutView.isErrorEnabled = false
-            }
-        })
-    }
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        inputLayoutView.isErrorEnabled = false
+      }
+    })
+  }
 
-    companion object {
-        private const val TAG = "NewPointerPost"
-    }
+  companion object {
+    private const val TAG = "NewPointerPost"
+  }
 }

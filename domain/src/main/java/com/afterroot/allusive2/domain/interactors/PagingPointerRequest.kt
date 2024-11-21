@@ -26,18 +26,19 @@ import com.google.firebase.firestore.Query
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-class PagingPointerRequest @Inject constructor() : PagingInteractor<PagingPointerRequest.Params, LocalPointerRequest>() {
+class PagingPointerRequest @Inject constructor() :
+  PagingInteractor<PagingPointerRequest.Params, LocalPointerRequest>() {
 
-    data class Params(
-        val query: Query,
-        val firestore: FirebaseFirestore,
-        val cached: Boolean = false,
-        override val pagingConfig: PagingConfig,
-    ) : Parameters<LocalPointerRequest>
+  data class Params(
+    val query: Query,
+    val firestore: FirebaseFirestore,
+    val cached: Boolean = false,
+    override val pagingConfig: PagingConfig,
+  ) : Parameters<LocalPointerRequest>
 
-    override fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(
-        config = params.pagingConfig,
-    ) {
-        PointerRequestsPagingSource(params.query, params.firestore)
-    }.flow
+  override fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(
+    config = params.pagingConfig,
+  ) {
+    PointerRequestsPagingSource(params.query, params.firestore)
+  }.flow
 }

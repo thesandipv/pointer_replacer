@@ -7,10 +7,10 @@
       <module name="build-logic.convention.test" target="17" />
       <module name="lib.pointer-replacer.utils" target="17" />
       <module name="pointer-replacer.allusive" target="17" />
-      <module name="pointer-replacer.arro" target="17" />
+      <module name="pointer-replacer.arro" target="21" />
       <module name="pointer-replacer.base" target="17" />
       <module name="pointer-replacer.common.ui.compose" target="17" />
-      <module name="pointer-replacer.common.ui.resources" target="17" />
+      <module name="pointer-replacer.common.ui.resources" target="21" />
       <module name="pointer-replacer.data" target="17" />
       <module name="pointer-replacer.domain" target="17" />
       <module name="pointer-replacer.ui.common-compose" target="17" />

@@ -27,58 +27,59 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
-class PointerRequestsPagingSource(private val query: Query, private val firestore: FirebaseFirestore) : PagingSource<QuerySnapshot, LocalPointerRequest>() {
-    override fun getRefreshKey(
-        state: PagingState<QuerySnapshot, LocalPointerRequest>,
-    ): QuerySnapshot? {
-        return null
+class PointerRequestsPagingSource(
+  private val query: Query,
+  private val firestore: FirebaseFirestore,
+) : PagingSource<QuerySnapshot, LocalPointerRequest>() {
+  override fun getRefreshKey(
+    state: PagingState<QuerySnapshot, LocalPointerRequest>,
+  ): QuerySnapshot? = null
+
+  override suspend fun load(
+    params: LoadParams<QuerySnapshot>,
+  ): LoadResult<QuerySnapshot, LocalPointerRequest> = try {
+    var currentPageSource = Source.DEFAULT
+    var nextPageSource = Source.DEFAULT
+
+    val cachedSnapshot = query.limit(3).get(Source.CACHE).await()
+
+    if (!cachedSnapshot.isEmpty && cachedSnapshot.size() > 2) {
+      val latestSnapshot = query.limit(1).get().await()
+      val latest = latestSnapshot.documents.first().toRequest()
+      val cached = cachedSnapshot.documents.first().toRequest()
+      Timber.d("load: Latest - ${latest?.fileName}")
+      Timber.d("load: Cached - ${cached?.fileName}")
+      Timber.d("load: isSame - ${latest == cached}")
+
+      if (latest != cached) {
+        currentPageSource = Source.DEFAULT
+      }
+    } else {
+      currentPageSource = Source.DEFAULT
     }
 
-    override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, LocalPointerRequest> {
-        return try {
-            var currentPageSource = Source.DEFAULT
-            var nextPageSource = Source.DEFAULT
+    Timber.d("load: Current Page Source: ${currentPageSource.name}")
+    var currentPage = params.key ?: query.limit(20).get(currentPageSource).await()
 
-            val cachedSnapshot = query.limit(3).get(Source.CACHE).await()
-
-            if (!cachedSnapshot.isEmpty && cachedSnapshot.size() > 2) {
-                val latestSnapshot = query.limit(1).get().await()
-                val latest = latestSnapshot.documents.first().toRequest()
-                val cached = cachedSnapshot.documents.first().toRequest()
-                Timber.d("load: Latest - ${latest?.fileName}")
-                Timber.d("load: Cached - ${cached?.fileName}")
-                Timber.d("load: isSame - ${latest == cached}")
-
-                if (latest != cached) {
-                    currentPageSource = Source.DEFAULT
-                }
-            } else {
-                currentPageSource = Source.DEFAULT
-            }
-
-            Timber.d("load: Current Page Source: ${currentPageSource.name}")
-            var currentPage = params.key ?: query.limit(20).get(currentPageSource).await()
-
-            if (currentPage.isEmpty || currentPage.size() < 15) {
-                Timber.d("load: Cache is empty. Getting data from Server.")
-                currentPage = params.key ?: query.limit(20).get().await()
-            }
-
-            val nextPageQuery = query
-                .limit(15)
-                .startAfter(currentPage.documents.last())
-
-            Timber.d("load: Next Page Source: ${nextPageSource.name}")
-            val nextPage = nextPageQuery.get(nextPageSource).await()
-
-            LoadResult.Page(
-                data = currentPage.toRequests().toLocalPointerRequest(firestore),
-                prevKey = null,
-                nextKey = nextPage,
-            )
-        } catch (e: Exception) {
-            Timber.e(e, "load: Error while loading")
-            LoadResult.Error(e)
-        }
+    if (currentPage.isEmpty || currentPage.size() < 15) {
+      Timber.d("load: Cache is empty. Getting data from Server.")
+      currentPage = params.key ?: query.limit(20).get().await()
     }
+
+    val nextPageQuery = query
+      .limit(15)
+      .startAfter(currentPage.documents.last())
+
+    Timber.d("load: Next Page Source: ${nextPageSource.name}")
+    val nextPage = nextPageQuery.get(nextPageSource).await()
+
+    LoadResult.Page(
+      data = currentPage.toRequests().toLocalPointerRequest(firestore),
+      prevKey = null,
+      nextKey = nextPage,
+    )
+  } catch (e: Exception) {
+    Timber.e(e, "load: Error while loading")
+    LoadResult.Error(e)
+  }
 }

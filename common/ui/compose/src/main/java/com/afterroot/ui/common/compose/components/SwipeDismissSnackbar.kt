@@ -25,11 +25,11 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun SwipeDismissSnackbar(
-    data: SnackbarData,
-    onDismiss: (() -> Unit)? = null,
-    snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) },
+  data: SnackbarData,
+  onDismiss: (() -> Unit)? = null,
+  snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) },
 ) {
-    Text(text = "TODO: Implement swipe-dismiss")
+  Text(text = "TODO: Implement swipe-dismiss")
     /*val dismissState = rememberDismissState {
         if (it != DismissValue.Default) {
             // First dismiss the snackbar

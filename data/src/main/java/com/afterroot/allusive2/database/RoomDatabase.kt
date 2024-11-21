@@ -34,53 +34,51 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.apply {
-            execSQL(
-                "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
-            )
-            execSQL("CREATE INDEX IF NOT EXISTS `index_pointers_new__id` ON pointers_new (_id)")
-            execSQL(
-                "INSERT INTO pointers_new (pointer_name, file_name, pointer_desc, uploader_id, uploader_name) SELECT pointer_name, file_name, pointer_desc, uploader_id, uploader_name FROM pointers",
-            )
-            execSQL("DROP TABLE pointers")
-            execSQL("ALTER TABLE pointers_new RENAME TO pointers")
-        }
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.apply {
+      execSQL(
+        "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
+      )
+      execSQL("CREATE INDEX IF NOT EXISTS `index_pointers_new__id` ON pointers_new (_id)")
+      execSQL(
+        "INSERT INTO pointers_new (pointer_name, file_name, pointer_desc, uploader_id, uploader_name) SELECT pointer_name, file_name, pointer_desc, uploader_id, uploader_name FROM pointers",
+      )
+      execSQL("DROP TABLE pointers")
+      execSQL("ALTER TABLE pointers_new RENAME TO pointers")
     }
+  }
 }
 
 @InstallIn(SingletonComponent::class)
 @Module
 object RoomModule {
-    @Provides
-    fun provideRoomDatabase(
-        @ApplicationContext context: Context,
-    ): MyDatabase = Room.databaseBuilder(
-        context,
-        MyDatabase::class.java,
-        "installed-pointers",
-    ).addMigrations(MIGRATION_1_2).build()
+  @Provides
+  fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
+    context,
+    MyDatabase::class.java,
+    "installed-pointers",
+  ).addMigrations(MIGRATION_1_2).build()
 
-    @Provides
-    fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
+  @Provides
+  fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
 }
 
 @Dao
 interface PointerDao {
-    @Query("SELECT * FROM pointers ORDER BY pointer_name")
-    fun getAll(): LiveData<List<RoomPointer>>
+  @Query("SELECT * FROM pointers ORDER BY pointer_name")
+  fun getAll(): LiveData<List<RoomPointer>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(vararg pointer: RoomPointer)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun add(vararg pointer: RoomPointer)
 
-    @Delete
-    suspend fun delete(pointer: RoomPointer)
+  @Delete
+  suspend fun delete(pointer: RoomPointer)
 
-    @Query("SELECT * FROM pointers WHERE file_name LIKE :fileName")
-    suspend fun exists(fileName: String): List<RoomPointer>
+  @Query("SELECT * FROM pointers WHERE file_name LIKE :fileName")
+  suspend fun exists(fileName: String): List<RoomPointer>
 }
 
 @Database(entities = [RoomPointer::class], version = 2)
 abstract class MyDatabase : RoomDatabase() {
-    abstract fun pointerDao(): PointerDao
+  abstract fun pointerDao(): PointerDao
 }

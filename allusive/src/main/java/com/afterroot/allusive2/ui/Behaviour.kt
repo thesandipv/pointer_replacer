@@ -26,118 +26,122 @@ import kotlin.math.max
 import kotlin.math.min
 
 class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) :
-    CoordinatorLayout.Behavior<V>(context, attrs) {
+  CoordinatorLayout.Behavior<V>(context, attrs) {
 
-    override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: V,
-        directTargetChild: View,
-        target: View,
-        axes: Int,
-        type: Int,
-    ): Boolean {
-        return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+  override fun onStartNestedScroll(
+    coordinatorLayout: CoordinatorLayout,
+    child: V,
+    directTargetChild: View,
+    target: View,
+    axes: Int,
+    type: Int,
+  ): Boolean = axes == ViewCompat.SCROLL_AXIS_VERTICAL
+
+  override fun onNestedPreScroll(
+    coordinatorLayout: CoordinatorLayout,
+    child: V,
+    target: View,
+    dx: Int,
+    dy: Int,
+    consumed: IntArray,
+    type: Int,
+  ) {
+    super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+    child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
+  }
+
+  override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
+    if (dependency is Snackbar.SnackbarLayout) {
+      updateSnackbar(child, dependency)
     }
+    return super.layoutDependsOn(parent, child, dependency)
+  }
 
-    override fun onNestedPreScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: V,
-        target: View,
-        dx: Int,
-        dy: Int,
-        consumed: IntArray,
-        type: Int,
-    ) {
-        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        child.translationY = max(0f, min(child.height.toFloat(), child.translationY + dy))
+  private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
+    if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
+      val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
+
+      params.anchorId = child.id
+      params.anchorGravity = Gravity.TOP
+      params.gravity = Gravity.TOP
+      snackbarLayout.layoutParams = params
     }
-
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
-        if (dependency is Snackbar.SnackbarLayout) {
-            updateSnackbar(child, dependency)
-        }
-        return super.layoutDependsOn(parent, child, dependency)
-    }
-
-    private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
-        if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
-            val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
-
-            params.anchorId = child.id
-            params.anchorGravity = Gravity.TOP
-            params.gravity = Gravity.TOP
-            snackbarLayout.layoutParams = params
-        }
-    }
+  }
 }
 
 class BottomNavigationFABBehavior(context: Context?, attrs: AttributeSet?) :
-    CoordinatorLayout.Behavior<View>(context, attrs) {
+  CoordinatorLayout.Behavior<View>(context, attrs) {
 
-    override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        directTargetChild: View,
-        target: View,
-        axes: Int,
-        type: Int,
-    ): Boolean {
-        return axes == ViewCompat.SCROLL_AXIS_VERTICAL ||
-            super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
+  override fun onStartNestedScroll(
+    coordinatorLayout: CoordinatorLayout,
+    child: View,
+    directTargetChild: View,
+    target: View,
+    axes: Int,
+    type: Int,
+  ): Boolean = axes == ViewCompat.SCROLL_AXIS_VERTICAL ||
+    super.onStartNestedScroll(
+      coordinatorLayout,
+      child,
+      directTargetChild,
+      target,
+      axes,
+      type,
+    )
+
+  override fun onNestedScroll(
+    coordinatorLayout: CoordinatorLayout,
+    child: View,
+    target: View,
+    dxConsumed: Int,
+    dyConsumed: Int,
+    dxUnconsumed: Int,
+    dyUnconsumed: Int,
+    type: Int,
+    consumed: IntArray,
+  ) {
+    super.onNestedScroll(
+      coordinatorLayout,
+      child,
+      target,
+      dxConsumed,
+      dyConsumed,
+      dxUnconsumed,
+      dyUnconsumed,
+      type,
+      consumed,
+    )
+    val fab = child as ExtendedFloatingActionButton
+
+    if (dyConsumed > 0) {
+      fab.shrink()
+    } else if (dyConsumed < 0) {
+      fab.extend()
     }
+  }
 
-    override fun onNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        target: View,
-        dxConsumed: Int,
-        dyConsumed: Int,
-        dxUnconsumed: Int,
-        dyUnconsumed: Int,
-        type: Int,
-        consumed: IntArray,
-    ) {
-        super.onNestedScroll(
-            coordinatorLayout,
-            child,
-            target,
-            dxConsumed,
-            dyConsumed,
-            dxUnconsumed,
-            dyUnconsumed,
-            type,
-            consumed,
-        )
-        val fab = child as ExtendedFloatingActionButton
+  override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean =
+    dependency is Snackbar.SnackbarLayout
 
-        if (dyConsumed > 0) {
-            fab.shrink()
-        } else if (dyConsumed < 0) {
-            fab.extend()
-        }
+  override fun onDependentViewRemoved(parent: CoordinatorLayout, child: View, dependency: View) {
+    child.translationY = 0f
+  }
+
+  override fun onDependentViewChanged(
+    parent: CoordinatorLayout,
+    child: View,
+    dependency: View,
+  ): Boolean = updateButton(child, dependency)
+
+  private fun updateButton(child: View, dependency: View): Boolean {
+    if (dependency is Snackbar.SnackbarLayout) {
+      val oldTranslation = child.translationY
+      val height = dependency.height.toFloat()
+      val newTranslation = dependency.translationY - height
+      child.translationY = newTranslation
+
+      return oldTranslation != newTranslation
     }
-
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        return dependency is Snackbar.SnackbarLayout
-    }
-
-    override fun onDependentViewRemoved(parent: CoordinatorLayout, child: View, dependency: View) {
-        child.translationY = 0f
-    }
-
-    override fun onDependentViewChanged(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        return updateButton(child, dependency)
-    }
-
-    private fun updateButton(child: View, dependency: View): Boolean {
-        if (dependency is Snackbar.SnackbarLayout) {
-            val oldTranslation = child.translationY
-            val height = dependency.height.toFloat()
-            val newTranslation = dependency.translationY - height
-            child.translationY = newTranslation
-
-            return oldTranslation != newTranslation
-        }
-        return false
-    }
+    return false
+  }
 }

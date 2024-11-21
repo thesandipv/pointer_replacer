@@ -17,6 +17,6 @@ package com.afterroot.allusive2.ui.repo
 import com.afterroot.allusive2.base.compose.Actions
 
 sealed class RepoActions : Actions() {
-    data class ApproveRequest(val repoId: String) : RepoActions()
-    object LoadRequests : RepoActions()
+  data class ApproveRequest(val repoId: String) : RepoActions()
+  object LoadRequests : RepoActions()
 }

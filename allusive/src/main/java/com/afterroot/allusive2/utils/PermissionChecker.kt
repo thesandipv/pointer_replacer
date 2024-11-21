@@ -20,11 +20,11 @@ import androidx.core.content.ContextCompat
 
 class PermissionChecker(private val mContext: Context) {
 
-    fun lacksPermissions(permissions: Array<String>): Boolean {
-        return permissions.any { lacksPermission(it) }
-    }
+  fun lacksPermissions(permissions: Array<String>): Boolean = permissions.any {
+    lacksPermission(it)
+  }
 
-    private fun lacksPermission(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_DENIED
-    }
+  private fun lacksPermission(permission: String): Boolean =
+    ContextCompat.checkSelfPermission(mContext, permission) ==
+      PackageManager.PERMISSION_DENIED
 }

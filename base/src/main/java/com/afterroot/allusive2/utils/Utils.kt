@@ -29,25 +29,31 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
  * @return [AlertDialog] based on [NetworkState]
  */
 fun Context.showNetworkDialog(
-    state: NetworkState,
-    positive: () -> Unit,
-    negative: () -> Unit,
-    isShowHide: Boolean = false,
+  state: NetworkState,
+  positive: () -> Unit,
+  negative: () -> Unit,
+  isShowHide: Boolean = false,
 ): AlertDialog {
-    val dialog = MaterialAlertDialogBuilder(this).apply {
-        setTitle(
-            if (state == NetworkState.CONNECTION_LOST) "Connection Lost" else "Network Disconnected",
-        )
-        setCancelable(false)
-        setMessage(com.afterroot.allusive2.resources.R.string.dialog_msg_no_network)
-        setNegativeButton("Exit") { _, _ -> negative() }
-        if (isShowHide) {
-            setPositiveButton("Hide") { dialog, _ -> dialog.dismiss() }
-        } else {
-            setPositiveButton("Retry") { _, _ -> positive() }
-        }
+  val dialog = MaterialAlertDialogBuilder(this).apply {
+    setTitle(
+      if (state ==
+        NetworkState.CONNECTION_LOST
+      ) {
+        "Connection Lost"
+      } else {
+        "Network Disconnected"
+      },
+    )
+    setCancelable(false)
+    setMessage(com.afterroot.allusive2.resources.R.string.dialog_msg_no_network)
+    setNegativeButton("Exit") { _, _ -> negative() }
+    if (isShowHide) {
+      setPositiveButton("Hide") { dialog, _ -> dialog.dismiss() }
+    } else {
+      setPositiveButton("Retry") { _, _ -> positive() }
     }
-    return dialog.show()
+  }
+  return dialog.show()
 }
 
 /**
@@ -68,10 +74,8 @@ fun <T> whenBuildIs(debug: T, release: T): T = if (BuildConfig.DEBUG) debug else
  * @since v1.9.4
  * @return either [debug] or [release] with provided type [T]
  */
-fun <T> whenBuildIs(
-    debug: () -> T,
-    release: () -> T,
-): T = whenBuildIs(debug.invoke(), release.invoke())
+fun <T> whenBuildIs(debug: () -> T, release: () -> T): T =
+  whenBuildIs(debug.invoke(), release.invoke())
 
 /**
  * Helper Function for invoking function only if build is Debug
@@ -79,9 +83,9 @@ fun <T> whenBuildIs(
  * @since v1.9.4
  */
 fun whenBuildIs(debug: () -> Unit) {
-    if (BuildConfig.DEBUG) debug.invoke()
+  if (BuildConfig.DEBUG) debug.invoke()
 }
 
 fun ComponentActivity.addMenuProviderExt(menuProvider: MenuProvider) {
-    addMenuProvider(menuProvider)
+  addMenuProvider(menuProvider)
 }

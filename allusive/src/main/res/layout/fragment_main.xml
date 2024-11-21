@@ -41,20 +41,20 @@
                 app:cardUseCompatPadding="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/ad_container">
 
                 <TextView
+                    android:id="@+id/text_apply_method"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:id="@+id/text_apply_method"
-                    tools:text="Apply Method"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Apply Method" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -177,8 +177,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:transitionName="@string/main_fragment_transition"
-                                tools:src="@drawable/pointer"
-                                tools:targetApi="lollipop" />
+                                tools:src="@drawable/pointer" />
                         </FrameLayout>
 
 
@@ -318,8 +317,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:transitionName="@string/transition_mouse"
-                                tools:src="@drawable/pointer"
-                                tools:targetApi="lollipop" />
+                                tools:src="@drawable/pointer" />
                         </FrameLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -348,10 +346,10 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/card_method"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_current_mouse"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:layout_height="50dp"
                 tools:layout_width="match_parent" />
 

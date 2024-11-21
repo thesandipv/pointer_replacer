@@ -39,59 +39,63 @@ import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
 class EditProfileFragment : Fragment() {
-    private lateinit var binding: FragmentEditProfileBinding
-    private lateinit var fabApply: ExtendedFloatingActionButton
-    private val sharedViewModel: MainSharedViewModel by activityViewModels()
+  private lateinit var binding: FragmentEditProfileBinding
+  private lateinit var fabApply: ExtendedFloatingActionButton
+  private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEditProfileBinding.inflate(inflater, container, false)
-        fabApply = requireActivity().findViewById(R.id.fab_apply)
-        return binding.root
-    }
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View? {
+    binding = FragmentEditProfileBinding.inflate(inflater, container, false)
+    fabApply = requireActivity().findViewById(R.id.fab_apply)
+    return binding.root
+  }
 
-    @Inject lateinit var db: FirebaseFirestore
+  @Inject lateinit var db: FirebaseFirestore
 
-    @Inject lateinit var firebaseUtils: FirebaseUtils
-    private lateinit var user: FirebaseUser
+  @Inject lateinit var firebaseUtils: FirebaseUtils
+  private lateinit var user: FirebaseUser
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        if (firebaseUtils.isUserSignedIn) {
-            user = firebaseUtils.firebaseUser!!
-            with(binding) {
-                inputProfileName.setText(user.displayName)
-                inputEmail.setText(user.email)
-                inputEmail.isEnabled = false
-            }
-            fabApply.apply {
-                setOnClickListener {
-                    val newName = binding.inputProfileName.text.toString().trim()
-                    if (user.displayName != newName) {
-                        val request = UserProfileChangeRequest.Builder()
-                            .setDisplayName(newName)
-                            .build()
-                        user.updateProfile(request).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                sharedViewModel.displayMsg(
-                                    getString(CommonR.string.msg_profile_updated),
-                                )
-                                db.collection(DatabaseFields.COLLECTION_USERS)
-                                    .document(user.uid)
-                                    .update(DatabaseFields.FIELD_NAME, newName)
-                            }
-                        }
-                    } else {
-                        sharedViewModel.displayMsg(getString(CommonR.string.msg_no_changes))
-                    }
-                }
-                icon = requireContext().getDrawableExt(
-                    CommonR.drawable.ic_action_save,
-                    getMaterialColor(com.google.android.material.R.attr.colorOnSecondary),
+    if (firebaseUtils.isUserSignedIn) {
+      user = firebaseUtils.firebaseUser!!
+      with(binding) {
+        inputProfileName.setText(user.displayName)
+        inputEmail.setText(user.email)
+        inputEmail.isEnabled = false
+      }
+      fabApply.apply {
+        setOnClickListener {
+          val newName = binding.inputProfileName.text.toString().trim()
+          if (user.displayName != newName) {
+            val request = UserProfileChangeRequest.Builder()
+              .setDisplayName(newName)
+              .build()
+            user.updateProfile(request).addOnCompleteListener { task ->
+              if (task.isSuccessful) {
+                sharedViewModel.displayMsg(
+                  getString(CommonR.string.msg_profile_updated),
                 )
+                db.collection(DatabaseFields.COLLECTION_USERS)
+                  .document(user.uid)
+                  .update(DatabaseFields.FIELD_NAME, newName)
+              }
             }
-        } else {
-            startActivity(Intent(this.context, SplashActivity::class.java))
+          } else {
+            sharedViewModel.displayMsg(getString(CommonR.string.msg_no_changes))
+          }
         }
+        icon = requireContext().getDrawableExt(
+          CommonR.drawable.ic_action_save,
+          getMaterialColor(com.google.android.material.R.attr.colorOnSecondary),
+        )
+      }
+    } else {
+      startActivity(Intent(this.context, SplashActivity::class.java))
     }
+  }
 }

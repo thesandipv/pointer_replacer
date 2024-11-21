@@ -30,44 +30,44 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MigrationTest {
-    private val dbName = "test_db"
+  private val dbName = "test_db"
 
-    @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        MyDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+  @get:Rule
+  val helper: MigrationTestHelper = MigrationTestHelper(
+    InstrumentationRegistry.getInstrumentation(),
+    MyDatabase::class.java.canonicalName,
+    FrameworkSQLiteOpenHelperFactory(),
+  )
 
-    @Test
-    @Throws(IOException::class)
-    fun verifyMigrationQueries() {
-        helper.createDatabase(dbName, 1).apply {
-            // db has schema version 1. insert some data using SQL queries.
-            // You cannot use DAO classes because they expect the latest schema.
-            val entry = contentValuesOf().apply {
-                put("_id", 1)
-                put("pointer_name", "Test")
-                put("file_name", "pointer34242324324.png")
-                put("pointer_desc", "Test Desc")
-                put("uploader_id", "45446464")
-                put("uploader_name", "Test User")
-            }
-            insert(RoomPointer.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE, entry)
+  @Test
+  @Throws(IOException::class)
+  fun verifyMigrationQueries() {
+    helper.createDatabase(dbName, 1).apply {
+      // db has schema version 1. insert some data using SQL queries.
+      // You cannot use DAO classes because they expect the latest schema.
+      val entry = contentValuesOf().apply {
+        put("_id", 1)
+        put("pointer_name", "Test")
+        put("file_name", "pointer34242324324.png")
+        put("pointer_desc", "Test Desc")
+        put("uploader_id", "45446464")
+        put("uploader_name", "Test User")
+      }
+      insert(RoomPointer.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE, entry)
 
-            // Prepare for the next version.
-            close()
-        }
-
-        // Re-open the database with version 2 and provide
-        // MIGRATION_1_2 as the migration process.
-        val dbv2 = helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2)
-
-        // MigrationTestHelper automatically verifies the schema changes,
-        // but you need to validate that the data was migrated properly.
-
-        val query = SupportSQLiteQueryBuilder.builder(RoomPointer.TABLE_NAME).create()
-        val get = dbv2.query(query)
-        Assert.assertEquals(1, get.count)
+      // Prepare for the next version.
+      close()
     }
+
+    // Re-open the database with version 2 and provide
+    // MIGRATION_1_2 as the migration process.
+    val dbv2 = helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2)
+
+    // MigrationTestHelper automatically verifies the schema changes,
+    // but you need to validate that the data was migrated properly.
+
+    val query = SupportSQLiteQueryBuilder.builder(RoomPointer.TABLE_NAME).create()
+    val get = dbv2.query(query)
+    Assert.assertEquals(1, get.count)
+  }
 }
