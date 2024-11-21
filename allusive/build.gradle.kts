@@ -138,6 +138,7 @@ dependencies {
   implementation(libs.google.ads)
   implementation(platform(libs.firebase.bom))
   implementation(libs.bundles.firebase)
+  implementation(libs.google.play.review)
 
   implementation(libs.google.gson)
 

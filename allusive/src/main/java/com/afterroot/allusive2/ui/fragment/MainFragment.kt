@@ -104,13 +104,17 @@ import com.afterroot.allusive2.resources.R as CommonR
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-  @Inject lateinit var firestore: FirebaseFirestore
+  @Inject
+  lateinit var firestore: FirebaseFirestore
 
-  @Inject lateinit var myDatabase: MyDatabase
+  @Inject
+  lateinit var myDatabase: MyDatabase
 
-  @Inject lateinit var remoteConfig: FirebaseRemoteConfig
+  @Inject
+  lateinit var remoteConfig: FirebaseRemoteConfig
 
-  @Inject lateinit var settings: Settings
+  @Inject
+  lateinit var settings: Settings
   private lateinit var binding: FragmentMainBinding
   private val sharedViewModel: MainSharedViewModel by activityViewModels()
   private var targetPath: String? = null
@@ -118,23 +122,26 @@ class MainFragment : Fragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
-      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
-      }
+    (requireActivity() as MenuHost).addMenuProvider(
+      object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+          menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
+        }
 
-      override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
-        R.id.profile_logout -> {
-          signOutDialog().show()
-          true
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+          R.id.profile_logout -> {
+            signOutDialog().show()
+            true
+          }
+
+          else -> {
+            menuItem.onNavDestinationSelected(
+              requireActivity().findNavController(R.id.fragment_repo_nav),
+            )
+          }
         }
-        else -> {
-          menuItem.onNavDestinationSelected(
-            requireActivity().findNavController(R.id.fragment_repo_nav),
-          )
-        }
-      }
-    })
+      },
+    )
   }
 
   override fun onCreateView(
@@ -222,6 +229,7 @@ class MainFragment : Fragment() {
               applyPointer()
             }
           }
+
           Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
             if (!isPointerSelected()) {
               sharedViewModel.displayMsg(
@@ -258,6 +266,7 @@ class MainFragment : Fragment() {
                 .navigate(R.id.magiskFragment)
             }
           }
+
           Constants.INDEX_RRO_METHOD -> { // Magisk - RRO Method
             showInterstitialAd {
               requireActivity().findNavController(R.id.fragment_repo_nav)
@@ -399,22 +408,20 @@ class MainFragment : Fragment() {
       setImageDrawable(Drawable.createFromPath(mousePath))
     }
 
-    val reviewManager =
-      if (BuildConfig.DEBUG) {
-        FakeReviewManager(
-          requireContext(),
-        )
-      } else {
-        ReviewManagerFactory.create(requireContext())
-      }
-    val request = reviewManager.requestReviewFlow()
-    request.addOnCompleteListener {
-      if (it.isSuccessful) {
-        val reviewInfo = it.result
-        val flow = reviewManager.launchReviewFlow(requireActivity(), reviewInfo)
-        flow.addOnCompleteListener {
-          showInterstitialAd {
-            showPointerAppliedMessage()
+    val reviewManager = if (BuildConfig.DEBUG) {
+      FakeReviewManager(requireContext())
+    } else {
+      ReviewManagerFactory.create(requireContext())
+    }
+
+    reviewManager.requestReviewFlow().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        task.result?.let {
+          val flow = reviewManager.launchReviewFlow(requireActivity(), it)
+          flow.addOnCompleteListener {
+            showInterstitialAd {
+              showPointerAppliedMessage()
+            }
           }
         }
       } else {
@@ -519,31 +526,31 @@ class MainFragment : Fragment() {
     }
   }
 
-/*
-    private fun addLocalPointer(fileName: String) {
-        val pointer = RoomPointer(
-            file_name = fileName,
-            uploader_name = "You (Local)",
-            uploader_id = "N/A",
-            pointer_name = fileName,
-            pointer_desc = "N/A"
-        )
-        lifecycleScope.launch {
-            addRoomPointer(pointer)
-        }
-    }
-*/
+  /*
+      private fun addLocalPointer(fileName: String) {
+          val pointer = RoomPointer(
+              file_name = fileName,
+              uploader_name = "You (Local)",
+              uploader_id = "N/A",
+              pointer_name = fileName,
+              pointer_desc = "N/A"
+          )
+          lifecycleScope.launch {
+              addRoomPointer(pointer)
+          }
+      }
+   */
 
-/*
-    private suspend fun addRoomPointer(roomPointer: RoomPointer) {
-        if (roomPointer.file_name == null) {
-            return
-        }
-        if (myDatabase.pointerDao().exists(roomPointer.file_name!!).isEmpty()) {
-            myDatabase.pointerDao().add(roomPointer)
-        }
-    }
-*/
+  /*
+      private suspend fun addRoomPointer(roomPointer: RoomPointer) {
+          if (roomPointer.file_name == null) {
+              return
+          }
+          if (myDatabase.pointerDao().exists(roomPointer.file_name!!).isEmpty()) {
+              myDatabase.pointerDao().add(roomPointer)
+          }
+      }
+   */
 
   private fun import() {
     val safUri = settings.safUri ?: ""
@@ -553,6 +560,7 @@ class MainFragment : Fragment() {
         // runImport = true
         askForPointerFolderLocation()
       }
+
       arePermissionsGranted(safUri) -> {
         // DO WORK
         val fileNames = arrayListOf<String>()
@@ -579,6 +587,7 @@ class MainFragment : Fragment() {
           generateRoomPointerFromFileName(fileNames)
         }
       }
+
       else -> {
         Timber.d("import: Pointer Folder Uri permission not stored. Asking for permission.")
         // runImport = true
@@ -644,60 +653,62 @@ class MainFragment : Fragment() {
       }
     }
 
-    pointerAdapter = LocalPointersAdapter(object : ItemSelectedCallback<RoomPointer> {
-      override fun onClick(position: Int, view: View?, item: RoomPointer) {
-        if (pointerType == POINTER_TOUCH) {
-          settings.selectedPointerName = item.pointer_name
-          settings.selectedPointerPath = targetPath + item.file_name
-        } else {
-          settings.selectedMouseName = item.pointer_name
-          settings.selectedMousePath = targetPath + item.file_name
-        }
-        Glide.with(requireContext())
-          .load(File(targetPath + item.file_name))
-          .override(requireContext().getMinPointerSize())
-          .into(
-            if (pointerType ==
-              POINTER_TOUCH
-            ) {
-              binding.selectedPointer
-            } else {
-              binding.selectedMouse
-            },
-          )
-
-        dialog.dismiss()
-      }
-
-      override fun onLongClick(position: Int, item: RoomPointer): Boolean {
-        MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-          title(text = "${getString(CommonR.string.text_delete)} ${item.pointer_name}")
-          message(res = CommonR.string.text_delete_confirm)
-          positiveButton(res = CommonR.string.text_yes) {
-            val pointerFile = File(targetPath + item.file_name)
-            if (!pointerFile.exists() || pointerFile.delete()) {
-              lifecycleScope.launch {
-                myDatabase.pointerDao().delete(item)
-              }
-              Toast.makeText(
-                context,
-                getString(CommonR.string.msg_delete_success),
-                Toast.LENGTH_SHORT,
-              )
-                .show()
-            } else {
-              Toast.makeText(
-                context,
-                getString(CommonR.string.msg_delete_failed),
-                Toast.LENGTH_SHORT,
-              ).show()
-            }
+    pointerAdapter = LocalPointersAdapter(
+      object : ItemSelectedCallback<RoomPointer> {
+        override fun onClick(position: Int, view: View?, item: RoomPointer) {
+          if (pointerType == POINTER_TOUCH) {
+            settings.selectedPointerName = item.pointer_name
+            settings.selectedPointerPath = targetPath + item.file_name
+          } else {
+            settings.selectedMouseName = item.pointer_name
+            settings.selectedMousePath = targetPath + item.file_name
           }
-          negativeButton(res = CommonR.string.text_no)
+          Glide.with(requireContext())
+            .load(File(targetPath + item.file_name))
+            .override(requireContext().getMinPointerSize())
+            .into(
+              if (pointerType ==
+                POINTER_TOUCH
+              ) {
+                binding.selectedPointer
+              } else {
+                binding.selectedMouse
+              },
+            )
+
+          dialog.dismiss()
         }
-        return true
-      }
-    })
+
+        override fun onLongClick(position: Int, item: RoomPointer): Boolean {
+          MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+            title(text = "${getString(CommonR.string.text_delete)} ${item.pointer_name}")
+            message(res = CommonR.string.text_delete_confirm)
+            positiveButton(res = CommonR.string.text_yes) {
+              val pointerFile = File(targetPath + item.file_name)
+              if (!pointerFile.exists() || pointerFile.delete()) {
+                lifecycleScope.launch {
+                  myDatabase.pointerDao().delete(item)
+                }
+                Toast.makeText(
+                  context,
+                  getString(CommonR.string.msg_delete_success),
+                  Toast.LENGTH_SHORT,
+                )
+                  .show()
+              } else {
+                Toast.makeText(
+                  context,
+                  getString(CommonR.string.msg_delete_failed),
+                  Toast.LENGTH_SHORT,
+                ).show()
+              }
+            }
+            negativeButton(res = CommonR.string.text_no)
+          }
+          return true
+        }
+      },
+    )
 
     bottomSheetListBinding.listPointers.apply {
       val lm = LinearLayoutManager(requireContext())
@@ -735,22 +746,22 @@ class MainFragment : Fragment() {
     }
   }
 
-/*
-    private fun downloadPointer(roomPointer: RoomPointer) {
-        val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_downloading_missing))
-        lifecycleScope.launch(Dispatchers.IO) {
-            val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
-            ref.getFile(File("$targetPath${roomPointer.file_name}"))
-                .addOnSuccessListener {
-                    requireContext().toast(getString(CommonR.string.msg_missing_pointers_auto_downloaded))
-                    dialog.dismiss()
-                }.addOnFailureListener {
-                    requireContext().toast(getString(CommonR.string.msg_error_pointers_missing))
-                    dialog.dismiss()
-                }
-        }
-    }
-*/
+  /*
+      private fun downloadPointer(roomPointer: RoomPointer) {
+          val dialog = requireContext().showStaticProgressDialog(getString(CommonR.string.text_progress_downloading_missing))
+          lifecycleScope.launch(Dispatchers.IO) {
+              val ref = storage.reference.child(DatabaseFields.COLLECTION_POINTERS).child(roomPointer.file_name!!)
+              ref.getFile(File("$targetPath${roomPointer.file_name}"))
+                  .addOnSuccessListener {
+                      requireContext().toast(getString(CommonR.string.msg_missing_pointers_auto_downloaded))
+                      dialog.dismiss()
+                  }.addOnFailureListener {
+                      requireContext().toast(getString(CommonR.string.msg_error_pointers_missing))
+                      dialog.dismiss()
+                  }
+          }
+      }
+   */
 
   private fun signOutDialog(): AlertDialog.Builder = MaterialAlertDialogBuilder(requireContext())
     .setTitle(getString(CommonR.string.dialog_title_sign_out))
