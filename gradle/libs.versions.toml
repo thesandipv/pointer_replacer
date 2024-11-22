@@ -262,7 +262,7 @@ accompanist-testharness = { group = "com.google.accompanist", name = "accompanis
 
 test-junit = { module = "junit:junit", version.ref = "junit" }
 test-mockk = "io.mockk:mockk:1.13.13"
-test-robolectric = "org.robolectric:robolectric:4.14"
+test-robolectric = "org.robolectric:robolectric:4.14.1"
 
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsuVersion" }
 libsu-io = { module = "com.github.topjohnwu.libsu:io", version.ref = "libsuVersion" }
