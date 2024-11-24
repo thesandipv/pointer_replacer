@@ -10,6 +10,17 @@ sidebar_position: 2
 
 ## v1.11.x
 
+### v1.11.4 (24-11-2024)
+- try to fix Zip Path Traversal https://support.google.com/faqs/answer/9294009
+
+### v1.11.3 (22-11-2024)
+- change minSdk to 23
+- changed ad placement
+- changed code style
+- refactor deprecations
+- refactor Play ReviewManager
+- update compile sdk to 35
+
 ### v1.11.1 (02-07-2022)
 - Introducing Downloadable RROs
 - Other internal changes
@@ -110,7 +121,7 @@ Open magisk manager and apply module from generated zip.
 
 ### v1.8.2 (07-09-2019)
 
-- Pointer Picker is now a detailed list. [1st time you should click 'Import Old Pointers']  
+- Pointer Picker is now a detailed list. [1st time you should click 'Import Old Pointers']
   More detail in Pointer Repo List
 - Transparent grid behind pointers for better Handling of Transparent Pointers
 - Description is now optional while uploading new pointer
