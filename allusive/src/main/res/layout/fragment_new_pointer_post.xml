@@ -40,7 +40,7 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/ad_container">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -152,10 +152,10 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/cardView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/input_desc"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:layout_height="50dp"
                 tools:layout_width="match_parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
