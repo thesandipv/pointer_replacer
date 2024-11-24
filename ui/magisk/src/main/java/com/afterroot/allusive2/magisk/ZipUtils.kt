@@ -43,16 +43,22 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
         continue
       }
       val name = if (junkPath) {
-        entry.name.substring(entry.name.lastIndexOf('/') + 1)
+        entry.name.substring(entry.name.lastIndexOf("/") + 1)
       } else {
         entry.name
       }
 
       val dest = File(folder, name)
       dest.parentFile!!.mkdirs()
+      if (!dest.canonicalPath.startsWith(folder.path)) {
+        throw Exception("Zip extract path not matched")
+      }
       FileOutputStream(dest).use { zin.copyTo(it) }
     }
   } catch (e: IOException) {
+    e.printStackTrace()
+    throw e
+  } catch (e: Exception) {
     e.printStackTrace()
     throw e
   }
