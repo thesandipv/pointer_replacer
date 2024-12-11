@@ -183,7 +183,7 @@ androidx-compose-iconsExt = { module = "androidx.compose.material:material-icons
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-compose-runtime-android = { module = "androidx.compose.runtime:runtime-android" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
-androidx-compose-material-navigation = { module = "androidx.compose.material:material-navigation", version = "1.7.0-beta01" }
+androidx-compose-material-navigation = { module = "androidx.compose.material:material-navigation", version = "1.7.6" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-material3-windowsizeclass = { module = "androidx.compose.material3:material3-window-size-class" }
 androidx-compose-material3-navigationSuite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "adaptiveNavigationSuite" }
