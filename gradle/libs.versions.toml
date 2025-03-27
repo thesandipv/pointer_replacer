@@ -80,7 +80,7 @@ google-gms = "com.google.gms.google-services:4.4.2"
 google-ossLic = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "ossLicPlugin" }
 google-protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-google-ksp = "com.google.devtools.ksp:2.1.20-1.0.31"
+google-ksp = "com.google.devtools.ksp:2.1.20-1.0.32"
 
 gradle-android-cacheFix = { id = "org.gradle.android.cache-fix", version = "3.0.1" }
 
