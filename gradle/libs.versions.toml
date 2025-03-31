@@ -78,7 +78,7 @@ ben-manes-versions = { id = "com.github.ben-manes.versions", version = "0.52.0" 
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crshlyticsPlugin" }
 google-gms = "com.google.gms.google-services:4.4.2"
 google-ossLic = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "ossLicPlugin" }
-google-protobuf = { id = "com.google.protobuf", version = "0.9.4" }
+google-protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-ksp = "com.google.devtools.ksp:2.1.20-1.0.32"
 
