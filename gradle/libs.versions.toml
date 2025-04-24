@@ -59,7 +59,7 @@ startUp = "1.2.0"
 transition = "1.5.1"
 truth = "1.4.4"
 vectorDrawable = "1.2.0"
-work = "2.10.0"
+work = "2.10.1"
 
 compileSdk = "35"
 minSdk = "23"
