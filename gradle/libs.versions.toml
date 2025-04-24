@@ -139,7 +139,7 @@ androidx-collection = { module = "androidx.collection:collection-ktx", version.r
 androidx-constraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayout" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-core-splash = { module = "androidx.core:core-splashscreen", version.ref = "coreSplash" }
-androidx-datastore = "androidx.datastore:datastore:1.1.4"
+androidx-datastore = "androidx.datastore:datastore:1.1.5"
 androidx-emoji = { module = "androidx.emoji:emoji", version.ref = "emoji" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-hiltCompiler = "androidx.hilt:hilt-compiler:1.2.0"
