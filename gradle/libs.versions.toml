@@ -126,7 +126,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-play = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
-kotlinx-atomicfu = "org.jetbrains.kotlinx:atomicfu:0.27.0"
+kotlinx-atomicfu = "org.jetbrains.kotlinx:atomicfu:0.28.0"
 kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
