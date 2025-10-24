@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Check Out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
@@ -70,7 +70,7 @@ jobs:
 
       - name: Check Out
         id: check-out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
