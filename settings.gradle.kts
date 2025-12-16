@@ -27,8 +27,8 @@ dependencyResolutionManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.19.2"
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+  id("com.gradle.develocity") version "4.2.2"
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 develocity {
@@ -66,7 +66,7 @@ include(
 
 project(":ards").projectDir = file("ards/lib") // AfterROOT Data Structure
 project(":arro").projectDir = file("arro/app") // Allusive RRO
-project(":utils").projectDir = file("utils/lib") // AfterROOT Utils
+project(":utils").projectDir = file("ards/utils/lib") // AfterROOT Utils
 
 fun readProperties(propertiesFile: File): Properties {
   if (!propertiesFile.exists()) {

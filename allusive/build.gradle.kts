@@ -41,7 +41,9 @@ android {
     }
     multiDexEnabled = true
 
-    resourceConfigurations.addAll(listOf("en"))
+    androidResources {
+      localeFilters += listOf("en")
+    }
   }
 
   val keystoreProperties = readProperties(rootProject.file("keystore.properties"))
@@ -135,7 +137,6 @@ dependencies {
 
   implementation(libs.google.ossLic)
   implementation(libs.google.material)
-  implementation(libs.google.ads)
   implementation(platform(libs.firebase.bom))
   implementation(libs.bundles.firebase)
   implementation(libs.google.play.review)

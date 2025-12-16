@@ -59,7 +59,7 @@ subprojects {
   }
 }
 
-task("incrementPatch") {
+tasks.register("incrementPatch") {
   doLast {
     versionProperties["patch"] = (patch + 1).toString()
     versionProperties.store(rootProject.file("version.properties").writer(), null)
