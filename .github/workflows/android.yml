@@ -6,12 +6,12 @@ on:
     branches: [ main ]
     tags:
       - allusive_v*
-      - run_ci_build
+      - ci*
     paths-ignore:
       - '.idea/**'
       - '**/README.md'
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main ]
     paths-ignore:
       - '.idea/**'
       - '**/README.md'
@@ -28,13 +28,13 @@ jobs:
 
     steps:
       - name: Check Out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
 
       - name: Set up JDK
-        uses: actions/setup-java@v4.7.1
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 21
@@ -44,7 +44,7 @@ jobs:
 
       - name: Setup Gradle
         id: setup-gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -70,7 +70,7 @@ jobs:
 
       - name: Check Out
         id: check-out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PRIV_REPO_PAT }}
           submodules: 'recursive'
@@ -95,7 +95,7 @@ jobs:
 
       - name: Set up JDK
         id: setup-jdk
-        uses: actions/setup-java@v4.7.1
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 21
@@ -125,7 +125,7 @@ jobs:
 
       - name: Setup Gradle
         id: setup-gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
         env:
           COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
         with:
@@ -188,19 +188,10 @@ jobs:
         if: always()
         run: ./release/clean.sh
 
-      - name: Android App size difference
-        continue-on-error: true
-        uses: microsoft/android-app-size-diff@v1.0.5
-        with:
-          baseAppPath: allusive/build/outputs/apk/release/allusive-release.apk
-          targetAppPath: allusive/build/outputs/apk/release/allusive-release.apk
-          summaryOutputPath: allusive/build/reports/apkSizeComparison.md
-          telemetryEnabled: false
-
       - name: Upload build reports
         id: upload-reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-reports
           path: allusive/build/reports
