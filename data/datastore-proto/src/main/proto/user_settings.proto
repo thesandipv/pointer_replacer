@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_package = "com.afterroot.allusive2.datastore";
+option java_multiple_files = true;
+
+message UserSettings {
+  bool is_onboarded = 15;
+  bool use_dynamic_color = 2;
+
+  DarkThemeConfigProto dark_theme_config = 3;
+
+  bool enable_firebase_emulator = 6;
+}
+
+enum DarkThemeConfigProto {
+  DARK_THEME_CONFIG_UNSPECIFIED = 0;
+  DARK_THEME_CONFIG_FOLLOW_SYSTEM = 1;
+  DARK_THEME_CONFIG_LIGHT = 2;
+  DARK_THEME_CONFIG_DARK = 3;
+}

@@ -44,7 +44,6 @@ import com.afterroot.allusive2.data.mapper.toNetworkUser
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.utils.addMenuProviderExt
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.EventObserver
@@ -120,10 +119,10 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(binding.toolbar)
     title = null
 
-    addMenuProviderExt(object : MenuProvider {
-      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(CommonR.menu.menu_common, menu)
-      }
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(CommonR.menu.menu_common, menu)
+            }
 
       override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
         CommonR.id.send_feedback -> {
@@ -144,7 +143,7 @@ class MainActivity : AppCompatActivity() {
   override fun onStart() {
     super.onStart()
     if (!firebaseUtils.isUserSignedIn) { // If not logged in, go to login.
-      startActivity(Intent(this, SplashActivity::class.java))
+      startActivity(Intent(this, OnboardingActivity::class.java))
     } else {
       initialize()
     }

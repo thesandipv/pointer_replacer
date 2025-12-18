@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
+ * Copyright (C) 2016-2024 Sandip Vaghela
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,7 +68,7 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
-import com.afterroot.allusive2.ui.SplashActivity
+import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.utils.extensions.getAsBitmap
@@ -773,7 +773,7 @@ class MainFragment : Fragment() {
           getString(CommonR.string.dialog_sign_out_result_success),
           Toast.LENGTH_SHORT,
         ).show()
-        startActivity(Intent(requireContext(), SplashActivity::class.java))
+        startActivity(Intent(requireContext(), OnboardingActivity::class.java))
       }
     }
     .setNegativeButton(android.R.string.cancel) { _, _ ->
