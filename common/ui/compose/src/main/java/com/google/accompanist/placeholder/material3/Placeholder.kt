@@ -45,9 +45,9 @@ import com.google.accompanist.placeholder.shimmer
  */
 @Composable
 public fun PlaceholderDefaults.color(
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    contentAlpha: Float = 0.1f,
+  backgroundColor: Color = MaterialTheme.colorScheme.surface,
+  contentColor: Color = contentColorFor(backgroundColor),
+  contentAlpha: Float = 0.1f,
 ): Color = contentColor.copy(contentAlpha).compositeOver(backgroundColor)
 
 /**
@@ -60,8 +60,8 @@ public fun PlaceholderDefaults.color(
  */
 @Composable
 public fun PlaceholderDefaults.fadeHighlightColor(
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    alpha: Float = 0.3f,
+  backgroundColor: Color = MaterialTheme.colorScheme.surface,
+  alpha: Float = 0.3f,
 ): Color = backgroundColor.copy(alpha = alpha)
 
 /**
@@ -74,11 +74,9 @@ public fun PlaceholderDefaults.fadeHighlightColor(
  */
 @Composable
 public fun PlaceholderDefaults.shimmerHighlightColor(
-    backgroundColor: Color = MaterialTheme.colorScheme.inverseSurface,
-    alpha: Float = 0.75f,
-): Color {
-    return backgroundColor.copy(alpha = alpha)
-}
+  backgroundColor: Color = MaterialTheme.colorScheme.inverseSurface,
+  alpha: Float = 0.75f,
+): Color = backgroundColor.copy(alpha = alpha)
 
 /**
  * Draws some skeleton UI which is typically used whilst content is 'loading'.
@@ -111,21 +109,21 @@ public fun PlaceholderDefaults.shimmerHighlightColor(
  * on/off screen. The boolean parameter defined for the transition is [visible].
  */
 public fun Modifier.placeholder(
-    visible: Boolean,
-    color: Color = Color.Unspecified,
-    shape: Shape? = null,
-    highlight: PlaceholderHighlight? = null,
-    placeholderFadeTransitionSpec:
-    @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
-    contentFadeTransitionSpec:
-    @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
+  visible: Boolean,
+  color: Color = Color.Unspecified,
+  shape: Shape? = null,
+  highlight: PlaceholderHighlight? = null,
+  placeholderFadeTransitionSpec:
+  @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
+  contentFadeTransitionSpec:
+  @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
 ): Modifier = composed {
-    Modifier.placeholder(
-        visible = visible,
-        color = if (color.isSpecified) color else PlaceholderDefaults.color(),
-        shape = shape ?: MaterialTheme.shapes.small,
-        highlight = highlight,
-        placeholderFadeTransitionSpec = placeholderFadeTransitionSpec,
-        contentFadeTransitionSpec = contentFadeTransitionSpec,
-    )
+  Modifier.placeholder(
+    visible = visible,
+    color = if (color.isSpecified) color else PlaceholderDefaults.color(),
+    shape = shape ?: MaterialTheme.shapes.small,
+    highlight = highlight,
+    placeholderFadeTransitionSpec = placeholderFadeTransitionSpec,
+    contentFadeTransitionSpec = contentFadeTransitionSpec,
+  )
 }

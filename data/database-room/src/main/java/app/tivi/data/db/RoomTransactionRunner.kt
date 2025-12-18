@@ -9,12 +9,9 @@ import androidx.room.withTransaction
 import com.afterroot.allusive2.database.MyDatabase
 import javax.inject.Inject
 
-class RoomTransactionRunner @Inject constructor(
-    private val db: MyDatabase,
-) : DatabaseTransactionRunner {
-    override suspend operator fun <T> invoke(block: suspend () -> T): T {
-        return db.withTransaction {
-            block()
-        }
-    }
+class RoomTransactionRunner @Inject constructor(private val db: MyDatabase) :
+  DatabaseTransactionRunner {
+  override suspend operator fun <T> invoke(block: suspend () -> T): T = db.withTransaction {
+    block()
+  }
 }

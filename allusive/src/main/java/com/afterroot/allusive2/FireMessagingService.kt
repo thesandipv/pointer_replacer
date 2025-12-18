@@ -46,7 +46,6 @@ class FireMessagingService : FirebaseMessagingService() {
 
   override fun onNewToken(token: String) {
     super.onNewToken(token)
-    Timber.tag("FireMessagingService").e("NEW_TOKEN %s", token)
     updateToken(token)
   }
 
@@ -69,7 +68,7 @@ class FireMessagingService : FirebaseMessagingService() {
         url = remoteMessage.data["link"],
         channelId = remoteMessage.notification!!.channelId,
         channelName =
-        remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
+          remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
         title = remoteMessage.notification?.title,
       )
     }

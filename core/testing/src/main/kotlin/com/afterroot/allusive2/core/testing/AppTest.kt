@@ -25,11 +25,11 @@ import org.robolectric.annotation.Config
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class, manifest = Config.NONE)
 abstract class AppTest {
-    @get:Rule(order = 0)
-    val hiltRule: HiltAndroidRule by lazy { HiltAndroidRule(this) }
+  @get:Rule(order = 0)
+  val hiltRule: HiltAndroidRule by lazy { HiltAndroidRule(this) }
 
-    @Before
-    fun init() {
-        hiltRule.inject()
-    }
+  @Before
+  fun init() {
+    hiltRule.inject()
+  }
 }

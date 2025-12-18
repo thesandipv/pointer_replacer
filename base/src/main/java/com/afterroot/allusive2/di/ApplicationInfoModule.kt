@@ -30,17 +30,17 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object ApplicationInfoModule {
-    @Provides
-    fun provideApplicationInfo(
-        @VersionCode
-        versionCode: Int,
-        @VersionName
-        versionName: String,
-        application: Application,
-    ): ApplicationInfo = ApplicationInfo(
-        packageName = application.packageName,
-        debugBuild = BuildConfig.DEBUG,
-        versionCode = versionCode,
-        versionName = versionName,
-    )
+  @Provides
+  fun provideApplicationInfo(
+    @VersionCode
+    versionCode: Int,
+    @VersionName
+    versionName: String,
+    application: Application,
+  ): ApplicationInfo = ApplicationInfo(
+    packageName = application.packageName,
+    debugBuild = BuildConfig.DEBUG,
+    versionCode = versionCode,
+    versionName = versionName,
+  )
 }

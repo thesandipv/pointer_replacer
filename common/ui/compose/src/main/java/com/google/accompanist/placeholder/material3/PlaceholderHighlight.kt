@@ -35,10 +35,10 @@ import com.google.accompanist.placeholder.shimmer
  */
 @Composable
 public fun PlaceholderHighlight.Companion.fade(
-    animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.fadeAnimationSpec,
+  animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.fadeAnimationSpec,
 ): PlaceholderHighlight = PlaceholderHighlight.fade(
-    highlightColor = PlaceholderDefaults.fadeHighlightColor(),
-    animationSpec = animationSpec,
+  highlightColor = PlaceholderDefaults.fadeHighlightColor(),
+  animationSpec = animationSpec,
 )
 
 /**
@@ -56,10 +56,10 @@ public fun PlaceholderHighlight.Companion.fade(
  */
 @Composable
 public fun PlaceholderHighlight.Companion.shimmer(
-    animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.shimmerAnimationSpec,
-    @FloatRange(from = 0.0, to = 1.0) progressForMaxAlpha: Float = 0.6f,
+  animationSpec: InfiniteRepeatableSpec<Float> = PlaceholderDefaults.shimmerAnimationSpec,
+  @FloatRange(from = 0.0, to = 1.0) progressForMaxAlpha: Float = 0.6f,
 ): PlaceholderHighlight = PlaceholderHighlight.shimmer(
-    highlightColor = PlaceholderDefaults.shimmerHighlightColor(),
-    animationSpec = animationSpec,
-    progressForMaxAlpha = progressForMaxAlpha,
+  highlightColor = PlaceholderDefaults.shimmerHighlightColor(),
+  animationSpec = animationSpec,
+  progressForMaxAlpha = progressForMaxAlpha,
 )

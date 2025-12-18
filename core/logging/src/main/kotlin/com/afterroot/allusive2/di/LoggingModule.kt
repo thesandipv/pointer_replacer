@@ -37,25 +37,21 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object LoggingModule {
-    @Provides
-    @Singleton
-    fun provideLogger(
-        timberLogger: TimberLogger,
-        recordingLogger: RecordingLogger,
-    ): Logger = CompositeLogger(timberLogger, recordingLogger)
+  @Provides
+  @Singleton
+  fun provideLogger(timberLogger: TimberLogger, recordingLogger: RecordingLogger): Logger =
+    CompositeLogger(timberLogger, recordingLogger)
 
-    @Provides
-    @Singleton
-    fun provideRecordingLogger(
-        applicationInfo: ApplicationInfo,
-    ): RecordingLogger = when {
-        applicationInfo.debugBuild -> RecordingLoggerImpl()
-        else -> NoopRecordingLogger
-    }
+  @Provides
+  @Singleton
+  fun provideRecordingLogger(applicationInfo: ApplicationInfo): RecordingLogger = when {
+    applicationInfo.debugBuild -> RecordingLoggerImpl()
+    else -> NoopRecordingLogger
+  }
 
-    @Provides
-    @Singleton
-    fun provideSetCrashReportingEnabledAction(
-        androidSetCrashReportingEnabledAction: AndroidSetCrashReportingEnabledAction,
-    ): SetCrashReportingEnabledAction = androidSetCrashReportingEnabledAction
+  @Provides
+  @Singleton
+  fun provideSetCrashReportingEnabledAction(
+    androidSetCrashReportingEnabledAction: AndroidSetCrashReportingEnabledAction,
+  ): SetCrashReportingEnabledAction = androidSetCrashReportingEnabledAction
 }

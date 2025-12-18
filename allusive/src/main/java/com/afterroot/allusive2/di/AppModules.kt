@@ -37,6 +37,8 @@ object AppModules {
     default = Dispatchers.Default,
     io = Dispatchers.IO,
     main = Dispatchers.Main,
+    databaseWrite = Dispatchers.IO.limitedParallelism(1),
+    databaseRead = Dispatchers.IO.limitedParallelism(4),
   )
 
   @Provides

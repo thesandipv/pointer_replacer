@@ -16,7 +16,6 @@ package com.afterroot.allusive2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.widget.ArrayAdapter
@@ -24,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
@@ -281,7 +281,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
           ).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
         }
         Intent(Intent.ACTION_VIEW).apply {
-          data = Uri.parse(getString(CommonR.string.url_play_store_app_page))
+          data = getString(CommonR.string.url_play_store_app_page).toUri()
           startActivity(this)
         }
         true
@@ -293,17 +293,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
     loadingDialog =
       requireContext().showStaticProgressDialog(getString(CommonR.string.text_please_wait))
     loadingDialog.show()
-    billingClient.startConnection(object : BillingClientStateListener {
-      override fun onBillingServiceDisconnected() {
-        sharedViewModel.displayMsg("Something went wrong.")
-      }
-
-      override fun onBillingSetupFinished(billingResult: BillingResult) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-          loadAllSku()
+    billingClient.startConnection(
+      object : BillingClientStateListener {
+        override fun onBillingServiceDisconnected() {
+          sharedViewModel.displayMsg("Something went wrong.")
         }
-      }
-    })
+
+        override fun onBillingSetupFinished(billingResult: BillingResult) {
+          if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            loadAllSku()
+          }
+        }
+      },
+    )
   }
 
   private fun loadAllSku() {

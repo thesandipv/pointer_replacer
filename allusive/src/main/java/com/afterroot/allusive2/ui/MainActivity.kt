@@ -119,10 +119,10 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(binding.toolbar)
     title = null
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(CommonR.menu.menu_common, menu)
-            }
+    addMenuProvider(object : MenuProvider {
+      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(CommonR.menu.menu_common, menu)
+      }
 
       override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
         CommonR.id.send_feedback -> {

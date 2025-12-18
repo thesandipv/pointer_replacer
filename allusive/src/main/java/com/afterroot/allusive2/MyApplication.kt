@@ -22,8 +22,8 @@ import dagger.hilt.android.HiltAndroidApp
 @Keep
 @HiltAndroidApp
 class MyApplication : MultiDexApplication() {
-    override fun onCreate() {
-        DynamicColors.applyToActivitiesIfAvailable(this)
-        super.onCreate()
-    }
+  override fun onCreate() {
+    DynamicColors.applyToActivitiesIfAvailable(this)
+    super.onCreate()
+  }
 }

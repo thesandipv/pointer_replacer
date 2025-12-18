@@ -14,7 +14,6 @@
  */
 package com.afterroot.allusive2.database
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Database
@@ -22,20 +21,14 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
-  override fun migrate(database: SupportSQLiteDatabase) {
-    database.apply {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.apply {
       execSQL(
         "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
       )
@@ -49,19 +42,6 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
   }
 }
 
-@InstallIn(SingletonComponent::class)
-@Module
-object RoomModule {
-  @Provides
-  fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
-    context,
-    MyDatabase::class.java,
-    "installed-pointers",
-  ).addMigrations(MIGRATION_1_2).build()
-
-  @Provides
-  fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
-}
 
 @Dao
 interface PointerDao {

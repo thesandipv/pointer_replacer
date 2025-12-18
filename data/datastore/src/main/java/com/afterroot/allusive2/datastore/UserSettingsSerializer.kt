@@ -23,19 +23,17 @@ import java.io.OutputStream
 import javax.inject.Inject
 
 class UserSettingsSerializer @Inject constructor() : Serializer<UserSettings> {
-    override val defaultValue: UserSettings
-        get() = UserSettings.getDefaultInstance()
+  override val defaultValue: UserSettings
+    get() = UserSettings.getDefaultInstance()
 
-    override suspend fun readFrom(input: InputStream): UserSettings {
-        return try {
-            // readFrom is already called on the data store background thread
-            UserSettings.parseFrom(input)
-        } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
-        }
-    }
+  override suspend fun readFrom(input: InputStream): UserSettings = try {
+    // readFrom is already called on the data store background thread
+    UserSettings.parseFrom(input)
+  } catch (exception: InvalidProtocolBufferException) {
+    throw CorruptionException("Cannot read proto.", exception)
+  }
 
-    override suspend fun writeTo(t: UserSettings, output: OutputStream) {
-        t.writeTo(output)
-    }
+  override suspend fun writeTo(t: UserSettings, output: OutputStream) {
+    t.writeTo(output)
+  }
 }

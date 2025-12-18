@@ -16,7 +16,7 @@
 package com.afterroot.allusive2.data.model
 
 enum class DarkThemeConfig {
-    FOLLOW_SYSTEM,
-    LIGHT,
-    DARK,
+  FOLLOW_SYSTEM,
+  LIGHT,
+  DARK,
 }

@@ -31,19 +31,16 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object DatabaseModule {
-    @Provides
-    @Singleton
-    fun provideRoomDatabase(
-        @ApplicationContext context: Context,
-    ): MyDatabase = Room.databaseBuilder(
-        context,
-        MyDatabase::class.java,
-        "installed-pointers",
-    ).addMigrations(MIGRATION_1_2).build()
+  @Provides
+  @Singleton
+  fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
+    context,
+    MyDatabase::class.java,
+    "installed-pointers",
+  ).addMigrations(MIGRATION_1_2).build()
 
-    @Provides
-    @Singleton
-    fun provideDatabaseTransactionRunner(
-        runner: RoomTransactionRunner,
-    ): DatabaseTransactionRunner = runner
+  @Provides
+  @Singleton
+  fun provideDatabaseTransactionRunner(runner: RoomTransactionRunner): DatabaseTransactionRunner =
+    runner
 }

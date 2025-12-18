@@ -15,7 +15,6 @@
 package com.afterroot.allusive2.ui.fragment
 
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -23,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -131,7 +129,6 @@ class CustomizeFragment : Fragment() {
     setClickListeners()
   }
 
-  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   override fun onStart() {
     super.onStart()
 
@@ -284,27 +281,27 @@ class CustomizeFragment : Fragment() {
   private fun setClickListeners() {
     binding.apply {
       butMinus.setOnClickListener {
-        seekBarSize.progress = seekBarSize.progress - 1
+        seekBarSize.progress -= 1
       }
 
       butPlus.setOnClickListener {
-        seekBarSize.progress = seekBarSize.progress + 1
+        seekBarSize.progress += 1
       }
 
       butPaddingPlus.setOnClickListener {
-        seekBarPadding.progress = seekBarPadding.progress + 1
+        seekBarPadding.progress += 1
       }
 
       butPaddingMinus.setOnClickListener {
-        seekBarPadding.progress = seekBarPadding.progress - 1
+        seekBarPadding.progress -= 1
       }
 
       butAlphaMinus.setOnClickListener {
-        seekBarAlpha.progress = seekBarAlpha.progress - 1
+        seekBarAlpha.progress -= 1
       }
 
       butAlphaPlus.setOnClickListener {
-        seekBarAlpha.progress = seekBarAlpha.progress + 1
+        seekBarAlpha.progress += 1
       }
 
       actionChangeColor.setOnClickListener {
@@ -318,8 +315,7 @@ class CustomizeFragment : Fragment() {
 
         MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
           title(CommonR.string.choose_color)
-          @Suppress("UNUSED_VARIABLE")
-          var dialog = colorChooser(
+          val dialog = colorChooser(
             ColorPalette.Primary,
             ColorPalette.PrimarySub,
             allowCustomArgb = true,

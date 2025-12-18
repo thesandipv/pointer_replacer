@@ -25,6 +25,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object DaoModule {
-    @Provides
-    fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
+  @Provides
+  fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
 }

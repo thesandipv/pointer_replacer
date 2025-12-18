@@ -21,12 +21,12 @@ import androidx.room.Upsert
 import com.afterroot.allusive2.data.model.AllusiveEntity
 
 interface RoomEntityDao<in E : AllusiveEntity> : EntityDao<E> {
-    @Upsert
-    override suspend fun upsert(entity: E): Long
+  @Upsert
+  override suspend fun upsert(entity: E): Long
 
-    @Upsert
-    override suspend fun upsertAll(entities: List<E>)
+  @Upsert
+  override suspend fun upsertAll(entities: List<E>)
 
-    @Delete
-    override suspend fun deleteEntity(entity: E)
+  @Delete
+  override suspend fun deleteEntity(entity: E)
 }

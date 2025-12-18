@@ -34,16 +34,16 @@ import kotlinx.coroutines.SupervisorJob
 @InstallIn(SingletonComponent::class)
 @Module
 object DataStoreModule {
-    @Provides
-    @Singleton
-    fun providesUserSettingsDataStore(
-        @ApplicationContext context: Context,
-        dispatchers: CoroutineDispatchers,
-        userSettingsSerializer: UserSettingsSerializer,
-    ): DataStore<UserSettings> = DataStoreFactory.create(
-        serializer = userSettingsSerializer,
-        scope = CoroutineScope(SupervisorJob() + dispatchers.io),
-    ) {
-        context.dataStoreFile("user_settings.pb")
-    }
+  @Provides
+  @Singleton
+  fun providesUserSettingsDataStore(
+    @ApplicationContext context: Context,
+    dispatchers: CoroutineDispatchers,
+    userSettingsSerializer: UserSettingsSerializer,
+  ): DataStore<UserSettings> = DataStoreFactory.create(
+    serializer = userSettingsSerializer,
+    scope = CoroutineScope(SupervisorJob() + dispatchers.io),
+  ) {
+    context.dataStoreFile("user_settings.pb")
+  }
 }

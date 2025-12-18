@@ -56,7 +56,7 @@ tasks.register('createEmptyModuleZip', CreateEmptyModuleZip) {
     outputDir = file("$rootDir/ui/magisk/src/main/assets")
 }
 
-tasks.whenTaskAdded { task ->
+tasks.configureEach { task ->
     if ((task.name =~ /package\w*Assets/).matches()) { //Matches tasks packageReleaseAssets, packageDebugAssets
         task.dependsOn 'createEmptyModuleZip'
     }

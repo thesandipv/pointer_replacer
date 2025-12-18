@@ -2,10 +2,10 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 
 plugins {
-    id(afterroot.plugins.android.library.get().pluginId)
-    id(afterroot.plugins.kotlin.android.get().pluginId)
-    id(afterroot.plugins.allusive2.android.common.get().pluginId)
-    id(afterroot.plugins.android.hilt.get().pluginId)
+  id(afterroot.plugins.android.library.get().pluginId)
+  id(afterroot.plugins.kotlin.android.get().pluginId)
+  id(afterroot.plugins.allusive2.android.common.get().pluginId)
+  id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
 apply(from = "$rootDir/gradle/create-zip.gradle")
@@ -34,8 +34,8 @@ dependencies {
   implementation(libs.bundles.firebase)
   implementation(libs.bundles.coroutines)
 
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.io)
+  implementation(libs.libsu.core)
+  implementation(libs.libsu.io)
 
   implementation("net.lingala.zip4j:zip4j:2.11.5")
 }
