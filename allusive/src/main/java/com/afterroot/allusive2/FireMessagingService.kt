@@ -23,7 +23,6 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
 import com.google.android.material.R as MaterialR
 
@@ -58,7 +57,7 @@ class FireMessagingService : FirebaseMessagingService() {
         url = remoteMessage.data["link"],
         channelId = remoteMessage.notification!!.channelId,
         channelName =
-          remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
+        remoteMessage.data["cname"] ?: getString(CommonR.string.fcm_channel_default),
         title = remoteMessage.notification?.title,
       )
     }

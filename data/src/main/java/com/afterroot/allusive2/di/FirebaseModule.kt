@@ -43,23 +43,21 @@ import kotlinx.coroutines.runBlocking
 object FirebaseModule {
   @Provides
   @Singleton
-    fun provideFirestore(
-        userDataRepository: UserDataRepository,
-        logger: Logger,
-    ): FirebaseFirestore = Firebase.firestore.apply {
-        firestoreSettings = firestoreSettings {
-      setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
-    }
-        runBlocking {
-            launch {
-                val userData = userDataRepository.userData.first()
-                if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
-                    useEmulator("10.0.2.2", 8080)
-                    logger.d { "Using firebase emulators: firestore" }
-                }
-            }
+  fun provideFirestore(userDataRepository: UserDataRepository, logger: Logger): FirebaseFirestore =
+    Firebase.firestore.apply {
+      firestoreSettings = firestoreSettings {
+        setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
+      }
+      runBlocking {
+        launch {
+          val userData = userDataRepository.userData.first()
+          if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
+            useEmulator("10.0.2.2", 8080)
+            logger.d { "Using firebase emulators: firestore" }
+          }
         }
-  }
+      }
+    }
 
   @Provides
   @Singleton
@@ -71,19 +69,17 @@ object FirebaseModule {
 
   @Provides
   @Singleton
-    fun provideStorage(
-        userDataRepository: UserDataRepository,
-        logger: Logger,
-    ): FirebaseStorage = Firebase.storage.apply {
-        runBlocking {
-            launch {
-                val userData = userDataRepository.userData.first()
-                if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
-                    useEmulator("10.0.2.2", 9199)
-                    logger.d { "Using firebase emulators: storage" }
-                }
-            }
+  fun provideStorage(userDataRepository: UserDataRepository, logger: Logger): FirebaseStorage =
+    Firebase.storage.apply {
+      runBlocking {
+        launch {
+          val userData = userDataRepository.userData.first()
+          if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
+            useEmulator("10.0.2.2", 9199)
+            logger.d { "Using firebase emulators: storage" }
+          }
         }
+      }
     }
 
   @Provides
@@ -108,7 +104,8 @@ object FirebaseModule {
   @Provides
   @Singleton
   fun provideAnalytics(): FirebaseAnalytics = Firebase.analytics
-    @Provides
-    @Singleton
-    fun provideFirebaseCrashlytics(): FirebaseCrashlytics = Firebase.crashlytics
+
+  @Provides
+  @Singleton
+  fun provideFirebaseCrashlytics(): FirebaseCrashlytics = Firebase.crashlytics
 }

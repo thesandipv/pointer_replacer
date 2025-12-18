@@ -16,24 +16,24 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class UserDataRepositoryImpl @Inject constructor(
-    private val userSettingsDataSource: UserSettingsDataSource,
+  private val userSettingsDataSource: UserSettingsDataSource,
 ) : UserDataRepository {
-    override val userData: Flow<UserData>
-        get() = userSettingsDataSource.data
+  override val userData: Flow<UserData>
+    get() = userSettingsDataSource.data
 
-    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
-        userSettingsDataSource.setDarkThemeConfig(darkThemeConfig)
-    }
+  override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+    userSettingsDataSource.setDarkThemeConfig(darkThemeConfig)
+  }
 
-    override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
-        userSettingsDataSource.setUseDynamicColor(useDynamicColor)
-    }
+  override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
+    userSettingsDataSource.setUseDynamicColor(useDynamicColor)
+  }
 
-    override suspend fun setIsOnboarded(value: Boolean) {
-        userSettingsDataSource.setIsOnboarded(value)
-    }
+  override suspend fun setIsOnboarded(value: Boolean) {
+    userSettingsDataSource.setIsOnboarded(value)
+  }
 
-    override suspend fun enableFirebaseEmulators(value: Boolean) {
-        userSettingsDataSource.setEnableFirebaseEmulators(value)
-    }
+  override suspend fun enableFirebaseEmulators(value: Boolean) {
+    userSettingsDataSource.setEnableFirebaseEmulators(value)
+  }
 }

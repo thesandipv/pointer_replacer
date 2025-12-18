@@ -17,8 +17,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.apply {
+  override fun migrate(db: SupportSQLiteDatabase) {
+    db.apply {
       execSQL(
         "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
       )
@@ -31,7 +31,6 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
   }
 }
-
 
 @Dao
 interface PointerDao {

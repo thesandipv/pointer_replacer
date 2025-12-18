@@ -1,6 +1,7 @@
 plugins {
-    id(afterroot.plugins.android.library.get().pluginId)
-    id(afterroot.plugins.kotlin.android.get().pluginId)
+  id(afterroot.plugins.android.library.get().pluginId)
+  id(afterroot.plugins.kotlin.android.get().pluginId)
+  id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
 android {
@@ -11,7 +12,7 @@ dependencies {
   implementation(projects.base)
   implementation(projects.data)
 
-    implementation(libs.kotlinx.atomicfu)
+  implementation(libs.kotlinx.atomicfu)
 
   implementation(libs.androidx.core)
   implementation(libs.androidx.lifecycle.viewmodel)

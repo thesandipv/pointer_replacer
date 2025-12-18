@@ -16,9 +16,8 @@ import com.google.firebase.firestore.Query
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-class PagingPointerRequest @Inject constructor(
-    private val firestore: FirebaseFirestore,
-) : PagingInteractor<PagingPointerRequest.Params, LocalPointerRequest>() {
+class PagingPointerRequest @Inject constructor(private val firestore: FirebaseFirestore) :
+  PagingInteractor<PagingPointerRequest.Params, LocalPointerRequest>() {
 
   data class Params(
     val query: Query,
@@ -26,9 +25,10 @@ class PagingPointerRequest @Inject constructor(
     override val pagingConfig: PagingConfig,
   ) : Parameters<LocalPointerRequest>
 
-    override suspend fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> = Pager(
-    config = params.pagingConfig,
-  ) {
-        PointerRequestsPagingSource(params.query, firestore)
-  }.flow
+  override suspend fun createObservable(params: Params): Flow<PagingData<LocalPointerRequest>> =
+    Pager(
+      config = params.pagingConfig,
+    ) {
+      PointerRequestsPagingSource(params.query, firestore)
+    }.flow
 }
