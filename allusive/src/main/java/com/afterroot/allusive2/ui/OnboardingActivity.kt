@@ -1,16 +1,6 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2020-2025 Sandip Vaghela
+ * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.ui
 
@@ -21,12 +11,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import app.tivi.util.Logger
 import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.R
-import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
-import com.afterroot.data.utils.FirebaseUtils
+import com.afterroot.utils.extensions.getPrefs
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -37,30 +29,33 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.jetbrains.anko.browse
 import org.jetbrains.anko.toast
-import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
 
 @AndroidEntryPoint
-class SplashActivity : AppCompatActivity() {
-
+class OnboardingActivity : AppCompatActivity() {
   private val networkViewModel: NetworkViewModel by viewModels()
-  private lateinit var settings: Settings
-
-  @Inject lateinit var firebaseAuth: FirebaseAuth
 
   @Inject lateinit var firestore: FirebaseFirestore
 
-  @Inject lateinit var firebaseUtils: FirebaseUtils
+  @Inject lateinit var firebaseAuth: FirebaseAuth
+
+  @Inject lateinit var logger: Logger
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    settings = Settings(this)
-    val theme = settings.theme
+    val splashScreen = installSplashScreen()
+    splashScreen.setKeepOnScreenCondition { true }
     AppCompatDelegate.setDefaultNightMode(
-      when (theme) {
+      when (
+        getPrefs().getString(
+          Constants.PREF_KEY_THEME,
+          getString(CommonR.string.theme_device_default),
+        )
+      ) {
         getString(
           CommonR.string.theme_device_default,
         ),
         -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+
         getString(CommonR.string.theme_battery) -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
         getString(CommonR.string.theme_light) -> AppCompatDelegate.MODE_NIGHT_NO
         getString(CommonR.string.theme_dark) -> AppCompatDelegate.MODE_NIGHT_YES
@@ -74,9 +69,10 @@ class SplashActivity : AppCompatActivity() {
     super.onPostCreate(savedInstanceState)
     setUpNetworkObserver()
     when {
-      !firebaseUtils.isUserSignedIn -> {
+      firebaseAuth.currentUser == null -> {
         tryLogin()
       }
+
       intent.extras != null -> {
         intent.extras?.let {
           val link = it.getString("link")
@@ -84,6 +80,7 @@ class SplashActivity : AppCompatActivity() {
             link != null -> {
               browse(link, true)
             }
+
             else -> {
               launchDashboard()
             }
@@ -91,15 +88,9 @@ class SplashActivity : AppCompatActivity() {
           finish()
         }
       }
+
       else -> {
         launchDashboard()
-      }
-    }
-
-    // Use Firebase emulators
-    runCatching {
-      if (BuildConfig.DEBUG && settings.getBoolean("key_enable_emulator", false)) {
-        firestore.useEmulator("10.0.2.2", 8080)
       }
     }
   }
@@ -117,7 +108,7 @@ class SplashActivity : AppCompatActivity() {
       }
 
       toast("Error: ${it.idpResponse?.error?.message}")
-      Timber.e(it.idpResponse?.error, "Sign-in error: ${it.idpResponse?.error?.message}")
+      logger.e(it.idpResponse?.error) { "Sign-in error: ${it.idpResponse?.error?.message}" }
 
       tryLogin()
     }
@@ -140,6 +131,7 @@ class SplashActivity : AppCompatActivity() {
           getString(CommonR.string.url_privacy_policy),
           getString(CommonR.string.url_privacy_policy),
         )
+        .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
         .setAvailableProviders(
           listOf(
             AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),

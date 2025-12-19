@@ -1,16 +1,6 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2020-2025 Sandip Vaghela
+ * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.ui.fragment
 
@@ -68,7 +58,7 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.magisk.reboot
 import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
-import com.afterroot.allusive2.ui.SplashActivity
+import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.utils.extensions.getAsBitmap
@@ -277,19 +267,11 @@ class MainFragment : Fragment() {
       }.show()
   }
 
-  private fun isPointerSelected(): Boolean {
-    if (binding.selectedPointer.width == 0 || binding.selectedPointer.height == 0) {
-      return false
-    }
-    return true
-  }
+  private fun isPointerSelected(): Boolean =
+    !(binding.selectedPointer.width == 0 || binding.selectedPointer.height == 0)
 
-  private fun isMouseSelected(): Boolean {
-    if (binding.selectedMouse.width == 0 || binding.selectedMouse.height == 0) {
-      return false
-    }
-    return true
-  }
+  private fun isMouseSelected(): Boolean =
+    !(binding.selectedMouse.width == 0 || binding.selectedMouse.height == 0)
 
   private fun loadCurrentPointers() {
     val pointerPath = settings.pointerPath
@@ -773,7 +755,7 @@ class MainFragment : Fragment() {
           getString(CommonR.string.dialog_sign_out_result_success),
           Toast.LENGTH_SHORT,
         ).show()
-        startActivity(Intent(requireContext(), SplashActivity::class.java))
+        startActivity(Intent(requireContext(), OnboardingActivity::class.java))
       }
     }
     .setNegativeButton(android.R.string.cancel) { _, _ ->

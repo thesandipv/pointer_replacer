@@ -1,22 +1,11 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2020-2025 Sandip Vaghela
+ * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.widget.ArrayAdapter
@@ -24,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
@@ -281,7 +271,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
           ).logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, this)
         }
         Intent(Intent.ACTION_VIEW).apply {
-          data = Uri.parse(getString(CommonR.string.url_play_store_app_page))
+          data = getString(CommonR.string.url_play_store_app_page).toUri()
           startActivity(this)
         }
         true
@@ -293,17 +283,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
     loadingDialog =
       requireContext().showStaticProgressDialog(getString(CommonR.string.text_please_wait))
     loadingDialog.show()
-    billingClient.startConnection(object : BillingClientStateListener {
-      override fun onBillingServiceDisconnected() {
-        sharedViewModel.displayMsg("Something went wrong.")
-      }
-
-      override fun onBillingSetupFinished(billingResult: BillingResult) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-          loadAllSku()
+    billingClient.startConnection(
+      object : BillingClientStateListener {
+        override fun onBillingServiceDisconnected() {
+          sharedViewModel.displayMsg("Something went wrong.")
         }
-      }
-    })
+
+        override fun onBillingSetupFinished(billingResult: BillingResult) {
+          if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            loadAllSku()
+          }
+        }
+      },
+    )
   }
 
   private fun loadAllSku() {

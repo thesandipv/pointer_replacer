@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="allusive2" pattern="src[pointer-replacer.*]:com.afterroot.allusive2..*||src[pointer-replacer.*]:com.afterroot.ui.common..*" />
+</component>

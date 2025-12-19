@@ -1,20 +1,9 @@
 /*
- * Copyright (C) 2016-2022 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2020-2025 Sandip Vaghela
+ * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.database
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Database
@@ -22,20 +11,14 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afterroot.allusive2.model.RoomPointer
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
-  override fun migrate(database: SupportSQLiteDatabase) {
-    database.apply {
+  override fun migrate(db: SupportSQLiteDatabase) {
+    db.apply {
       execSQL(
         "CREATE TABLE pointers_new (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, pointer_name TEXT, file_name TEXT, pointer_desc TEXT, uploader_id TEXT NOT NULL, uploader_name TEXT NOT NULL)",
       )
@@ -47,20 +30,6 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
       execSQL("ALTER TABLE pointers_new RENAME TO pointers")
     }
   }
-}
-
-@InstallIn(SingletonComponent::class)
-@Module
-object RoomModule {
-  @Provides
-  fun provideRoomDatabase(@ApplicationContext context: Context): MyDatabase = Room.databaseBuilder(
-    context,
-    MyDatabase::class.java,
-    "installed-pointers",
-  ).addMigrations(MIGRATION_1_2).build()
-
-  @Provides
-  fun providePointersDao(myDatabase: MyDatabase): PointerDao = myDatabase.pointerDao()
 }
 
 @Dao

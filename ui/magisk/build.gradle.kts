@@ -2,11 +2,10 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 
 plugins {
-  id("com.afterroot.android.library")
-  id("com.afterroot.kotlin.android")
-  id("com.afterroot.allusive2.android.common")
-  alias(libs.plugins.google.hilt)
-  alias(libs.plugins.jetbrains.kotlin.kapt)
+  id(afterroot.plugins.android.library.get().pluginId)
+  id(afterroot.plugins.kotlin.android.get().pluginId)
+  id(afterroot.plugins.allusive2.android.common.get().pluginId)
+  id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
 apply(from = "$rootDir/gradle/create-zip.gradle")
@@ -34,9 +33,6 @@ dependencies {
   implementation(platform(libs.firebase.bom))
   implementation(libs.bundles.firebase)
   implementation(libs.bundles.coroutines)
-
-  implementation(libs.hilt.hilt)
-  kapt(libs.hilt.compiler)
 
   implementation(libs.libsu.core)
   implementation(libs.libsu.io)

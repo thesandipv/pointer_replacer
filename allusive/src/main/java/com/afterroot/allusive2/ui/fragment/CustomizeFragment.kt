@@ -1,21 +1,10 @@
 /*
- * Copyright (C) 2016-2021 Sandip Vaghela
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2020-2025 Sandip Vaghela
+ * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.ui.fragment
 
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -23,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -131,7 +119,6 @@ class CustomizeFragment : Fragment() {
     setClickListeners()
   }
 
-  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   override fun onStart() {
     super.onStart()
 
@@ -284,27 +271,27 @@ class CustomizeFragment : Fragment() {
   private fun setClickListeners() {
     binding.apply {
       butMinus.setOnClickListener {
-        seekBarSize.progress = seekBarSize.progress - 1
+        seekBarSize.progress -= 1
       }
 
       butPlus.setOnClickListener {
-        seekBarSize.progress = seekBarSize.progress + 1
+        seekBarSize.progress += 1
       }
 
       butPaddingPlus.setOnClickListener {
-        seekBarPadding.progress = seekBarPadding.progress + 1
+        seekBarPadding.progress += 1
       }
 
       butPaddingMinus.setOnClickListener {
-        seekBarPadding.progress = seekBarPadding.progress - 1
+        seekBarPadding.progress -= 1
       }
 
       butAlphaMinus.setOnClickListener {
-        seekBarAlpha.progress = seekBarAlpha.progress - 1
+        seekBarAlpha.progress -= 1
       }
 
       butAlphaPlus.setOnClickListener {
-        seekBarAlpha.progress = seekBarAlpha.progress + 1
+        seekBarAlpha.progress += 1
       }
 
       actionChangeColor.setOnClickListener {
@@ -318,8 +305,7 @@ class CustomizeFragment : Fragment() {
 
         MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
           title(CommonR.string.choose_color)
-          @Suppress("UNUSED_VARIABLE")
-          var dialog = colorChooser(
+          val dialog = colorChooser(
             ColorPalette.Primary,
             ColorPalette.PrimarySub,
             allowCustomArgb = true,
