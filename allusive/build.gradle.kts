@@ -92,6 +92,7 @@ android {
 
 dependencies {
   implementation(projects.data)
+  implementation(projects.data.databaseRoom)
   implementation(projects.ui.home)
   implementation(projects.ui.magisk)
   implementation(projects.ui.repo)

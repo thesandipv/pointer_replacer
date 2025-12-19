@@ -88,7 +88,7 @@ class RepoViewModel @Inject constructor(
       query = baseQuery
     }
     pagingPointerRequest(
-      PagingPointerRequest.Params(query, firestore, pagingConfig = PAGING_CONFIG),
+      PagingPointerRequest.Params(query, pagingConfig = PAGING_CONFIG),
     )
   }
 

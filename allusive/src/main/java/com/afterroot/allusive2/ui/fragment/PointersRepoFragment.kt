@@ -192,7 +192,7 @@ class PointersRepoFragment :
 
         setBackgroundColor(getMaterialColor(MaterialR.attr.colorSurfaceVariant))
         setColorSchemeColors(
-          getMaterialColor(MaterialR.attr.colorPrimary),
+          getMaterialColor(androidx.appcompat.R.attr.colorPrimary),
           getMaterialColor(MaterialR.attr.colorSecondary),
         )
       }
@@ -458,7 +458,7 @@ class PointersRepoFragment :
             setImageDrawable(
               context.getDrawableExt(
                 CommonR.drawable.ic_removed,
-                getMaterialColor(MaterialR.attr.colorError),
+                getMaterialColor(androidx.appcompat.R.attr.colorError),
               ),
             )
           }

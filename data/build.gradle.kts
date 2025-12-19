@@ -21,8 +21,9 @@ ksp {
 dependencies {
   api(projects.ards)
   api(projects.core.logging)
-  implementation(projects.data.model)
+  api(projects.data.model)
   implementation(projects.data.datastore)
+  implementation(projects.core.logging)
 
   implementation(libs.androidx.paging)
   implementation(libs.androidx.preference)

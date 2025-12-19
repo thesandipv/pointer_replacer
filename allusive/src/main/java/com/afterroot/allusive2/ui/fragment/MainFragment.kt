@@ -267,19 +267,11 @@ class MainFragment : Fragment() {
       }.show()
   }
 
-  private fun isPointerSelected(): Boolean {
-    if (binding.selectedPointer.width == 0 || binding.selectedPointer.height == 0) {
-      return false
-    }
-    return true
-  }
+  private fun isPointerSelected(): Boolean =
+    !(binding.selectedPointer.width == 0 || binding.selectedPointer.height == 0)
 
-  private fun isMouseSelected(): Boolean {
-    if (binding.selectedMouse.width == 0 || binding.selectedMouse.height == 0) {
-      return false
-    }
-    return true
-  }
+  private fun isMouseSelected(): Boolean =
+    !(binding.selectedMouse.width == 0 || binding.selectedMouse.height == 0)
 
   private fun loadCurrentPointers() {
     val pointerPath = settings.pointerPath

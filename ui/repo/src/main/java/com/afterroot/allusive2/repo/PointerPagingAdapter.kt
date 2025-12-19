@@ -113,7 +113,7 @@ class PointerVH(
           setImageDrawable(
             context.getTintedDrawable(
               CommonR.drawable.ic_removed,
-              getMaterialColor(com.google.android.material.R.attr.colorError),
+              getMaterialColor(androidx.appcompat.R.attr.colorError),
             ),
           )
         }
