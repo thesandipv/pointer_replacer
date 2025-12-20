@@ -100,7 +100,7 @@ class NewPointerPost : Fragment() {
         adView.apply {
           setAdSize(AdSize.BANNER)
           adUnitId =
-            if (BuildConfig.DEBUG || (!result.isSuccessful && BuildConfig.DEBUG)) {
+            if (BuildConfig.DEBUG) {
               getString(CommonR.string.ad_banner_new_pointer)
             } else {
               remoteConfig.getString("ad_banner_new_pointer")
@@ -207,19 +207,20 @@ class NewPointerPost : Fragment() {
 
   private val actionGetUploadPointer =
     registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+      if (uri != null) {
+        isPointerImported = true
+      }
       uri?.let {
-        Glide.with(
-          this,
-        ).load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
+        Glide.with(this)
+          .load(uri).override(128, 128).centerCrop().into(binding.pointerThumb)
         binding.pointerThumb.background =
           context?.getDrawableExt(CommonR.drawable.transparent_grid)
       }
     }
 
   private fun upload(file: File) {
-    val dialog = requireContext().showStaticProgressDialog(
-      getString(CommonR.string.text_progress_init),
-    )
+    val dialog = requireContext()
+      .showStaticProgressDialog(getString(CommonR.string.text_progress_init))
 
     val storageRef = storage.reference
     val fileUri = Uri.fromFile(file)
@@ -239,7 +240,7 @@ class NewPointerPost : Fragment() {
       )
     }.addOnCompleteListener { task ->
       val map = hashMapOf<String, String>()
-      map[firebaseUtils.uid!!] = firebaseUtils.firebaseUser?.displayName.toString()
+      map[firebaseUtils.uid] = firebaseUtils.firebaseUser?.displayName.toString()
       if (task.isSuccessful) {
         dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
         val pointer = Pointer(
