@@ -38,6 +38,7 @@ ktor = "3.3.3"
 legacySupportV13 = "1.0.0"
 legacySupportV4 = "1.0.0"
 libsuVersion = "5.2.2"
+licensee   = "1.14.1"
 lifecycle = "2.10.0"
 materialDialogs = "3.3.0"
 mockito-inline = "5.2.0"
@@ -96,6 +97,7 @@ jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serializati
 
 maven-publish = { id = "com.vanniktech.maven.publish", version = "0.35.0" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+cash-licensee = { id = "app.cash.licensee", version.ref = "licensee" }
 
 [libraries]
 android-pluginGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }

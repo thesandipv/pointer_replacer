@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.google.ksp)
   alias(libs.plugins.jetbrains.kotlin.kapt) // TODO Remove after removing data-binding
 
-  id(libs.plugins.google.ossLic.get().pluginId)
+  id(libs.plugins.cash.licensee.get().pluginId)
   id("androidx.navigation.safeargs.kotlin")
   id("kotlin-parcelize")
 }
@@ -88,6 +88,21 @@ android {
       "META-INF/LICENSE*.md",
       "META-INF/**/previous-compilation-data.bin",
     )
+}
+
+licensee {
+  allow("Apache-2.0")
+  allow("BSD-3-Clause")
+  allow("MIT")
+  allow("CC0-1.0")
+  allowUrl("https://developer.android.com/studio/terms.html")
+  allowUrl("https://github.com/afollestad/material-dialogs/blob/main/LICENSE.md")
+  allowUrl("https://developer.android.com/guide/playcore/license")
+  allowUrl("https://developer.android.com/google/play/integrity/overview#tos")
+  allowUrl("https://spdx.org/licenses/MIT.txt")
+
+  bundleAndroidAsset = true
+  androidAssetReportPath = "licences/licenses.json" // Override the default path.
 }
 
 dependencies {
