@@ -101,6 +101,8 @@ licensee {
   allowUrl("https://developer.android.com/google/play/integrity/overview#tos")
   allowUrl("https://spdx.org/licenses/MIT.txt")
 
+  ignoreDependencies("com.github.topjohnwu.libsu")
+
   bundleAndroidAsset = true
   androidAssetReportPath = "licences/licenses.json" // Override the default path.
 }
@@ -159,7 +161,6 @@ dependencies {
 
   implementation(libs.google.gson)
 
-  implementation(libs.commonsIo)
   compileOnly((files("libs/api-82.jar")))
 
   implementation(libs.bundles.coroutines)
