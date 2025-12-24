@@ -113,6 +113,7 @@ dependencies {
   implementation(projects.ui.home)
   implementation(projects.ui.magisk)
   implementation(projects.ui.repo)
+  implementation(projects.ui.settings)
 
   implementation(libs.kotlin.stdLib)
 
@@ -153,7 +154,6 @@ dependencies {
 
   ksp(libs.glide.ksp)
 
-  implementation(libs.google.ossLic)
   implementation(libs.google.material)
   implementation(platform(libs.firebase.bom))
   implementation(libs.bundles.firebase)

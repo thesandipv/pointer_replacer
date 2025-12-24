@@ -9,7 +9,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath(libs.google.pluginOssLic)
     classpath(libs.androidx.navigation.pluginSafeArgs)
   }
 }
