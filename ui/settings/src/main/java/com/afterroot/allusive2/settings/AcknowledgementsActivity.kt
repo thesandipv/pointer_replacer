@@ -102,7 +102,7 @@ fun Acknowledgements(
     ) {
       LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(vertical = 8.dp),
       ) {
         items(items = ossLibraries) {
           OssLibraryItem(
