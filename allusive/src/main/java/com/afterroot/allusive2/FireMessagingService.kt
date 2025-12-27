@@ -7,7 +7,6 @@ package com.afterroot.allusive2
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -42,7 +41,7 @@ class FireMessagingService : FirebaseMessagingService() {
     try {
       if (firebaseUtils.isUserSignedIn) {
         firebaseFirestore.collection(DatabaseFields.COLLECTION_USERS)
-          .document(firebaseUtils.uid!!)
+          .document(firebaseUtils.uid)
           .update(DatabaseFields.FIELD_FCM_ID, token)
       }
     } catch (e: Exception) {
@@ -99,7 +98,7 @@ class FireMessagingService : FirebaseMessagingService() {
       .setContentIntent(pendingIntent)
 
     val notificationManager = getSystemService(
-      Context.NOTIFICATION_SERVICE,
+      NOTIFICATION_SERVICE,
     ) as NotificationManager
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -33,6 +33,7 @@ import com.afterroot.allusive2.base.BuildConfig
 import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
+import com.afterroot.allusive2.settings.AcknowledgementsActivity
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.showStaticProgressDialog
@@ -43,7 +44,6 @@ import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.SkuDetailsParams
 import com.android.billingclient.api.querySkuDetails
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -149,8 +149,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
   private fun setOpenSourceLicPref() {
     findPreference<Preference>("licenses")?.apply {
       onPreferenceClickListener = Preference.OnPreferenceClickListener {
-        OssLicensesMenuActivity.setActivityTitle("Licences").apply { }
-        startActivity(Intent(requireContext(), OssLicensesMenuActivity::class.java))
+        startActivity(Intent(requireContext(), AcknowledgementsActivity::class.java))
         return@OnPreferenceClickListener true
       }
     }
