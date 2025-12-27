@@ -61,6 +61,7 @@ include(
   ":ui:home",
   ":ui:magisk",
   ":ui:repo",
+  ":ui:settings",
   ":utils",
 )
 

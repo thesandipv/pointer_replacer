@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*
- * Copyright (C) 2021-2024 AfterROOT
- */
-
 package com.afterroot.allusive2.di
 
 import app.tivi.app.ApplicationInfo
