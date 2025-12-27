@@ -60,11 +60,9 @@ subprojects {
 }
 
 tasks.register("incrementPatch") {
-  doLast {
-    versionProperties["patch"] = (patch + 1).toString()
-    versionProperties.store(rootProject.file("version.properties").writer(), null)
-    println("-INFO: Patch changed from $patch to ${versionProperties["patch"]}")
-  }
+  versionProperties["patch"] = (patch + 1).toString()
+  versionProperties.store(rootProject.file("version.properties").writer(), null)
+  println("- INFO: Patch changed from $patch to ${versionProperties["patch"]}")
 }
 
 apply(from = file("gradle/projectDependencyGraph.gradle"))
