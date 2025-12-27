@@ -6,7 +6,6 @@ package com.afterroot.allusive2.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -16,6 +15,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
@@ -109,25 +109,28 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(binding.toolbar)
     title = null
 
-    addMenuProvider(object : MenuProvider {
-      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(CommonR.menu.menu_common, menu)
-      }
-
-      override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
-        CommonR.id.send_feedback -> {
-          email(
-            email = "afterhasroot@gmail.com",
-            subject = "Pointer Replacer Feedback",
-            text = feedbackBody,
-          )
-          true
+    addMenuProvider(
+      object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+          menuInflater.inflate(CommonR.menu.menu_common, menu)
         }
-        else -> menuItem.onNavDestinationSelected(
-          findNavController(R.id.fragment_repo_nav),
-        )
-      }
-    })
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+          CommonR.id.send_feedback -> {
+            email(
+              email = "afterhasroot@gmail.com",
+              subject = "Pointer Replacer Feedback",
+              text = feedbackBody,
+            )
+            true
+          }
+
+          else -> menuItem.onNavDestinationSelected(
+            findNavController(R.id.fragment_repo_nav),
+          )
+        }
+      },
+    )
   }
 
   override fun onStart() {
@@ -429,7 +432,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun setUpNavigation() {
     val host: NavHostFragment =
-      supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as NavHostFragment?
+      supportFragmentManager.findFragmentById(R.id.fragment_repo_nav) as? NavHostFragment?
         ?: return
     val navController = host.navController
     navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -527,9 +530,7 @@ class MainActivity : AppCompatActivity() {
             setPositiveButton("Update") { _, _ ->
               val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(
-                  "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
-                ),
+                "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri(),
               )
               intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
               startActivity(intent)
@@ -547,9 +548,7 @@ class MainActivity : AppCompatActivity() {
             setPositiveButton("Update") { _, _ ->
               val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(
-                  "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
-                ),
+                "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri(),
               )
               intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
               startActivity(intent)
@@ -559,9 +558,5 @@ class MainActivity : AppCompatActivity() {
           }.show()
         }
       }
-  }
-
-  companion object {
-    private const val TAG = "MainActivity"
   }
 }

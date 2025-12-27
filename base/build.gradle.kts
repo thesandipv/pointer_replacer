@@ -37,6 +37,8 @@ dependencies {
 
   implementation(libs.materialdialogs.core)
 
+  api(libs.kotlinx.serialization)
+
   api(libs.timber)
   api(projects.utils)
 }

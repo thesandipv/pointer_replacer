@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.google.ksp)
   alias(libs.plugins.jetbrains.kotlin.kapt) // TODO Remove after removing data-binding
 
-  id(libs.plugins.google.ossLic.get().pluginId)
+  id(libs.plugins.cash.licensee.get().pluginId)
   id("androidx.navigation.safeargs.kotlin")
   id("kotlin-parcelize")
 }
@@ -90,12 +90,30 @@ android {
     )
 }
 
+licensee {
+  allow("Apache-2.0")
+  allow("BSD-3-Clause")
+  allow("MIT")
+  allow("CC0-1.0")
+  allowUrl("https://developer.android.com/studio/terms.html")
+  allowUrl("https://github.com/afollestad/material-dialogs/blob/main/LICENSE.md")
+  allowUrl("https://developer.android.com/guide/playcore/license")
+  allowUrl("https://developer.android.com/google/play/integrity/overview#tos")
+  allowUrl("https://spdx.org/licenses/MIT.txt")
+
+  ignoreDependencies("com.github.topjohnwu.libsu")
+
+  bundleAndroidAsset = true
+  androidAssetReportPath = "licences/licenses.json" // Override the default path.
+}
+
 dependencies {
   implementation(projects.data)
   implementation(projects.data.databaseRoom)
   implementation(projects.ui.home)
   implementation(projects.ui.magisk)
   implementation(projects.ui.repo)
+  implementation(projects.ui.settings)
 
   implementation(libs.kotlin.stdLib)
 
@@ -136,7 +154,6 @@ dependencies {
 
   ksp(libs.glide.ksp)
 
-  implementation(libs.google.ossLic)
   implementation(libs.google.material)
   implementation(platform(libs.firebase.bom))
   implementation(libs.bundles.firebase)
@@ -144,7 +161,6 @@ dependencies {
 
   implementation(libs.google.gson)
 
-  implementation(libs.commonsIo)
   compileOnly((files("libs/api-82.jar")))
 
   implementation(libs.bundles.coroutines)

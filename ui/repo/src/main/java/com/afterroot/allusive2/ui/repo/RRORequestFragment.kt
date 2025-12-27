@@ -32,13 +32,13 @@ class RRORequestFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?,
-  ): View? {
+  ): View {
     _binding = FragmentRroRequestBinding.inflate(inflater, container, false)
     val view = binding.root
     binding.composeLayout.apply {
       setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
       setContent {
-        Theme(requireContext()) {
+        Theme {
           Requests()
         }
       }

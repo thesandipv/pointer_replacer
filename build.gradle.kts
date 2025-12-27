@@ -9,7 +9,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath(libs.google.pluginOssLic)
     classpath(libs.androidx.navigation.pluginSafeArgs)
   }
 }
@@ -32,6 +31,7 @@ plugins {
   alias(libs.plugins.jetbrains.kotlin.multiplatform) apply false
   alias(libs.plugins.jetbrains.kotlin.kapt) apply false
   alias(libs.plugins.jetbrains.kotlin.serialization) apply false
+  alias(libs.plugins.cash.licensee) apply false
   alias(libs.plugins.spotless)
 }
 
@@ -60,11 +60,9 @@ subprojects {
 }
 
 tasks.register("incrementPatch") {
-  doLast {
-    versionProperties["patch"] = (patch + 1).toString()
-    versionProperties.store(rootProject.file("version.properties").writer(), null)
-    println("-INFO: Patch changed from $patch to ${versionProperties["patch"]}")
-  }
+  versionProperties["patch"] = (patch + 1).toString()
+  versionProperties.store(rootProject.file("version.properties").writer(), null)
+  println("- INFO: Patch changed from $patch to ${versionProperties["patch"]}")
 }
 
 apply(from = file("gradle/projectDependencyGraph.gradle"))
