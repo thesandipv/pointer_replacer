@@ -4591,13 +4591,13 @@ __metadata:
   linkType: hard
 
 "algoliasearch-helper@npm:^3.7.0":
-  version: 3.7.0
-  resolution: "algoliasearch-helper@npm:3.7.0"
+  version: 3.26.1
+  resolution: "algoliasearch-helper@npm:3.26.1"
   dependencies:
     "@algolia/events": ^4.0.1
   peerDependencies:
-    algoliasearch: ">= 3.1 < 5"
-  checksum: 34afebf5aa6db2f032b6e8aab7e3a3bdd062ea2eebd9120000dbc02367126ac99e7402ea3cb4e8cdff58df0661805adc52219fd932ed4435fb1058b8e78a61d4
+    algoliasearch: ">= 3.1 < 6"
+  checksum: 7198cc004f216403ce3ca71805831c779202a5ef7d249a65cdb0b01e6b612efd781f42ce647225e6b883cf425386f6c6858fbb0fbd6a68e13f11fd854de1fcbe
   languageName: node
   linkType: hard
 
