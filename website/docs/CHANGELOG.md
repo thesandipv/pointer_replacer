@@ -11,9 +11,11 @@ sidebar_position: 2
 ## v1.11.x
 
 ### v1.11.4 (24-11-2024)
+
 - try to fix Zip Path Traversal https://support.google.com/faqs/answer/9294009
 
 ### v1.11.3 (22-11-2024)
+
 - change minSdk to 23
 - changed ad placement
 - changed code style
@@ -22,11 +24,13 @@ sidebar_position: 2
 - update compile sdk to 35
 
 ### v1.11.1 (02-07-2022)
+
 - Introducing Downloadable RROs
 - Other internal changes
 - Removed support for Android KitKat
 
 ### v1.11.0 (10-04-2022)
+
 - Major Design Upgrade.
 - Fix Magisk Module Install button is not visible.
 - Add branded login screen.
@@ -38,6 +42,7 @@ sidebar_position: 2
 ## v1.10.x
 
 ### v1.10.1 (06-03-2022)
+
 - Repository now loads in pages.
 - Install by RRO Layer
 - Magisk Module can be installed within the app.
