@@ -1,6 +1,3 @@
-[submodule "website"]
-	path = website
-	url = https://github.com/thesandipv/allusive-web.git
 [submodule "ards"]
 	path = ards
 	url = https://github.com/afterroot/ards.git
