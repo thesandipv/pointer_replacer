@@ -1,9 +1,9 @@
 {
+  // This file is not used in compilation. It is here just for a nice editor experience.
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@docusaurus/tsconfig",
-  "include": ["src/"],
   "compilerOptions": {
-    "baseUrl": ".",
-    "allowJs": true
-  }
+    "baseUrl": "."
+  },
+  "exclude": [".docusaurus", "build"]
 }
