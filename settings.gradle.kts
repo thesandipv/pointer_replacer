@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import java.util.Properties
 
 pluginManagement {
@@ -27,7 +25,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.3"
+  id("com.gradle.develocity") version "4.4.3"
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
