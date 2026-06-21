@@ -3,7 +3,6 @@ import com.android.build.gradle.internal.lint.LintModelWriterTask
 
 plugins {
   id(afterroot.plugins.android.library.get().pluginId)
-  id(afterroot.plugins.kotlin.android.get().pluginId)
   id(afterroot.plugins.allusive2.android.common.get().pluginId)
   id(afterroot.plugins.android.hilt.get().pluginId)
 }

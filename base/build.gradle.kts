@@ -1,6 +1,5 @@
 plugins {
   id(afterroot.plugins.android.library.get().pluginId)
-  id(afterroot.plugins.kotlin.android.get().pluginId)
   id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
@@ -22,23 +21,17 @@ android {
 }
 
 dependencies {
-  api(libs.kotlinx.coroutines.core)
-
-  implementation(projects.common.ui.resources)
-
   api(libs.glide.glide)
-  ksp(libs.glide.ksp)
+  api(libs.kotlinx.coroutines.core)
+  api(libs.kotlinx.serialization)
+  api(libs.timber)
 
-  implementation(libs.androidx.activity)
-  implementation(libs.firebase.firestore)
-
-  implementation(libs.firebase.ui.firestore)
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.firebase.storage)
   implementation(libs.firebase.ui.storage)
 
-  implementation(libs.materialdialogs.core)
-
-  api(libs.kotlinx.serialization)
-
-  api(libs.timber)
   api(projects.utils)
+  implementation(projects.common.ui.resources)
+
+  ksp(libs.glide.ksp)
 }

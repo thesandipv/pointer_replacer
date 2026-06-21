@@ -4,14 +4,13 @@
  */
 package com.afterroot.allusive2
 
+import android.app.Application
 import androidx.annotation.Keep
-import androidx.multidex.MultiDexApplication
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
-
 @Keep
 @HiltAndroidApp
-class MyApplication : MultiDexApplication() {
+class MyApplication : Application() {
   override fun onCreate() {
     DynamicColors.applyToActivitiesIfAvailable(this)
     super.onCreate()

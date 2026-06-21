@@ -131,7 +131,7 @@ class OnboardingActivity : AppCompatActivity() {
           getString(CommonR.string.url_privacy_policy),
           getString(CommonR.string.url_privacy_policy),
         )
-        .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
+        .setCredentialManagerEnabled(!BuildConfig.DEBUG)
         .setAvailableProviders(
           listOf(
             AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
