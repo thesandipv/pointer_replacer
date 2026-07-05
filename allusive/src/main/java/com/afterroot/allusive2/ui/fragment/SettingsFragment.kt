@@ -42,20 +42,22 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
-import com.android.billingclient.api.SkuDetailsParams
-import com.android.billingclient.api.querySkuDetails
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.queryProductDetails
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
 
@@ -72,6 +74,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
   @Inject lateinit var firestore: FirebaseFirestore
 
   @Inject lateinit var firebaseUtils: FirebaseUtils
+
+  @Inject lateinit var json: Json
   private val sharedViewModel: MainSharedViewModel by activityViewModels()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -95,25 +99,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
   }
 
   private fun initBilling() {
+    val pendingPurchasesParams = PendingPurchasesParams.newBuilder()
+      .enableOneTimeProducts()
+      .build()
     billingClient =
-      BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener {
-          _,
-          purchases,
-        ->
-        val purchase = purchases?.first()
-        if (purchase != null) { // Consume every time after successful purchase
-          val params = ConsumeParams.newBuilder().setPurchaseToken(
-            purchase.purchaseToken,
-          ).build()
-          billingClient.consumeAsync(params) { result, _ ->
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-              Timber.tag(TAG).d("initBilling: Purchase Done and Consumed")
-            } else {
-              Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
+      BillingClient.newBuilder(requireContext())
+        .enablePendingPurchases(pendingPurchasesParams)
+        .setListener { _, purchases ->
+          val purchase = purchases?.first()
+          if (purchase != null) { // Consume every time after successful purchase
+            val params = ConsumeParams.newBuilder().setPurchaseToken(
+              purchase.purchaseToken,
+            ).build()
+            billingClient.consumeAsync(params) { result, _ ->
+              if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                Timber.tag(TAG).d("initBilling: Purchase Done and Consumed")
+              } else {
+                Timber.tag(TAG).d("initBilling: Purchase Done but not Consumed.")
+              }
             }
           }
-        }
-      }.build()
+        }.build()
   }
 
   private fun initFirebaseConfig() {
@@ -304,41 +310,50 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     lifecycleScope.launch {
-      val skuModel = Gson().fromJson(
-        firebaseRemoteConfig.getString("pr_sku_list"),
-        SkuModel::class.java,
-      )
-      val params = SkuDetailsParams.newBuilder().setSkusList(
-        skuModel.sku,
-      ).setType(BillingClient.SkuType.INAPP).build()
+      val skuModel = json.decodeFromString<SkuModel>(firebaseRemoteConfig.getString("pr_sku_list"))
+      val productList = skuModel.sku.map { productId ->
+        QueryProductDetailsParams.Product.newBuilder()
+          .setProductId(productId)
+          .setProductType(BillingClient.ProductType.INAPP)
+          .build()
+      }
+      val params = QueryProductDetailsParams.newBuilder()
+        .setProductList(productList)
+        .build()
 
-      val queryResult = billingClient.querySkuDetails(params)
+      val queryResult = billingClient.queryProductDetails(params)
       val billingResult = queryResult.billingResult
-      val skuDetailsList = queryResult.skuDetailsList
-      if (billingResult.responseCode != BillingClient.BillingResponseCode.OK &&
-        skuDetailsList == null
+      val productDetailsList = queryResult.productDetailsList
+      if (billingResult.responseCode != BillingClient.BillingResponseCode.OK ||
+        productDetailsList.isNullOrEmpty()
       ) {
         this.cancel()
         return@launch
       }
       val list = ArrayList<String>()
-      for (skuDetails in skuDetailsList!!) {
-        list.add("${skuDetails.price} - ${skuDetails.title.substringBefore("(")}")
+      for (productDetails in productDetailsList) {
+        val price = productDetails.oneTimePurchaseOfferDetails?.formattedPrice ?: ""
+        list.add("$price - ${productDetails.title.substringBefore("(")}")
       }
 
       val adapter =
         ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, list)
       withContext(Dispatchers.Main) {
-        delay(100)
+        delay(100.milliseconds)
         loadingDialog.dismiss()
         MaterialAlertDialogBuilder(
           requireContext(),
         ).setTitle(getString(CommonR.string.pref_title_donate_dev))
           .setAdapter(adapter) { _, which ->
+            val productDetailsParamsList = listOf(
+              BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetailsList[which])
+                .build(),
+            )
             val billingFlowParams =
-              BillingFlowParams.newBuilder().setSkuDetails(
-                skuDetailsList[which],
-              ).build()
+              BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build()
             billingClient.launchBillingFlow(requireActivity(), billingFlowParams)
           }.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
             dialog.dismiss()
