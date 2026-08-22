@@ -171,4 +171,5 @@ dependencies {
 
   implementation(libs.okhttp.okhttp)
   implementation(libs.fastScroll)
+  implementation(libs.coil)
 }
