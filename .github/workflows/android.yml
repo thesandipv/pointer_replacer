@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup Gradle
         id: setup-gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: Setup Gradle
         id: setup-gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         env:
           COMMIT_ID: ${{ steps.commithash.outputs.sha_short }}
         with:
