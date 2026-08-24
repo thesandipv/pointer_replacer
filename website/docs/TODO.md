@@ -20,10 +20,11 @@ Create New Issue in Main Project
 
 - [ ] ADD - Support replacing mouse pointer with Magisk method
 - [ ] IMP - Detect change in size while repacking magisk module.
-  - [ ] use database to store meta data of created magisk modules.
+  - [ ] use database to store metadata of created magisk modules.
 - [ ] IMP - Remove `multiDexKeepFile` and use `multiDexKeepProguard` instead.
 - [ ] ADD - Create online repo of RRO Pointers
   - [ ] add deeplink support
+- [ ] IMP - Remove MaterialDialogs and use Alert dialogs.
 
 ### v1.10.2
 

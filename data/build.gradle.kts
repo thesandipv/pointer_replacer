@@ -42,4 +42,6 @@ dependencies {
   api(libs.retrofit.gson)
 
   implementation(libs.materialdialogs.core)
+
+  testImplementation(libs.test.junit)
 }

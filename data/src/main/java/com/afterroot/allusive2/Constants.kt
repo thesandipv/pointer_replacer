@@ -30,6 +30,17 @@ object Reason {
   const val NOT_A_POINTER = 2
   const val OTHER = 3
   const val NOTICE = 4
+  const val EXPLICIT = 5
+  const val COPYRIGHT = 6
+  const val SPAM = 7
+}
+
+object PointerStatus {
+  const val PENDING = "PENDING"
+  const val APPROVED = "APPROVED"
+  const val QUARANTINED = "QUARANTINED"
+  const val REJECTED = "REJECTED"
+  const val DELETED = "DELETED"
 }
 
 fun Context.getMinPointerSize(): Int = this.resources.getInteger(

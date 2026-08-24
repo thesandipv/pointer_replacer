@@ -27,9 +27,21 @@ object DatabaseFields {
   const val FIELD_DOWNVOTES = "downvotes"
   const val FIELD_HAS_RRO = "hasRRO"
   const val FIELD_RRO_REQUESTED = "rroRequested"
+  const val FIELD_STATUS = "status"
+  const val FIELD_REASON_CODE = "reasonCode"
+  const val FIELD_SHA256 = "sha256"
+  const val FIELD_DHASH = "dHash"
+  const val FIELD_REPORT_COUNT = "reportCount"
 
   // table 'requests'
   const val COLLECTION_REQUESTS = "requests"
   const val FIELD_REQUEST_CLOSED = "isRequestClosed"
   const val FIELD_TIMESTAMP = "timestamp"
+
+  // table 'reports'
+  const val COLLECTION_REPORTS = "reports"
+  const val FIELD_POINTER_ID = "pointerId"
+  const val FIELD_REPORTER_UID = "reporterUid"
+  const val FIELD_REPORT_REASON = "reason"
+  const val FIELD_REPORT_DETAILS = "details"
 }

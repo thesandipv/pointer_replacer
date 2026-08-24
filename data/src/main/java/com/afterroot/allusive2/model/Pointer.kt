@@ -5,6 +5,7 @@
 package com.afterroot.allusive2.model
 
 import androidx.annotation.Keep
+import com.afterroot.allusive2.PointerStatus
 import com.afterroot.allusive2.Reason
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
@@ -26,6 +27,10 @@ data class Pointer(
    * Use constants from [Reason]
    * */
   var reasonCode: Int = Reason.OK,
+  var status: String = PointerStatus.APPROVED,
+  var sha256: String? = null,
+  var dHash: String? = null,
+  var reportCount: Int = 0,
   var hasRRO: Boolean = false,
   var rroRequested: Boolean = false,
   @Exclude var docId: String? = null,

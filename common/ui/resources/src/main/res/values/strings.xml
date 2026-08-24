@@ -227,4 +227,16 @@
     <string name="text_request_status">Request Status</string>
     <string name="text_your_requests">Your Requests</string>
     <string name="text_info_method">Apply Method: %1$s</string>
+    <string name="text_report_pointer">Report Pointer</string>
+    <string name="dialog_title_report_pointer">Report Pointer</string>
+    <string name="report_reason_duplicate">Duplicate Pointer</string>
+    <string name="report_reason_explicit">Explicit or Inappropriate Content</string>
+    <string name="report_reason_not_a_pointer">Not a Pointer / Low Quality</string>
+    <string name="report_reason_spam">Spam or Advertising</string>
+    <string name="report_reason_other">Other</string>
+    <string name="msg_report_success">Thank you for reporting. This item has been submitted for moderation.</string>
+    <string name="msg_duplicate_pointer_error">This pointer already exists in the repository (duplicate detected).</string>
+    <string name="msg_explicit_content_error">Upload contains prohibited or inappropriate content.</string>
+    <string name="msg_posting_revoked">Your posting privileges have been suspended.</string>
+    <string name="input_hint_report_details">Additional details (optional)</string>
 </resources>

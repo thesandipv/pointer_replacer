@@ -40,6 +40,7 @@ import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
 import com.afterroot.allusive2.data.mapper.toPointer
 import com.afterroot.allusive2.data.mapper.toRoomPointer
 import com.afterroot.allusive2.data.pointers
+import com.afterroot.allusive2.data.reports
 import com.afterroot.allusive2.data.requests
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.database.MyDatabase
@@ -49,6 +50,7 @@ import com.afterroot.allusive2.databinding.FragmentPointerRepoBinding
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.model.Pointer
+import com.afterroot.allusive2.model.PointerReport
 import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
@@ -562,17 +564,61 @@ class PointersRepoFragment :
     showPointerInfoDialog(item)
   }
 
+  private fun showReportDialog(pointer: Pointer) {
+    val reasons = listOf(
+      getString(CommonR.string.report_reason_duplicate),
+      getString(CommonR.string.report_reason_explicit),
+      getString(CommonR.string.report_reason_not_a_pointer),
+      getString(CommonR.string.report_reason_spam),
+      getString(CommonR.string.report_reason_other),
+    )
+    MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+      title(res = CommonR.string.dialog_title_report_pointer)
+      cornerRadius(16f)
+      listItems(items = reasons) { _, index, _ ->
+        val reasonCode = when (index) {
+          0 -> Reason.DUPLICATE
+          1 -> Reason.EXPLICIT
+          2 -> Reason.NOT_A_POINTER
+          3 -> Reason.SPAM
+          else -> Reason.OTHER
+        }
+        lifecycleScope.launch {
+          val report = PointerReport(
+            pointerId = pointer.docId,
+            reporterUid = firebaseUtils.uid,
+            reason = reasonCode,
+          )
+          firestore.reports().add(report).addOnSuccessListener {
+            pointer.docId?.let { docId ->
+              firestore.pointers().document(docId)
+                .update(DatabaseFields.FIELD_REPORT_COUNT, FieldValue.increment(1))
+            }
+            requireContext().toast(CommonR.string.msg_report_success)
+          }.addOnFailureListener {
+            requireContext().toast(CommonR.string.msg_error)
+          }
+        }
+      }
+    }
+  }
+
   @SuppressLint("CheckResult")
   override fun onLongClick(position: Int, item: Pointer): Boolean {
     val result = kotlin.runCatching {
-      if (!item.uploadedBy!!.containsKey(firebaseUtils.uid) || item.reasonCode != Reason.OK) {
+      val isOwner = item.uploadedBy?.containsKey(firebaseUtils.uid) == true
+      val list = mutableListOf<String>()
+      if (isOwner && item.reasonCode == Reason.OK) {
+        list.add(getString(CommonR.string.text_edit))
+        list.add(getString(CommonR.string.text_delete))
+      }
+      if (!isOwner) {
+        list.add(getString(CommonR.string.text_report_pointer))
+      }
+      if (list.isEmpty()) {
         return false
       }
-      val list =
-        mutableListOf(
-          getString(CommonR.string.text_edit),
-          getString(CommonR.string.text_delete),
-        )
+
       MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
         cornerRadius(16f)
         listItems(items = list) { _, _, text ->
@@ -583,6 +629,10 @@ class PointersRepoFragment :
 
             getString(CommonR.string.text_delete) -> {
               showDeleteDialog(item, position)
+            }
+
+            getString(CommonR.string.text_report_pointer) -> {
+              showReportDialog(item)
             }
           }
         }

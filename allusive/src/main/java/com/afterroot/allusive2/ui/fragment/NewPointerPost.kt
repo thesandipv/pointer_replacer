@@ -16,13 +16,18 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.PointerStatus
 import com.afterroot.allusive2.R
+import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.FragmentNewPointerPostBinding
 import com.afterroot.allusive2.model.Pointer
+import com.afterroot.allusive2.utils.ImageHashUtils
+import com.afterroot.allusive2.utils.ModerationUtils
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -50,6 +55,8 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.jetbrains.anko.find
 import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
@@ -148,7 +155,8 @@ class NewPointerPost : Fragment() {
     requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
       setOnClickListener {
         if (verifyData()) {
-          upload(saveTmpPointer())
+          val result = saveTmpPointer()
+          upload(result.file, result.dHash)
         }
       }
       icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
@@ -218,67 +226,112 @@ class NewPointerPost : Fragment() {
       }
     }
 
-  private fun upload(file: File) {
+  private fun upload(file: File, dHash: String?) {
     val dialog = requireContext()
       .showStaticProgressDialog(getString(CommonR.string.text_progress_init))
 
-    val storageRef = storage.reference
-    val fileUri = Uri.fromFile(file)
-    val fileRef = storageRef.child(
-      "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}",
-    )
-    val uploadTask = fileRef.putFile(fileUri)
+    lifecycleScope.launch {
+      try {
+        val sha256 = ImageHashUtils.calculateSHA256(file)
 
-    uploadTask.addOnProgressListener {
-      val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
-      dialog.updateProgressText(
-        String.format(
-          "%s..%s",
-          getString(CommonR.string.text_progress_uploading),
-          progress,
-        ),
-      )
-    }.addOnCompleteListener { task ->
-      val map = hashMapOf<String, String>()
-      map[firebaseUtils.uid] = firebaseUtils.firebaseUser?.displayName.toString()
-      if (task.isSuccessful) {
-        dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
-        val pointer = Pointer(
-          name = pointerName,
-          filename = fileUri.lastPathSegment!!,
-          description = pointerDescription,
-          uploadedBy = map,
-          time = Timestamp.now().toDate(),
+        // 1. Check user posting permissions
+        val userDoc = db.collection(DatabaseFields.COLLECTION_USERS)
+          .document(firebaseUtils.uid)
+          .get()
+          .await()
+        val properties = userDoc.get(DatabaseFields.FIELD_USER_PROPERTIES) as? Map<*, *>
+        val canPost = properties?.get("canPost") as? Boolean ?: true
+        if (!canPost) {
+          dialog.dismiss()
+          sharedViewModel.displayMsg(getString(CommonR.string.msg_posting_revoked))
+          return@launch
+        }
+
+        // 2. Check for duplicate SHA-256
+        val duplicateSnapshot = db.collection(DatabaseFields.COLLECTION_POINTERS)
+          .whereEqualTo(DatabaseFields.FIELD_SHA256, sha256)
+          .limit(1)
+          .get()
+          .await()
+        if (!duplicateSnapshot.isEmpty) {
+          dialog.dismiss()
+          sharedViewModel.displayMsg(getString(CommonR.string.msg_duplicate_pointer_error))
+          return@launch
+        }
+
+        // 3. Upload to Firebase Storage
+        val storageRef = storage.reference
+        val fileUri = Uri.fromFile(file)
+        val fileRef = storageRef.child(
+          "${DatabaseFields.COLLECTION_POINTERS}/${fileUri.lastPathSegment!!}",
         )
-        Timber.tag(TAG).d("upload: %s", pointer)
-        db.collection(
-          DatabaseFields.COLLECTION_POINTERS,
-        ).add(pointer).addOnSuccessListener {
-          requireActivity().apply {
-            sharedViewModel.displayMsg(
-              getString(CommonR.string.msg_pointer_upload_success),
+        val uploadTask = fileRef.putFile(fileUri)
+
+        uploadTask.addOnProgressListener {
+          val progress = "${(100 * it.bytesTransferred) / it.totalByteCount}%"
+          dialog.updateProgressText(
+            String.format(
+              "%s..%s",
+              getString(CommonR.string.text_progress_uploading),
+              progress,
+            ),
+          )
+        }.addOnCompleteListener { task ->
+          val map = hashMapOf<String, String>()
+          map[firebaseUtils.uid] = firebaseUtils.firebaseUser?.displayName.toString()
+          if (task.isSuccessful) {
+            dialog.updateProgressText(getString(CommonR.string.text_progress_finishing_up))
+            val pointer = Pointer(
+              name = pointerName,
+              filename = fileUri.lastPathSegment!!,
+              description = pointerDescription,
+              uploadedBy = map,
+              time = Timestamp.now().toDate(),
+              status = PointerStatus.APPROVED,
+              reasonCode = Reason.OK,
+              sha256 = sha256,
+              dHash = dHash,
             )
-            dialog.dismiss()
-            findNavController().navigateUp()
+            Timber.tag(TAG).d("upload: %s", pointer)
+            db.collection(
+              DatabaseFields.COLLECTION_POINTERS,
+            ).add(pointer).addOnSuccessListener {
+              requireActivity().apply {
+                sharedViewModel.displayMsg(
+                  getString(CommonR.string.msg_pointer_upload_success),
+                )
+                dialog.dismiss()
+                findNavController().navigateUp()
+              }
+            }.addOnFailureListener {
+              sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
+              dialog.dismiss()
+            }
           }
         }.addOnFailureListener {
+          dialog.dismiss()
+          binding.pointerThumb.background =
+            context?.getDrawableExt(CommonR.drawable.transparent_grid)
           sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
         }
+      } catch (e: Exception) {
+        Timber.e(e, "upload failed")
+        dialog.dismiss()
+        sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
       }
-    }.addOnFailureListener {
-      binding.pointerThumb.background =
-        context?.getDrawableExt(CommonR.drawable.transparent_grid)
-      sharedViewModel.displayMsg(getString(CommonR.string.msg_error))
     }
   }
+
+  private data class SavedTmpPointerResult(val file: File, val dHash: String?)
 
   /**
    * @throws IOException exception
    */
   @Throws(IOException::class)
-  private fun saveTmpPointer(): File {
+  private fun saveTmpPointer(): SavedTmpPointerResult {
     binding.pointerThumb.background = null
     val bitmap = binding.pointerThumb.getAsBitmap()
+    val dHash = bitmap?.let { ImageHashUtils.calculateDHash(it) }
     val file = File.createTempFile("pointer", ".png", requireContext().cacheDir)
     val out: FileOutputStream
     try {
@@ -291,7 +344,7 @@ class NewPointerPost : Fragment() {
     } catch (iae: IllegalArgumentException) {
       iae.printStackTrace()
     }
-    return file
+    return SavedTmpPointerResult(file, dHash)
   }
 
   private fun verifyData(): Boolean {
@@ -306,6 +359,11 @@ class NewPointerPost : Fragment() {
       if (pointerDescription.length >= inputDesc.counterMaxLength) {
         setListener(editDesc, inputDesc)
         inputDesc.error = "Maximum Characters"
+        isOK = false
+      }
+
+      if (ModerationUtils.containsExplicitContent(pointerName, pointerDescription)) {
+        sharedViewModel.displayMsg(getString(CommonR.string.msg_explicit_content_error))
         isOK = false
       }
 
