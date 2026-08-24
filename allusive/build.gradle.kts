@@ -2,7 +2,6 @@ import com.afterroot.gradle.readProperties
 
 plugins {
   id(afterroot.plugins.android.application.get().pluginId)
-  id(afterroot.plugins.kotlin.android.get().pluginId)
   id(afterroot.plugins.android.compose.get().pluginId)
   id(afterroot.plugins.android.hilt.get().pluginId)
   id(afterroot.plugins.allusive2.android.common.get().pluginId)
@@ -10,14 +9,13 @@ plugins {
   alias(libs.plugins.firebase.crashlytics)
   alias(libs.plugins.google.gms)
   alias(libs.plugins.google.ksp)
-  alias(libs.plugins.jetbrains.kotlin.kapt) // TODO Remove after removing data-binding
 
   id(libs.plugins.cash.licensee.get().pluginId)
   id("androidx.navigation.safeargs.kotlin")
   id("kotlin-parcelize")
 }
 
-val ci by extra { System.getenv("CI") == "true" }
+extra.set("ci", System.getenv("CI") == "true")
 
 android {
   namespace = "com.afterroot.allusive2"
@@ -100,6 +98,7 @@ licensee {
   allowUrl("https://developer.android.com/guide/playcore/license")
   allowUrl("https://developer.android.com/google/play/integrity/overview#tos")
   allowUrl("https://spdx.org/licenses/MIT.txt")
+  allowUrl("https://golang.org/LICENSE")
 
   ignoreDependencies("com.github.topjohnwu.libsu")
 
@@ -126,7 +125,6 @@ dependencies {
   implementation(libs.androidx.core.splash)
   implementation(libs.androidx.fragment)
   implementation(libs.bundles.lifecycle)
-  implementation(libs.androidx.multiDex)
   implementation(libs.androidx.navigation.fragment)
   implementation(libs.androidx.navigation.ui)
   implementation(libs.androidx.paging)
@@ -173,4 +171,5 @@ dependencies {
 
   implementation(libs.okhttp.okhttp)
   implementation(libs.fastScroll)
+  implementation(libs.coil)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 Sandip Vaghela
+ * Copyright (C) 2020-2026 Sandip Vaghela
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.afterroot.allusive2.ui
@@ -131,7 +131,7 @@ class OnboardingActivity : AppCompatActivity() {
           getString(CommonR.string.url_privacy_policy),
           getString(CommonR.string.url_privacy_policy),
         )
-        .setIsSmartLockEnabled(!BuildConfig.DEBUG, true)
+        .setCredentialManagerEnabled(!BuildConfig.DEBUG)
         .setAvailableProviders(
           listOf(
             AuthUI.IdpConfig.EmailBuilder().setRequireName(true).build(),
