@@ -4165,7 +4165,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:^17.0.5":
+"@types/react@npm:*":
   version: 17.0.5
   resolution: "@types/react@npm:17.0.5"
   dependencies:
@@ -4173,6 +4173,15 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 86bfb0be783b95771aa61a5e480f3d878a8cb9b9eeea0d02eee7978dc9899a7cba3b346a2c9bd7460d353231fcdee8af7b7e20ad036f706fbe55e1f6519efa3e
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^19.0.0":
+  version: 19.2.18
+  resolution: "@types/react@npm:19.2.18"
+  dependencies:
+    csstype: ^3.2.2
+  checksum: 01e42509fd2dbe05652bbe50f69883c79f6c5b24e5f306307e1f95eaf7eddf1cdd2646a1e056c6088d2c4403d5e2ab72226e31001c6564630529901514872fb1
   languageName: node
   linkType: hard
 
@@ -6139,6 +6148,13 @@ __metadata:
   version: 3.0.8
   resolution: "csstype@npm:3.0.8"
   checksum: 5939a003858a31a32cbc52a8f45496aa0c2bcb4629b21c5bc14a7ddcac1a3d4adfd655f56843dc14940f60563378e9444af2c9c373b3f212601b9eeb6740b8db
+  languageName: node
+  linkType: hard
+
+"csstype@npm:^3.2.2":
+  version: 3.2.3
+  resolution: "csstype@npm:3.2.3"
+  checksum: cb882521b3398958a1ce6ca98c011aec0bde1c77ecaf8a1dd4db3b112a189939beae3b1308243b2fe50fc27eb3edeb0f73a5a4d91d928765dc6d5ecc7bda92ee
   languageName: node
   linkType: hard
 
@@ -8917,7 +8933,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loose-envify@npm:^1.0.0, loose-envify@npm:^1.1.0, loose-envify@npm:^1.2.0, loose-envify@npm:^1.3.1, loose-envify@npm:^1.4.0":
+"loose-envify@npm:^1.0.0, loose-envify@npm:^1.2.0, loose-envify@npm:^1.3.1, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
   dependencies:
@@ -9998,15 +10014,15 @@ __metadata:
     "@mdx-js/react": ^1.6.22
     "@svgr/webpack": ^5.5.0
     "@tsconfig/docusaurus": ^1.0.2
-    "@types/react": ^17.0.5
+    "@types/react": ^19.0.0
     "@types/react-helmet": ^6.1.1
     "@types/react-router-dom": ^5.1.7
     autoprefixer: ^10.4.2
     clsx: ^1.1.1
     postcss: ^8.4.8
     prism-react-renderer: ^1.2.1
-    react: ^17.0.1
-    react-dom: ^17.0.1
+    react: ^19.0.0
+    react-dom: ^19.0.0
     tailwindcss: ^3.0.23
     typescript: ^4.6.2
   languageName: unknown
@@ -10825,16 +10841,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^17.0.1":
-  version: 17.0.2
-  resolution: "react-dom@npm:17.0.2"
+"react-dom@npm:^19.0.0":
+  version: 19.2.8
+  resolution: "react-dom@npm:19.2.8"
   dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    scheduler: ^0.20.2
+    scheduler: ^0.27.0
   peerDependencies:
-    react: 17.0.2
-  checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
+    react: ^19.2.8
+  checksum: cef5d9493f911f20da5648bbd44a27e7e2e96868be4ed0a6a650499b19d74156d35e8c2eee9c075a2cbce59ef3da483cb55113f2941c1bc17fd005ffa92d7084
   languageName: node
   linkType: hard
 
@@ -10971,13 +10985,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^17.0.1":
-  version: 17.0.2
-  resolution: "react@npm:17.0.2"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-  checksum: b254cc17ce3011788330f7bbf383ab653c6848902d7936a87b09d835d091e3f295f7e9dd1597c6daac5dc80f90e778c8230218ba8ad599f74adcc11e33b9d61b
+"react@npm:^19.0.0":
+  version: 19.2.8
+  resolution: "react@npm:19.2.8"
+  checksum: cdedb4786eb3eb79c8fbaa6df299de61ecd9e1cd4c7cd52213b5af7a98c67d532fd6b14b9d546ae5851f3962437aec22ad17ee6e8e0450de11c595300c5e5bd7
   languageName: node
   linkType: hard
 
@@ -11479,13 +11490,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.20.2":
-  version: 0.20.2
-  resolution: "scheduler@npm:0.20.2"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-  checksum: c4b35cf967c8f0d3e65753252d0f260271f81a81e427241295c5a7b783abf4ea9e905f22f815ab66676f5313be0a25f47be582254db8f9241b259213e999b8fc
+"scheduler@npm:^0.27.0":
+  version: 0.27.0
+  resolution: "scheduler@npm:0.27.0"
+  checksum: 92644ead0a9443e20f9d24132fe93675b156209b9eeb35ea245f8a86768d0cc0fcca56f341eeef21d9b6dd8e72d6d5e260eb5a41d34b05cd605dd45a29f572ef
   languageName: node
   linkType: hard
 
