@@ -4085,6 +4085,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/prismjs@npm:^1.26.0":
+  version: 1.26.6
+  resolution: "@types/prismjs@npm:1.26.6"
+  checksum: b61abb7370d55b549ab67d1dfab479f1f27539cebe02f051db67f0ad90f5de34df6b9fcaf340dd2f3e0217bba15d3e31c642832560ecf1779397d6950ee69478
+  languageName: node
+  linkType: hard
+
 "@types/prop-types@npm:*":
   version: 15.7.3
   resolution: "@types/prop-types@npm:15.7.3"
@@ -5522,6 +5529,13 @@ __metadata:
   version: 1.1.1
   resolution: "clsx@npm:1.1.1"
   checksum: ff052650329773b9b245177305fc4c4dc3129f7b2be84af4f58dc5defa99538c61d4207be7419405a5f8f3d92007c954f4daba5a7b74e563d5de71c28c830063
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "clsx@npm:2.1.1"
+  checksum: acd3e1ab9d8a433ecb3cc2f6a05ab95fe50b4a3cfc5ba47abb6cbf3754585fcb87b84e90c822a1f256c4198e3b41c7f6c391577ffc8678ad587fc0976b24fd57
   languageName: node
   linkType: hard
 
@@ -10004,7 +10018,7 @@ __metadata:
     autoprefixer: ^10.4.2
     clsx: ^1.1.1
     postcss: ^8.4.8
-    prism-react-renderer: ^1.2.1
+    prism-react-renderer: ^2.0.0
     react: ^17.0.1
     react-dom: ^17.0.1
     tailwindcss: ^3.0.23
@@ -10551,6 +10565,18 @@ __metadata:
   peerDependencies:
     react: ">=0.14.9"
   checksum: 883693ea59dd6c7d821930ff232f1b28cd3f5d4a111fdb0a730f2ae34ffc7ca805ad3522c86eecbc79f9bee30279371e1fa6b33b4f72a6d3f17921b733b303b6
+  languageName: node
+  linkType: hard
+
+"prism-react-renderer@npm:^2.0.0":
+  version: 2.4.1
+  resolution: "prism-react-renderer@npm:2.4.1"
+  dependencies:
+    "@types/prismjs": ^1.26.0
+    clsx: ^2.0.0
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: ddd5490a1335629addde9535db7872f0aee8dbce048818dd6e4c3972c779780af13d669c12d3f2fbb54c5b22d1578e50945099ef1a24dd445f33774e87d85e6e
   languageName: node
   linkType: hard
 
