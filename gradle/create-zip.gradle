@@ -57,7 +57,7 @@ tasks.register('createEmptyModuleZip', CreateEmptyModuleZip) {
 }
 
 tasks.configureEach { task ->
-    if ((task.name =~ /package\w*Assets/).matches()) { //Matches tasks packageReleaseAssets, packageDebugAssets
+    if ((task.name =~ /generate\w*Assets/).matches()) { //Matches tasks mergeReleaseAssets, mergeDebugAssets
         task.dependsOn 'createEmptyModuleZip'
     }
 }

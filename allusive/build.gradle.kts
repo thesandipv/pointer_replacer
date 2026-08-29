@@ -159,7 +159,7 @@ dependencies {
 
   implementation(libs.google.gson)
 
-  compileOnly((files("libs/api-82.jar")))
+  compileOnly(libs.xposed.api)
 
   implementation(libs.bundles.coroutines)
 
