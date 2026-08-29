@@ -237,6 +237,19 @@ class MagiskFragment : Fragment() {
             if (this.exists()) updateProgress("- Replaced XHDPI pointer_spot_touch.png")
           }
         }
+
+        Variant.XXHDPI -> {
+          val scaled = bmp.scale(VariantSizes.XXHDPI, VariantSizes.XXHDPI)
+          scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_XXHDPI").apply {
+            if (this.exists()) updateProgress("- Replaced XXHDPI pointer_spot_touch.png")
+          }
+        }
+        Variant.XXXHDPI -> {
+          val scaled = bmp.scale(VariantSizes.XXXHDPI, VariantSizes.XXXHDPI)
+          scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_XXXHDPI").apply {
+            if (this.exists()) updateProgress("- Replaced XXXHDPI pointer_spot_touch.png")
+          }
+        }
       }
     }
   }

@@ -32,9 +32,11 @@ fun magiskEmptyModuleZipPath(context: Context) =
 fun magiskEmptyModuleExtractPath(context: Context) =
   "${context.externalCacheDir?.path}/empty-module"
 fun rroApkDownloadPath(context: Context) = "${context.externalCacheDir?.path}/rros"
+const val POINTER_XXXHDPI = "/res/drawable-xxxhdpi-v4/pointer_spot_touch.png"
+const val POINTER_XXHDPI = "/res/drawable-xxhdpi-v4/pointer_spot_touch.png"
 const val POINTER_XHDPI = "/res/drawable-xhdpi-v4/pointer_spot_touch.png"
-const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
 const val POINTER_HDPI = "/res/drawable-hdpi-v4/pointer_spot_touch.png"
+const val POINTER_MDPI = "/res/drawable-mdpi-v4/pointer_spot_touch.png"
 const val MAGISK_EMPTY_ZIP = "empty-module.zip"
 const val MAGISK_PACKAGE = "com.topjohnwu.magisk"
 
@@ -56,9 +58,11 @@ fun filesToReplace(context: Context): List<File> {
   if (!File(targetPath).exists()) return emptyList()
   val list = mutableListOf<File>()
   val paths = listOf(
-    "$targetPath$POINTER_HDPI",
     "$targetPath$POINTER_MDPI",
+    "$targetPath$POINTER_HDPI",
     "$targetPath$POINTER_XHDPI",
+    "$targetPath$POINTER_XXHDPI",
+    "$targetPath$POINTER_XXXHDPI",
   )
   paths.forEach {
     val file = File(it)
@@ -73,34 +77,40 @@ enum class Variant {
   MDPI,
   HDPI,
   XHDPI,
+  XXHDPI,
+  XXXHDPI,
 }
 
 object VariantSizes {
-  const val MDPI = 33
-  const val HDPI = 49
-  const val XHDPI = 66
+  const val MDPI = 24
+  const val HDPI = 36
+  const val XHDPI = 48
+  const val XXHDPI = 72
+  const val XXXHDPI = 96
 }
 
-val ALL_VARIANTS = listOf(Variant.MDPI, Variant.HDPI, Variant.XHDPI)
+val ALL_VARIANTS = listOf(
+  Variant.MDPI,
+  Variant.HDPI,
+  Variant.XHDPI,
+  Variant.XXHDPI,
+  Variant.XXXHDPI,
+)
 
 fun variantsToReplace(context: Context): List<Variant> {
   val targetPath = frameworkExtractPath(context)
-  if (!File(targetPath).exists()) return emptyList()
-
-  val list = mutableListOf<Variant>()
-  if (File("$targetPath$POINTER_HDPI").exists()) list.add(Variant.HDPI)
-  if (File("$targetPath$POINTER_MDPI").exists()) list.add(Variant.MDPI)
-  if (File("$targetPath$POINTER_XHDPI").exists()) list.add(Variant.XHDPI)
-  return list
+  return variantsToReplace(targetPath)
 }
 
 fun variantsToReplace(targetPath: String): List<Variant> {
   if (!File(targetPath).exists()) return emptyList()
 
   val list = mutableListOf<Variant>()
-  if (File("$targetPath$POINTER_HDPI").exists()) list.add(Variant.HDPI)
   if (File("$targetPath$POINTER_MDPI").exists()) list.add(Variant.MDPI)
+  if (File("$targetPath$POINTER_HDPI").exists()) list.add(Variant.HDPI)
   if (File("$targetPath$POINTER_XHDPI").exists()) list.add(Variant.XHDPI)
+  if (File("$targetPath$POINTER_XXHDPI").exists()) list.add(Variant.XXHDPI)
+  if (File("$targetPath$POINTER_XXXHDPI").exists()) list.add(Variant.XXXHDPI)
   return list
 }
 
@@ -161,7 +171,9 @@ fun copyRepackedFrameworkResApk(context: Context): File {
 
 fun copyDownloadedRROApk(context: Context, dlRROApkFileName: String): File {
   val downloaded = File(rroApkDownloadPath(context), dlRROApkFileName)
-  return downloaded.copyTo(target = File(magiskRROSourceApkPath(context)), overwrite = true)
+  val target = File(magiskRROSourceApkPath(context))
+  target.parentFile?.mkdirs()
+  return downloaded.copyTo(target = target, overwrite = true)
 }
 
 fun createModuleProp(context: Context) {
