@@ -127,20 +127,28 @@ class MagiskFragment : Fragment() {
 
   private fun createMagiskModule() {
     lifecycleScope.launch {
-            /*val extracted = File(frameworkExtractPath(requireContext()))
-            if (!extracted.exists()) {
-                copyAndExtractFrameworkResApk()
-            } else {
-                updateProgress("- Using already extracted framework-res.apk")
-            }*/
-
       createAndReplacePointerFiles(ALL_VARIANTS)
-      repackFrameworkResApk()
-      copyMagiskModuleZip()
-      extractMagiskModuleZip()
-      copyRepackedFW()
-      val module = repackMagiskModuleZip()
-      if (module?.exists() == true) {
+      updateProgress("- Modifying framework-res.apk with new pointer...")
+      val repackedFw = withContext(Dispatchers.IO) {
+        repackFrameworkResApk()
+      }
+      if (repackedFw == null || !repackedFw.exists()) {
+        updateProgress("- Failed to repack framework-res.apk", completed = true)
+        return@launch
+      }
+
+      updateProgress("- Packaging Magisk Module...")
+      val module = withContext(Dispatchers.IO) {
+        val fileName = "${settings.selectedPointerName}_Magisk.zip"
+        buildFrameworkMagiskModule(
+          context = requireContext(),
+          pointerName = settings.selectedPointerName ?: "Custom",
+          repackedFrameworkApk = repackedFw,
+          outputPath = repackedMagiskModulePath(requireContext(), fileName),
+        )
+      }
+
+      if (module.exists()) {
         updateProgress("- Magisk module saved at: ${module.path}")
         setupInstallButton(module.path)
       }
@@ -196,18 +204,6 @@ class MagiskFragment : Fragment() {
     progress.value = Result.Running(stringBuilder.toString())
   }
 
-  private suspend fun copyAndExtractFrameworkResApk() {
-    updateProgress("- Copying framework-res.apk from /system/framework")
-    withContext(Dispatchers.IO) {
-      val frameworkResApk = copyFrameworkRes(requireContext())
-      withContext(Dispatchers.Main) { updateProgress("- Extracting framework-res.apk") }
-
-      frameworkResApk.unzip(toFolder = File(frameworkExtractPath(requireContext())))
-
-      withContext(Dispatchers.Main) { updateProgress("- Done Extracting") }
-    }
-  }
-
   private fun createAndReplacePointerFiles(variants: List<Variant>) {
     val pointersDir = File(pointerSavePath(requireContext()))
     if (!pointersDir.exists()) pointersDir.mkdirs()
@@ -237,7 +233,6 @@ class MagiskFragment : Fragment() {
             if (this.exists()) updateProgress("- Replaced XHDPI pointer_spot_touch.png")
           }
         }
-
         Variant.XXHDPI -> {
           val scaled = bmp.scale(VariantSizes.XXHDPI, VariantSizes.XXHDPI)
           scaled.saveAs("${pointerSavePath(requireContext())}$POINTER_XXHDPI").apply {
@@ -267,50 +262,6 @@ class MagiskFragment : Fragment() {
       result = File(repackedFrameworkPath(requireContext()))
     }
     updateProgress("- Repack Successful")
-    return result
-  }
-
-  private suspend fun repackMagiskModuleZip(): File? {
-    var result: File?
-    updateProgress("- Repacking magisk module")
-    withContext(Dispatchers.IO) {
-      val path = magiskEmptyModuleExtractPath(requireContext())
-      val fileName = "${settings.selectedPointerName}_Magisk.zip"
-      result =
-        zip(
-          sourceFolder = File(path),
-          exportPath = repackedMagiskModulePath(requireContext(), fileName),
-        )
-    }
-    updateProgress("- Repack Successful")
-    return result
-  }
-
-  private suspend fun copyMagiskModuleZip() {
-    updateProgress("- Copying $MAGISK_EMPTY_ZIP")
-    withContext(Dispatchers.IO) {
-      copyMagiskEmptyZip(
-        context = requireContext(),
-        to = magiskEmptyModuleZipPath(requireContext()),
-      )
-    }
-    updateProgress("- Done copying $MAGISK_EMPTY_ZIP")
-  }
-
-  private suspend fun extractMagiskModuleZip() {
-    updateProgress("- Extracting $MAGISK_EMPTY_ZIP")
-    withContext(Dispatchers.IO) {
-      extractMagiskZip(requireContext())
-    }
-    updateProgress("- Done Extracting $MAGISK_EMPTY_ZIP")
-  }
-
-  private suspend fun copyRepackedFW(): File {
-    updateProgress("- Copying repacked framework-res.apk")
-    val result = withContext(Dispatchers.IO) {
-      copyRepackedFrameworkResApk(requireContext())
-    }
-    updateProgress("- Done copying framework-res.apk")
     return result
   }
 }

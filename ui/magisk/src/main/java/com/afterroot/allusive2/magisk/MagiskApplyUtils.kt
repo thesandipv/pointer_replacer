@@ -5,18 +5,16 @@
 package com.afterroot.allusive2.magisk
 
 import android.content.Context
-import android.content.res.AssetManager
 import android.graphics.Bitmap
 import com.afollestad.materialdialogs.MaterialDialog
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.FileReader
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.util.Properties
+import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.ZipParameters
 import timber.log.Timber
 import com.afterroot.allusive2.resources.R as CommonR
 
@@ -53,26 +51,6 @@ fun copyFrameworkRes(context: Context): File {
   return file.copyTo(target)
 }
 
-fun filesToReplace(context: Context): List<File> {
-  val targetPath = frameworkExtractPath(context)
-  if (!File(targetPath).exists()) return emptyList()
-  val list = mutableListOf<File>()
-  val paths = listOf(
-    "$targetPath$POINTER_MDPI",
-    "$targetPath$POINTER_HDPI",
-    "$targetPath$POINTER_XHDPI",
-    "$targetPath$POINTER_XXHDPI",
-    "$targetPath$POINTER_XXXHDPI",
-  )
-  paths.forEach {
-    val file = File(it)
-    if (file.exists()) {
-      list.add(file)
-    }
-  }
-  return list
-}
-
 enum class Variant {
   MDPI,
   HDPI,
@@ -97,23 +75,6 @@ val ALL_VARIANTS = listOf(
   Variant.XXXHDPI,
 )
 
-fun variantsToReplace(context: Context): List<Variant> {
-  val targetPath = frameworkExtractPath(context)
-  return variantsToReplace(targetPath)
-}
-
-fun variantsToReplace(targetPath: String): List<Variant> {
-  if (!File(targetPath).exists()) return emptyList()
-
-  val list = mutableListOf<Variant>()
-  if (File("$targetPath$POINTER_MDPI").exists()) list.add(Variant.MDPI)
-  if (File("$targetPath$POINTER_HDPI").exists()) list.add(Variant.HDPI)
-  if (File("$targetPath$POINTER_XHDPI").exists()) list.add(Variant.XHDPI)
-  if (File("$targetPath$POINTER_XXHDPI").exists()) list.add(Variant.XXHDPI)
-  if (File("$targetPath$POINTER_XXXHDPI").exists()) list.add(Variant.XXXHDPI)
-  return list
-}
-
 fun Bitmap.saveAs(path: String): File {
   val file = File(path)
   file.parentFile?.mkdirs()
@@ -130,56 +91,102 @@ fun Bitmap.saveAs(path: String): File {
   return file
 }
 
-fun copyMagiskEmptyZip(context: Context, to: String) {
-  copyAssetFile(context, MAGISK_EMPTY_ZIP, to)
-}
-
-fun copyMagiskRROZip(context: Context, to: String) {
-  copyAssetFile(context, MAGISK_RRO_ZIP, to)
-}
-
-fun extractMagiskZip(context: Context) {
-  val file = File(magiskEmptyModuleZipPath(context))
-  if (!file.exists()) return
-  file.unzip(toFolder = File(magiskEmptyModuleExtractPath(context)))
-}
-
 fun copyAssetFile(context: Context, fileName: String, to: String) {
-  val assetManager: AssetManager = context.assets
-  val inputStream: InputStream?
-  val outputStream: OutputStream?
   try {
-    inputStream = assetManager.open(fileName)
-    val outFile = File(to)
-    outputStream = FileOutputStream(outFile)
-    inputStream.copyTo(outputStream)
-    inputStream.close()
-    outputStream.flush()
-    outputStream.close()
+    context.assets.open(fileName).use { inputStream ->
+      val outFile = File(to)
+      outFile.parentFile?.mkdirs()
+      FileOutputStream(outFile).use { outputStream ->
+        inputStream.copyTo(outputStream)
+      }
+    }
   } catch (e: IOException) {
     Timber.tag("COPY_ASSET").e(e, "Failed to copy asset file: %s", fileName)
   }
 }
 
-fun copyRepackedFrameworkResApk(context: Context): File {
-  val repacked = File(repackedFrameworkPath(context))
-  return repacked.copyTo(
-    target = File("${magiskEmptyModuleExtractPath(context)}$FRAMEWORK_APK"),
-    overwrite = true,
-  )
+/**
+ * Builds an RRO Magisk module zip directly from the base asset template using Zip4j.
+ * Eliminates disk extraction and repacking steps.
+ */
+fun buildRroMagiskModule(
+  context: Context,
+  pointerName: String,
+  rroApkFile: File,
+  outputPath: String,
+): File {
+  val outputFile = File(outputPath)
+  outputFile.parentFile?.mkdirs()
+  if (outputFile.exists()) outputFile.delete()
+
+  // Copy base template directly to output path
+  copyAssetFile(context, MAGISK_RRO_ZIP, outputFile.path)
+
+  // Inject RRO APK and custom module.prop via Zip4j
+  val zipFile = ZipFile(outputFile)
+  val apkParams = ZipParameters().apply {
+    fileNameInZip = "system/vendor/overlay/allusive_rro.apk"
+  }
+  zipFile.addFile(rroApkFile, apkParams)
+
+  val moduleProp = """
+    id=pointer_replacer_rro
+    name=Pointer Replacer RRO - $pointerName
+    version=v2.0
+    versionCode=2
+    author=thesandipv
+    description=Magisk RRO Overlay for '$pointerName' pointer
+  """.trimIndent()
+
+  val propParams = ZipParameters().apply {
+    fileNameInZip = "module.prop"
+  }
+  ByteArrayInputStream(moduleProp.toByteArray(Charsets.UTF_8)).use { stream ->
+    zipFile.addStream(stream, propParams)
+  }
+
+  return outputFile
 }
 
-fun copyDownloadedRROApk(context: Context, dlRROApkFileName: String): File {
-  val downloaded = File(rroApkDownloadPath(context), dlRROApkFileName)
-  val target = File(magiskRROSourceApkPath(context))
-  target.parentFile?.mkdirs()
-  return downloaded.copyTo(target = target, overwrite = true)
-}
+/**
+ * Builds a framework-res Magisk module zip directly from the base asset template using Zip4j.
+ */
+fun buildFrameworkMagiskModule(
+  context: Context,
+  pointerName: String,
+  repackedFrameworkApk: File,
+  outputPath: String,
+): File {
+  val outputFile = File(outputPath)
+  outputFile.parentFile?.mkdirs()
+  if (outputFile.exists()) outputFile.delete()
 
-fun createModuleProp(context: Context) {
-  val properties = Properties()
-  properties.load(FileReader(File(magiskEmptyModuleExtractPath(context) + "/module.prop")))
-  properties.keys
+  // Copy base template directly to output path
+  copyAssetFile(context, MAGISK_EMPTY_ZIP, outputFile.path)
+
+  val zipFile = ZipFile(outputFile)
+  val fwParams = ZipParameters().apply {
+    fileNameInZip = "system/framework/framework-res.apk"
+  }
+  zipFile.addFile(repackedFrameworkApk, fwParams)
+
+  val moduleProp = """
+    id=pointer_replacer
+    name=Pointer Replacer - $pointerName
+    version=v2.0
+    versionCode=2
+    author=thesandipv
+    description=Framework-res pointer replacement for '$pointerName'
+  """.trimIndent()
+
+  val propParams = ZipParameters().apply {
+    fileNameInZip = "module.prop"
+  }
+  ByteArrayInputStream(moduleProp.toByteArray(Charsets.UTF_8)).use { stream ->
+    zipFile.addStream(stream, propParams)
+  }
+
+  return outputFile
 }
 
 fun showRebootDialog(context: Context) {
@@ -204,7 +211,7 @@ fun installModule(path: String, callback: Shell.ResultCallback, onElementAdd: (S
       onElementAdd(e)
     }
   }
-  Shell.su("magisk --install-module \"${path}\"").to(callbackList).submit(callback)
+  Shell.cmd("magisk --install-module \"${path}\"").to(callbackList).submit(callback)
 }
 
 fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean) -> Unit) {

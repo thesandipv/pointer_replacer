@@ -161,12 +161,25 @@ class MagiskRROFragment : Fragment() {
 
   private fun createMagiskModule() {
     lifecycleScope.launch {
-      downloadRROApk()
-      copyAndExtractMagiskRROModuleZip()
-      copyDownloadedRROApk()
+      val downloaded = downloadRROApk()
+      if (!downloaded) {
+        updateProgress("- Error: Could not download RRO APK", completed = true)
+        return@launch
+      }
 
-      val module = repackMagiskModuleZip()
-      if (module?.exists() == true) {
+      val rroApk = File(rroApkDownloadPath(requireContext()), downloadApkFileName)
+      updateProgress("- Building Magisk Module")
+
+      val module = withContext(Dispatchers.IO) {
+        buildRroMagiskModule(
+          context = requireContext(),
+          pointerName = selectedPointer.name ?: "Custom",
+          rroApkFile = rroApk,
+          outputPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName),
+        )
+      }
+
+      if (module.exists()) {
         updateProgress("- Magisk module saved at: ${module.path}")
         setupInstallButton(module.path)
       }
@@ -267,65 +280,6 @@ class MagiskRROFragment : Fragment() {
         }
       }
     }
-    return result
-  }
-
-  private suspend fun copyAndExtractMagiskRROModuleZip() {
-    withContext(Dispatchers.IO) {
-      copyMagiskRROZip()
-      withContext(Dispatchers.Main) { updateProgress("- Extracting rro-module.zip") }
-      File(magiskRROModuleZipPath(requireContext()))
-        .unzip(toFolder = File(magiskRROModuleExtractPath(requireContext())))
-
-      // Delete placeholder file if exists
-      File(
-        "${magiskRROModuleExtractPath(requireContext())}/system/vendor/overlay/placeholder",
-      ).apply {
-        if (exists() && delete()) {
-          withContext(Dispatchers.Main) { updateProgress("- Deleted Placeholder file") }
-        }
-      }
-
-      withContext(Dispatchers.Main) { updateProgress("- Done Extracting") }
-    }
-  }
-
-  private suspend fun repackMagiskModuleZip(): File? {
-    var result: File?
-    updateProgress("- Repacking magisk module")
-    withContext(Dispatchers.IO) {
-      val path = magiskRROModuleExtractPath(requireContext())
-      result =
-        zip(
-          sourceFolder = File(path),
-          exportPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName),
-        )
-    }
-    updateProgress("- Repack Successful")
-    return result
-  }
-
-  private suspend fun copyMagiskRROZip() {
-    withContext(Dispatchers.Main) {
-      updateProgress("- Copying $MAGISK_RRO_ZIP")
-    }
-    withContext(Dispatchers.IO) {
-      copyMagiskRROZip(
-        context = requireContext(),
-        to = magiskRROModuleZipPath(requireContext()),
-      )
-    }
-    withContext(Dispatchers.Main) {
-      updateProgress("- Done copying $MAGISK_RRO_ZIP")
-    }
-  }
-
-  private suspend fun copyDownloadedRROApk(): File {
-    updateProgress("- Copying downloaded rro apk")
-    val result = withContext(Dispatchers.IO) {
-      copyDownloadedRROApk(requireContext(), downloadApkFileName)
-    }
-    updateProgress("- Done copying downloaded rro apk")
     return result
   }
 }
