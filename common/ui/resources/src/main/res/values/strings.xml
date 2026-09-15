@@ -7,7 +7,6 @@
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/4145271758</string>
     <string name="ad_rewarded_1_id" translatable="false">ca-app-pub-6628325093439880/8486157233</string>
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~8565132642</string>
-    <string name="app_name">Pointer Replacer</string>
     <string name="apply_pointer">Apply Pointer</string>
     <string name="button_text_learn_more">Learn More</string>
     <string name="change_color">Change Color</string>
