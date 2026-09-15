@@ -32,4 +32,8 @@ object DatabaseFields {
   const val COLLECTION_REQUESTS = "requests"
   const val FIELD_REQUEST_CLOSED = "isRequestClosed"
   const val FIELD_TIMESTAMP = "timestamp"
+
+  // table 'deleted_users'
+  const val COLLECTION_DELETED_USERS = "deleted_users"
+  const val FIELD_DELETED_AT = "deletedAt"
 }

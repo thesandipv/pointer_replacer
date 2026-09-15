@@ -17,11 +17,13 @@ import androidx.core.net.toUri
 import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
+import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -30,9 +32,11 @@ import com.afollestad.materialdialogs.input.input
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.base.BuildConfig
+import com.afterroot.allusive2.data.model.DarkThemeConfig
 import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.model.SkuModel
+import com.afterroot.allusive2.repository.UserDataRepository
 import com.afterroot.allusive2.settings.AcknowledgementsActivity
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -45,10 +49,12 @@ import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.queryProductDetails
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -71,7 +77,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
   @Inject lateinit var settings: Settings
 
+  @Inject lateinit var userDataRepository: UserDataRepository
+
   @Inject lateinit var firestore: FirebaseFirestore
+
+  @Inject lateinit var storage: FirebaseStorage
 
   @Inject lateinit var firebaseUtils: FirebaseUtils
 
@@ -88,6 +98,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     initFirebaseConfig()
     setAppThemePref()
+    setDynamicColorPref()
     setMaxPointerPaddingPref()
     setMaxPointerSizePref()
     setOpenSourceLicPref()
@@ -96,6 +107,46 @@ class SettingsFragment : PreferenceFragmentCompat() {
     initBilling()
     setRateOnGPlay()
     setDebugPreferences()
+  }
+
+  override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    observeUserData()
+  }
+
+  private fun observeUserData() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        userDataRepository.userData.collect { userData ->
+          findPreference<ListPreference>("key_app_theme")?.let { pref ->
+            val themeValue = when (userData.darkThemeConfig) {
+              DarkThemeConfig.FOLLOW_SYSTEM -> getString(CommonR.string.theme_device_default)
+              DarkThemeConfig.LIGHT -> getString(CommonR.string.theme_light)
+              DarkThemeConfig.DARK -> getString(CommonR.string.theme_dark)
+            }
+            if (pref.value != themeValue) {
+              pref.value = themeValue
+            }
+          }
+
+          findPreference<SwitchPreferenceCompat>(
+            getString(CommonR.string.key_use_dynamic_color),
+          )?.let { pref ->
+            if (pref.isChecked != userData.useDynamicColor) {
+              pref.isChecked = userData.useDynamicColor
+            }
+          }
+
+          if (BuildConfig.DEBUG) {
+            findPreference<SwitchPreferenceCompat>("key_enable_emulator")?.let { pref ->
+              if (pref.isChecked != userData.enableFirebaseEmulators) {
+                pref.isChecked = userData.enableFirebaseEmulators
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   private fun initBilling() {
@@ -165,6 +216,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
     findPreference<ListPreference>(
       "key_app_theme",
     )?.setOnPreferenceChangeListener { _, newValue ->
+      val darkThemeConfig = when (newValue) {
+        getString(CommonR.string.theme_device_default) -> DarkThemeConfig.FOLLOW_SYSTEM
+        getString(CommonR.string.theme_battery) -> DarkThemeConfig.FOLLOW_SYSTEM
+        getString(CommonR.string.theme_light) -> DarkThemeConfig.LIGHT
+        getString(CommonR.string.theme_dark) -> DarkThemeConfig.DARK
+        else -> DarkThemeConfig.FOLLOW_SYSTEM
+      }
+      lifecycleScope.launch {
+        userDataRepository.setDarkThemeConfig(darkThemeConfig)
+      }
       AppCompatDelegate.setDefaultNightMode(
         when (newValue) {
           getString(
@@ -183,6 +244,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         },
       )
       return@setOnPreferenceChangeListener true
+    }
+  }
+
+  private fun setDynamicColorPref() {
+    findPreference<SwitchPreferenceCompat>(
+      getString(CommonR.string.key_use_dynamic_color),
+    )?.apply {
+      isVisible = DynamicColors.isDynamicColorAvailable()
+      onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+        lifecycleScope.launch {
+          userDataRepository.setDynamicColorPreference(newValue as Boolean)
+        }
+        true
+      }
     }
   }
 
@@ -364,20 +439,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
   private fun setDebugPreferences() {
     if (!BuildConfig.DEBUG) return
-    findPreference<SwitchPreference>("key_enable_emulator")?.apply {
-      onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
-        Toast.makeText(
-          requireContext(),
-          "App will close. You'll need to restart.",
-          Toast.LENGTH_SHORT,
-        ).show()
-        requireActivity().finish()
+    findPreference<SwitchPreferenceCompat>("key_enable_emulator")?.apply {
+      onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+        lifecycleScope.launch {
+          userDataRepository.enableFirebaseEmulators(newValue as Boolean)
+          Toast.makeText(
+            requireContext(),
+            "App will close. You'll need to restart.",
+            Toast.LENGTH_SHORT,
+          ).show()
+          requireActivity().finish()
+        }
         true
       }
     }
     findPreference<Preference>("key_create_stub_pointers")?.apply {
       onPreferenceClickListener = Preference.OnPreferenceClickListener {
-        createStubPointers(firestore, firebaseUtils)
+        createStubPointers(firestore, storage, firebaseUtils)
         true
       }
     }

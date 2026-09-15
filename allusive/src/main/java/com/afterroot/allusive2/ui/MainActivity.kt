@@ -14,12 +14,15 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -31,9 +34,11 @@ import com.afterroot.allusive2.BuildConfig
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.mapper.toNetworkUser
+import com.afterroot.allusive2.data.model.DarkThemeConfig
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.databinding.ActivityDashboardBinding
 import com.afterroot.allusive2.home.HomeActions
+import com.afterroot.allusive2.repository.UserDataRepository
 import com.afterroot.allusive2.utils.showNetworkDialog
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.EventObserver
@@ -101,6 +106,8 @@ class MainActivity : AppCompatActivity() {
   @Inject lateinit var remoteConfig: FirebaseRemoteConfig
 
   @Inject lateinit var settings: Settings
+
+  @Inject lateinit var userDataRepository: UserDataRepository
   // private val manifestPermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_SETTINGS)
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +115,19 @@ class MainActivity : AppCompatActivity() {
     binding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard)
     setSupportActionBar(binding.toolbar)
     title = null
+
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        userDataRepository.userData.collect { userData ->
+          val mode = when (userData.darkThemeConfig) {
+            DarkThemeConfig.FOLLOW_SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            DarkThemeConfig.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+            DarkThemeConfig.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+          }
+          AppCompatDelegate.setDefaultNightMode(mode)
+        }
+      }
+    }
 
     addMenuProvider(
       object : MenuProvider {
