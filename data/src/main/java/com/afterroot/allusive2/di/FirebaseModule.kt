@@ -54,6 +54,8 @@ object FirebaseModule {
           if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
             useEmulator("10.0.2.2", 8080)
             logger.d { "Using firebase emulators: firestore" }
+          } else {
+            logger.d { "Not Using firebase emulators: firestore" }
           }
         }
       }

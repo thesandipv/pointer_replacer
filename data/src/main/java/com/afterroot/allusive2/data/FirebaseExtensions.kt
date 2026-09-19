@@ -10,4 +10,5 @@ import com.google.firebase.storage.FirebaseStorage
 
 fun FirebaseFirestore.pointers() = collection(DatabaseFields.COLLECTION_POINTERS)
 fun FirebaseFirestore.requests() = collection(DatabaseFields.COLLECTION_REQUESTS)
+fun FirebaseFirestore.deletedUsers() = collection(DatabaseFields.COLLECTION_DELETED_USERS)
 fun FirebaseStorage.pointers() = reference.child(DatabaseFields.COLLECTION_POINTERS)
