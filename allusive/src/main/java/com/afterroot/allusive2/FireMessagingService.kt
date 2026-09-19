@@ -9,10 +9,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.afterroot.allusive2.database.DatabaseFields
 import com.afterroot.allusive2.ui.MainActivity
 import com.afterroot.data.utils.FirebaseUtils
@@ -67,15 +67,15 @@ class FireMessagingService : FirebaseMessagingService() {
     url: String? = "",
     channelId: String? = getString(CommonR.string.fcm_channel_id),
     channelName: String? = getString(CommonR.string.fcm_channel_default),
-    title: String? = getString(CommonR.string.app_name),
+    title: String? = getString(R.string.app_name),
   ) {
-    val intent: Intent
-    if (url!!.isEmpty()) {
-      intent = Intent(this, MainActivity::class.java)
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    val intent: Intent = if (url.isNullOrEmpty()) {
+      Intent(this, MainActivity::class.java).apply {
+        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+      }
     } else {
-      intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
+      Intent(Intent.ACTION_VIEW).apply {
+        data = url.toUri()
       }
     }
     val pendingIntent = PendingIntent.getActivity(
@@ -90,7 +90,7 @@ class FireMessagingService : FirebaseMessagingService() {
       channelId ?: getString(CommonR.string.fcm_channel_id),
     )
       .setSmallIcon(CommonR.drawable.ic_launch_screen)
-      .setContentTitle(title ?: getString(CommonR.string.app_name))
+      .setContentTitle(title ?: getString(R.string.app_name))
       .setContentText(message)
       .setAutoCancel(true)
       .setColor(ContextCompat.getColor(this, getMaterialColor(MaterialR.attr.colorSecondary)))

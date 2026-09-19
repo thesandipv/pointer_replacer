@@ -26,7 +26,12 @@
             app:key="key_app_theme"
             app:title="App Theme"
             app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/key_use_dynamic_color"
+            app:summary="@string/pref_summary_dynamic_color"
+            app:title="@string/pref_title_dynamic_color" />
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="key_enable_emulator"
             app:title="Enable Emulator on Firestore" />

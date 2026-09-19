@@ -38,6 +38,10 @@ object DatabaseFields {
   const val FIELD_REQUEST_CLOSED = "isRequestClosed"
   const val FIELD_TIMESTAMP = "timestamp"
 
+  // table 'deleted_users'
+  const val COLLECTION_DELETED_USERS = "deleted_users"
+  const val FIELD_DELETED_AT = "deletedAt"
+
   // table 'reports'
   const val COLLECTION_REPORTS = "reports"
   const val FIELD_POINTER_ID = "pointerId"

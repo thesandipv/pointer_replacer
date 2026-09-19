@@ -16,14 +16,14 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimarySurface"
-                app:layout_scrollFlags="scroll|enterAlways">
+                android:background="?attr/colorPrimarySurface">
 
                 <TextSwitcher
                     android:id="@+id/title_bar_title_switcher"

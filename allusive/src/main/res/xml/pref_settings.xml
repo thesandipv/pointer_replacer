@@ -26,6 +26,11 @@
             app:key="key_app_theme"
             app:title="App Theme"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/key_use_dynamic_color"
+            app:summary="@string/pref_summary_dynamic_color"
+            app:title="@string/pref_title_dynamic_color" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/pref_category_support">
         <Preference

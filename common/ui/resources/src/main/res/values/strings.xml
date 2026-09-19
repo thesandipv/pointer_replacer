@@ -7,17 +7,21 @@
     <string name="ad_interstitial_1_id" translatable="false">ca-app-pub-6628325093439880/4145271758</string>
     <string name="ad_rewarded_1_id" translatable="false">ca-app-pub-6628325093439880/8486157233</string>
     <string name="admob_app_id" translatable="false">ca-app-pub-6628325093439880~8565132642</string>
-    <string name="app_name">Pointer Replacer</string>
     <string name="apply_pointer">Apply Pointer</string>
     <string name="button_text_learn_more">Learn More</string>
     <string name="change_color">Change Color</string>
     <string name="choose_color">Choose Color</string>
+    <string name="button_delete_account">Delete Account</string>
     <string name="dialog_button_install">Install</string>
     <string name="dialog_delete_confirm">Delete this Pointer?</string>
+    <string name="dialog_delete_account_confirm">Are you sure you want to delete your account? All your profile information will be permanently deleted. This action cannot be undone.</string>
+    <string name="dialog_delete_account_success">Account successfully deleted.</string>
+    <string name="dialog_delete_account_failed">Failed to delete account. Please sign out, sign in again, and retry.</string>
     <string name="dialog_msg_no_network">No Network Available. Please check connection and try again.</string>
     <string name="dialog_msg_sign_out">Do you want to Sign Out?</string>
     <string name="dialog_sign_out_result_success">Signed Out</string>
     <string name="dialog_title_confirmation">Are you sure?</string>
+    <string name="dialog_title_delete_account">Delete Account</string>
     <string name="dialog_title_no_network">No Network</string>
     <string name="dialog_title_select_mouse_pointer">Select Mouse Pointer</string>
     <string name="dialog_title_select_pointer">Select Pointers</string>
@@ -70,6 +74,7 @@
     <string name="key_appliedPointerSize" translatable="false">SELECTED_POINTER_SIZE</string>
     <string name="key_appliedPointerPadding" translatable="false">SELECTED_POINTER_PADDING</string>
     <string name="key_show_touches" translatable="false">show_touches</string>
+    <string name="key_use_dynamic_color" translatable="false">key_use_dynamic_color</string>
     <string name="key_use_material_cc" translatable="false">use_md_cc</string>
     <string name="key_version" translatable="false">pref_version</string>
     <string name="key_watch_ads" translatable="false">pref_watch_ads</string>
@@ -111,6 +116,7 @@
     <string name="pointer_preview">Pointer Preview</string>
     <string name="pref_category_support">Support Development</string>
     <string name="pref_summary_donation">to support development</string>
+    <string name="pref_summary_dynamic_color">Apply system dynamic colors based on wallpaper</string>
     <string name="pref_summary_enable_alpha">Enables Slider to Change Pointer Alpha (transparency)</string>
     <string name="pref_summary_licences">Click to view licenses of third party libraries</string>
     <string name="pref_summary_source_code">tap to visit GitHub Repository</string>
@@ -119,6 +125,7 @@
     <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
     <string name="pref_summary_method_note">These settings are only applicable for Xposed Method and Magisk (framework-res) Method.</string>
     <string name="pref_title_donate_dev">Donate Developer</string>
+    <string name="pref_title_dynamic_color">Dynamic Color</string>
     <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
     <string name="pref_title_licences">Licenses</string>
     <string name="pref_title_pointer_settings">Pointer Settings</string>
@@ -181,6 +188,9 @@
     <string name="text_progress_downloading_missing">Downloading missing Pointers</string>
     <string name="text_progress_finishing_up">Finishing Up</string>
     <string name="text_progress_init">Initializing</string>
+    <string name="text_progress_deleting_requests">Deleting requests…</string>
+    <string name="text_progress_deleting_pointers">Deleting Pointers…</string>
+    <string name="text_progress_deleting_profile">Deleting Profile…</string>
     <string name="text_progress_uploading">Uploading</string>
     <string name="text_reboot_confirm">Pointer Applied. Choose Reboot or Soft-Reboot. Click outside to cancel.</string>
     <string name="text_selected_pointer">Selected</string>

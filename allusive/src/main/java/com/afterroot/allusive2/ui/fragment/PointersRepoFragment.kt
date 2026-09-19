@@ -547,9 +547,7 @@ class PointersRepoFragment :
             firestore.pointers().document(it).delete().await()
             binding.list.scrollToPosition(position)
             // delete pointer from storage bucket
-            storage.reference.child(DatabaseFields.COLLECTION_POINTERS)
-              .child(pointer.filename!!)
-              .delete()
+            storage.pointers().child(pointer.filename!!).delete()
             context.toast(CommonR.string.msg_delete_success)
           }
         }
