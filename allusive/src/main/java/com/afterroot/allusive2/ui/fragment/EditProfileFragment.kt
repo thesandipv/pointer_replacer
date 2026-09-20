@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -24,10 +25,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -88,13 +91,20 @@ class EditProfileFragment : Fragment() {
       setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
       setContent {
         Theme {
-          val name by nameState.collectAsStateWithLifecycle()
-          EditProfileScreen(
-            username = name,
-            email = if (::user.isInitialized) user.email.orEmpty() else "",
-            onUsernameChange = { nameState.value = it },
-            onDeleteAccountClick = { showDeleteAccountDialog() },
-          )
+          val isSignedIn = firebaseUtils.isUserSignedIn
+          if (isSignedIn) {
+            val name by nameState.collectAsStateWithLifecycle()
+            EditProfileScreen(
+              username = name,
+              email = if (::user.isInitialized) user.email.orEmpty() else "",
+              onUsernameChange = { nameState.value = it },
+              onDeleteAccountClick = { showDeleteAccountDialog() },
+            )
+          } else {
+            GuestProfileScreen(
+              onSignInClick = { startSignIn() },
+            )
+          }
         }
       }
     }
@@ -108,6 +118,7 @@ class EditProfileFragment : Fragment() {
       nameState.value = user.displayName.orEmpty()
 
       fabApply.apply {
+        show()
         setOnClickListener {
           val newName = nameState.value.trim()
           if (user.displayName != newName) {
@@ -134,8 +145,16 @@ class EditProfileFragment : Fragment() {
         )
       }
     } else {
-      startActivity(Intent(this.context, OnboardingActivity::class.java))
+      fabApply.hide()
     }
+  }
+
+  private fun startSignIn() {
+    startActivity(
+      Intent(requireContext(), OnboardingActivity::class.java).apply {
+        putExtra(OnboardingActivity.EXTRA_SIGN_IN, true)
+      },
+    )
   }
 
   private fun showDeleteAccountDialog() {
@@ -280,6 +299,27 @@ fun EditProfileScreen(
       modifier = Modifier.fillMaxWidth(),
     ) {
       Text(stringResource(CommonR.string.button_delete_account))
+    }
+  }
+}
+
+@Composable
+fun GuestProfileScreen(onSignInClick: () -> Unit, modifier: Modifier = Modifier) {
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(24.dp),
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(
+      text = stringResource(CommonR.string.guest_mode_profile_msg),
+      style = MaterialTheme.typography.bodyLarge,
+      textAlign = TextAlign.Center,
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+    Button(onClick = onSignInClick) {
+      Text(stringResource(CommonR.string.text_login))
     }
   }
 }

@@ -155,11 +155,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    if (!firebaseUtils.isUserSignedIn) { // If not logged in, go to login.
-      startActivity(Intent(this, OnboardingActivity::class.java))
-    } else {
-      initialize()
-    }
+    initialize()
   }
 
   override fun onResume() {
@@ -173,6 +169,7 @@ class MainActivity : AppCompatActivity() {
       Bundle().apply {
         putString("Device_Name", Build.DEVICE)
         putString("Device_Model", Build.MODEL)
+        putString("Device_Brand", Build.BRAND)
         putString("Manufacturer", Build.MANUFACTURER)
         putString("AndroidVersion", Build.VERSION.RELEASE)
         putString("AppVersion", BuildConfig.VERSION_CODE.toString())
@@ -335,8 +332,9 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun addUserInfoInDB() {
+    if (!firebaseUtils.isUserSignedIn) return
     try {
-      val curUser = firebaseUtils.firebaseUser!!
+      val curUser = firebaseUtils.firebaseUser ?: return
       val userRef = firestore.collection(
         DatabaseFields.COLLECTION_USERS,
       ).document(curUser.uid)
