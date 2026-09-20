@@ -84,6 +84,12 @@ class NewPointerPost : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    if (!firebaseUtils.isUserSignedIn) {
+      sharedViewModel.displayMsg(getString(CommonR.string.dialog_msg_sign_in_to_upload))
+      findNavController().navigateUp()
+      return
+    }
+
     binding.actionUpload.setOnClickListener {
       actionGetUploadPointer.launch("image/png")
     }

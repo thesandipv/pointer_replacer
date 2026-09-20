@@ -5,6 +5,7 @@
 package com.afterroot.allusive2.ui.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -51,6 +52,7 @@ import com.afterroot.allusive2.home.HomeActions
 import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
+import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -61,6 +63,7 @@ import com.afterroot.utils.getMaterialColor
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -130,34 +133,32 @@ class PointersRepoFragment :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    if (firebaseUtils.isUserSignedIn) {
-      targetPath = requireContext().getPointerSaveDir()
-      // setUpList()
-      setUpAdapter()
-      loadPointers()
+    targetPath = requireContext().getPointerSaveDir()
+    // setUpList()
+    setUpAdapter()
+    loadPointers()
 
-      requireActivity().addMenuProvider(
-        object : MenuProvider {
-          override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(RepoR.menu.menu_repo, menu)
+    requireActivity().addMenuProvider(
+      object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+          menuInflater.inflate(RepoR.menu.menu_repo, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+          android.R.id.home -> {
+            false
           }
 
-          override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
-            android.R.id.home -> {
-              false
-            }
-
-            RepoR.id.repo_request_status -> {
-              findNavController().navigate(R.id.repo_to_rro_request)
-              true
-            }
-
-            else -> menuItem.onNavDestinationSelected(findNavController())
+          RepoR.id.repo_request_status -> {
+            findNavController().navigate(R.id.repo_to_rro_request)
+            true
           }
-        },
-        viewLifecycleOwner,
-      )
-    }
+
+          else -> menuItem.onNavDestinationSelected(findNavController())
+        }
+      },
+      viewLifecycleOwner,
+    )
   }
 
   private fun onNetworkChange(isAvailable: Boolean) {
@@ -172,9 +173,13 @@ class PointersRepoFragment :
       fabApply.apply {
         show()
         setOnClickListener {
-          requireActivity().findNavController(
-            R.id.fragment_repo_nav,
-          ).navigate(R.id.repo_to_new_pointer)
+          if (firebaseUtils.isUserSignedIn) {
+            requireActivity().findNavController(
+              R.id.fragment_repo_nav,
+            ).navigate(R.id.repo_to_new_pointer)
+          } else {
+            showSignInRequiredDialog(getString(CommonR.string.dialog_msg_sign_in_to_upload))
+          }
         }
         icon = requireContext().getDrawableExt(CommonR.drawable.ic_add)
       }
@@ -395,6 +400,12 @@ class PointersRepoFragment :
                       }
                   }
                 setOnClickListener {
+                  if (!firebaseUtils.isUserSignedIn) {
+                    showSignInRequiredDialog(
+                      getString(CommonR.string.dialog_msg_sign_in_to_request_rro),
+                    )
+                    return@setOnClickListener
+                  }
                   showInterstitialAd {
                     lifecycleScope.launch {
                       firestore.pointers().document(pointer.docId.toString())
@@ -563,7 +574,10 @@ class PointersRepoFragment :
   @SuppressLint("CheckResult")
   override fun onLongClick(position: Int, item: Pointer): Boolean {
     val result = kotlin.runCatching {
-      if (!item.uploadedBy!!.containsKey(firebaseUtils.uid) || item.reasonCode != Reason.OK) {
+      if (!firebaseUtils.isUserSignedIn ||
+        item.uploadedBy?.containsKey(firebaseUtils.uid) != true ||
+        item.reasonCode != Reason.OK
+      ) {
         return false
       }
       val list =
@@ -590,6 +604,21 @@ class PointersRepoFragment :
       it.message?.let { it1 -> requireContext().toast(it1) }
     }
     return true
+  }
+
+  private fun showSignInRequiredDialog(message: String) {
+    MaterialAlertDialogBuilder(requireContext())
+      .setTitle(getString(CommonR.string.dialog_title_sign_in_required))
+      .setMessage(message)
+      .setPositiveButton(getString(CommonR.string.text_login)) { _, _ ->
+        startActivity(
+          Intent(requireContext(), OnboardingActivity::class.java).apply {
+            putExtra(OnboardingActivity.EXTRA_SIGN_IN, true)
+          },
+        )
+      }
+      .setNegativeButton(android.R.string.cancel, null)
+      .show()
   }
 
   private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->

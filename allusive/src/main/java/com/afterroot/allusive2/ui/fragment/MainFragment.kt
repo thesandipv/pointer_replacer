@@ -61,6 +61,7 @@ import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
+import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.getAsBitmap
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.visible
@@ -95,6 +96,9 @@ import com.afterroot.allusive2.resources.R as CommonR
 class MainFragment : Fragment() {
 
   @Inject
+  lateinit var firebaseUtils: FirebaseUtils
+
+  @Inject
   lateinit var firestore: FirebaseFirestore
 
   @Inject
@@ -118,9 +122,23 @@ class MainFragment : Fragment() {
           menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
         }
 
+        override fun onPrepareMenu(menu: Menu) {
+          val isSignedIn = firebaseUtils.isUserSignedIn
+          menu.findItem(R.id.toEditProfile)?.isVisible = isSignedIn
+          menu.findItem(R.id.profile_logout)?.title = if (isSignedIn) {
+            getString(CommonR.string.text_logout)
+          } else {
+            getString(CommonR.string.text_login)
+          }
+        }
+
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
           R.id.profile_logout -> {
-            signOutDialog().show()
+            if (firebaseUtils.isUserSignedIn) {
+              signOutDialog().show()
+            } else {
+              startSignIn()
+            }
             true
           }
 
@@ -132,6 +150,11 @@ class MainFragment : Fragment() {
         }
       },
     )
+  }
+
+  override fun onResume() {
+    super.onResume()
+    requireActivity().invalidateOptionsMenu()
   }
 
   override fun onCreateView(
@@ -755,11 +778,19 @@ class MainFragment : Fragment() {
           getString(CommonR.string.dialog_sign_out_result_success),
           Toast.LENGTH_SHORT,
         ).show()
-        startActivity(Intent(requireContext(), OnboardingActivity::class.java))
+        requireActivity().invalidateOptionsMenu()
       }
     }
     .setNegativeButton(android.R.string.cancel) { _, _ ->
     }.setCancelable(true)
+
+  private fun startSignIn() {
+    startActivity(
+      Intent(requireContext(), OnboardingActivity::class.java).apply {
+        putExtra(OnboardingActivity.EXTRA_SIGN_IN, true)
+      },
+    )
+  }
 
   companion object {
     private const val TAG = "MainFragment"

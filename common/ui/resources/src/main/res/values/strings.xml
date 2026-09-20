@@ -172,7 +172,12 @@
     <string name="text_download">Download</string>
     <string name="text_edit">Edit</string>
     <string name="text_installed">Installed</string>
+    <string name="text_login">Sign In</string>
     <string name="text_logout">Logout</string>
+    <string name="dialog_title_sign_in_required">Sign In Required</string>
+    <string name="dialog_msg_sign_in_to_upload">Please sign in to upload and share custom pointers with the community.</string>
+    <string name="dialog_msg_sign_in_to_request_rro">Please sign in to request an RRO overlay for this pointer.</string>
+    <string name="guest_mode_profile_msg">You are currently browsing as a guest. Sign in to track your uploads and manage your profile.</string>
     <string name="text_max_padding_size">Max Scale Size</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
     <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
