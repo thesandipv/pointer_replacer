@@ -10,6 +10,16 @@ sidebar_position: 2
 
 ## v1.11.x
 
+### CURRENT
+- [ADD] Delete account option (All data including pointers will be deleted.)
+
+### v1.11.6 (27-12-2025)
+- [FIX] Upload error with message 'Please import pointer first'
+- [Internal] Migrate from oss-licences-plugin to custom implementation with licensee
+
+### v1.11.5 (24-11-2024)
+- Minor fixes
+
 ### v1.11.4 (24-11-2024)
 - try to fix Zip Path Traversal https://support.google.com/faqs/answer/9294009
 
