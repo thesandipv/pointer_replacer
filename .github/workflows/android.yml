@@ -159,8 +159,8 @@ jobs:
           track: production
           status: inProgress
           userFraction: 0.80
-          releaseFiles: allusive/build/outputs/bundle/release/allusive-release.aab
-          mappingFile: allusive/build/outputs/mapping/release/mapping.txt
+          releaseFiles: allusive/build/outputs/bundle/playRelease/allusive-play-release.aab
+          mappingFile: allusive/build/outputs/mapping/playRelease/mapping.txt
 
       - name: Publish to Internal Track Play Store
         id: publish-to-play-store-internal
@@ -172,8 +172,8 @@ jobs:
           packageName: com.afterroot.allusive2
           track: internal
           status: completed
-          releaseFiles: allusive/build/outputs/bundle/release/allusive-release.aab
-          mappingFile: allusive/build/outputs/mapping/release/mapping.txt
+          releaseFiles: allusive/build/outputs/bundle/playRelease/allusive-play-release.aab
+          mappingFile: allusive/build/outputs/mapping/playRelease/mapping.txt
 
       - name: Create release for tags
         id: create-release
@@ -182,7 +182,7 @@ jobs:
         with:
           draft: true
           files: |
-            allusive/build/outputs/apk/release/allusive-release.apk
+            allusive/build/outputs/apk/github/release/allusive-github-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -197,16 +197,6 @@ jobs:
         with:
           name: build-reports
           path: allusive/build/reports
-
-      - name: Upload to Slack
-        id: upload-to-slack
-        uses: adrey/slack-file-upload-action@1.0.5
-        continue-on-error: true
-        with:
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          path: allusive/build/outputs/apk/release/allusive-release.apk
-          channel: builds
-          filename: Allusive-${{ steps.commithash.outputs.sha_short }}.apk
 
       - uses: act10ns/slack@v2
         if: always()

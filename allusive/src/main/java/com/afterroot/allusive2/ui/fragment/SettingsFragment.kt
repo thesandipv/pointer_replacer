@@ -32,6 +32,7 @@ import com.afollestad.materialdialogs.input.input
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.base.BuildConfig
+import com.afterroot.allusive2.BuildConfig as AppBuildConfig
 import com.afterroot.allusive2.data.model.DarkThemeConfig
 import com.afterroot.allusive2.data.stub.createStubPointers
 import com.afterroot.allusive2.getMinPointerSize
@@ -199,6 +200,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
           BuildConfig.VERSION_NAME,
           BuildConfig.VERSION_CODE,
           BuildConfig.COMMIT_ID,
+          AppBuildConfig.DISTRIBUTION
         )
     }
   }

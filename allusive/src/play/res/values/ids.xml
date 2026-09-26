@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dummy IDs so code referencing them compiles in play variant without errors -->
+    <item type="id" name="magiskFragment" />
+    <item type="id" name="magiskRROFragment" />
+</resources>

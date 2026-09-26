@@ -53,6 +53,7 @@ import com.afterroot.allusive2.model.Pointer
 import com.afterroot.allusive2.model.PointerRequest
 import com.afterroot.allusive2.repo.PointerPagingAdapter
 import com.afterroot.allusive2.ui.OnboardingActivity
+import com.afterroot.allusive2.ui.RepoNavigator
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
 import com.afterroot.allusive2.viewmodel.NetworkViewModel
 import com.afterroot.data.utils.FirebaseUtils
@@ -359,7 +360,9 @@ class PointersRepoFragment :
             }
           }
           binding.infoActionInstallRro.apply {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (BuildConfig.DISTRIBUTION != "github" ||
+              Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+            ) {
               visible(false)
             } else {
               visible(true)
@@ -367,17 +370,11 @@ class PointersRepoFragment :
                 text = getString(CommonR.string.text_install_rro)
                 setOnClickListener {
                   showInterstitialAd {
-                    if (this@PointersRepoFragment.findNavController().currentDestination?.id ==
-                      R.id.repoFragment
-                    ) {
-                      val directions = PointersRepoFragmentDirections.repoToRroInstall(
-                        pointer.docId.toString(),
-                        pointer.filename.toString(),
-                      )
-                      this@PointersRepoFragment.findNavController().navigate(
-                        directions,
-                      )
-                    }
+                    RepoNavigator.installRro(
+                      fragment = this@PointersRepoFragment,
+                      docId = pointer.docId.toString(),
+                      fileName = pointer.filename.toString(),
+                    )
                     dialog.dismiss()
                   }
                 }

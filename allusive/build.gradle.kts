@@ -44,6 +44,21 @@ android {
     }
   }
 
+  flavorDimensions += "distribution"
+
+  productFlavors {
+    create("play") {
+      dimension = "distribution"
+    }
+    create("github") {
+      dimension = "distribution"
+    }
+  }
+
+  productFlavors.configureEach {
+    buildConfigField("String", "DISTRIBUTION", "\"${name}\"")
+  }
+
   val keystoreProperties = readProperties(rootProject.file("keystore.properties"))
 
   signingConfigs {
@@ -110,7 +125,7 @@ dependencies {
   implementation(projects.data)
   implementation(projects.data.databaseRoom)
   implementation(projects.ui.home)
-  implementation(projects.ui.magisk)
+  "githubImplementation"(projects.ui.magisk)
   implementation(projects.ui.repo)
   implementation(projects.ui.settings)
 
