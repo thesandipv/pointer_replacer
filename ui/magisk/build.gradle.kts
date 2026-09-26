@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
+import com.android.build.gradle.internal.lint.LintModelWriterTask
+
 plugins {
   id(afterroot.plugins.android.library.get().pluginId)
   id(afterroot.plugins.allusive2.android.common.get().pluginId)
@@ -28,6 +31,12 @@ val createMagiskModuleZips = tasks.register("createMagiskModuleZips") {
 
 tasks.matching { it.name.matches(Regex("generate.*Assets")) }.configureEach {
   dependsOn(createMagiskModuleZips)
+}
+
+tasks.whenTaskAdded {
+  if (this is LintModelWriterTask || this is AndroidLintAnalysisTask) {
+    this.mustRunAfter("createMagiskModuleZips")
+  }
 }
 
 android {
