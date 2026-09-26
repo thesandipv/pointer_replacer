@@ -26,14 +26,6 @@
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@+id/repoFragment" />
         <action
-            android:id="@+id/repo_to_rro_install"
-            app:destination="@id/magiskRROFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"
-            app:popUpTo="@+id/repoFragment" />
-        <action
             android:id="@+id/repo_to_rro_request"
             app:destination="@id/rroRequestFragment"
             app:enterAnim="@anim/slide_in_right"
@@ -63,20 +55,6 @@
         <action
             android:id="@+id/toCustomize"
             app:destination="@id/customizeFragment" />
-        <action
-            android:id="@+id/toMagisk"
-            app:destination="@id/magiskFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/toMagiskRRO"
-            app:destination="@id/magiskRROFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -92,24 +70,6 @@
     <fragment
         android:id="@+id/customizeFragment"
         android:name="com.afterroot.allusive2.ui.fragment.CustomizeFragment" />
-    <fragment
-        android:id="@+id/magiskFragment"
-        android:name="com.afterroot.allusive2.magisk.MagiskFragment" />
-    <fragment
-        android:id="@+id/magiskRROFragment"
-        android:name="com.afterroot.allusive2.magisk.MagiskRROFragment">
-        <deepLink
-            android:id="@+id/deepLink"
-            android:autoVerify="true"
-            app:uri="https://pointer-replacer.web.app/arro/install/{repoDocId}/{pointerFileName}"
-            tools:targetApi="m" />
-        <argument
-            android:name="repoDocId"
-            app:argType="string" />
-        <argument
-            android:name="pointerFileName"
-            app:argType="string" />
-    </fragment>
     <fragment
         android:id="@+id/rroRequestFragment"
         android:name="com.afterroot.allusive2.ui.repo.RRORequestFragment" />

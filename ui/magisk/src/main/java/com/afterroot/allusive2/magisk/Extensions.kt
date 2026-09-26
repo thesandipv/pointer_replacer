@@ -4,12 +4,13 @@
  */
 package com.afterroot.allusive2.magisk
 
-import com.topjohnwu.superuser.Shell
+import com.afterroot.allusive2.base.reboot as baseReboot
+import com.afterroot.allusive2.base.softReboot as baseSoftReboot
 
 fun reboot(reason: String = "") {
-  Shell.su("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
+  baseReboot(reason)
 }
 
 fun softReboot() {
-  Shell.su("busybox killall system_server || busybox killall zygote").submit()
+  baseSoftReboot()
 }
