@@ -360,14 +360,16 @@ class PointersRepoFragment :
             }
           }
           binding.infoActionInstallRro.apply {
-            if (BuildConfig.DISTRIBUTION != "github" ||
-              Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-            ) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
               visible(false)
             } else {
               visible(true)
               if (pointer.hasRRO) {
-                text = getString(CommonR.string.text_install_rro)
+                text = if (BuildConfig.DISTRIBUTION == "play") {
+                  getString(CommonR.string.text_get_rro_web)
+                } else {
+                  getString(CommonR.string.text_install_rro)
+                }
                 setOnClickListener {
                   showInterstitialAd {
                     RepoNavigator.installRro(

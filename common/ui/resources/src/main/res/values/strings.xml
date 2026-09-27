@@ -242,4 +242,6 @@
     <string name="text_request_status">Request Status</string>
     <string name="text_your_requests">Your Requests</string>
     <string name="text_info_method">Apply Method: %1$s</string>
+    <string name="text_get_rro_web">Get RRO (Web)</string>
+    <string name="dialog_msg_rro_web_info">This overlay package can be downloaded from our website for manual installation via your module manager.</string>
 </resources>
