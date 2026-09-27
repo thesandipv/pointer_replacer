@@ -31,6 +31,7 @@ dependencies {
   implementation(libs.firebase.ui.storage)
 
   api(projects.utils)
+  api(libs.libsu.core)
   implementation(projects.common.ui.resources)
 
   ksp(libs.glide.ksp)

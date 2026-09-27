@@ -65,6 +65,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import com.afterroot.allusive2.BuildConfig as AppBuildConfig
 import com.afterroot.allusive2.resources.R as CommonR
 
 @SuppressLint("ValidFragment")
@@ -199,6 +200,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
           BuildConfig.VERSION_NAME,
           BuildConfig.VERSION_CODE,
           BuildConfig.COMMIT_ID,
+          AppBuildConfig.DISTRIBUTION,
         )
     }
   }

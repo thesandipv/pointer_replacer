@@ -47,6 +47,8 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.base.reboot
+import com.afterroot.allusive2.base.softReboot
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.database.addLocalPointer
 import com.afterroot.allusive2.databinding.FragmentMainBinding
@@ -55,8 +57,6 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.getPointerSaveRootDir
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.magisk.reboot
-import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.utils.whenBuildIs
@@ -186,7 +186,14 @@ class MainFragment : Fragment() {
     requireActivity().findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
       icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
       setOnClickListener {
-        showApplyMethodDialog()
+        if (BuildConfig.DISTRIBUTION == "play") {
+          settings.applyMethod = Constants.INDEX_XPOSED_METHOD
+          showInterstitialAd {
+            applyPointer()
+          }
+        } else {
+          showApplyMethodDialog()
+        }
       }
     }
     setUpAd()
@@ -227,8 +234,13 @@ class MainFragment : Fragment() {
       }
     }
 
-    binding.textApplyMethod.text =
-      getString(CommonR.string.text_info_method, settings.applyMethodName)
+    if (BuildConfig.DISTRIBUTION == "play") {
+      binding.textApplyMethod.text =
+        getString(CommonR.string.text_info_method, "Xposed")
+    } else {
+      binding.textApplyMethod.text =
+        getString(CommonR.string.text_info_method, settings.applyMethodName)
+    }
   }
 
   private fun showApplyMethodDialog() {
@@ -244,6 +256,10 @@ class MainFragment : Fragment() {
           }
 
           Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
+            if (BuildConfig.DISTRIBUTION != "github") {
+              showInterstitialAd { applyPointer() }
+              return@setItems
+            }
             if (!isPointerSelected()) {
               sharedViewModel.displayMsg(
                 getString(CommonR.string.msg_pointer_not_selected),
@@ -281,6 +297,10 @@ class MainFragment : Fragment() {
           }
 
           Constants.INDEX_RRO_METHOD -> { // Magisk - RRO Method
+            if (BuildConfig.DISTRIBUTION != "github") {
+              showInterstitialAd { applyPointer() }
+              return@setItems
+            }
             showInterstitialAd {
               requireActivity().findNavController(R.id.fragment_repo_nav)
                 .navigate(R.id.magiskRROFragment)
