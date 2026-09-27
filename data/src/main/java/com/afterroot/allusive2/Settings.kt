@@ -191,8 +191,7 @@ class Settings @Inject constructor(@ApplicationContext val context: Context) {
   val applyMethodName
     get() = when (applyMethod) {
       Constants.INDEX_XPOSED_METHOD -> "Xposed"
-      Constants.INDEX_FW_RES_METHOD -> "Magisk (framework-res)"
-      Constants.INDEX_RRO_METHOD -> "Magisk (RRO)"
+      Constants.INDEX_RRO_METHOD, 2 -> "Magisk (RRO)"
       else -> ""
     }
 }

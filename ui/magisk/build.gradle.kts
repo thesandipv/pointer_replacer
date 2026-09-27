@@ -7,14 +7,6 @@ plugins {
   id(afterroot.plugins.android.hilt.get().pluginId)
 }
 
-tasks.register<Zip>("createEmptyModuleZip") {
-  group = "build"
-  description = "Creates Empty Magisk Module Zip"
-  archiveFileName.set("empty-module.zip")
-  destinationDirectory.set(layout.projectDirectory.dir("src/main/assets"))
-  from(layout.projectDirectory.dir("module/empty-module"))
-}
-
 tasks.register<Zip>("createRroModuleZip") {
   group = "build"
   description = "Creates RRO Magisk Module Zip"
@@ -26,7 +18,7 @@ tasks.register<Zip>("createRroModuleZip") {
 val createMagiskModuleZips = tasks.register("createMagiskModuleZips") {
   group = "build"
   description = "Creates all Magisk Module Zips"
-  dependsOn("createEmptyModuleZip", "createRroModuleZip")
+  dependsOn("createRroModuleZip")
 }
 
 tasks.matching { it.name.matches(Regex("generate.*Assets")) }.configureEach {
