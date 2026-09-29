@@ -9,6 +9,5 @@
     </array>
     <array name="pointer_apply_modes" tools:ignore="InconsistentArrays">
         <item>@string/method_xposed</item>
-        <item>@string/method_magisk_fw_res</item>
     </array>
 </resources>

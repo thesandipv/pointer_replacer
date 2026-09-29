@@ -255,47 +255,6 @@ class MainFragment : Fragment() {
             }
           }
 
-          Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
-            if (BuildConfig.DISTRIBUTION != "github") {
-              showInterstitialAd { applyPointer() }
-              return@setItems
-            }
-            if (!isPointerSelected()) {
-              sharedViewModel.displayMsg(
-                getString(CommonR.string.msg_pointer_not_selected),
-              )
-              return@setItems
-            }
-            if (!isMouseSelected()) {
-              sharedViewModel.displayMsg(
-                getString(CommonR.string.msg_mouse_not_selected),
-              )
-              return@setItems
-            }
-            val filesDir = requireContext().getPointerSaveRootDir()
-            val pointerPath = "$filesDir/pointer.png"
-            val mousePath = "$filesDir/mouse.png"
-            settings.pointerPath = pointerPath
-            settings.mousePath = mousePath
-            createFileFromView(binding.selectedPointer, pointerPath)
-            createFileFromView(binding.selectedMouse, mousePath)
-
-            binding.textNoPointerApplied.visible(false)
-            binding.textNoMouseApplied.visible(false)
-            binding.currentPointer.apply {
-              visible(true)
-              setImageDrawable(Drawable.createFromPath(pointerPath))
-            }
-            binding.currentMouse.apply {
-              visible(true)
-              setImageDrawable(Drawable.createFromPath(mousePath))
-            }
-            showInterstitialAd {
-              requireActivity().findNavController(R.id.fragment_repo_nav)
-                .navigate(R.id.magiskFragment)
-            }
-          }
-
           Constants.INDEX_RRO_METHOD -> { // Magisk - RRO Method
             if (BuildConfig.DISTRIBUTION != "github") {
               showInterstitialAd { applyPointer() }

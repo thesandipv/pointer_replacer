@@ -123,7 +123,7 @@
     <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
     <string name="pref_summary_xda">tap to visit official XDA thread</string>
     <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
-    <string name="pref_summary_method_note">These settings are only applicable for Xposed Method and Magisk (framework-res) Method.</string>
+    <string name="pref_summary_method_note">These settings are only applicable for Xposed Method.</string>
     <string name="pref_title_donate_dev">Donate Developer</string>
     <string name="pref_title_dynamic_color">Dynamic Color</string>
     <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
@@ -234,7 +234,6 @@
     <string name="open_magisk_manager">Open Magisk Manager</string>
     <string name="install_module">Install Magisk Module</string>
     <string name="method_xposed">Xposed</string>
-    <string name="method_magisk_fw_res">Replace Pointer in framework-res.apk with Magisk</string>
     <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
     <string name="text_install_rro">Install RRO</string>
     <string name="text_chip_rro">RRO</string>
