@@ -19,8 +19,7 @@ object Constants {
   const val PLACEHOLDER_3 = "Lorem Ispum Dolor"
 
   const val INDEX_XPOSED_METHOD = 0
-  const val INDEX_FW_RES_METHOD = 1
-  const val INDEX_RRO_METHOD = 2
+  const val INDEX_RRO_METHOD = 1
 }
 
 object Reason {

@@ -12,6 +12,10 @@ sidebar_position: 2
 
 ### CURRENT
 - [ADD] Delete account option (All data including pointers will be deleted.)
+- [ADD] `play` and `github` distribution product flavors for Google Play Store compliance
+- [ADD] Web RRO download flow for Play Store variant
+- [NEW] Modernized Magisk RRO module generation with atomic Zip4j packaging
+- [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 
 ### v1.11.6 (27-12-2025)
 - [FIX] Upload error with message 'Please import pointer first'

@@ -47,6 +47,8 @@ import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.adapter.LocalPointersAdapter
 import com.afterroot.allusive2.adapter.callback.ItemSelectedCallback
+import com.afterroot.allusive2.base.reboot
+import com.afterroot.allusive2.base.softReboot
 import com.afterroot.allusive2.database.MyDatabase
 import com.afterroot.allusive2.database.addLocalPointer
 import com.afterroot.allusive2.databinding.FragmentMainBinding
@@ -55,12 +57,11 @@ import com.afterroot.allusive2.getMinPointerSize
 import com.afterroot.allusive2.getPointerSaveDir
 import com.afterroot.allusive2.getPointerSaveRootDir
 import com.afterroot.allusive2.home.HomeActions
-import com.afterroot.allusive2.magisk.reboot
-import com.afterroot.allusive2.magisk.softReboot
 import com.afterroot.allusive2.model.RoomPointer
 import com.afterroot.allusive2.ui.OnboardingActivity
 import com.afterroot.allusive2.utils.whenBuildIs
 import com.afterroot.allusive2.viewmodel.MainSharedViewModel
+import com.afterroot.data.utils.FirebaseUtils
 import com.afterroot.utils.extensions.getAsBitmap
 import com.afterroot.utils.extensions.getDrawableExt
 import com.afterroot.utils.extensions.visible
@@ -95,6 +96,9 @@ import com.afterroot.allusive2.resources.R as CommonR
 class MainFragment : Fragment() {
 
   @Inject
+  lateinit var firebaseUtils: FirebaseUtils
+
+  @Inject
   lateinit var firestore: FirebaseFirestore
 
   @Inject
@@ -118,9 +122,23 @@ class MainFragment : Fragment() {
           menuInflater.inflate(R.menu.menu_dashboard_activity, menu)
         }
 
+        override fun onPrepareMenu(menu: Menu) {
+          val isSignedIn = firebaseUtils.isUserSignedIn
+          menu.findItem(R.id.toEditProfile)?.isVisible = isSignedIn
+          menu.findItem(R.id.profile_logout)?.title = if (isSignedIn) {
+            getString(CommonR.string.text_logout)
+          } else {
+            getString(CommonR.string.text_login)
+          }
+        }
+
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
           R.id.profile_logout -> {
-            signOutDialog().show()
+            if (firebaseUtils.isUserSignedIn) {
+              signOutDialog().show()
+            } else {
+              startSignIn()
+            }
             true
           }
 
@@ -132,6 +150,11 @@ class MainFragment : Fragment() {
         }
       },
     )
+  }
+
+  override fun onResume() {
+    super.onResume()
+    requireActivity().invalidateOptionsMenu()
   }
 
   override fun onCreateView(
@@ -163,7 +186,14 @@ class MainFragment : Fragment() {
     requireActivity().findViewById<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
       icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
       setOnClickListener {
-        showApplyMethodDialog()
+        if (BuildConfig.DISTRIBUTION == "play") {
+          settings.applyMethod = Constants.INDEX_XPOSED_METHOD
+          showInterstitialAd {
+            applyPointer()
+          }
+        } else {
+          showApplyMethodDialog()
+        }
       }
     }
     setUpAd()
@@ -204,8 +234,13 @@ class MainFragment : Fragment() {
       }
     }
 
-    binding.textApplyMethod.text =
-      getString(CommonR.string.text_info_method, settings.applyMethodName)
+    if (BuildConfig.DISTRIBUTION == "play") {
+      binding.textApplyMethod.text =
+        getString(CommonR.string.text_info_method, "Xposed")
+    } else {
+      binding.textApplyMethod.text =
+        getString(CommonR.string.text_info_method, settings.applyMethodName)
+    }
   }
 
   private fun showApplyMethodDialog() {
@@ -220,44 +255,11 @@ class MainFragment : Fragment() {
             }
           }
 
-          Constants.INDEX_FW_RES_METHOD -> { // Magisk - framework-res Method
-            if (!isPointerSelected()) {
-              sharedViewModel.displayMsg(
-                getString(CommonR.string.msg_pointer_not_selected),
-              )
-              return@setItems
-            }
-            if (!isMouseSelected()) {
-              sharedViewModel.displayMsg(
-                getString(CommonR.string.msg_mouse_not_selected),
-              )
-              return@setItems
-            }
-            val filesDir = requireContext().getPointerSaveRootDir()
-            val pointerPath = "$filesDir/pointer.png"
-            val mousePath = "$filesDir/mouse.png"
-            settings.pointerPath = pointerPath
-            settings.mousePath = mousePath
-            createFileFromView(binding.selectedPointer, pointerPath)
-            createFileFromView(binding.selectedMouse, mousePath)
-
-            binding.textNoPointerApplied.visible(false)
-            binding.textNoMouseApplied.visible(false)
-            binding.currentPointer.apply {
-              visible(true)
-              setImageDrawable(Drawable.createFromPath(pointerPath))
-            }
-            binding.currentMouse.apply {
-              visible(true)
-              setImageDrawable(Drawable.createFromPath(mousePath))
-            }
-            showInterstitialAd {
-              requireActivity().findNavController(R.id.fragment_repo_nav)
-                .navigate(R.id.magiskFragment)
-            }
-          }
-
           Constants.INDEX_RRO_METHOD -> { // Magisk - RRO Method
+            if (BuildConfig.DISTRIBUTION != "github") {
+              showInterstitialAd { applyPointer() }
+              return@setItems
+            }
             showInterstitialAd {
               requireActivity().findNavController(R.id.fragment_repo_nav)
                 .navigate(R.id.magiskRROFragment)
@@ -755,11 +757,19 @@ class MainFragment : Fragment() {
           getString(CommonR.string.dialog_sign_out_result_success),
           Toast.LENGTH_SHORT,
         ).show()
-        startActivity(Intent(requireContext(), OnboardingActivity::class.java))
+        requireActivity().invalidateOptionsMenu()
       }
     }
     .setNegativeButton(android.R.string.cancel) { _, _ ->
     }.setCancelable(true)
+
+  private fun startSignIn() {
+    startActivity(
+      Intent(requireContext(), OnboardingActivity::class.java).apply {
+        putExtra(OnboardingActivity.EXTRA_SIGN_IN, true)
+      },
+    )
+  }
 
   companion object {
     private const val TAG = "MainFragment"

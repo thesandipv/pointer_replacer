@@ -123,7 +123,7 @@
     <string name="pref_summary_watch_ad">Support Development by Watching Ads</string>
     <string name="pref_summary_xda">tap to visit official XDA thread</string>
     <string name="pref_summary_xposed_repo">tap to open Xposed Module Repo</string>
-    <string name="pref_summary_method_note">These settings are only applicable for Xposed Method and Magisk (framework-res) Method.</string>
+    <string name="pref_summary_method_note">These settings are only applicable for Xposed Method.</string>
     <string name="pref_title_donate_dev">Donate Developer</string>
     <string name="pref_title_dynamic_color">Dynamic Color</string>
     <string name="pref_title_enable_alpha">Enable Pointer Alpha</string>
@@ -144,7 +144,7 @@
     <string name="reset_size">Reset Size &amp; Scale</string>
     <string name="str_format_uploaded_by">by %s</string>
     <string name="str_format_value_error">Value must be greater than %1$d</string>
-    <string name="str_format_version">v%1$s (%2$d) - %3$s</string>
+    <string name="str_format_version">v%1$s-%4$s (%2$d) - %3$s</string>
     <string name="tap_and_move_your_finger_to_see_preview">Tap and move your finger to see preview</string>
     <string name="text_action_apply">Apply</string>
     <string name="text_action_browse">Browse</string>
@@ -172,7 +172,12 @@
     <string name="text_download">Download</string>
     <string name="text_edit">Edit</string>
     <string name="text_installed">Installed</string>
+    <string name="text_login">Sign In</string>
     <string name="text_logout">Logout</string>
+    <string name="dialog_title_sign_in_required">Sign In Required</string>
+    <string name="dialog_msg_sign_in_to_upload">Please sign in to upload and share custom pointers with the community.</string>
+    <string name="dialog_msg_sign_in_to_request_rro">Please sign in to request an RRO overlay for this pointer.</string>
+    <string name="guest_mode_profile_msg">You are currently browsing as a guest. Sign in to track your uploads and manage your profile.</string>
     <string name="text_max_padding_size">Max Scale Size</string>
     <string name="text_max_pointer_size">Max Pointer Size</string>
     <string name="text_multiline_sample">This is multiline text sample.\nLine 2\nLine 3\nLine 4</string>
@@ -229,7 +234,6 @@
     <string name="open_magisk_manager">Open Magisk Manager</string>
     <string name="install_module">Install Magisk Module</string>
     <string name="method_xposed">Xposed</string>
-    <string name="method_magisk_fw_res">Replace Pointer in framework-res.apk with Magisk</string>
     <string name="method_magisk_rro">Create RRO Overlay and replace with Magisk</string>
     <string name="text_install_rro">Install RRO</string>
     <string name="text_chip_rro">RRO</string>
@@ -237,6 +241,8 @@
     <string name="text_request_status">Request Status</string>
     <string name="text_your_requests">Your Requests</string>
     <string name="text_info_method">Apply Method: %1$s</string>
+    <string name="text_get_rro_web">Get RRO (Web)</string>
+    <string name="dialog_msg_rro_web_info">This overlay package can be downloaded from our website for manual installation via your module manager.</string>
     <string name="text_report_pointer">Report Pointer</string>
     <string name="dialog_title_report_pointer">Report Pointer</string>
     <string name="report_reason_duplicate">Duplicate Pointer</string>

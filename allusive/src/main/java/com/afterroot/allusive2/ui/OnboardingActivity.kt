@@ -4,7 +4,6 @@
  */
 package com.afterroot.allusive2.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -68,25 +67,17 @@ class OnboardingActivity : AppCompatActivity() {
   override fun onPostCreate(savedInstanceState: Bundle?) {
     super.onPostCreate(savedInstanceState)
     setUpNetworkObserver()
+
+    val isExplicitSignIn = intent.getBooleanExtra(EXTRA_SIGN_IN, false)
     when {
-      firebaseAuth.currentUser == null -> {
+      isExplicitSignIn -> {
         tryLogin()
       }
 
-      intent.extras != null -> {
-        intent.extras?.let {
-          val link = it.getString("link")
-          when {
-            link != null -> {
-              browse(link, true)
-            }
-
-            else -> {
-              launchDashboard()
-            }
-          }
-          finish()
-        }
+      intent.extras?.getString("link") != null -> {
+        val link = intent.extras?.getString("link")
+        browse(link!!, true)
+        finish()
       }
 
       else -> {
@@ -96,21 +87,28 @@ class OnboardingActivity : AppCompatActivity() {
   }
 
   private val resultLauncher = registerForActivityResult(FirebaseAuthUIActivityResultContract()) {
-    if (it.resultCode == Activity.RESULT_OK) {
-      launchDashboard()
+    if (it.resultCode == RESULT_OK) {
+      if (intent.getBooleanExtra(EXTRA_SIGN_IN, false)) {
+        finish()
+      } else {
+        launchDashboard()
+      }
     } else {
       if (it.idpResponse == null) {
         toast("Sign In Cancelled")
+      } else {
+        if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
+          toast("No internet")
+        }
+        toast("Error: ${it.idpResponse?.error?.message}")
+        logger.e(it.idpResponse?.error) { "Sign-in error: ${it.idpResponse?.error?.message}" }
       }
 
-      if (it.idpResponse?.error?.errorCode == ErrorCodes.NO_NETWORK) {
-        toast("No internet")
+      if (intent.getBooleanExtra(EXTRA_SIGN_IN, false)) {
+        finish()
+      } else {
+        launchDashboard()
       }
-
-      toast("Error: ${it.idpResponse?.error?.message}")
-      logger.e(it.idpResponse?.error) { "Sign-in error: ${it.idpResponse?.error?.message}" }
-
-      tryLogin()
     }
   }
 
@@ -144,6 +142,10 @@ class OnboardingActivity : AppCompatActivity() {
   private fun launchDashboard() {
     startActivity(Intent(this, MainActivity::class.java))
     finish()
+  }
+
+  companion object {
+    const val EXTRA_SIGN_IN = "${BuildConfig.APPLICATION_ID}.EXTRA_SIGN_IN"
   }
 
   private var dialog: AlertDialog? = null
