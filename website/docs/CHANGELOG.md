@@ -14,6 +14,11 @@ sidebar_position: 2
 - [ADD] Delete account option (All data including pointers will be deleted.)
 - [ADD] `play` and `github` distribution product flavors for Google Play Store compliance
 - [ADD] Web RRO download flow for Play Store variant
+- [NEW] Pre-packaged flashable Magisk Module ZIP distribution (RRO 2.0)
+- [IMPROVE] Use Firestore pointer names in generated Magisk `module.prop` metadata instead of raw filenames
+- [NEW] Direct ZIP installation in app without on-device repacking
+- [ADD] Multi-core batch migration pipeline (`migrate_all_rros.py`) for RRO 2.0 APKs and Magisk ZIPs
+- [SCHEMA] Added `rroVersion` field to Pointer model and DatabaseFields
 - [NEW] Modernized Magisk RRO module generation with atomic Zip4j packaging
 - [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 

@@ -57,6 +57,7 @@ class MagiskRROFragment : Fragment() {
   private lateinit var pointerFileName: String
   private lateinit var selectedPointer: Pointer
   private lateinit var downloadApkFileName: String
+  private lateinit var downloadZipFileName: String
   private lateinit var magiskModuleSaveName: String
 
   override fun onCreateView(
@@ -73,6 +74,7 @@ class MagiskRROFragment : Fragment() {
     repoDocId = arguments?.getString("repoDocId") ?: ""
     pointerFileName = arguments?.getString("pointerFileName") ?: ""
     downloadApkFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.apk"
+    downloadZipFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.zip"
 
     lifecycleScope.launch {
       selectedPointer =
@@ -143,7 +145,7 @@ class MagiskRROFragment : Fragment() {
       updateProgress(completed = true)
       return
     }
-    createMagiskModule()
+    prepareMagiskModule()
   }
 
   private fun setPointerImage() {
@@ -159,16 +161,30 @@ class MagiskRROFragment : Fragment() {
     }
   }
 
-  private fun createMagiskModule() {
+  private fun prepareMagiskModule() {
     lifecycleScope.launch {
+      // 1. Try downloading pre-packaged flashable Magisk Module ZIP
+      val zipDownloaded = downloadRROMagiskZip()
+      if (zipDownloaded) {
+        val module = File(repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
+        if (module.exists()) {
+          updateProgress("- Magisk module ready at: ${module.path}")
+          setupInstallButton(module.path)
+        }
+        updateProgress(completed = true)
+        return@launch
+      }
+
+      // 2. Fallback: Download raw APK and package on device
+      updateProgress("- Module ZIP not available, downloading APK...")
       val downloaded = downloadRROApk()
       if (!downloaded) {
-        updateProgress("- Error: Could not download RRO APK", completed = true)
+        updateProgress("- Error: Could not download RRO", completed = true)
         return@launch
       }
 
       val rroApk = File(rroApkDownloadPath(requireContext()), downloadApkFileName)
-      updateProgress("- Building Magisk Module")
+      updateProgress("- Packaging Magisk Module...")
 
       val module = withContext(Dispatchers.IO) {
         buildRroMagiskModule(
@@ -278,6 +294,48 @@ class MagiskRROFragment : Fragment() {
           updateProgress("- RRO Apk download failed")
           result = false
         }
+      }
+    }
+    return result
+  }
+
+  private suspend fun downloadRROMagiskZip(): Boolean {
+    var result = false
+    val url =
+      "https://github.com/afterroot/allusive-repo/raw/main/modules/$downloadZipFileName"
+
+    val targetFile = File(repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
+
+    if (targetFile.exists()) {
+      updateProgress("- Magisk module already exists at: ${targetFile.path}")
+      return true
+    }
+
+    targetFile.parentFile?.mkdirs()
+
+    updateProgress("- Downloading Magisk Module ZIP from: $url")
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request = Request.Builder().url(url).build()
+        val response = okHttpClient.newCall(request).execute()
+        if (response.isSuccessful) {
+          response.body.byteStream().buffered().use { input ->
+            targetFile.outputStream().use { output ->
+              input.copyTo(output)
+            }
+          }
+          withContext(Dispatchers.Main) {
+            updateProgress("- Magisk module saved at: ${targetFile.path}")
+            result = true
+          }
+
+          if (repoDocId.isNotBlank()) {
+            firestore.pointers().document(repoDocId)
+              .update(DatabaseFields.FIELD_RRO_DOWNLOADS, FieldValue.increment(1))
+          }
+        }
+      }.onFailure { e ->
+        Timber.e(e, "downloadRROMagiskZip failed")
       }
     }
     return result
