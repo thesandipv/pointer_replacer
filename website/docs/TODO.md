@@ -24,6 +24,8 @@ Create New Issue in Main Project
 - [ ] IMP - Remove `multiDexKeepFile` and use `multiDexKeepProguard` instead.
 - [ ] ADD - Create online repo of RRO Pointers
   - [ ] add deeplink support
+- [ ] ADD - Ads in REPO list
+- [ ] M3E Bottom bar
 
 ### v1.10.2
 

@@ -52,6 +52,7 @@ class MagiskRROFragment : Fragment() {
   @Inject lateinit var okHttpClient: OkHttpClient
 
   @Inject lateinit var settings: Settings
+  private var pointerType: Int = Constants.POINTER_TOUCH
   private val progress = MutableLiveData<Result>()
   private lateinit var repoDocId: String
   private lateinit var pointerFileName: String
@@ -73,8 +74,13 @@ class MagiskRROFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     repoDocId = arguments?.getString("repoDocId") ?: ""
     pointerFileName = arguments?.getString("pointerFileName") ?: ""
-    downloadApkFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.apk"
-    downloadZipFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.zip"
+    pointerType =
+      arguments?.getInt("pointerType", Constants.POINTER_TOUCH) ?: Constants.POINTER_TOUCH
+
+    val isMouse = pointerType == Constants.POINTER_MOUSE
+    val stem = pointerFileName.substringBeforeLast(".")
+    downloadApkFileName = if (isMouse) "RRO_mouse_$stem.apk" else "RRO_$stem.apk"
+    downloadZipFileName = if (isMouse) "RRO_mouse_$stem.zip" else "RRO_$stem.zip"
 
     lifecycleScope.launch {
       selectedPointer =
@@ -85,7 +91,8 @@ class MagiskRROFragment : Fragment() {
             repoDocId,
           ).get().await().toObject(Pointer::class.java)
           ?: Pointer()
-      magiskModuleSaveName = "${selectedPointer.name}_RRO-2_Magisk.zip"
+      val suffix = if (isMouse) "Mouse_Magisk.zip" else "Magisk.zip"
+      magiskModuleSaveName = "${selectedPointer.name}_RRO-2_$suffix"
       init()
     }
   }
@@ -192,6 +199,7 @@ class MagiskRROFragment : Fragment() {
           pointerName = selectedPointer.name ?: "Custom",
           rroApkFile = rroApk,
           outputPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName),
+          pointerType = pointerType,
         )
       }
 

@@ -93,10 +93,16 @@
             app:uri="https://pointer-replacer.web.app/arro/install/{repoDocId}/{pointerFileName}" />
         <argument
             android:name="repoDocId"
+            android:defaultValue=""
             app:argType="string" />
         <argument
             android:name="pointerFileName"
+            android:defaultValue=""
             app:argType="string" />
+        <argument
+            android:name="pointerType"
+            android:defaultValue="1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/rroRequestFragment"
