@@ -23,6 +23,7 @@ sidebar_position: 2
 - [NEW] Dedicated Mouse Pointer RRO Overlay package (`com.afterroot.allusive_rro_mouse`) and flashable Magisk module (`pointer_replacer_rro_mouse`) allowing touch and mouse RRO overlays to coexist
 - [ADD] In-app pointer type chooser (Touch vs. Mouse) when installing or downloading RRO overlays
 - [ADD] Mouse cursor support in `compile_rro.py`, `process_requested_rros.py`, and `migrate_all_rros.py`
+- [IMPROVE] Redirect to website using Firestore document ID instead of filename in Play Store variant
 - [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 
 ### v1.11.6 (27-12-2025)

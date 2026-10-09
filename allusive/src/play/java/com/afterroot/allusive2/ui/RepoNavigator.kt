@@ -19,9 +19,7 @@ object RepoNavigator {
     pointerType: Int = Constants.POINTER_TOUCH,
   ) {
     val context = fragment.requireContext()
-    val isMouse = pointerType == Constants.POINTER_MOUSE
-    val prefix = if (isMouse) "RRO_mouse_" else "RRO_"
-    val webUrl = "https://pointer-replacer.web.app/rro/$prefix$fileName"
+    val webUrl = "https://pointer-replacer.web.app/rro/$docId"
 
     MaterialAlertDialogBuilder(context)
       .setTitle(CommonR.string.text_get_rro_web)

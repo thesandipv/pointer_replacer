@@ -373,6 +373,15 @@ class PointersRepoFragment :
                 }
                 setOnClickListener {
                   showInterstitialAd {
+                    if (BuildConfig.DISTRIBUTION == "play") {
+                      RepoNavigator.installRro(
+                        fragment = this@PointersRepoFragment,
+                        docId = pointer.docId.toString(),
+                        fileName = pointer.filename.toString(),
+                      )
+                      dialog.dismiss()
+                      return@showInterstitialAd
+                    }
                     val pointerTypes = arrayOf(
                       getString(CommonR.string.pointer_type_touch),
                       getString(CommonR.string.pointer_type_mouse),
@@ -380,9 +389,7 @@ class PointersRepoFragment :
                     MaterialAlertDialogBuilder(requireContext())
                       .setTitle(CommonR.string.title_select_pointer_type)
                       .setItems(pointerTypes) { _, which ->
-                        val selectedType = if (which ==
-                          1
-                        ) {
+                        val selectedType = if (which == 1) {
                           Constants.POINTER_MOUSE
                         } else {
                           Constants.POINTER_TOUCH
