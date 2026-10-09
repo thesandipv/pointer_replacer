@@ -44,7 +44,6 @@ rootProject.name = "pointer-replacer"
 include(
   ":allusive",
   ":ards",
-  ":arro",
   ":base",
   ":common:ui:compose",
   ":common:ui:resources",
@@ -65,7 +64,6 @@ include(
 )
 
 project(":ards").projectDir = file("ards/lib") // AfterROOT Data Structure
-project(":arro").projectDir = file("arro/app") // Allusive RRO
 project(":utils").projectDir = file("ards/utils/lib") // AfterROOT Utils
 
 fun readProperties(propertiesFile: File): Properties {

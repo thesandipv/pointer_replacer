@@ -7,13 +7,19 @@ package com.afterroot.allusive2.ui
 import android.content.Intent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.afterroot.allusive2.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.afterroot.allusive2.resources.R as CommonR
 
 object RepoNavigator {
-  fun installRro(fragment: Fragment, docId: String, fileName: String) {
+  fun installRro(
+    fragment: Fragment,
+    docId: String,
+    fileName: String,
+    pointerType: Int = Constants.POINTER_TOUCH,
+  ) {
     val context = fragment.requireContext()
-    val webUrl = "https://pointer-replacer.web.app/rro/$fileName"
+    val webUrl = "https://pointer-replacer.web.app/rro/$docId"
 
     MaterialAlertDialogBuilder(context)
       .setTitle(CommonR.string.text_get_rro_web)

@@ -34,6 +34,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.allusive2.BuildConfig
+import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.Settings
@@ -372,12 +373,36 @@ class PointersRepoFragment :
                 }
                 setOnClickListener {
                   showInterstitialAd {
-                    RepoNavigator.installRro(
-                      fragment = this@PointersRepoFragment,
-                      docId = pointer.docId.toString(),
-                      fileName = pointer.filename.toString(),
+                    if (BuildConfig.DISTRIBUTION == "play") {
+                      RepoNavigator.installRro(
+                        fragment = this@PointersRepoFragment,
+                        docId = pointer.docId.toString(),
+                        fileName = pointer.filename.toString(),
+                      )
+                      dialog.dismiss()
+                      return@showInterstitialAd
+                    }
+                    val pointerTypes = arrayOf(
+                      getString(CommonR.string.pointer_type_touch),
+                      getString(CommonR.string.pointer_type_mouse),
                     )
-                    dialog.dismiss()
+                    MaterialAlertDialogBuilder(requireContext())
+                      .setTitle(CommonR.string.title_select_pointer_type)
+                      .setItems(pointerTypes) { _, which ->
+                        val selectedType = if (which == 1) {
+                          Constants.POINTER_MOUSE
+                        } else {
+                          Constants.POINTER_TOUCH
+                        }
+                        RepoNavigator.installRro(
+                          fragment = this@PointersRepoFragment,
+                          docId = pointer.docId.toString(),
+                          fileName = pointer.filename.toString(),
+                          pointerType = selectedType,
+                        )
+                        dialog.dismiss()
+                      }
+                      .show()
                   }
                 }
               } else {

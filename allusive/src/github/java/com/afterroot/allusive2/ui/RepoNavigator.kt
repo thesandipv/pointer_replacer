@@ -6,15 +6,22 @@ package com.afterroot.allusive2.ui
 
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.afterroot.allusive2.Constants
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.ui.fragment.PointersRepoFragmentDirections
 
 object RepoNavigator {
-  fun installRro(fragment: Fragment, docId: String, fileName: String) {
+  fun installRro(
+    fragment: Fragment,
+    docId: String,
+    fileName: String,
+    pointerType: Int = Constants.POINTER_TOUCH,
+  ) {
     if (fragment.findNavController().currentDestination?.id == R.id.repoFragment) {
       val directions = PointersRepoFragmentDirections.repoToRroInstall(
         repoDocId = docId,
         pointerFileName = fileName,
+        pointerType = pointerType,
       )
       fragment.findNavController().navigate(directions)
     }

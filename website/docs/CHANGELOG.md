@@ -14,7 +14,16 @@ sidebar_position: 2
 - [ADD] Delete account option (All data including pointers will be deleted.)
 - [ADD] `play` and `github` distribution product flavors for Google Play Store compliance
 - [ADD] Web RRO download flow for Play Store variant
+- [NEW] Pre-packaged flashable Magisk Module ZIP distribution (RRO 2.0)
+- [IMPROVE] Use Firestore pointer names in generated Magisk `module.prop` metadata instead of raw filenames
+- [NEW] Direct ZIP installation in app without on-device repacking
+- [ADD] Multi-core batch migration pipeline (`migrate_all_rros.py`) for RRO 2.0 APKs and Magisk ZIPs
+- [SCHEMA] Added `rroVersion` field to Pointer model and DatabaseFields
 - [NEW] Modernized Magisk RRO module generation with atomic Zip4j packaging
+- [NEW] Dedicated Mouse Pointer RRO Overlay package (`com.afterroot.allusive_rro_mouse`) and flashable Magisk module (`pointer_replacer_rro_mouse`) allowing touch and mouse RRO overlays to coexist
+- [ADD] In-app pointer type chooser (Touch vs. Mouse) when installing or downloading RRO overlays
+- [ADD] Mouse cursor support in `compile_rro.py`, `process_requested_rros.py`, and `migrate_all_rros.py`
+- [IMPROVE] Redirect to website using Firestore document ID instead of filename in Play Store variant
 - [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 
 ### v1.11.6 (27-12-2025)
