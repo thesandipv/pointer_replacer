@@ -576,11 +576,18 @@ class PointersRepoFragment :
       message(text = getString(CommonR.string.dialog_delete_confirm))
       positiveButton(CommonR.string.text_delete) {
         lifecycleScope.launch {
-          pointer.docId?.let {
-            firestore.pointers().document(it).delete().await()
+          pointer.docId?.let { docId ->
+            firestore.pointers().document(docId).delete().await()
+            try {
+              firestore.requests().document(docId).delete().await()
+            } catch (e: Exception) {
+              Timber.e(e, "Error deleting pointer request")
+            }
             binding.list.scrollToPosition(position)
             // delete pointer from storage bucket
-            storage.pointers().child(pointer.filename!!).delete()
+            pointer.filename?.let { filename ->
+              storage.pointers().child(filename).delete()
+            }
             context.toast(CommonR.string.msg_delete_success)
           }
         }
