@@ -201,6 +201,11 @@ class EditProfileFragment : Fragment() {
           val pointer = doc.toObject(Pointer::class.java)
           if (pointer?.uploadedBy?.containsKey(uid) == true) {
             doc.reference.delete().await()
+            try {
+              db.requests().document(doc.id).delete().await()
+            } catch (e: Exception) {
+              Timber.e(e, "Error deleting pointer request: %s", doc.id)
+            }
             pointer.filename?.let { filename ->
               try {
                 storage.pointers().child(filename).delete().await()
