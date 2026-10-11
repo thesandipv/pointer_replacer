@@ -26,6 +26,7 @@ object DatabaseFields {
   const val FIELD_UPVOTES = "upvotes"
   const val FIELD_DOWNVOTES = "downvotes"
   const val FIELD_HAS_RRO = "hasRRO"
+  const val FIELD_RRO_VERSION = "rroVersion"
   const val FIELD_RRO_REQUESTED = "rroRequested"
   const val FIELD_STATUS = "status"
   const val FIELD_REASON_CODE = "reasonCode"

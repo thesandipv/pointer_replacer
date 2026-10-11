@@ -6,6 +6,7 @@ package com.afterroot.allusive2.magisk
 
 import android.content.Context
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.allusive2.Constants
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import java.io.ByteArrayInputStream
@@ -48,6 +49,7 @@ fun buildRroMagiskModule(
   pointerName: String,
   rroApkFile: File,
   outputPath: String,
+  pointerType: Int = Constants.POINTER_TOUCH,
 ): File {
   val outputFile = File(outputPath)
   outputFile.parentFile?.mkdirs()
@@ -56,20 +58,35 @@ fun buildRroMagiskModule(
   // Copy base template directly to output path
   copyAssetFile(context, MAGISK_RRO_ZIP, outputFile.path)
 
+  val isMouse = pointerType == Constants.POINTER_MOUSE
+  val targetApkName = if (isMouse) "allusive_rro_mouse.apk" else "allusive_rro.apk"
+  val moduleId = if (isMouse) "pointer_replacer_rro_mouse" else "pointer_replacer_rro"
+  val displayName = if (isMouse) "Pointer Replacer RRO (Mouse) - $pointerName" else "Pointer Replacer RRO - $pointerName"
+  val description = if (isMouse) {
+    "Magisk Mouse RRO Overlay for '$pointerName' pointer"
+  } else {
+    "Magisk RRO Overlay for '$pointerName' pointer"
+  }
+
   // Inject RRO APK and custom module.prop via Zip4j
   val zipFile = ZipFile(outputFile)
-  val apkParams = ZipParameters().apply {
-    fileNameInZip = "system/vendor/overlay/allusive_rro.apk"
+  val apkParamsVendor = ZipParameters().apply {
+    fileNameInZip = "system/vendor/overlay/$targetApkName"
   }
-  zipFile.addFile(rroApkFile, apkParams)
+  zipFile.addFile(rroApkFile, apkParamsVendor)
+
+  val apkParamsProduct = ZipParameters().apply {
+    fileNameInZip = "system/product/overlay/$targetApkName"
+  }
+  zipFile.addFile(rroApkFile, apkParamsProduct)
 
   val moduleProp = """
-    id=pointer_replacer_rro
-    name=Pointer Replacer RRO - $pointerName
+    id=$moduleId
+    name=$displayName
     version=v2.0
     versionCode=2
     author=thesandipv
-    description=Magisk RRO Overlay for '$pointerName' pointer
+    description=$description
   """.trimIndent()
 
   val propParams = ZipParameters().apply {

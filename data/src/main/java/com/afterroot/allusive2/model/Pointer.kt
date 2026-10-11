@@ -32,6 +32,7 @@ data class Pointer(
   var dHash: String? = null,
   var reportCount: Int = 0,
   var hasRRO: Boolean = false,
+  var rroVersion: Int = 1,
   var rroRequested: Boolean = false,
   @Exclude var docId: String? = null,
 ) : Serializable

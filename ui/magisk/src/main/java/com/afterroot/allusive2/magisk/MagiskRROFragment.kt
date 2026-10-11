@@ -52,11 +52,13 @@ class MagiskRROFragment : Fragment() {
   @Inject lateinit var okHttpClient: OkHttpClient
 
   @Inject lateinit var settings: Settings
+  private var pointerType: Int = Constants.POINTER_TOUCH
   private val progress = MutableLiveData<Result>()
   private lateinit var repoDocId: String
   private lateinit var pointerFileName: String
   private lateinit var selectedPointer: Pointer
   private lateinit var downloadApkFileName: String
+  private lateinit var downloadZipFileName: String
   private lateinit var magiskModuleSaveName: String
 
   override fun onCreateView(
@@ -72,7 +74,13 @@ class MagiskRROFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     repoDocId = arguments?.getString("repoDocId") ?: ""
     pointerFileName = arguments?.getString("pointerFileName") ?: ""
-    downloadApkFileName = "RRO_${pointerFileName.substringBeforeLast(".")}.apk"
+    pointerType =
+      arguments?.getInt("pointerType", Constants.POINTER_TOUCH) ?: Constants.POINTER_TOUCH
+
+    val isMouse = pointerType == Constants.POINTER_MOUSE
+    val stem = pointerFileName.substringBeforeLast(".")
+    downloadApkFileName = if (isMouse) "RRO_mouse_$stem.apk" else "RRO_$stem.apk"
+    downloadZipFileName = if (isMouse) "RRO_mouse_$stem.zip" else "RRO_$stem.zip"
 
     lifecycleScope.launch {
       selectedPointer =
@@ -83,7 +91,8 @@ class MagiskRROFragment : Fragment() {
             repoDocId,
           ).get().await().toObject(Pointer::class.java)
           ?: Pointer()
-      magiskModuleSaveName = "${selectedPointer.name}_RRO-2_Magisk.zip"
+      val suffix = if (isMouse) "Mouse_Magisk.zip" else "Magisk.zip"
+      magiskModuleSaveName = "${selectedPointer.name}_RRO-2_$suffix"
       init()
     }
   }
@@ -143,7 +152,7 @@ class MagiskRROFragment : Fragment() {
       updateProgress(completed = true)
       return
     }
-    createMagiskModule()
+    prepareMagiskModule()
   }
 
   private fun setPointerImage() {
@@ -159,16 +168,30 @@ class MagiskRROFragment : Fragment() {
     }
   }
 
-  private fun createMagiskModule() {
+  private fun prepareMagiskModule() {
     lifecycleScope.launch {
+      // 1. Try downloading pre-packaged flashable Magisk Module ZIP
+      val zipDownloaded = downloadRROMagiskZip()
+      if (zipDownloaded) {
+        val module = File(repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
+        if (module.exists()) {
+          updateProgress("- Magisk module ready at: ${module.path}")
+          setupInstallButton(module.path)
+        }
+        updateProgress(completed = true)
+        return@launch
+      }
+
+      // 2. Fallback: Download raw APK and package on device
+      updateProgress("- Module ZIP not available, downloading APK...")
       val downloaded = downloadRROApk()
       if (!downloaded) {
-        updateProgress("- Error: Could not download RRO APK", completed = true)
+        updateProgress("- Error: Could not download RRO", completed = true)
         return@launch
       }
 
       val rroApk = File(rroApkDownloadPath(requireContext()), downloadApkFileName)
-      updateProgress("- Building Magisk Module")
+      updateProgress("- Packaging Magisk Module...")
 
       val module = withContext(Dispatchers.IO) {
         buildRroMagiskModule(
@@ -176,6 +199,7 @@ class MagiskRROFragment : Fragment() {
           pointerName = selectedPointer.name ?: "Custom",
           rroApkFile = rroApk,
           outputPath = repackedMagiskModulePath(requireContext(), magiskModuleSaveName),
+          pointerType = pointerType,
         )
       }
 
@@ -278,6 +302,48 @@ class MagiskRROFragment : Fragment() {
           updateProgress("- RRO Apk download failed")
           result = false
         }
+      }
+    }
+    return result
+  }
+
+  private suspend fun downloadRROMagiskZip(): Boolean {
+    var result = false
+    val url =
+      "https://github.com/afterroot/allusive-repo/raw/main/modules/$downloadZipFileName"
+
+    val targetFile = File(repackedMagiskModulePath(requireContext(), magiskModuleSaveName))
+
+    if (targetFile.exists()) {
+      updateProgress("- Magisk module already exists at: ${targetFile.path}")
+      return true
+    }
+
+    targetFile.parentFile?.mkdirs()
+
+    updateProgress("- Downloading Magisk Module ZIP from: $url")
+    withContext(Dispatchers.IO) {
+      runCatching {
+        val request = Request.Builder().url(url).build()
+        val response = okHttpClient.newCall(request).execute()
+        if (response.isSuccessful) {
+          response.body.byteStream().buffered().use { input ->
+            targetFile.outputStream().use { output ->
+              input.copyTo(output)
+            }
+          }
+          withContext(Dispatchers.Main) {
+            updateProgress("- Magisk module saved at: ${targetFile.path}")
+            result = true
+          }
+
+          if (repoDocId.isNotBlank()) {
+            firestore.pointers().document(repoDocId)
+              .update(DatabaseFields.FIELD_RRO_DOWNLOADS, FieldValue.increment(1))
+          }
+        }
+      }.onFailure { e ->
+        Timber.e(e, "downloadRROMagiskZip failed")
       }
     }
     return result

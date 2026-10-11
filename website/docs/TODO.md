@@ -25,6 +25,8 @@ Create New Issue in Main Project
 - [ ] ADD - Create online repo of RRO Pointers
   - [ ] add deeplink support
 - [ ] IMP - Remove MaterialDialogs and use Alert dialogs.
+- [ ] ADD - Ads in REPO list
+- [ ] M3E Bottom bar
 
 ### v1.10.2
 

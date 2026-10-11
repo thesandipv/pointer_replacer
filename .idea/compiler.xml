@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="11">
+      <module name="pointer-replacer.arro" target="25" />
       <module name="pointer-replacer.ui.common-compose" target="17" />
       <module name="pointer-replacer.ui.resources" target="17" />
     </bytecodeTargetLevel>
