@@ -19,6 +19,7 @@ import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.firestoreSettings
@@ -35,8 +36,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+
+private const val EMULATOR_HOST = "10.0.2.2"
+private const val EMULATOR_PORT_FIRESTORE = 8080
+private const val EMULATOR_PORT_AUTH = 9099
+private const val EMULATOR_PORT_STORAGE = 9199
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -45,19 +50,23 @@ object FirebaseModule {
   @Singleton
   fun provideFirestore(userDataRepository: UserDataRepository, logger: Logger): FirebaseFirestore =
     Firebase.firestore.apply {
-      firestoreSettings = firestoreSettings {
-        setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
+      val isEmulatorEnabled = runBlocking {
+        BuildConfig.DEBUG && userDataRepository.userData.first().enableFirebaseEmulators
       }
-      runBlocking {
-        launch {
-          val userData = userDataRepository.userData.first()
-          if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
-            useEmulator("10.0.2.2", 8080)
-            logger.d { "Using firebase emulators: firestore" }
+      if (isEmulatorEnabled) {
+        useEmulator(EMULATOR_HOST, EMULATOR_PORT_FIRESTORE)
+        logger.d { "Using firebase emulators: firestore" }
+      } else {
+        logger.d { "Not Using firebase emulators: firestore" }
+      }
+      firestoreSettings = firestoreSettings {
+        setLocalCacheSettings(
+          if (isEmulatorEnabled) {
+            MemoryCacheSettings.newBuilder().build()
           } else {
-            logger.d { "Not Using firebase emulators: firestore" }
-          }
-        }
+            PersistentCacheSettings.newBuilder().build()
+          },
+        )
       }
     }
 
@@ -67,19 +76,30 @@ object FirebaseModule {
 
   @Provides
   @Singleton
-  fun provideAuth(): FirebaseAuth = Firebase.auth
+  fun provideAuth(userDataRepository: UserDataRepository, logger: Logger): FirebaseAuth =
+    Firebase.auth.apply {
+      runBlocking {
+        val userData = userDataRepository.userData.first()
+        if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
+          useEmulator(EMULATOR_HOST, EMULATOR_PORT_AUTH)
+          logger.d { "Using firebase emulators: auth" }
+        } else {
+          logger.d { "Not Using firebase emulators: auth" }
+        }
+      }
+    }
 
   @Provides
   @Singleton
   fun provideStorage(userDataRepository: UserDataRepository, logger: Logger): FirebaseStorage =
     Firebase.storage.apply {
       runBlocking {
-        launch {
-          val userData = userDataRepository.userData.first()
-          if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
-            useEmulator("10.0.2.2", 9199)
-            logger.d { "Using firebase emulators: storage" }
-          }
+        val userData = userDataRepository.userData.first()
+        if (BuildConfig.DEBUG && userData.enableFirebaseEmulators) {
+          useEmulator(EMULATOR_HOST, EMULATOR_PORT_STORAGE)
+          logger.d { "Using firebase emulators: storage" }
+        } else {
+          logger.d { "Not Using firebase emulators: storage" }
         }
       }
     }
