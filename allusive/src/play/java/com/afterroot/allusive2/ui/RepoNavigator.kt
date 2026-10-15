@@ -19,7 +19,7 @@ object RepoNavigator {
     pointerType: Int = Constants.POINTER_TOUCH,
   ) {
     val context = fragment.requireContext()
-    val webUrl = "https://pointer-replacer.web.app/rro/$docId"
+    val webUrl = "https://pointer-replacer.web.app/pointer/$docId"
 
     MaterialAlertDialogBuilder(context)
       .setTitle(CommonR.string.text_get_rro_web)
