@@ -17,13 +17,20 @@ sidebar_position: 2
 - [ADD] Multi-core batch migration pipeline (`migrate_all_rros.py`) for RRO 2.0 APKs and Magisk ZIPs
 - [ADD] Web RRO download flow for Play Store variant
 - [ADD] `play` and `github` distribution product flavors for Google Play Store compliance
+- [FIX] Exclude docId from Firestore document serialization using `@get:Exclude` in `Pointer` and `PointerReport` models
+- [FIX] Interstitial ad dismiss safety check to guarantee callback execution even when ads fail to load
 - [FIX] Resolve CI build failure when a pointer is deleted while its RRO request is still pending (#440)
+- [FIX] Rewarded ad lifecycle and upload flow implementation in `NewPointerPost`
+- [IMPROVE] Edge-to-edge support with dynamic system insets and bottom margin handling for bottom navigation and action buttons
+- [IMPROVE] Pointer upload validation: strict PNG format enforcement, alpha channel transparency check, and automatic 128x128 px dimension normalization
 - [IMPROVE] Redirect to website using Firestore document ID instead of filename in Play Store variant
+- [IMPROVE] Scrolling container padding (`clipToPadding="false"`, `80dp` bottom padding) across RecyclerView, NestedScrollView, and Compose screens
 - [IMPROVE] Use Firestore pointer names in generated Magisk `module.prop` metadata instead of raw filenames
 - [NEW] Dedicated Mouse Pointer RRO Overlay package (`com.afterroot.allusive_rro_mouse`) and flashable Magisk module (`pointer_replacer_rro_mouse`) allowing touch and mouse RRO overlays to coexist
 - [NEW] Direct ZIP installation in app without on-device repacking
 - [NEW] Modernized Magisk RRO module generation with atomic Zip4j packaging
 - [NEW] Pre-packaged flashable Magisk Module ZIP distribution (RRO 2.0)
+- [REF] Migrated screens to Jetpack Compose (`EditProfileFragment`, `CustomizeFragment`, `NewPointerPost`)
 - [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 - [SCHEMA] Added `rroVersion` field to Pointer model and DatabaseFields
 

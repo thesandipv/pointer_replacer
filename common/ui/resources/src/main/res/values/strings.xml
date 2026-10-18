@@ -100,12 +100,15 @@
     <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
     <string name="msg_no_changes">No Changes to Save.</string>
     <string name="msg_no_pointers_installed">No Pointers Installed</string>
+    <string name="msg_only_png_supported">Only PNG format is supported.</string>
     <string name="msg_pointer_downloaded">Pointer Downloaded</string>
+    <string name="msg_pointer_no_alpha_error">Pointer must have transparency (alpha channel).</string>
     <string name="msg_pointer_not_imported">Please import pointer image first.</string>
     <string name="msg_pointer_not_selected">Please Select Pointer first</string>
     <string name="msg_pointer_upload_success">Pointer Uploaded</string>
     <string name="msg_profile_updated">"Profile Updated"</string>
     <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
+    <string name="msg_watch_ad_to_upload">Please watch the complete ad to continue upload.</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Select and Apply Pointer</string>

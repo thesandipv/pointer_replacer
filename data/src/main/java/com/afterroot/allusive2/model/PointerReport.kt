@@ -19,5 +19,5 @@ data class PointerReport(
   var reason: Int = Reason.OTHER,
   var details: String? = null,
   @ServerTimestamp var timestamp: Date = Timestamp.now().toDate(),
-  @Exclude var docId: String? = null,
+  @get:Exclude var docId: String? = null,
 ) : Serializable

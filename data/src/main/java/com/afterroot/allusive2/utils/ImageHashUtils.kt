@@ -6,6 +6,7 @@ package com.afterroot.allusive2.utils
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.core.graphics.get
 import androidx.core.graphics.scale
 import java.io.File
 import java.io.FileInputStream
@@ -48,8 +49,8 @@ object ImageHashUtils {
 
     for (y in 0 until 8) {
       for (x in 0 until 8) {
-        val leftPixel = scaled.getPixel(x, y)
-        val rightPixel = scaled.getPixel(x + 1, y)
+        val leftPixel = scaled[x, y]
+        val rightPixel = scaled[x + 1, y]
 
         val leftLuminance = getLuminance(leftPixel)
         val rightLuminance = getLuminance(rightPixel)
