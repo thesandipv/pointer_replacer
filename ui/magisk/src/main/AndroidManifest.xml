@@ -1,3 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-<manifest/>
+    <queries>
+        <package android:name="com.topjohnwu.magisk" />
+        <package android:name="io.github.tiann.kernelsu" />
+        <package android:name="io.github.tiann.kernelsu.debug" />
+        <package android:name="com.rifsxd.ksunext" />
+        <package android:name="me.bmax.apatch" />
+    </queries>
+
+</manifest>
