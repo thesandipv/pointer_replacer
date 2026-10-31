@@ -159,7 +159,13 @@ class MagiskRROFragment : Fragment() {
     uiState.update {
       it.copy(
         pointerType = pointerType,
-        rootManagerName = if (rootManager != RootManager.UNKNOWN) rootManager.displayName else "Root Manager",
+        rootManagerName = if (rootManager !=
+          RootManager.UNKNOWN
+        ) {
+          rootManager.displayName
+        } else {
+          "Root Manager"
+        },
       )
     }
 
