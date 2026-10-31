@@ -30,7 +30,7 @@ sidebar_position: 2
 - [NEW] Direct ZIP installation in app without on-device repacking
 - [NEW] Modernized Magisk RRO module generation with atomic Zip4j packaging
 - [NEW] Pre-packaged flashable Magisk Module ZIP distribution (RRO 2.0)
-- [REF] Migrated screens to Jetpack Compose (`EditProfileFragment`, `CustomizeFragment`, `NewPointerPost`)
+- [REF] Migrated screens to Jetpack Compose (`EditProfileFragment`, `CustomizeFragment`, `NewPointerPost`, `MagiskRROFragment`)
 - [REMOVED] Deprecated and removed legacy `framework-res` pointer replacement method
 - [SCHEMA] Added `rroVersion` field to Pointer model and DatabaseFields
 
