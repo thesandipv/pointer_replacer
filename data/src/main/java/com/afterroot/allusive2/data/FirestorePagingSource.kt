@@ -6,6 +6,8 @@ package com.afterroot.allusive2.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.afterroot.allusive2.PointerStatus
+import com.afterroot.allusive2.Reason
 import com.afterroot.allusive2.Settings
 import com.afterroot.allusive2.data.mapper.toPointer
 import com.afterroot.allusive2.data.mapper.toPointers
@@ -101,8 +103,18 @@ class FirestorePagingSource(
 
     val nextPage = nextPageQuery.get(nextPageSource).await()
 
+    val activePointers = currentPage.toPointers().filterNotNull().filter { pointer ->
+      val isOwner = pointer.uploadedBy?.containsKey(firebaseUtils.uid) == true
+      if (isOwner) {
+        pointer.status != PointerStatus.DELETED
+      } else {
+        (pointer.status == PointerStatus.APPROVED || pointer.status.isEmpty()) &&
+          pointer.reasonCode == Reason.OK
+      }
+    }
+
     LoadResult.Page(
-      data = currentPage.toPointers().filterNotNull(),
+      data = activePointers,
       prevKey = null,
       nextKey = nextPage,
     )

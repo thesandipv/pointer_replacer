@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.lint.LintModelWriterTask
 
 plugins {
   id(afterroot.plugins.android.library.get().pluginId)
+  id(afterroot.plugins.android.compose.get().pluginId)
   id(afterroot.plugins.allusive2.android.common.get().pluginId)
   id(afterroot.plugins.android.hilt.get().pluginId)
 }
@@ -33,16 +34,11 @@ tasks.whenTaskAdded {
 
 android {
   namespace = "com.afterroot.allusive2.magisk"
-
-  buildFeatures {
-    dataBinding = true
-    viewBinding = true
-  }
 }
 dependencies {
   implementation(projects.data)
 
-  implementation(libs.materialdialogs.core)
+  implementation(libs.coil)
 
   implementation(libs.androidx.constraintLayout)
   implementation(libs.androidx.lifecycle.runtime)

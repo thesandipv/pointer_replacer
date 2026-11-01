@@ -28,6 +28,11 @@ object DatabaseFields {
   const val FIELD_HAS_RRO = "hasRRO"
   const val FIELD_RRO_VERSION = "rroVersion"
   const val FIELD_RRO_REQUESTED = "rroRequested"
+  const val FIELD_STATUS = "status"
+  const val FIELD_REASON_CODE = "reasonCode"
+  const val FIELD_SHA256 = "sha256"
+  const val FIELD_DHASH = "dHash"
+  const val FIELD_REPORT_COUNT = "reportCount"
 
   // table 'requests'
   const val COLLECTION_REQUESTS = "requests"
@@ -37,4 +42,11 @@ object DatabaseFields {
   // table 'deleted_users'
   const val COLLECTION_DELETED_USERS = "deleted_users"
   const val FIELD_DELETED_AT = "deletedAt"
+
+  // table 'reports'
+  const val COLLECTION_REPORTS = "reports"
+  const val FIELD_POINTER_ID = "pointerId"
+  const val FIELD_REPORTER_UID = "reporterUid"
+  const val FIELD_REPORT_REASON = "reason"
+  const val FIELD_REPORT_DETAILS = "details"
 }

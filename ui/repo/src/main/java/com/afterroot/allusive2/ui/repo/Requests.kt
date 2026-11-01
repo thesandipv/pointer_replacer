@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -48,7 +48,14 @@ import com.afterroot.allusive2.resources.R as CommonR
 
 @Composable
 fun Requests() {
-  Requests(viewModel = hiltViewModel())
+  Requests(
+    viewModel = androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel(
+      checkNotNull<androidx.lifecycle.ViewModelStoreOwner>(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+      },
+      null,
+    ),
+  )
 }
 
 @Composable
@@ -80,9 +87,12 @@ fun Requests(
       )
     }
     AnimatedVisibility(visible = !isLoading) {
-      RequestsList(list = requestsList, onClick = {
-        Timber.d("Requests: ${it.fileName}")
-      })
+      RequestsList(
+        list = requestsList,
+        onClick = {
+          Timber.d("Requests: ${it.fileName}")
+        },
+      )
     }
   }
 }
@@ -96,11 +106,12 @@ fun RequestsList(
     verticalArrangement = Arrangement.spacedBy(8.dp),
     modifier = Modifier.fillMaxWidth(),
   ) {
-    items(count = list.itemCount, key = {
-      list.itemKey { item ->
-        item.pointerName!!
-      }
-    }) { index ->
+    items(
+      count = list.itemCount,
+      key = list.itemKey { item ->
+        item.fileName!!
+      },
+    ) { index ->
       list[index]?.let { item ->
         RequestListItem(pointerRequest = item)
       }

@@ -5,8 +5,10 @@
 package com.afterroot.allusive2.magisk
 
 import android.content.Context
-import com.afollestad.materialdialogs.MaterialDialog
+import android.content.Intent
+import android.content.pm.PackageManager
 import com.afterroot.allusive2.Constants
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import java.io.ByteArrayInputStream
@@ -99,20 +101,54 @@ fun buildRroMagiskModule(
   return outputFile
 }
 
+enum class RootManager(val displayName: String, val packageNames: List<String>) {
+  MAGISK("Magisk", listOf("com.topjohnwu.magisk")),
+  KERNEL_SU("KernelSU", listOf("io.github.tiann.kernelsu", "io.github.tiann.kernelsu.debug")),
+  KSU_NEXT("KernelSU Next", listOf("com.rifsxd.ksunext")),
+  APATCH("APatch", listOf("me.bmax.apatch")),
+  UNKNOWN("Root Manager", emptyList()),
+}
+
+fun getInstalledRootManager(context: Context): RootManager {
+  val pm = context.packageManager
+  for (manager in RootManager.entries) {
+    for (pkg in manager.packageNames) {
+      try {
+        pm.getPackageInfo(pkg, 0)
+        return manager
+      } catch (_: PackageManager.NameNotFoundException) {
+      }
+    }
+  }
+  return RootManager.UNKNOWN
+}
+
+fun getLaunchIntentForRootManager(context: Context): Pair<Intent?, String> {
+  val pm = context.packageManager
+  for (manager in RootManager.entries) {
+    for (pkg in manager.packageNames) {
+      val intent = pm.getLaunchIntentForPackage(pkg)
+      if (intent != null) {
+        return Pair(intent, manager.displayName)
+      }
+    }
+  }
+  return Pair(null, RootManager.UNKNOWN.displayName)
+}
+
 fun showRebootDialog(context: Context) {
-  MaterialDialog(context).show {
-    title(res = CommonR.string.reboot)
-    message(text = "Pointer Applied.")
-    positiveButton(res = CommonR.string.reboot) {
+  MaterialAlertDialogBuilder(context)
+    .setTitle(CommonR.string.reboot)
+    .setMessage("Pointer Applied.")
+    .setPositiveButton(CommonR.string.reboot) { _, _ ->
       try {
         reboot()
       } catch (e: Exception) {
         e.printStackTrace()
       }
     }
-    negativeButton(android.R.string.cancel) {
-    }
-  }
+    .setNegativeButton(android.R.string.cancel, null)
+    .show()
 }
 
 fun installModule(path: String, callback: Shell.ResultCallback, onElementAdd: (String?) -> Unit) {
@@ -121,22 +157,33 @@ fun installModule(path: String, callback: Shell.ResultCallback, onElementAdd: (S
       onElementAdd(e)
     }
   }
-  Shell.cmd("magisk --install-module \"${path}\"").to(callbackList).submit(callback)
+  val command = """
+    if command -v magisk >/dev/null 2>&1; then
+      magisk --install-module "$path"
+    elif command -v ksu >/dev/null 2>&1; then
+      ksu module install "$path"
+    elif command -v apd >/dev/null 2>&1; then
+      apd module install "$path"
+    else
+      magisk --install-module "$path"
+    fi
+  """.trimIndent()
+  Shell.cmd(command).to(callbackList).submit(callback)
 }
 
 fun showRROExperimentalWarning(context: Context, onResponse: (response: Boolean) -> Unit) {
-  MaterialDialog(context).show {
-    title(text = "Declaration")
-    message(
-      text = "Applying Pointer by Creating RRO Layer is completely experimental. " +
-        "It's is not guaranteed that it'll work for you. By clicking Install, you understand that your device may stuck in bootloop. " +
-        "Also you are aware about methods of disabling magisk.",
+  MaterialAlertDialogBuilder(context)
+    .setTitle("Declaration")
+    .setMessage(
+      "Applying Pointer by Creating RRO Layer is completely experimental. " +
+        "It is not guaranteed that it will work for you. By clicking Install, you understand that your device may get stuck in a bootloop. " +
+        "Also ensure you are aware of methods to disable root modules in safe mode.",
     )
-    positiveButton(text = "Install") {
+    .setPositiveButton("Install") { _, _ ->
       onResponse(true)
     }
-    negativeButton(android.R.string.cancel) {
+    .setNegativeButton(android.R.string.cancel) { _, _ ->
       onResponse(false)
     }
-  }
+    .show()
 }

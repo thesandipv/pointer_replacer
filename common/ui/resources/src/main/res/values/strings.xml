@@ -100,12 +100,15 @@
     <string name="msg_mouse_not_selected">Please Select Mouse Pointer first</string>
     <string name="msg_no_changes">No Changes to Save.</string>
     <string name="msg_no_pointers_installed">No Pointers Installed</string>
+    <string name="msg_only_png_supported">Only PNG format is supported.</string>
     <string name="msg_pointer_downloaded">Pointer Downloaded</string>
+    <string name="msg_pointer_no_alpha_error">Pointer must have transparency (alpha channel).</string>
     <string name="msg_pointer_not_imported">Please import pointer image first.</string>
     <string name="msg_pointer_not_selected">Please Select Pointer first</string>
     <string name="msg_pointer_upload_success">Pointer Uploaded</string>
     <string name="msg_profile_updated">"Profile Updated"</string>
     <string name="msg_secure_settings_permission">Please grant app to write Secure Settings permission</string>
+    <string name="msg_watch_ad_to_upload">Please watch the complete ad to continue upload.</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="no_pointer_applied">No Pointer Applied.\nPlease Select and Apply Pointer</string>
@@ -246,4 +249,16 @@
     <string name="title_select_pointer_type">Select Pointer Type</string>
     <string name="pointer_type_touch">Touch Pointer</string>
     <string name="pointer_type_mouse">Mouse Pointer</string>
+    <string name="text_report_pointer">Report Pointer</string>
+    <string name="dialog_title_report_pointer">Report Pointer</string>
+    <string name="report_reason_duplicate">Duplicate Pointer</string>
+    <string name="report_reason_explicit">Explicit or Inappropriate Content</string>
+    <string name="report_reason_not_a_pointer">Not a Pointer / Low Quality</string>
+    <string name="report_reason_spam">Spam or Advertising</string>
+    <string name="report_reason_other">Other</string>
+    <string name="msg_report_success">Thank you for reporting. This item has been submitted for moderation.</string>
+    <string name="msg_duplicate_pointer_error">This pointer already exists in the repository (duplicate detected).</string>
+    <string name="msg_explicit_content_error">Upload contains prohibited or inappropriate content.</string>
+    <string name="msg_posting_revoked">Your posting privileges have been suspended.</string>
+    <string name="input_hint_report_details">Additional details (optional)</string>
 </resources>

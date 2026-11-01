@@ -4,40 +4,73 @@
  */
 package com.afterroot.allusive2.ui.fragment
 
-import android.net.Uri
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.SeekBar
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.navigation.findNavController
-import androidx.transition.ChangeBounds
-import androidx.transition.ChangeTransform
-import androidx.transition.TransitionSet
-import com.afollestad.materialdialogs.LayoutMode
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.fragment.findNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.color.ColorPalette
 import com.afollestad.materialdialogs.color.colorChooser
 import com.afterroot.allusive2.Constants.POINTER_TOUCH
 import com.afterroot.allusive2.R
 import com.afterroot.allusive2.Settings
-import com.afterroot.allusive2.databinding.FragmentCustomizePointerBinding
 import com.afterroot.allusive2.getMinPointerSize
+import com.afterroot.ui.common.compose.theme.Theme
 import com.afterroot.utils.extensions.getDrawableExt
-import com.afterroot.utils.extensions.visible
-import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.util.Locale
 import javax.inject.Inject
-import org.jetbrains.anko.find
+import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.MutableStateFlow
 import com.afterroot.allusive2.resources.R as CommonR
 
 /**
@@ -49,291 +82,351 @@ class CustomizeFragment : Fragment() {
 
   @Inject lateinit var settings: Settings
   private var pointerType: Int = 0
-  private var selectedColor: Int = 0
-  private var typeAlpha: Int = 255
-  private var typeColor: Int = 0
-  private var typePadding: Int = 0
-  private var typeSize: Int = 0
-  private lateinit var binding: FragmentCustomizePointerBinding
+
+  private val sizeState = MutableStateFlow(0)
+  private val paddingState = MutableStateFlow(0)
+  private val alphaState = MutableStateFlow(255)
+  private val colorState = MutableStateFlow(0)
+
+  private val minSize: Int
+    get() = requireContext().getMinPointerSize()
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    pointerType = requireArguments().getInt("TYPE")
+    initValues()
+  }
+
+  private fun initValues() {
+    val min = minSize
+    settings.apply {
+      if (pointerType == POINTER_TOUCH) {
+        sizeState.value = pointerSize.coerceAtLeast(min)
+        paddingState.value = pointerPadding
+        alphaState.value = pointerAlpha
+        colorState.value = pointerColor
+        typePath = selectedPointerPath.orEmpty()
+      } else {
+        sizeState.value = mouseSize.coerceAtLeast(min)
+        paddingState.value = mousePadding
+        alphaState.value = mouseAlpha
+        colorState.value = mouseColor
+        typePath = selectedMousePath.orEmpty()
+      }
+    }
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?,
-  ): View {
-    binding = FragmentCustomizePointerBinding.inflate(inflater, container, false)
-    pointerType = requireArguments().getInt("TYPE")
-    return binding.root
+  ): View = ComposeView(requireContext()).apply {
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    setContent {
+      Theme {
+        val size by sizeState.collectAsStateWithLifecycle()
+        val padding by paddingState.collectAsStateWithLifecycle()
+        val alpha by alphaState.collectAsStateWithLifecycle()
+        val color by colorState.collectAsStateWithLifecycle()
+
+        CustomizePointerScreen(
+          typePath = typePath,
+          size = size,
+          minSize = minSize,
+          maxSize = settings.maxPointerSize,
+          padding = padding,
+          maxPadding = settings.maxPointerPadding,
+          alpha = alpha,
+          isAlphaEnabled = settings.isEnableAlpha,
+          tintColor = color,
+          onSizeChange = { sizeState.value = it },
+          onPaddingChange = { paddingState.value = it },
+          onAlphaChange = { alphaState.value = it },
+          onChangeColorClick = { showColorChooser() },
+          onResetColorClick = { resetColor() },
+        )
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    settings.apply {
-      if (pointerType == POINTER_TOUCH) {
-        typeColor = pointerColor
-        typeSize = pointerSize
-        typePadding = pointerPadding
-        typeAlpha = pointerAlpha
-        typePath = selectedPointerPath!!
-      } else {
-        typeColor = mouseColor
-        typeSize = mouseSize
-        typePadding = mousePadding
-        typeAlpha = mouseAlpha
-        typePath = selectedMousePath!!
-      }
-    }
 
-    binding.imageCustomizePointer.setColorFilter(typeColor)
-
-    Glide.with(requireContext())
-      .load(Uri.fromFile(File(typePath)))
-      .into(binding.imageCustomizePointer)
-
-    requireActivity().find<ExtendedFloatingActionButton>(R.id.fab_apply).apply {
+    requireActivity().findViewById<ExtendedFloatingActionButton>(R.id.fab_apply)?.apply {
+      icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
       setOnClickListener {
+        val sizeVal = sizeState.value
+        val paddingVal = paddingState.value
+        val alphaVal = alphaState.value
+        val colorVal = colorState.value
+
         if (pointerType == POINTER_TOUCH) {
           settings.apply {
-            pointerSize = minSize + binding.seekBarSize.progress
-            pointerPadding = binding.seekBarPadding.progress
-            pointerAlpha = binding.seekBarAlpha.progress
-            pointerColor = selectedColor
+            pointerSize = sizeVal
+            pointerPadding = paddingVal
+            pointerAlpha = alphaVal
+            pointerColor = colorVal
           }
         } else {
           settings.apply {
-            mouseSize = minSize + binding.seekBarSize.progress
-            mousePadding = binding.seekBarPadding.progress
-            mouseAlpha = binding.seekBarAlpha.progress
-            mouseColor = selectedColor
+            mouseSize = sizeVal
+            mousePadding = paddingVal
+            mouseAlpha = alphaVal
+            mouseColor = colorVal
           }
         }
-        requireActivity().find<FragmentContainerView>(
-          R.id.fragment_repo_nav,
-        ).findNavController().navigateUp()
+        findNavController().navigateUp()
       }
-      icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
-      icon = requireContext().getDrawableExt(CommonR.drawable.ic_action_apply)
     }
-
-    setSeekBars()
-    setClickListeners()
   }
 
-  override fun onStart() {
-    super.onStart()
-
-    if (pointerType == POINTER_TOUCH) {
-      binding.imageCustomizePointer.transitionName =
-        getString(CommonR.string.main_fragment_transition)
+  @SuppressLint("CheckResult")
+  private fun showColorChooser() {
+    val tmpColor = if (pointerType == POINTER_TOUCH) {
+      settings.pointerTmpColor
     } else {
-      binding.imageCustomizePointer.transitionName =
-        getString(CommonR.string.transition_mouse)
+      settings.mouseTmpColor
     }
-    TransitionSet()
-      .addTransition(ChangeBounds())
-      .addTransition(ChangeTransform())
-      .apply {
-        ordering = TransitionSet.ORDERING_TOGETHER
-        duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-        interpolator = FastOutSlowInInterpolator()
-        sharedElementEnterTransition = this
+
+    MaterialDialog(requireContext()).show {
+      title(CommonR.string.choose_color)
+      colorChooser(
+        ColorPalette.Primary,
+        ColorPalette.PrimarySub,
+        allowCustomArgb = true,
+        showAlphaSelector = true,
+        initialSelection = tmpColor,
+      ) { _, selectedColor ->
+        colorState.value = selectedColor
+        if (pointerType == POINTER_TOUCH) {
+          settings.pointerTmpColor = selectedColor
+        } else {
+          settings.mouseTmpColor = selectedColor
+        }
       }
+      positiveButton(android.R.string.ok)
+      negativeButton(android.R.string.cancel)
+    }
   }
 
-  private val minSize: Int
-    get() = requireContext().getMinPointerSize()
+  private fun resetColor() {
+    if (pointerType == POINTER_TOUCH) {
+      settings.pointerTmpColor = 0
+    } else {
+      settings.mouseTmpColor = 0
+    }
+    colorState.value = 0
+  }
+}
 
-  /**
-   * Set initial values to SeekBar
-   */
-  private fun setSeekBars() {
-    val maxSize = settings.maxPointerSize
-    val maxPadding = settings.maxPointerPadding
-    val alpha = typeAlpha
-    val pointerSize = typeSize
-    val padding = typePadding
-    val formatTextSize = "%s: %d*%d "
-    val formatPadding = "| %s: %d "
-
-    binding.apply {
-      with(settings.isEnableAlpha) {
-        alphaBarLayout.visible(this)
-        textAlpha.visible(this)
-      }
-
-      imageCustomizePointer.imageAlpha = alpha
-
-      // pointer size
-      seekBarSize.max = maxSize - minSize
-      seekBarSize.progress = pointerSize - minSize
-      textSize.text =
-        String.format(
-          formatTextSize,
-          getString(CommonR.string.text_size),
-          pointerSize,
-          pointerSize,
+@Composable
+fun CustomizePointerScreen(
+  typePath: String,
+  size: Int,
+  minSize: Int,
+  maxSize: Int,
+  padding: Int,
+  maxPadding: Int,
+  alpha: Int,
+  isAlphaEnabled: Boolean,
+  tintColor: Int,
+  onSizeChange: (Int) -> Unit,
+  onPaddingChange: (Int) -> Unit,
+  onAlphaChange: (Int) -> Unit,
+  onChangeColorClick: () -> Unit,
+  onResetColorClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState())
+      .padding(16.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    Card(
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        Text(
+          text = stringResource(CommonR.string.pointer_preview),
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
         )
 
-      // pointer padding
-      seekBarPadding.max = maxPadding
-      seekBarPadding.progress = padding
-      textPadding.text =
-        String.format(formatPadding, getString(CommonR.string.text_padding), padding)
+        Box(
+          modifier = Modifier
+            .size(100.dp)
+            .clip(RoundedCornerShape(8.dp)),
+          contentAlignment = Alignment.Center,
+        ) {
+          val imageBitmap = ImageBitmap.imageResource(id = CommonR.drawable.transparent_rect)
 
-      // pointer alpha
-      textAlpha.text =
-        String.format(formatPadding, getString(CommonR.string.text_alpha), alpha)
-      seekBarAlpha.progress = alpha
-
-      var currentSize: Int = seekBarSize.progress + minSize
-      setPointerImageParams(currentSize, padding)
-
-      seekBarSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar?, newProgress: Int, fromUser: Boolean) {
-          currentSize = minSize + newProgress
-          textSize.text =
-            String.format(
-              Locale.US,
-              formatTextSize,
-              getString(CommonR.string.text_size),
-              currentSize,
-              currentSize,
+          // Remember the brush so it doesn't get re-allocated on every recomposition
+          val tiledBrush = remember(imageBitmap) {
+            ShaderBrush(
+              ImageShader(
+                image = imageBitmap,
+                tileModeX = TileMode.Repeated,
+                tileModeY = TileMode.Repeated,
+              ),
             )
-          setLayoutSize(currentSize)
-        }
+          }
+          Box(
+            modifier = Modifier
+              .fillMaxSize()
+              .background(tiledBrush),
+          )
 
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-          setPointerImageParams(currentSize, seekBarPadding.progress)
-        }
-      })
-
-      seekBarPadding.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        var imagePadding: Int = 0
-        override fun onProgressChanged(seekBar: SeekBar, newPadding: Int, fromUser: Boolean) {
-          textPadding.text =
-            String.format(
-              Locale.US,
-              formatPadding,
-              getString(CommonR.string.text_padding),
-              newPadding,
+          if (typePath.isNotEmpty()) {
+            val context = LocalContext.current
+            val painter = rememberAsyncImagePainter(
+              model = ImageRequest.Builder(context)
+                .data(File(typePath))
+                .crossfade(true)
+                .build(),
             )
-          setLayoutPadding(newPadding)
-          imagePadding = newPadding
-        }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-        }
+            val density = LocalDensity.current
+            val sizeDp = with(density) { size.toDp() }
+            val paddingDp = with(density) { padding.toDp() }
 
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-          setLayoutPadding(imagePadding)
-        }
-      })
-
-      seekBarAlpha.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-          textAlpha.text =
-            String.format(
-              Locale.US,
-              formatPadding,
-              getString(CommonR.string.text_alpha),
-              value,
+            Image(
+              painter = painter,
+              contentDescription = null,
+              colorFilter = if (tintColor != 0) ColorFilter.tint(Color(tintColor)) else null,
+              alpha = alpha / 255f,
+              modifier = Modifier
+                .size(sizeDp)
+                .padding(paddingDp),
             )
-          imageCustomizePointer.imageAlpha = value
+          }
+        }
+      }
+    }
+
+    Card(
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+          Text(
+            text = "${stringResource(CommonR.string.text_size)}: $size*$size",
+            style = MaterialTheme.typography.bodyMedium,
+          )
+          Text(
+            text = "| ${stringResource(CommonR.string.text_padding)}: $padding",
+            style = MaterialTheme.typography.bodyMedium,
+          )
+          if (isAlphaEnabled) {
+            Text(
+              text = "| ${stringResource(CommonR.string.text_alpha)}: $alpha",
+              style = MaterialTheme.typography.bodyMedium,
+            )
+          }
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-        }
+        SliderControlRow(
+          value = size,
+          valueRange = minSize.toFloat()..maxSize.toFloat(),
+          onValueChange = onSizeChange,
+          contentDescriptionMinus = "Decrease size",
+          contentDescriptionPlus = "Increase size",
+        )
 
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-          imageCustomizePointer.imageAlpha = seekBar.progress
+        SliderControlRow(
+          value = padding,
+          valueRange = 0f..maxPadding.toFloat(),
+          onValueChange = onPaddingChange,
+          contentDescriptionMinus = "Decrease padding",
+          contentDescriptionPlus = "Increase padding",
+        )
+
+        if (isAlphaEnabled) {
+          SliderControlRow(
+            value = alpha,
+            valueRange = 0f..255f,
+            onValueChange = onAlphaChange,
+            contentDescriptionMinus = "Decrease alpha",
+            contentDescriptionPlus = "Increase alpha",
+          )
         }
-      })
+      }
+    }
+
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+    ) {
+      OutlinedButton(
+        onClick = onResetColorClick,
+      ) {
+        Text(text = stringResource(CommonR.string.reset_color))
+      }
+      Button(
+        onClick = onChangeColorClick,
+      ) {
+        Text(text = stringResource(CommonR.string.change_color))
+      }
     }
   }
+}
 
-  private fun setPointerImageParams(size: Int, padding: Int) {
-    setLayoutSize(size)
-    setLayoutPadding(padding)
-  }
+@Composable
+private fun SliderControlRow(
+  value: Int,
+  valueRange: ClosedFloatingPointRange<Float>,
+  onValueChange: (Int) -> Unit,
+  contentDescriptionMinus: String,
+  contentDescriptionPlus: String,
+  modifier: Modifier = Modifier,
+) {
+  Row(
+    modifier = modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    IconButton(
+      onClick = {
+        onValueChange((value - 1).coerceAtLeast(valueRange.start.toInt()))
+      },
+    ) {
+      Icon(
+        painter = painterResource(CommonR.drawable.ic_action_minus),
+        contentDescription = contentDescriptionMinus,
+      )
+    }
 
-  private fun setLayoutSize(size: Int) {
-    binding.imageCustomizePointer.layoutParams =
-      FrameLayout.LayoutParams(size, size, Gravity.CENTER)
-  }
+    Slider(
+      value = value.toFloat(),
+      onValueChange = { onValueChange(it.roundToInt()) },
+      valueRange = valueRange,
+      modifier = Modifier.weight(1f),
+    )
 
-  private fun setLayoutPadding(padding: Int) {
-    binding.imageCustomizePointer.setPadding(padding, padding, padding, padding)
-  }
-
-  private fun setClickListeners() {
-    binding.apply {
-      butMinus.setOnClickListener {
-        seekBarSize.progress -= 1
-      }
-
-      butPlus.setOnClickListener {
-        seekBarSize.progress += 1
-      }
-
-      butPaddingPlus.setOnClickListener {
-        seekBarPadding.progress += 1
-      }
-
-      butPaddingMinus.setOnClickListener {
-        seekBarPadding.progress -= 1
-      }
-
-      butAlphaMinus.setOnClickListener {
-        seekBarAlpha.progress -= 1
-      }
-
-      butAlphaPlus.setOnClickListener {
-        seekBarAlpha.progress += 1
-      }
-
-      actionChangeColor.setOnClickListener {
-        val tmpColor = if (pointerType ==
-          POINTER_TOUCH
-        ) {
-          settings.pointerTmpColor
-        } else {
-          settings.mouseTmpColor
-        }
-
-        MaterialDialog(requireContext(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
-          title(CommonR.string.choose_color)
-          val dialog = colorChooser(
-            ColorPalette.Primary,
-            ColorPalette.PrimarySub,
-            allowCustomArgb = true,
-            showAlphaSelector = true,
-            initialSelection = tmpColor,
-          ) { _, selectedColor ->
-            imageCustomizePointer.setColorFilter(selectedColor)
-            this@CustomizeFragment.selectedColor = selectedColor
-            if (pointerType == POINTER_TOUCH) {
-              settings.pointerTmpColor = selectedColor
-            } else {
-              settings.mouseTmpColor = selectedColor
-            }
-          }
-          positiveButton(android.R.string.ok)
-          negativeButton(android.R.string.cancel)
-        }
-      }
-
-      actionResetColor.setOnClickListener {
-        if (pointerType == POINTER_TOUCH) {
-          settings.pointerTmpColor = 0
-        } else {
-          settings.mouseTmpColor = 0
-        }
-        selectedColor = 0
-        imageCustomizePointer.setColorFilter(0)
-      }
+    IconButton(
+      onClick = {
+        onValueChange((value + 1).coerceAtMost(valueRange.endInclusive.toInt()))
+      },
+    ) {
+      Icon(
+        painter = painterResource(CommonR.drawable.ic_action_plus),
+        contentDescription = contentDescriptionPlus,
+      )
     }
   }
 }
